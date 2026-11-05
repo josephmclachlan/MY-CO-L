@@ -39,6 +39,11 @@ No sound plays on its own. Each sound is called at the moment something appears 
 | PROCESSING indicator | `warble()` |
 | ALERT flash | `alarm(true)` ... `alarm(false)` |
 
+Typing has two voices. **CLACK** (default) is chonky and clacky (Joseph, 5 Nov 2026): a heavy mechanical
+keyboard, a typewriter, a scantron reader and an 80s tractor-feed printer. Each step is a switch click,
+a metal strike and a heavy bottom-out thock; long readouts (3+ characters per step) sound like a dot-matrix
+head; each new line gets a paper-feed ratchet. **BLIP** is the electronic voice from the first sound study.
+
 Idle is the quiet room hum only. The optional ambience layer (rumble + air hiss) is off by default.
 CHATTER mode (default) chatters while text prints; TICK mode gives one tick per line or action.
 Glitches (dropouts and crackle) only happen while text is printing, and always with a visual glitch.

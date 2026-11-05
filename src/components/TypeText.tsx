@@ -76,7 +76,7 @@ export function TypeText({ lines, group = 1, speed, instant, onDone, className }
       const inLine = count - lineStart
       const next = Math.min(lineStart + line.text.length, count + group)
       const ch = line.text.slice(inLine, inLine + (next - count)).trimStart()[0] ?? ' '
-      sound.typeChar(ch, lineIdx, inLine)
+      sound.typeChar(ch, lineIdx, inLine, next - count)
       count = next
       setShown(count)
       timer = window.setTimeout(step, 1000 / steps)

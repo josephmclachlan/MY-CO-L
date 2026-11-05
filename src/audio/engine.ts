@@ -65,6 +65,7 @@ export class SoundEngine {
   private alarmTimer: number | null = null
   private lastBlip = 0
   private lastTickLine = -1
+  private lastFeedLine = -1
   private printing = 0
   private glitchListeners = new Set<GlitchListener>()
 
@@ -203,8 +204,12 @@ export class SoundEngine {
     this.printing = Math.max(0, this.printing - 1)
   }
 
-  /** One character has just appeared on screen. `line` keeps pitch steady per line. */
-  typeChar(ch: string, line: number, charIndex: number): void {
+  /**
+   * One step of text has just appeared on screen. `line` keeps the voice steady
+   * per line; `group` is how many characters landed in this step (3+ = a long
+   * readout, which sounds like a printer rather than a keyboard).
+   */
+  typeChar(ch: string, line: number, charIndex: number, group = 1): void {
     const ctx = this.live()
     if (!ctx || ch.trim() === '') return
     const t = ctx.currentTime
@@ -216,14 +221,79 @@ export class SoundEngine {
       }
       return
     }
-    // Long fast readouts: cap at ~30 blips a second so it stays a texture.
+    // Long fast readouts: cap at ~30 hits a second so it stays a texture.
     if (t - this.lastBlip < 0.033) return
     this.lastBlip = t
+    if (this.settings.typingVoice === 'CLACK') {
+      // Paper advance (line feed) as each new line starts.
+      if (line !== this.lastFeedLine && line < 98) {
+        this.lastFeedLine = line
+        if (charIndex > 0 || line > 0) this.lineFeed(t)
+      }
+      if (group >= 3) this.printerRasp(t + 0.004, line)
+      else this.keyClack(t, line)
+      this.maybeGlitch(t)
+      return
+    }
     const base = (line * 7 + 3) % BLIP_SET.length
     const idx = Math.min(BLIP_SET.length - 1, Math.max(0, base + Math.floor(rand(-2, 3))))
     const f = BLIP_SET[idx] * rand(0.985, 1.015)
     this.tone('typing', 'square', f, t, rand(0.018, 0.032), 0.5, { filter: 3800, attack: 0.002 })
     this.maybeGlitch(t)
+  }
+
+  // ---------- the CLACK voice ----------
+  // Chonky and clacky (Joseph, 5 Nov 2026): a heavy mechanical keyboard, a
+  // typewriter, a scantron reader and an 80s tractor-feed printer. Built from
+  // filtered noise hits with fast decays, plus a short falling thump.
+
+  /** A noise hit with a sharp start and an exponential decay. */
+  private hit(t: number, peak: number, decay: number, type: BiquadFilterType, freq: number, q: number) {
+    const ctx = this.ctx!
+    const src = ctx.createBufferSource()
+    src.buffer = this.noise
+    const f = ctx.createBiquadFilter()
+    f.type = type
+    f.frequency.value = freq
+    f.Q.value = q
+    const g = ctx.createGain()
+    g.gain.setValueAtTime(0.0001, t)
+    g.gain.linearRampToValueAtTime(peak, t + 0.0008)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.0008 + decay * 4)
+    src.connect(f).connect(g).connect(this.bus.typing)
+    src.start(t, Math.random() * 1.8)
+    src.stop(t + decay * 4 + 0.02)
+  }
+
+  /** One key: switch click, metal strike, then the heavy bottom-out thock. */
+  private keyClack(t: number, line: number) {
+    const lineShift = 1 + ((line * 5) % 7) * 0.025 // each line sits a little differently
+    // Switch click: bright and very short.
+    this.hit(t, 0.55, 0.004, 'highpass', rand(2800, 4200), 0.7)
+    // Typebar / plate strike: a short metallic ring.
+    this.hit(t + 0.002, 1.4, rand(0.012, 0.02), 'bandpass', rand(1150, 1650) * lineShift, 7)
+    // Bottom-out thock a few ms later (key travel), with a falling thump.
+    const th = t + rand(0.004, 0.009)
+    this.hit(th, 2.4, rand(0.03, 0.045), 'bandpass', rand(170, 250) * lineShift, 2.2)
+    this.tone('typing', 'sine', rand(150, 175), th, 0.045, 0.55, { to: 70, attack: 0.001 })
+    // Sometimes the spring rattles on the way back up.
+    if (Math.random() < 0.3) this.hit(t + rand(0.018, 0.03), 0.22, 0.004, 'bandpass', rand(2200, 3200), 3)
+  }
+
+  /** Long readouts: a dot-matrix head rasp (a burst of tiny pin hits ~600/s) with a soft platen knock. */
+  private printerRasp(t: number, line: number) {
+    const pins = 8 + Math.floor(Math.random() * 7)
+    const gap = rand(0.0014, 0.0019)
+    const f = (2000 + ((line * 3) % 5) * 180) * rand(0.97, 1.03)
+    for (let i = 0; i < pins; i++) this.hit(t + i * gap, rand(0.25, 0.4), 0.0018, 'bandpass', f, 3)
+    this.hit(t, 0.7, 0.02, 'bandpass', rand(260, 340), 2)
+    if (Math.random() < 0.25) this.keyClack(t + pins * gap + 0.004, line)
+  }
+
+  /** Scantron / tractor-feed paper advance: a quick ratchet and a low thud. */
+  private lineFeed(t: number) {
+    for (let i = 0; i < 3; i++) this.hit(t + i * 0.016, 0.35, 0.006, 'bandpass', rand(850, 1050), 4)
+    this.hit(t + 0.05, 0.9, 0.035, 'lowpass', 140, 0.8)
   }
 
   private tick(t: number) {
