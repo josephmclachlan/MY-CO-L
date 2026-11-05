@@ -7,6 +7,7 @@ import { DataColumns } from '../components/DataColumns'
 
 type Test =
   | { kind: 'typing' }
+  | { kind: 'readout' }
   | { kind: 'chatter' }
   | { kind: 'drone' }
   | { kind: 'warble' }
@@ -148,6 +149,17 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
           <button type="button" className="btn" disabled={disabled} onClick={() => run({ kind: 'typing' })}>
             TEST TYPING
           </button>
+          <button type="button" className="btn" disabled={disabled} onClick={() => run({ kind: 'readout' })}>
+            TEST READOUT
+          </button>
+        </div>
+        <div className="tune-row">
+          <span className="lbl">TYPING VOICE</span>
+          {(['CLACK', 'BLIP'] as const).map((v) => (
+            <button key={v} type="button" className={`btn ${snd.typingVoice === v ? 'on' : ''}`} onClick={() => setSound('typingVoice', v)}>
+              {v}
+            </button>
+          ))}
         </div>
 
         <Meter label="DATA CHATTER" value={snd.chatter} onChange={(v) => setSound('chatter', v)} format={pct} disabled={disabled} />
@@ -261,6 +273,14 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
           <TypeText
             key={test.id}
             lines={['LOT B1104 // 40 BLOCKS // KNOCKED TUE', 'BREAKER S17 // 75X // 1650W // CIRCUIT CLEAR']}
+          />
+        )}
+        {test?.t.kind === 'readout' && (
+          <TypeText
+            key={test.id}
+            group={5}
+            speed={20}
+            lines={['S13 MEGACHEF 1 ..... 1200W', 'S14 MEGACHEF 2 ..... 1200W', 'S15 MEGACHEF 3 ..... 1200W', 'S16 MEGACHEF 4 ..... 1200W', 'S17 75X ............ 1650W']}
           />
         )}
         {test?.t.kind === 'chatter' && <DataColumns key={test.id} rows={3} cols={4} duration={2000} />}
