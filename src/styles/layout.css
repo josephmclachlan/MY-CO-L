@@ -179,7 +179,11 @@
   min-height: 0;
 }
 .body.has-index {
-  grid-template-columns: minmax(0, 1fr) minmax(170px, 23%);
+  /* Menus sit on the left on desktop (Joseph, 5 Nov 2026). */
+  grid-template-columns: minmax(170px, 23%) minmax(0, 1fr);
+}
+.body.has-index .index-panel {
+  order: -1;
 }
 .panel {
   border: 1px solid var(--fg-dim);
@@ -285,6 +289,10 @@
   }
   .index-panel {
     max-height: 26vh;
+  }
+  /* On a phone the index stays under the screen. */
+  .body.has-index .index-panel {
+    order: 0;
   }
   .keybar {
     grid-template-columns: repeat(4, minmax(0, 1fr));
