@@ -3,6 +3,12 @@ import { MODULES, STATION } from '../data/farm'
 import { Wireframe } from '../components/Wireframe'
 import { TypeText } from '../components/TypeText'
 
+/** Own little sign per module, in the spirit of the door-sign set. Original shapes only. */
+const GLYPHS: Record<string, string> = {
+  SPECIMEN: '\u25C8', VITALS: '\u25B2', DECK: '\u25A3', CARGO: '\u25A4', XENO: '\u2B21',
+  HAZARD: '\u26A0', PROPULSION: '\u224B', LEDGER: '\u25EB', TRADE: '\u21C4', SEQUENCE: '\u25A6', MANUAL: '\u25A5',
+}
+
 interface Props {
   selected: number
   setSelected: (n: number) => void
@@ -55,7 +61,7 @@ export function Menu({ selected, setSelected, onOpen, firstShow }: Props) {
                 onClick={() => onOpen(i)}
               >
                 <span>{String(m.num).padStart(2, '0')}</span>
-                <span className="mi-name">{m.name}</span>
+                <span className="mi-name"><span className="mi-glyph" aria-hidden="true">{GLYPHS[m.key] ?? '\u25C7'}</span>{m.name}</span>
                 <span className="mi-what">{m.what}</span>
               </li>
             ))}

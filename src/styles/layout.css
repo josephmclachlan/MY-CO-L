@@ -662,3 +662,7 @@
 .logo-svg rect { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw var(--draw) linear forwards; }
 .logo.wire-static .logo-svg rect { animation: none; stroke-dashoffset: 0; }
 .logo-band { stroke-width: 2.6; }
+
+/* Module sign glyphs in the main menu. */
+.menu-item .mi-glyph { display: inline-block; width: 1.5em; color: var(--fg-dim); }
+.menu-item.sel .mi-glyph { color: var(--bg); }
