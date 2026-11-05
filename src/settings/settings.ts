@@ -7,6 +7,7 @@ export const THEMES: ThemeName[] = ['PHOSPHOR', 'CRYO', 'SODIUM', 'ALERT']
 
 export type DataFont = 'SHARE TECH MONO' | 'VT323'
 export type SoundMode = 'CHATTER' | 'TICK'
+export type TypingVoice = 'CLACK' | 'BLIP'
 
 export interface LookSettings {
   theme: ThemeName
@@ -25,6 +26,7 @@ export interface LookSettings {
 export interface SoundSettings {
   enabled: boolean
   mode: SoundMode
+  typingVoice: TypingVoice // CLACK = keyboard, typewriter and printer; BLIP = electronic
   master: number // 0..1
   typing: number // blip per character
   chatter: number // data bursts locked to data animations
@@ -62,6 +64,7 @@ export const DEFAULTS: Settings = {
   sound: {
     enabled: true,
     mode: 'CHATTER',
+    typingVoice: 'CLACK',
     master: 0.5,
     typing: 0.55,
     chatter: 0.45,
