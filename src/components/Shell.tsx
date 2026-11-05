@@ -39,6 +39,7 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
   const clock = useClock()
   const [cmd, setCmd] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const mainRef = useRef<HTMLElement>(null)
   const [online, setOnline] = useState(() => navigator.onLine)
 
   useEffect(() => {
@@ -53,6 +54,8 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
   }, [])
 
   useEffect(() => {
+    // Each new screen starts at the top.
+    mainRef.current?.scrollTo({ top: 0 })
     // Don't pop the phone keyboard up on every screen change.
     if (window.matchMedia('(pointer: fine)').matches) inputRef.current?.focus({ preventScroll: true })
   }, [focusToken])
@@ -77,7 +80,7 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
         <span>{settings.look.clean ? 'CLEAN' : settings.look.theme}</span>
       </div>
       <div className={`body ${index ? 'has-index' : ''} ${bodyClass ?? ''}`}>
-        <main className="panel main-panel">{children}</main>
+        <main className="panel main-panel" ref={mainRef}>{children}</main>
         {index && <aside className="panel index-panel">{index}</aside>}
       </div>
       <form

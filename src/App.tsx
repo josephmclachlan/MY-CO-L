@@ -11,10 +11,18 @@ import { Pending } from './screens/Pending'
 import { Help } from './screens/Help'
 import { Login } from './screens/Login'
 import { MODULES, STATION } from './data/farm'
+import { Vitals, VitalsIndex } from './screens/Vitals'
+import { DeckPlan, DeckIndex } from './screens/DeckPlan'
+import { usePower } from './power/PowerContext'
+import { allCircuits, type RoomId } from './data/power'
+import { ROOMS } from './data/rooms'
 import { dbLinked, supabase } from './lib/supabase'
 
 type Stage = 'power' | 'boot' | 'login' | 'shell'
 type View = { name: 'menu' } | { name: 'tune' } | { name: 'help' } | { name: 'status' } | { name: 'login' } | { name: 'module'; idx: number }
+
+const VITALS_IDX = MODULES.findIndex((m) => m.key === 'VITALS')
+const DECK_IDX = MODULES.findIndex((m) => m.key === 'DECK')
 
 const TITLES: Record<View['name'], string> = {
   menu: 'MAIN MENU',
@@ -27,6 +35,7 @@ const TITLES: Record<View['name'], string> = {
 
 export default function App() {
   const { settings, update, sound, session } = useApp()
+  const power = usePower()
   const [stage, setStage] = useState<Stage>('power')
   const [view, setView] = useState<View>({ name: 'menu' })
   const [firstMenu, setFirstMenu] = useState(true)
@@ -154,7 +163,53 @@ export default function App() {
       setSelected(mod)
       return go({ name: 'module', idx: mod })
     }
+    // Power and rooms.
+    const openVitals = () => {
+      setSelected(VITALS_IDX)
+      if (!(view.name === 'module' && view.idx === VITALS_IDX)) go({ name: 'module', idx: VITALS_IDX })
+    }
+    const openRoom = (r: RoomId) => {
+      power.setSelectedRoom(r)
+      setSelected(DECK_IDX)
+      if (!(view.name === 'module' && view.idx === DECK_IDX)) go({ name: 'module', idx: DECK_IDX })
+      else sound.chirp()
+    }
+    const room = ROOMS.find((r) => r.id === cmd.toLowerCase() || r.name === raw.trim().toUpperCase())
+    if (room) return openRoom(room.id)
+    const brk = allCircuits(power.state.heater).find((c) => c.tag === cmd || c.tag.replace('-', '') === cmd)
+    if (brk && !/^[1-9]$/.test(cmd)) {
+      const was = power.on.has(brk.id)
+      power.toggle(brk.id)
+      power.setSelectedCircuit(brk.id)
+      openVitals()
+      return say(`${brk.tag} ${brk.short} ${was ? 'OFF' : 'ON'}${brk.id === 'bag' || brk.id === 'pump' ? ' (BAGGER AND PUMP LINKED)' : ''}`)
+    }
     switch (cmd) {
+      case 'UTILITY':
+      case 'ICE':
+        power.setSource('utility')
+        openVitals()
+        return say('SOURCE ICE UTILITY // BASELINE LOADED')
+      case 'GEN':
+      case 'GENERATOR':
+        power.setSource('generator')
+        openVitals()
+        return say('SOURCE GENERATOR // EMERGENCY LIST LOADED', true)
+      case 'HEATER': {
+        const h = arg.startsWith('B') || arg.includes('6') ? '6500' : arg.startsWith('A') || arg.includes('2') ? '2x4500' : null
+        if (!h) return say('USE HEATER A (2 X 4,500 W) OR HEATER B (1 X 6,500 W).', true)
+        power.setHeater(h)
+        openVitals()
+        return say(h === '6500' ? 'STEAM HEATER B // 1 X 6,500 W' : 'STEAM HEATER A // 2 X 4,500 W')
+      }
+      case 'BASELINE':
+        power.applyScenario('base')
+        openVitals()
+        return say('BASELINE // CONTINUOUS LOADS ONLY')
+      case 'EMERGENCY':
+        power.applyScenario('emerg')
+        openVitals()
+        return say('GENERATOR // EMERGENCY LIST', true)
       case 'MENU':
       case 'CORE':
         if (cmd === 'CORE') sound.whoosh()
@@ -331,9 +386,33 @@ export default function App() {
       break
     case 'module':
       title = MODULES[view.idx].name
-      content = <Pending mod={MODULES[view.idx]} />
+      if (view.idx === VITALS_IDX)
+        content = (
+          <Vitals
+            onOpenRoom={(r) => {
+              power.setSelectedRoom(r)
+              setSelected(DECK_IDX)
+              go({ name: 'module', idx: DECK_IDX })
+            }}
+          />
+        )
+      else if (view.idx === DECK_IDX)
+        content = (
+          <DeckPlan
+            onOpenVitals={() => {
+              setSelected(VITALS_IDX)
+              go({ name: 'module', idx: VITALS_IDX })
+            }}
+          />
+        )
+      else content = <Pending mod={MODULES[view.idx]} />
       break
   }
+
+  if (view.name === 'module' && view.idx === VITALS_IDX)
+    hints.module = 'TAP A BREAKER TO FLIP IT // TYPE A TAG (S4) OR GEN, UTILITY, HEATER A/B // F2 MENU'
+  if (view.name === 'module' && view.idx === DECK_IDX)
+    hints.module = 'TAP A ROOM // TYPE LAB, PACKING, INCUBATION, FRUITING OR BOILING // F2 MENU'
 
   const hint = reply ? (
     <TypeText key={reply.id} className={reply.warn ? 'warn' : ''} lines={[reply.text]} />
@@ -357,7 +436,15 @@ export default function App() {
         <>
           <Shell
             title={title}
-            index={view.name === 'tune' ? tuneIndex : moduleIndex}
+            index={
+              view.name === 'tune'
+                ? tuneIndex
+                : view.name === 'module' && view.idx === VITALS_IDX
+                  ? <VitalsIndex />
+                  : view.name === 'module' && view.idx === DECK_IDX
+                    ? <DeckIndex />
+                    : moduleIndex
+            }
             keys={keys}
             onKey={onKey}
             hint={hint}
@@ -366,7 +453,7 @@ export default function App() {
               onCommand(c)
             }}
             focusToken={focusToken}
-            bodyClass={`view-${view.name}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>

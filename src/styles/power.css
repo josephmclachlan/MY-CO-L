@@ -1,0 +1,578 @@
+/* VITALS and DECK PLAN. One phosphor colour; --warn only for warnings,
+   --hazard trim for generator mode and rooms in alarm. */
+
+.tiny {
+  font-size: 0.78em;
+}
+.box {
+  border: 1px solid var(--fg-faint);
+  padding: 10px 12px 12px;
+}
+.vitals,
+.deck {
+  display: grid;
+  gap: 12px;
+}
+.vitals > section {
+  scroll-margin-top: 8px;
+}
+
+/* generator mode: hazard trim round the whole main panel */
+.body:has(.gen-mode) .main-panel {
+  border: 2px dashed var(--hazard);
+}
+
+.unconf {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  font-size: 0.78em;
+  letter-spacing: 0.08em;
+  color: var(--hazard);
+  text-shadow: none;
+}
+
+.lv-near {
+  color: var(--hazard);
+}
+.lv-over {
+  color: var(--warn);
+}
+
+/* ---------- top controls ---------- */
+
+.v-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: center;
+}
+.seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.seg-lbl {
+  color: var(--fg-dim);
+  font-size: 0.85em;
+  margin-right: 2px;
+}
+.status-chip {
+  margin-left: auto;
+  border: 1px solid var(--fg);
+  padding: 4px 10px;
+  font-family: 'Michroma', sans-serif;
+  font-size: 0.7em;
+  letter-spacing: 0.12em;
+}
+.status-chip.lv-ok {
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+}
+.status-chip.lv-near {
+  border: 2px dashed var(--hazard);
+  color: var(--hazard);
+}
+.status-chip.lv-over {
+  border-color: var(--warn);
+  background: var(--warn);
+  color: var(--bg);
+  text-shadow: none;
+  animation: blink 0.8s steps(1) infinite;
+}
+.v-heatnote {
+  margin-top: -6px;
+}
+
+/* ---------- budget ---------- */
+
+.readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 10px 16px;
+  margin-bottom: 10px;
+}
+.ro {
+  display: grid;
+  gap: 1px;
+}
+.ro-k {
+  font-size: 0.75em;
+  color: var(--fg-dim);
+  letter-spacing: 0.1em;
+}
+.ro-v {
+  font-size: 1.3em;
+}
+.ro-v.big {
+  font-size: 1.9em;
+  line-height: 1.1;
+}
+.ro-s {
+  font-size: 0.75em;
+}
+
+.loadbar {
+  display: grid;
+  grid-template-columns: 3.2em minmax(0, 1fr) 5.4em;
+  gap: 10px;
+  align-items: center;
+  margin: 6px 0 18px;
+}
+.lb-label {
+  color: var(--fg-dim);
+}
+.lb-value {
+  text-align: right;
+}
+.lb-track {
+  position: relative;
+  height: 20px;
+  border: 1px solid var(--fg-dim);
+}
+.lb-fill {
+  position: absolute;
+  inset: 2px auto 2px 2px;
+  width: max(0px, calc(var(--pct) - 4px));
+  background: repeating-linear-gradient(-55deg, var(--fg) 0 2px, transparent 2px 5px);
+  box-shadow: 0 0 calc(8px * var(--glow-k)) var(--glow);
+  transition: width 0.25s steps(6);
+}
+.lv-near .lb-fill {
+  background: repeating-linear-gradient(-55deg, var(--hazard) 0 2px, transparent 2px 5px);
+}
+.lv-over .lb-fill {
+  background: repeating-linear-gradient(-55deg, var(--warn) 0 3px, transparent 3px 5px);
+}
+.lv-over .lb-track {
+  border-color: var(--warn);
+}
+.lv-over .lb-value,
+.lv-near .lb-value {
+  color: inherit;
+}
+.loadbar.lv-near .lb-value {
+  color: var(--hazard);
+}
+.loadbar.lv-over .lb-value {
+  color: var(--warn);
+}
+.lb-near {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 0;
+  border-left: 1px dashed var(--hazard);
+}
+.lb-scale b {
+  position: absolute;
+  top: calc(100% + 5px);
+  transform: translateX(-50%);
+  font-weight: normal;
+  font-size: 0.68em;
+  color: var(--fg-dim);
+  white-space: nowrap;
+}
+.lb-scale b:last-child {
+  transform: translateX(-100%);
+}
+.lb-scale b:first-child {
+  transform: none;
+}
+
+/* ---------- presets and rules ---------- */
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.btn.danger {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+.btn.danger.on {
+  background: var(--warn);
+  color: var(--bg);
+}
+.btn .dim-on {
+  opacity: 0.65;
+  margin-left: 4px;
+}
+.peak {
+  margin-top: 8px;
+  font-size: 0.85em;
+}
+.linkish {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  text-shadow: inherit;
+}
+
+/* ---------- breaker boxes ---------- */
+
+.brk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 6px;
+}
+.brk-grid.small {
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+}
+.brk {
+  font: inherit;
+  font-size: 0.82em;
+  color: var(--fg-dim);
+  background: transparent;
+  border: 1px solid var(--fg-faint);
+  padding: 5px 7px 6px;
+  text-align: left;
+  display: grid;
+  gap: 3px;
+  cursor: pointer;
+  text-shadow: none;
+  min-height: 82px;
+  position: relative;
+}
+.brk.compact {
+  min-height: 64px;
+}
+.brk:hover,
+.brk:focus-visible {
+  border-color: var(--fg-dim);
+  outline: none;
+}
+.brk.on {
+  color: var(--fg);
+  border-color: var(--fg);
+  text-shadow: inherit;
+  background: var(--bg-hi);
+}
+.brk.sel {
+  box-shadow: 0 0 0 1px var(--fg), 0 0 calc(10px * var(--glow-k)) var(--glow);
+}
+.b-head,
+.b-foot,
+.b-flags {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  align-items: center;
+}
+.b-tag {
+  font-family: 'Michroma', sans-serif;
+  font-size: 0.85em;
+}
+.b-leg,
+.b-flags {
+  font-size: 0.78em;
+  opacity: 0.8;
+}
+.b-flags span {
+  border: 1px solid currentColor;
+  padding: 0 3px;
+}
+.b-flags .b-amp {
+  border: 0;
+  margin-left: auto;
+}
+.b-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+}
+/* the little breaker lever: down = off, up = on */
+.b-sw {
+  width: 12px;
+  height: 18px;
+  border: 1px solid currentColor;
+  position: relative;
+  flex: none;
+}
+.b-sw i {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  height: 6px;
+  bottom: 2px;
+  background: currentColor;
+  transition: bottom 0.08s steps(2);
+}
+.brk.on .b-sw i {
+  bottom: 8px;
+}
+.brk.flash {
+  animation: brk-flash 0.22s steps(2) both;
+}
+@keyframes brk-flash {
+  0% { background: var(--fg); color: var(--bg); }
+  100% { }
+}
+
+.brk-detail .bd-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.facts.tight {
+  margin-top: 4px;
+  gap: 1px 12px;
+}
+.bd-items {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 0.86em;
+}
+.bd-items td {
+  border-top: 1px solid var(--fg-faint);
+  padding: 4px 6px 4px 0;
+  vertical-align: top;
+}
+.bd-items td.num {
+  text-align: right;
+  white-space: nowrap;
+}
+.wedit {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.wedit input {
+  font: inherit;
+  font-size: max(16px, 1em);
+  width: 5.5em;
+  color: var(--fg);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--fg-dim);
+  text-align: right;
+  text-shadow: inherit;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.wedit input:focus {
+  border-bottom-color: var(--fg);
+}
+
+/* ---------- deck plan ---------- */
+
+.deck-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .deck-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.deck-frame {
+  border: 1px solid var(--fg-faint);
+  padding: 6px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 1;
+}
+@media (max-width: 900px) {
+  .deck-frame {
+    position: static;
+  }
+}
+.deck-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+  font-family: 'Share Tech Mono', monospace;
+}
+.deck-wall {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 2;
+  stroke-linejoin: miter;
+  filter: drop-shadow(0 0 calc(3px * var(--glow-k)) var(--glow));
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 1.2s linear forwards;
+}
+.deck-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+.deck-room:hover .deck-hit,
+.deck-room:focus-visible .deck-hit {
+  fill: var(--fg-faint);
+  fill-opacity: 0.35;
+}
+.deck-room:focus {
+  outline: none;
+}
+.deck-room.sel .deck-hit {
+  fill: var(--fg-faint);
+  fill-opacity: 0.6;
+}
+.deck-room.sel .deck-wall {
+  stroke-width: 3.5;
+}
+.deck-room.alarm .deck-wall {
+  stroke: var(--hazard);
+}
+.deck-alarm {
+  fill: none;
+  stroke: var(--hazard);
+  stroke-width: 3;
+  stroke-dasharray: 12 8;
+  pointer-events: none;
+  animation: alarm-march 1s linear infinite;
+}
+@keyframes alarm-march {
+  to { stroke-dashoffset: -22; }
+}
+.deck-room.alarm .deck-label {
+  fill: var(--hazard);
+}
+.deck-label {
+  fill: var(--fg);
+  font-family: 'Michroma', sans-serif;
+  font-size: 17px;
+  letter-spacing: 0.12em;
+  text-anchor: middle;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 4px;
+}
+.deck-kw {
+  fill: var(--fg-dim);
+  font-size: 16px;
+  text-anchor: middle;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 4px;
+}
+.deck-room.sel .deck-kw {
+  fill: var(--fg);
+}
+.deck-inner {
+  fill: none;
+  stroke: var(--fg-dim);
+  stroke-width: 1;
+  stroke-dasharray: 6 4;
+}
+.deck-rack {
+  fill: none;
+  stroke: var(--fg-faint);
+  stroke-width: 1;
+}
+.deck-rack.faint,
+.deck-inner.faint {
+  stroke: var(--fg-faint);
+}
+.deck-note {
+  fill: var(--fg-dim);
+  font-size: 13px;
+}
+.deck-note.end {
+  text-anchor: end;
+}
+.glyph,
+.glyph * {
+  fill: none;
+  stroke: var(--fg-dim);
+  stroke-width: 1;
+  pointer-events: none;
+}
+.glyph.lit,
+.glyph.lit * {
+  stroke: var(--fg);
+  stroke-width: 1.6;
+  filter: drop-shadow(0 0 calc(3px * var(--glow-k)) var(--glow));
+}
+circle.glyph.lit,
+rect.glyph.lit {
+  fill: var(--fg);
+  fill-opacity: 0.25;
+}
+@media (prefers-reduced-motion: reduce) {
+  .deck-wall {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .deck-alarm {
+    animation: none;
+  }
+}
+
+.room-readout {
+  display: grid;
+  gap: 2px;
+}
+.rr-name {
+  font-family: 'Michroma', sans-serif;
+  letter-spacing: 0.12em;
+}
+.rr-sec {
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+.placeholder {
+  border: 1px dashed var(--fg-faint);
+  padding: 6px 8px;
+}
+.ph-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--fg-dim);
+}
+.index-list li.sel {
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+.index-list li.sel .k,
+.index-list li.sel .warn {
+  color: var(--bg);
+}
+
+@media (max-width: 700px) {
+  /* On a phone the screen itself carries the room list and live legs. */
+  .body.view-power .index-panel {
+    display: none;
+  }
+  .body.view-power {
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .status-chip {
+    margin-left: 0;
+  }
+  .loadbar {
+    grid-template-columns: 2.4em minmax(0, 1fr) 4.6em;
+  }
+  .lb-scale b:not(:first-child):not(:last-child) {
+    display: none;
+  }
+  .brk-grid {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  }
+  .brk {
+    min-height: 72px;
+  }
+  .bd-items td:nth-child(2) {
+    font-size: 0.9em;
+  }
+}
