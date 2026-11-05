@@ -5,6 +5,7 @@ import { useApp } from '../settings/AppContext'
 import { supabase } from '../lib/supabase'
 import { Store, MemoryBackend, type Backend, type Row } from '../lib/store'
 import { LocalBackend } from '../lib/localdb'
+import { saveRates, useRates } from './useRates'
 import { RemoteBackend } from '../lib/remotedb'
 
 const Ctx = createContext<Store | null>(null)
@@ -77,10 +78,15 @@ export function useCargoPrefs(): [CargoPrefs, (p: Partial<CargoPrefs>) => void] 
     (fn) => (prefListeners.add(fn), () => void prefListeners.delete(fn)),
     () => prefs,
   )
+  // The exchange rate is shared with PRICES + COSTS (saved in app_settings); the rest stays on the device.
+  const store = useStore()
+  const r = useRates()
   const set = (patch: Partial<CargoPrefs>) => {
+    if (patch.fx !== undefined && patch.fx > 0 && patch.fx !== r.fx) void saveRates(store, r, { fx: patch.fx }).catch(() => undefined)
     prefs = { ...prefs, ...patch }
     savePrefs(prefs)
     for (const l of prefListeners) l()
   }
-  return [p, set]
+  const merged = useMemo(() => (p.fx === r.fx ? p : { ...p, fx: r.fx }), [p, r.fx])
+  return [merged, set]
 }

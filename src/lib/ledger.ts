@@ -8,8 +8,8 @@
 //   LABOUR        hours from labour_entries x the hourly rate (switch and rate in LEDGER)
 //   WEAR          optional ₡ per block
 
-import { BILL_ESTIMATE_MID, ICE, LB_KG, PLAN_SPLIT, WEEK_BAGS, YIELD_LB, roomDays } from '../data/ledger'
-import { ICE_RATE_CRC } from '../data/cook'
+import { LB_KG, PLAN_SPLIT, WEEK_BAGS, YIELD_LB, roomDays } from '../data/ledger'
+import { estimateMid, rates } from './rates'
 import { plannedPeaks, segKwh, type CookRun } from './cook'
 import { runLines } from './stockplan'
 import type { Item, Move, Price } from './cargo'
@@ -186,7 +186,7 @@ export function planWeekCookCrc(): number {
     segKwh(plannedPeaks('steam_box', '2x4500', t).segs) +
     segKwh(plannedPeaks('megachef', '2x4500', t, 4).segs) +
     3 * segKwh(plannedPeaks('pressure_75x', '2x4500', t).segs)
-  return kwh * ICE_RATE_CRC * ICE.tax
+  return kwh * rates().ice.energyCrcPerKwh * rates().ice.tax
 }
 
 /** Bag-days in the rooms in a month of a full 130-bag farm (steady state). */
@@ -196,7 +196,7 @@ export function planBagDaysPerMonth(): number {
 
 /** Room energy per bag-day for a month with no bill: the package estimate less planned cooks, over a full farm. */
 export function planRoomRate(): number {
-  const room = BILL_ESTIMATE_MID - planWeekCookCrc() * (DAYS_PER_MONTH / 7)
+  const room = estimateMid() - planWeekCookCrc() * (DAYS_PER_MONTH / 7)
   return Math.max(0, room) / planBagDaysPerMonth()
 }
 
@@ -296,7 +296,8 @@ export function buildLedger(inp: LedgerInput, speciesName: (key: string) => stri
 
   // ---- cook energy ----
   const planCook = planWeekCookCrc()
-  const cookCrc = (r: CookRun) => Number(r.cost_crc ?? 0) * ICE.tax
+  // Priced at today's rate from the run's kWh, so a rate change on PRICES + COSTS reaches old runs too.
+  const cookCrc = (r: CookRun) => (r.kwh !== null && r.kwh !== undefined ? Number(r.kwh) * rates().ice.energyCrcPerKwh : Number(r.cost_crc ?? 0)) * rates().ice.tax
   const cookDay = (r: CookRun) => dayOf(r.started_at ?? (r.created_at as string | undefined) ?? '')
   const looseByWeek = new Map<string, number>()
   const cookWeeks = new Set<string>()
@@ -343,7 +344,7 @@ export function buildLedger(inp: LedgerInput, speciesName: (key: string) => stri
       monthRows.push({ month: ym, bill: Number(bill.total_crc), billBasis: 'ACTUAL', cook, room, bagDays, perBagDay: per })
       for (const [l, bd] of inMonth) addPart(parts.get(l.id)!.room, part(bd * per, 'ACTUAL'))
     } else {
-      monthRows.push({ month: ym, bill: BILL_ESTIMATE_MID, billBasis: 'ESTIMATE', cook, room: rate * bagDays, bagDays, perBagDay: rate })
+      monthRows.push({ month: ym, bill: estimateMid(), billBasis: 'ESTIMATE', cook, room: rate * bagDays, bagDays, perBagDay: rate })
       for (const [l, bd] of inMonth) addPart(parts.get(l.id)!.room, part(bd * rate, 'ESTIMATE', [`NO ICE BILL FOR ${ym}: PACKAGE ESTIMATE`]))
     }
   }

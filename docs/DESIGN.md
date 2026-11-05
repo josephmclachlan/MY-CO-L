@@ -123,3 +123,7 @@ Screen `src/screens/Propulsion.tsx` (parts in `CookParts.tsx`), logic `src/lib/c
 - Every part carries a basis (ACTUAL, ESTIMATE, MIXED, NONE) and notes; the screen shows a tag for anything that is
   not ACTUAL. Nothing here comes from the textbook, so there is no text gate to add.
 - Migration `0006_ledger_trade.sql` adds `sales.species_key`, `sales.lot_codes` and the `delivery` channel.
+- PRICES + COSTS: `src/lib/rates.ts` holds the one `Rates` record (defaults with sources, `mergeRates`, a live copy the
+  pure maths reads through `rates()`). `src/store/useRates.ts` loads row `rates` of `app_settings` (migration 0007) and
+  updates the live copy; App calls it once so every screen's maths sees changes. Cook runs are re-priced from their kWh
+  at the current rate. The CARGO exchange rate reads and writes the same record.
