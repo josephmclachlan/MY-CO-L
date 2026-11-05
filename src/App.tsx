@@ -21,6 +21,7 @@ import { Hazard, HazardIndex, HAZARD_START, HAZARD_TABS, type HazardState } from
 import { Propulsion, CookIndex, COOK_START, COOK_TABS, type CookState } from './screens/Propulsion'
 import { Ledger, LedgerIndex, LEDGER_START, type LedgerState } from './screens/Ledger'
 import { Trade, TradeIndex, TRADE_START, TRADE_TABS, type TradeState } from './screens/Trade'
+import { Mission, MissionIndex, MISSION_START, type MissionState } from './screens/Mission'
 import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
 import { useStoreStatus, useTable } from './store/StoreContext'
@@ -49,6 +50,7 @@ const HAZARD_IDX = MODULES.findIndex((m) => m.key === 'HAZARD')
 const COOK_IDX = MODULES.findIndex((m) => m.key === 'PROPULSION')
 const LEDGER_IDX = MODULES.findIndex((m) => m.key === 'LEDGER')
 const TRADE_IDX = MODULES.findIndex((m) => m.key === 'TRADE')
+const MISSION_IDX = MODULES.findIndex((m) => m.key === 'MISSION')
 
 /** Everything needed to put the terminal back on a screen: Back restores one of these. */
 interface Snap {
@@ -63,6 +65,7 @@ interface Snap {
   cook: CookState
   ledger: LedgerState
   trade: TradeState
+  mission: MissionState
 }
 const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
@@ -101,11 +104,13 @@ export default function App() {
   const setLedger = useCallback((p: Partial<LedgerState>) => setLedgerState((c) => ({ ...c, ...p })), [])
   const [trade, setTradeState] = useState<TradeState>(TRADE_START)
   const setTrade = useCallback((p: Partial<TradeState>) => setTradeState((c) => ({ ...c, ...p })), [])
+  const [mission, setMissionState] = useState<MissionState>(MISSION_START)
+  const setMission = useCallback((p: Partial<MissionState>) => setMissionState((c) => ({ ...c, ...p })), [])
   const strains = useTable<Strain>('strains')
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade }
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -145,6 +150,7 @@ export default function App() {
     setCookState(s.cook)
     setLedgerState(s.ledger)
     setTradeState(s.trade)
+    setMissionState(s.mission)
     power.setSelectedRoom(s.room)
     setReply(null)
     setSweep((n) => n + 1)
@@ -216,6 +222,14 @@ export default function App() {
     setTrade(p)
     setSelected(TRADE_IDX)
     if (!here) go({ name: 'module', idx: TRADE_IDX }, false)
+    else sound.chirp()
+  }
+  const openMission = (p: Partial<MissionState>) => {
+    const here = view.name === 'module' && view.idx === MISSION_IDX
+    if (!here) pushHist()
+    setMission(p)
+    setSelected(MISSION_IDX)
+    if (!here) go({ name: 'module', idx: MISSION_IDX }, false)
     else sound.chirp()
   }
   const openSpecies = (key: string) => {
@@ -388,6 +402,11 @@ export default function App() {
     if (['SALE', 'SALES', 'SELL', 'SOLD'].includes(cmd)) return openTrade({ tab: 'SALE' })
     const trTab = TRADE_TABS.find((t) => t === cmd)
     if (trTab && (trTab === 'TOTALS' || trTab === 'BUYERS' || (view.name === 'module' && view.idx === TRADE_IDX))) return openTrade({ tab: trTab })
+    // Lots and harvests: MISSION, BOARD, TODAY, HARVEST, LOT.
+    if (['MISSION', 'BOARD', 'LOTS'].includes(cmd)) return openMission({ tab: 'BOARD' })
+    if (['TODAY', 'TODO'].includes(cmd)) return openMission({ tab: 'TODAY' })
+    if (['HARVEST', 'PICK', 'PICKED'].includes(cmd)) return openMission({ tab: 'HARVEST' })
+    if (['LOT', 'NEWLOT', 'KNOCK'].includes(cmd)) return openMission({ tab: 'NEWLOT' })
     // Power and rooms.
     const openVitals = () => {
       setSelected(VITALS_IDX)
@@ -699,6 +718,7 @@ export default function App() {
             }}
           />
         )
+      else if (view.idx === MISSION_IDX) content = <Mission x={mission} set={setMission} say={say} />
       else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} />
       else if (view.idx === MANUAL_IDX) content = <Manual loc={manualLoc} onOpen={openManual} />
       else content = <Pending mod={MODULES[view.idx]} />
@@ -727,6 +747,8 @@ export default function App() {
     hints.module = 'PICK AT LEFT // NO TAG = LOGGED, ESTIMATE = FROM THE PLAN // TYPE BILLS, LABOUR OR TRADE // F2 MENU'
   if (view.name === 'module' && view.idx === TRADE_IDX)
     hints.module = 'NEW SALE: KG, TAP CHANNEL, SAVE // TYPE TOTALS, BUYERS OR LOG // MARGIN USES LEDGER COST // F2 MENU'
+  if (view.name === 'module' && view.idx === MISSION_IDX)
+    hints.module = 'BOARD SHOWS EVERY ACTIVE LOT // TYPE TODAY, HARVEST OR LOT // KG LOGGED FEEDS LEDGER AND TRADE // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
     hints.module = 'PICK A CHAPTER OR SECTION AT LEFT // TAP A LINK TO JUMP // BACK RETURNS TO WHERE YOU WERE // F2 MENU'
 
@@ -776,6 +798,8 @@ export default function App() {
                             ? <LedgerIndex x={ledger} set={setLedger} />
                           : view.name === 'module' && view.idx === TRADE_IDX
                             ? <TradeIndex x={trade} set={setTrade} />
+                          : view.name === 'module' && view.idx === MISSION_IDX
+                            ? <MissionIndex x={mission} set={setMission} />
                           : moduleIndex
             }
             keys={keys}
@@ -787,7 +811,7 @@ export default function App() {
             }}
             focusToken={focusToken}
             onBack={histLen > 0 ? goBack : undefined}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX) ? ' view-ledger' : ''}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX) ? ' view-ledger' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>
