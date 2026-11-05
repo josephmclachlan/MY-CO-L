@@ -111,3 +111,15 @@ Screen `src/screens/Propulsion.tsx` (parts in `CookParts.tsx`), logic `src/lib/c
 - Loads: `block_lots.cook_run_id` and `grain_runs.cook_run_id` (both columns exist since migration 0001) link the
   food that came out of a run. Losses logged in XENOGENETICS and the HAZARD INDEX show on the run.
 - Migration `0005_cook_log.sql` adds the columns the screen keeps (run it after 0004). Local mode needs nothing.
+
+## LEDGER and TRADE (costs and sales)
+
+- Maths in `src/lib/ledger.ts` (cost parts, bag-day sharing, plan week) and `src/lib/trade.ts` (totals, buyers,
+  margin); constants with their sources in `src/data/ledger.ts`; tests in `ledger.test.ts` and `trade.test.ts`.
+- `src/store/useLedger.ts` reads every table LEDGER needs and is shared with TRADE (margin = sale ₡ less LEDGER
+  cost per kg x kg, fresh only). LEDGER switches (labour, rate, wear) are saved on the device.
+- The ICE bill check is the package's own formula (`calculations/build_data.py`): (₡7,924.29 fixed + ₡59.67/kWh +
+  ₡9,861.68 per kW above 8 kW, 10 kW minimum) x 1.16.
+- Every part carries a basis (ACTUAL, ESTIMATE, MIXED, NONE) and notes; the screen shows a tag for anything that is
+  not ACTUAL. Nothing here comes from the textbook, so there is no text gate to add.
+- Migration `0006_ledger_trade.sql` adds `sales.species_key`, `sales.lot_codes` and the `delivery` channel.

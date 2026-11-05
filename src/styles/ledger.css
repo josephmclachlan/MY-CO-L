@@ -1,0 +1,46 @@
+/* LEDGER and TRADE. Reuses the cook log's boxes and inputs (.cook); one phosphor colour, hazard colour only for warnings.
+   The index is on the LEFT on desktop (standing rule). Phones hide it and use the picker at the top. */
+.body.view-ledger.has-index { grid-template-columns: minmax(200px, 26%) minmax(0, 1fr); }
+.lg-stack { display: grid; gap: 10px; min-width: 0; }
+.lg-card-head { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
+.lg-card-head b { font-weight: normal; letter-spacing: 0.12em; padding: 0 6px; background: var(--fg); color: var(--bg); text-shadow: none; }
+.lg-big { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5em, 1fr)); gap: 6px 14px; }
+.lg-big > div { display: grid; gap: 1px; border-left: 2px solid var(--fg-dim); padding-left: 8px; }
+.lg-big > div > span:first-child { color: var(--fg-dim); font-size: 0.75em; letter-spacing: 0.1em; }
+.lg-big b { font-weight: normal; font-size: 1.15em; }
+.lg-big .lg-money { font-size: 1.15em; }
+.lg-money small, .lg-pv small { color: var(--fg-dim); font-size: 0.72em; }
+.lg-parts, .lg-hbars { display: grid; gap: 4px; }
+.lg-part, .lg-hbar { display: grid; grid-template-columns: 9.5em minmax(60px, 1fr) minmax(0, max-content); gap: 2px 8px; align-items: center; font-size: 0.92em; }
+.lg-pl { color: var(--fg-dim); letter-spacing: 0.06em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lg-pn { grid-column: 1 / -1; font-style: normal; color: var(--fg-dim); font-size: 0.74em; padding-left: 9.5em; }
+.lg-bar { height: 10px; border: 1px solid var(--fg-faint); position: relative; }
+.lg-bar i { position: absolute; inset: 0 auto 0 0; background: repeating-linear-gradient(135deg, var(--fg) 0 2px, transparent 2px 5px); box-shadow: 0 0 4px var(--glow); }
+.lg-part.estimate .lg-bar i, .lg-part.mixed .lg-bar i { opacity: 0.6; }
+.lg-part.none { opacity: 0.6; }
+.lg-tag { display: inline-block; margin-left: 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.78em; letter-spacing: 0.08em; padding: 0 4px; border: 1px dashed var(--fg-dim); color: var(--fg-dim); text-shadow: none; white-space: nowrap; vertical-align: 1px; }
+.lg-tag.mixed { border-style: dotted; }
+.lg-tag.none { border-style: solid; opacity: 0.8; }
+.lg-warn, .lg-check.warn { border: 2px dashed var(--hazard); color: var(--hazard); padding: 6px 10px; text-shadow: none; }
+.lg-warn-text { color: var(--hazard) !important; text-shadow: none; }
+.lg-check { border: 1px solid var(--fg-dim); padding: 6px 10px; }
+.lg-table { border-collapse: collapse; font-size: 0.85em; min-width: 100%; }
+.lg-table th, .lg-table td { border: 1px solid var(--fg-faint); padding: 3px 6px; white-space: nowrap; text-align: left; }
+.lg-table th { color: var(--fg-dim); font-weight: normal; letter-spacing: 0.08em; }
+.lg-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.lg-btns .btn { min-height: 38px; }
+.lg-save { min-height: 48px; font-size: 1.1em; letter-spacing: 0.2em; }
+.lg-mini { display: grid; gap: 2px; padding: 4px 8px; color: var(--fg-dim); }
+.lg-chart { width: 100%; max-width: 640px; height: auto; display: block; }
+.lg-chart .bar { fill: var(--fg); opacity: 0.85; }
+.lg-chart .ax { stroke: var(--fg-dim); stroke-width: 1; }
+.lg-chart .lb { fill: var(--fg-dim); font-size: 9px; font-family: 'Share Tech Mono', monospace; }
+
+@media (max-width: 700px) {
+  .body.view-ledger.has-index { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  .body.view-ledger.has-index .index-panel { display: none; }
+  .lg-part, .lg-hbar { grid-template-columns: 7.5em minmax(40px, 1fr); }
+  .lg-part .lg-pv, .lg-hbar .lg-pv { grid-column: 1 / -1; }
+  .lg-pn { padding-left: 0; }
+  .lg-sale .lg-btns .btn { flex: 1 1 30%; }
+}

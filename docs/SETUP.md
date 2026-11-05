@@ -67,7 +67,8 @@ the address, so this is for testing until launch, before your MycoWizards refere
    **Then the genetics lab.** Same way: copy `supabase/migrations/0003_genetics.sql`, paste, **Run**. It lets the
    XENOGENETICS screen store strains by species, master (P0) cultures, water tubes and cryovials, grain-run status
    and cold-storage dates. Then `0004_hazard_links.sql` (loss logging against the HAZARD INDEX) and
-   `0005_cook_log.sql` (the PROPULSION cook log columns). Run each file once, in number order.
+   `0005_cook_log.sql` (the PROPULSION cook log columns), then `0006_ledger_trade.sql` (sales species, lot codes and
+   the DELIVERY channel). Run each file once, in number order.
 7. **Copy the two public values.** **Project Settings** (gear icon) > **API Keys** (or **Data API**):
    - the **Project URL** (looks like `https://abcd1234.supabase.co`)
    - the **publishable** key (or, on older screens, the **anon public** key).
