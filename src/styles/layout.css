@@ -375,9 +375,11 @@
   .menu-wire {
     order: -1;
   }
-  .menu-wire svg {
-    width: 120px !important;
-    height: 120px !important;
+  /* The logo scales as one piece: container sets the size, globe and overlay fill it. */
+  .menu-wire .logo {
+    width: min(260px, 78vw) !important;
+    height: auto !important;
+    aspect-ratio: 260 / 200;
   }
   /* On a phone the menu list already is the index. */
   .body.view-menu .index-panel {
