@@ -52,10 +52,10 @@ function fillFor(pat: string): { fill: string; stroke?: boolean } {
 function Cart({ slots, loaded, sealed, steam }: { slots: { pat: string }[]; loaded: number; sealed: number; steam: number }) {
   const W = 330
   const H = 200
-  const bw = 9.5
+  const gx = 2
+  const x0 = 22
+  const bw = (W - 20 - 2 * 12 - (SLOTS - 1) * gx) / SLOTS // bags always fit inside the box outline
   const bh = 24
-  const gx = 2.2
-  const x0 = 24
   const y0 = 18
   return (
     <svg className="seq-cart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Steam box cart loading with bags">
@@ -98,11 +98,11 @@ function Cart({ slots, loaded, sealed, steam }: { slots: { pat: string }[]; load
   )
 }
 
-function Bar({ label, p, state }: { label: string; p: number; state: 'wait' | 'run' | 'ok' }) {
+function Bar({ label, p, state, keep }: { label: string; p: number; state: 'wait' | 'run' | 'ok'; keep?: boolean }) {
   const cells = 30
   const on = Math.round(p * cells)
   return (
-    <div className={`seq-bar ${state}`}>
+    <div className={`seq-bar ${state} ${keep ? 'keep' : ''}`}>
       <span className="seq-bar-l">{label}</span>
       <span className="seq-bar-t" aria-hidden>
         {Array.from({ length: cells }).map((_, i) => <i key={i} className={i < on ? 'on' : ''} />)}
@@ -156,7 +156,7 @@ export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
     soundOn.current = true
     setPhase(PHASES[0].id)
     setP(0)
-    window.setTimeout(() => stageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80)
+    window.setTimeout(() => stageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
     const tick = (now: number) => {
       const ph = PHASES[i]
       const f = Math.min(1, (now - t0) / ph.ms)
@@ -214,6 +214,19 @@ export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
   return (
     <div className="planner seq">
       <div className="section-title">PRODUCTION SEQUENCE</div>
+      {phase !== 'idle' && (
+        <div className={`seq-stage ${phase === 'done' ? 'finished' : ''}`} ref={stageRef}>
+          <div className="seq-abort">{running && <button onClick={reset}>ABORT</button>}</div>
+          <div className="section-title">STEAM BOX // CART 1 OF {carts} // {perCart} BAGS // ~{Math.round(perCart * 10 * 0.4536)} KG</div>
+          <Cart slots={slots} loaded={loaded} sealed={sealed} steam={steam} />
+          <div className="seq-bars">
+            {PHASES.map((ph, k) => <Bar key={ph.id} label={ph.label} p={prog(k)} state={state(k)} />)}
+            <Bar keep label="BAGS LOADED" p={perCart ? loaded / perCart : 0} state={phase === 'done' ? 'ok' : loaded ? 'run' : 'wait'} />
+          </div>
+          <div className="tiny dim">SCHEMATIC, NOT TO SCALE. TIER SPACING IS NOT IN THE SOURCES. CART {CART_BAGS} X 10 LB BAGS (STEAM BOX REV D).</div>
+          {phase === 'done' && <TypeText group={3} lines={[`SEQUENCE COMPLETE. ${bags} BAGS IN ${carts} LOAD${carts > 1 ? 'S' : ''}. STEAM HOLD ${STEAM_HOLD_H} H.`, { text: 'ANIMATION ONLY. THIS DOES NOT CONTROL THE BOILER OR LOG A COOK.', cls: 'dim' }]} />}
+        </div>
+      )}
       <TypeText group={3} className="dim" lines={['SET THE BAG RUN. PICK A SUGGESTION OR TICK SPECIES. THE RATIO FOLLOWS THE CROP PLAN. THEN INITIATE.']} />
       <label className="pl-bags">
         <span>BAGS THIS RUN</span>
@@ -337,18 +350,6 @@ export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
         {phase !== 'idle' && <button onClick={reset}>{running ? 'ABORT' : 'CLEAR'}</button>}
       </div>
 
-      {phase !== 'idle' && (
-        <div className="seq-stage" ref={stageRef}>
-          <div className="section-title">STEAM BOX // CART 1 OF {carts} // {perCart} BAGS // ~{Math.round(perCart * 10 * 0.4536)} KG</div>
-          <Cart slots={slots} loaded={loaded} sealed={sealed} steam={steam} />
-          <div className="tiny dim">SCHEMATIC, NOT TO SCALE. TIER SPACING IS NOT IN THE SOURCES. CART {CART_BAGS} X 10 LB BAGS (STEAM BOX REV D).</div>
-          <div className="seq-bars">
-            {PHASES.map((ph, k) => <Bar key={ph.id} label={ph.label} p={prog(k)} state={state(k)} />)}
-            <Bar label="BAGS LOADED" p={perCart ? loaded / perCart : 0} state={phase === 'done' ? 'ok' : loaded ? 'run' : 'wait'} />
-          </div>
-          {phase === 'done' && <TypeText group={3} lines={[`SEQUENCE COMPLETE. ${bags} BAGS IN ${carts} LOAD${carts > 1 ? 'S' : ''}. STEAM HOLD ${STEAM_HOLD_H} H.`, { text: 'ANIMATION ONLY. THIS DOES NOT CONTROL THE BOILER OR LOG A COOK.', cls: 'dim' }]} />}
-        </div>
-      )}
     </div>
   )
 }
