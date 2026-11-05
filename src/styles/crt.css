@@ -1,0 +1,240 @@
+/* MY/CO/L themes and screen glass.
+   One phosphor colour per screen. Red-orange (--warn) only for warnings. */
+
+:root,
+:root[data-theme='PHOSPHOR'] {
+  --fg: #5dff8a;
+  --fg-dim: #2fa858;
+  --fg-faint: #134a24;
+  --bg: #020a05;
+  --bg-hi: #06190c;
+  --glow: rgba(93, 255, 138, 0.55);
+  --warn: #ff6a3d;
+  --hazard: #f2c230;
+  --bezel: #15171a;
+}
+:root[data-theme='CRYO'] {
+  --fg: #7fe8ff;
+  --fg-dim: #3a9fc0;
+  --fg-faint: #0f3d4f;
+  --bg: #01080c;
+  --bg-hi: #04161f;
+  --glow: rgba(127, 232, 255, 0.5);
+}
+:root[data-theme='SODIUM'] {
+  --fg: #ffb547;
+  --fg-dim: #b8792a;
+  --fg-faint: #4d300c;
+  --bg: #0a0602;
+  --bg-hi: #1a1005;
+  --glow: rgba(255, 181, 71, 0.5);
+}
+:root[data-theme='ALERT'] {
+  --fg: #ff5a4a;
+  --fg-dim: #b8352a;
+  --fg-faint: #4d140d;
+  --bg: #0c0201;
+  --bg-hi: #1f0604;
+  --glow: rgba(255, 90, 74, 0.6);
+  --warn: #ffe0d8;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: #000;
+}
+body {
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ---------- the tube ---------- */
+
+.crt {
+  position: fixed;
+  inset: 0;
+  background: var(--bezel);
+  /* A thin dark bezel so the curved glass has an edge to fall away into. */
+  padding: calc(env(safe-area-inset-top) + 4px + 10px * var(--curve-k)) calc(env(safe-area-inset-right) + 4px + 14px * var(--curve-k))
+    calc(env(safe-area-inset-bottom) + 4px + 10px * var(--curve-k)) calc(env(safe-area-inset-left) + 4px + 14px * var(--curve-k));
+  box-sizing: border-box;
+  color: var(--fg);
+  font-size: calc(15px * var(--text-scale));
+  letter-spacing: 0.04em;
+}
+.crt.font-stm {
+  font-family: 'Share Tech Mono', ui-monospace, monospace;
+}
+.crt.font-vt {
+  font-family: 'VT323', ui-monospace, monospace;
+  font-size: calc(19px * var(--text-scale));
+  letter-spacing: 0.02em;
+}
+
+.crt-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  /* Rounder corners the more curve there is. */
+  border-radius: calc(4px + 40px * var(--curve-k)) / calc(4px + 34px * var(--curve-k));
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 calc(30px * var(--glow-k)) rgba(0, 0, 0, 0.9);
+}
+.crt-warp {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+}
+.crt-content {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Phosphor glow plus a touch of colour fringing that grows with the curve. */
+  text-shadow:
+    0 0 calc(3px * var(--glow-k)) var(--glow),
+    0 0 calc(12px * var(--glow-k)) var(--glow),
+    calc(-0.9px * var(--curve-k)) 0 rgba(255, 40, 80, calc(0.45 * var(--curve-k))),
+    calc(0.9px * var(--curve-k)) 0 rgba(40, 140, 255, calc(0.45 * var(--curve-k)));
+}
+
+.fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* Scanlines sit inside the warp, so they bow with the glass. */
+.fx-scan {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.55) 0px,
+    rgba(0, 0, 0, 0.55) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: var(--scan-k);
+}
+/* Flicker lives on its own dark layer so it never forces the warp to redraw. */
+.fx-flicker {
+  background: #000;
+  opacity: 0;
+  animation: flicker 3.7s steps(1) infinite;
+}
+@keyframes flicker {
+  0% { opacity: 0; }
+  7% { opacity: calc(0.06 * var(--flicker-k)); }
+  8% { opacity: 0; }
+  41% { opacity: calc(0.03 * var(--flicker-k)); }
+  43% { opacity: 0; }
+  72% { opacity: calc(0.08 * var(--flicker-k)); }
+  73% { opacity: 0; }
+}
+/* Grain and faint vertical streaks. */
+.fx-noise {
+  background-image:
+    var(--noise-img),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 7px, rgba(0, 0, 0, 0.04) 7px 9px, transparent 9px 23px);
+  background-size: 128px 128px, auto;
+  mix-blend-mode: screen;
+  opacity: calc(0.16 * var(--noise-k));
+  animation: grain 0.6s steps(6) infinite;
+}
+@keyframes grain {
+  0% { background-position: 0 0, 0 0; }
+  20% { background-position: -37px 21px, 0 0; }
+  40% { background-position: 53px -11px, 0 0; }
+  60% { background-position: -19px -47px, 0 0; }
+  80% { background-position: 29px 61px, 0 0; }
+  100% { background-position: 0 0, 0 0; }
+}
+/* Dark corners and edges of a convex tube. */
+.fx-vignette {
+  background:
+    radial-gradient(ellipse 75% 70% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 85%, rgba(0, 0, 0, 0.92) 100%);
+  opacity: calc(0.25 + 0.75 * var(--curve-k));
+  box-shadow: inset 0 0 calc(80px * var(--curve-k)) calc(10px * var(--curve-k)) rgba(0, 0, 0, 0.85);
+}
+.crt.clean .fx-vignette {
+  opacity: 0;
+  box-shadow: none;
+}
+/* Light from the room catching the glass. */
+.fx-glare {
+  background:
+    radial-gradient(ellipse 60% 45% at 28% 18%, rgba(255, 255, 255, 0.07), transparent 70%),
+    radial-gradient(ellipse 90% 60% at 50% 115%, rgba(255, 255, 255, 0.025), transparent 60%);
+  opacity: calc(var(--curve-k) * 1.6);
+}
+
+/* Glitch: bright lines smear sideways, matched with the crackle or dropout. */
+.crt.glitching .crt-content {
+  transform: translateX(calc(2px + 4px * var(--glow-k))) skewX(-1.5deg);
+  text-shadow:
+    8px 0 var(--glow),
+    -14px 0 rgba(255, 255, 255, 0.15),
+    0 0 12px var(--glow);
+  filter: brightness(1.4);
+}
+
+/* Power-on: a bright line that opens into the full raster.
+   (On the screen, not the warp layer, so it never overrides the bulge filter.) */
+.crt.on .crt-screen {
+  animation: poweron 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes poweron {
+  0% { transform: scale(0.02, 0.003); filter: brightness(6); }
+  35% { transform: scale(1, 0.006); filter: brightness(4); }
+  70% { transform: scale(1, 1.02); filter: brightness(1.6); }
+  100% { transform: scale(1, 1); filter: none; }
+}
+
+/* Screen change: a ruled line sweeps down. */
+.sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  top: 0;
+  background: var(--fg);
+  box-shadow: 0 0 12px var(--glow);
+  animation: sweep 0.45s linear forwards;
+  pointer-events: none;
+  z-index: 5;
+}
+@keyframes sweep {
+  from { top: 0; opacity: 1; }
+  to { top: 100%; opacity: 0.2; }
+}
+
+/* ALERT flash: the whole screen goes solid red and back. */
+.crt.alert-flash .crt-warp {
+  animation: alertflash 0.76s steps(1) infinite;
+}
+@keyframes alertflash {
+  0% { background: var(--fg); color: var(--bg); }
+  50% { background: var(--bg); color: var(--fg); }
+}
+.crt.alert-flash .crt-warp .crt-content {
+  color: inherit;
+}
+
+.crt.clean .crt-content {
+  text-shadow: none;
+}
+.crt.clean .fx {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-flicker,
+  .fx-noise,
+  .crt.on .crt-screen {
+    animation: none;
+  }
+}
