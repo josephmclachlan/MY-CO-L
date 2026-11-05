@@ -1,0 +1,306 @@
+{
+ "id": "black-pearl",
+ "order": 7,
+ "name": "BLACK PEARL",
+ "latin": "Pleurotus hybrid (black oyster)",
+ "tier": "farm",
+ "form": "cluster",
+ "seed": 71,
+ "blurb": "KING-LIKE STEM, OYSTER VIGOUR. TREAT AS ONE FLUSH.",
+ "overview": [
+  {
+   "k": "Names",
+   "v": "Black Pearl, Black King, Black Pearl King, Cosmic Queen and Shimofuri (Hiratake) are used interchangeably.",
+   "s": [
+    "F17-0077"
+   ]
+  },
+  {
+   "k": "Origin",
+   "v": "Best supported: Hokuto Corporation's Shimofuri Hiratake, an interspecific hybrid of P. ostreatus, P. nebrodensis and P. eryngii (Canadian patent CA 2,878,902). Other accounts say European x Asian ostreatus, or king x blue.",
+   "s": [
+    "F17-0083"
+   ]
+  },
+  {
+   "k": "Appeal",
+   "v": "Massive king-like stem, softer oyster texture, vigorous even in poorly controlled conditions.",
+   "s": [
+    "F17-0085"
+   ]
+  },
+  {
+   "k": "Ecology",
+   "v": "A hybrid that cannot cross within itself, so probably safer than sporing wild types.",
+   "s": [
+    "F17-0088"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Substrate",
+   "v": "House Master's Mix; no other recipe given.",
+   "s": [
+    "F18-0108"
+   ]
+  },
+  {
+   "k": "Spawn rate",
+   "v": "One 6 lb G2 per twenty 10 lb blocks (about 3%). Do not go beyond 30 blocks per bag.",
+   "s": [
+    "F18-0109"
+   ]
+  },
+  {
+   "k": "Agar",
+   "v": "PDYA. 3-5 days in the flow hood at 27-29 °C, then 18-21 °C. Discard plates older than 3 months.",
+   "s": [
+    "F18-0111"
+   ]
+  },
+  {
+   "k": "Cut",
+   "v": "Slit or cross-cut about 1/4 in (6 mm) deep on the long face. Side-fruiting did as well or better than top-fruiting.",
+   "s": [
+    "F18-0121",
+    "F18-0122"
+   ]
+  },
+  {
+   "k": "Culture storage",
+   "v": "5 mL cryovial, 3 mL of 10% glycerol and 5-10 colonized rye grains, -80 °C.",
+   "s": [
+    "F18-0110"
+   ]
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Grain spawn",
+   "v": "G2 firm by day 7, usually held to about day 14, then refrigerated. Cold-stored spawn good about 1 month.",
+   "s": [
+    "F18-0115"
+   ],
+   "d": [
+    7,
+    14
+   ]
+  },
+  {
+   "k": "Block incubation",
+   "v": "Fruitable at about 10 days, stable to 3 weeks. Shipped at 12-13 days.",
+   "s": [
+    "F18-0118",
+    "F18-0135"
+   ],
+   "w": [
+    "black-oyster"
+   ],
+   "d": [
+    10,
+    21
+   ]
+  },
+  {
+   "k": "Block incubation, other trial",
+   "v": "Full colonisation in about 2 weeks, but heavier blocks after 2.5-3 weeks.",
+   "f": "ctx",
+   "s": [
+    "F18-0119"
+   ],
+   "w": [
+    "alc-vs-lc 0:15:05"
+   ]
+  },
+  {
+   "k": "Pins",
+   "v": "5-7 days after cutting: amber droplets, then pins. Slower than most oysters.",
+   "s": [
+    "F18-0127"
+   ],
+   "d": [
+    5,
+    7
+   ]
+  },
+  {
+   "k": "Pins to harvest",
+   "v": "Plan 10-14 days.",
+   "s": [
+    "F18-0128"
+   ],
+   "d": [
+    10,
+    14
+   ]
+  },
+  {
+   "k": "Pins to harvest, partner farm",
+   "v": "About 4-5 days after pinning.",
+   "f": "ctx",
+   "s": [
+    "F18-0129"
+   ]
+  },
+  {
+   "k": "Catawba knock to first harvest",
+   "v": "32 days (30-37), median of real picks.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "fruitC": {
+  "range": [
+   [
+    10,
+    18
+   ]
+  ],
+  "ideal": [
+   [
+    13,
+    16
+   ]
+  ]
+ },
+ "climate": [
+  {
+   "k": "Incubation temp",
+   "v": "About 19 °C (66 °F) room air.",
+   "s": [
+    "F18-0117"
+   ]
+  },
+  {
+   "k": "Fruiting temp",
+   "v": "Range 10-18 °C, ideal 13-16 °C. 10-12 °C gives the densest fruit. Pinning falls off above about 18 °C.",
+   "s": [
+    "F18-0123"
+   ],
+   "w": [
+    "black-oyster 0:30:20"
+   ]
+  },
+  {
+   "k": "RH",
+   "v": "No number given. Fine high-pressure mist recommended, not coarse fog. An ultrasonic fogger on 30/10 min led to cap yellowing and blotch.",
+   "s": [
+    "F18-0124",
+    "F17-0125"
+   ]
+  },
+  {
+   "k": "CO2",
+   "v": "Exhaust fan on at about 800-900 ppm.",
+   "s": [
+    "F18-0125"
+   ],
+   "w": [
+    "black-oyster 0:33:29"
+   ]
+  },
+  {
+   "k": "Light",
+   "v": "Standard full spectrum. Blue LED may help.",
+   "s": [
+    "F18-0126"
+   ]
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Per block",
+   "v": "2.58-2.87 lb (1.17-1.30 kg), about 2.7 lb typical. Side-fruited after about 3 weeks.",
+   "s": [
+    "F18-0130"
+   ]
+  },
+  {
+   "k": "Gain from longer incubation",
+   "v": "An estimated +0.5 to +1 lb per block from a longer run plus side fruiting.",
+   "s": [
+    "F18-0131"
+   ]
+  },
+  {
+   "k": "Failure",
+   "v": "One huge \"washer\" of about 4 lb when CO2 was not controlled.",
+   "s": [
+    "F18-0132"
+   ],
+   "w": [
+    "black-oyster 0:33:29"
+   ]
+  },
+  {
+   "k": "Catawba real yield",
+   "v": "About 1.15 lb/block aggregate (plan was 1.5), well under the 2.7 lb trial.",
+   "f": "conflict",
+   "s": [
+    "CATAWBA"
+   ]
+  },
+  {
+   "k": "Shelf life",
+   "v": "Fairly good if picked before the caps flatten. Blocks keep weeks at 1 °C.",
+   "s": [
+    "F18-0133",
+    "F18-0120"
+   ]
+  }
+ ],
+ "cat": {
+  "lb": 1.15,
+  "d": 32,
+  "dr": "30-37",
+  "plan": 1.5
+ },
+ "hazards": [
+  {
+   "k": "Stroma",
+   "v": "Second only to blue oyster. In blocks: very dense, amber-tinted circular patches that predict poor yield.",
+   "s": [
+    "F17-0121"
+   ]
+  },
+  {
+   "k": "Blotch",
+   "v": "Climbs sharply in warm rooms.",
+   "s": [
+    "F17-0122"
+   ]
+  },
+  {
+   "k": "Rose comb",
+   "v": "Lumpy, deformed caps. Water quality blamed almost every time."
+  },
+  {
+   "k": "One-flush rule",
+   "v": "Do not keep blocks after the first harvest: exposed wet substrate invites contaminants."
+  }
+ ],
+ "notes": [
+  {
+   "v": "Give it an extra week of incubation: cheap insurance for yield.",
+   "s": [
+    "F17-0124"
+   ]
+  },
+  {
+   "v": "Inspect grain for hard discoloured spots before spawning. A stroma spot never reverts.",
+   "s": [
+    "F17-0126"
+   ]
+  },
+  {
+   "v": "Rack: middle to bottom.",
+   "s": [
+    "F17-0052"
+   ]
+  }
+ ],
+ "strains": []
+}

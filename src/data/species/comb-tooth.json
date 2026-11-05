@@ -1,0 +1,309 @@
+{
+ "id": "comb-tooth",
+ "order": 3,
+ "name": "COMB TOOTH",
+ "latin": "Hericium coralloides",
+ "tier": "plan",
+ "plan": {
+  "share": 12,
+  "note": "share of the old 100-bag split; scaled to the 130-bag run, split not yet confirmed"
+ },
+ "form": "coral",
+ "seed": 37,
+ "blurb": "DENSE, FRACTAL, SELLS WELL. WANTS WARMER THAN THE 16 °C ROOM.",
+ "overview": [
+  {
+   "k": "Form",
+   "v": "Grows out as a column, then branches repeatedly like Romanesco cauliflower, teeth hanging underneath. Dense, cloud-like heads.",
+   "s": [
+    "F17-0252"
+   ],
+   "w": [
+    "comb-tooth 0:19:23"
+   ]
+  },
+  {
+   "k": "Versus lion's mane",
+   "v": "Treated nearly identically in culture. Denser, auto-fruits later, so better behaved as spawn.",
+   "s": [
+    "F17-0251",
+    "F17-0185"
+   ]
+  },
+  {
+   "k": "Strain",
+   "v": "HcFF, wild collection from Denmark. Stable, vigorous, keeps producing in warmer conditions where lion's mane tapers off.",
+   "s": [
+    "F17-0255",
+    "F18-0199"
+   ]
+  },
+  {
+   "k": "Season",
+   "v": "Wild season Aug-Oct (north). Fruits better in warm months.",
+   "s": [
+    "F17-0253"
+   ]
+  },
+  {
+   "k": "Market",
+   "v": "Sells as a crab-cake substitute. Liked by retail and wholesale customers.",
+   "s": [
+    "F17-0273",
+    "F17-0270"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Substrate",
+   "v": "Straight combo pellets, 50:50 soy hulls : sawdust. 60:40 also called ideal; wording ambiguous.",
+   "s": [
+    "F17-0261",
+    "F18-0204"
+   ],
+   "w": [
+    "comb-tooth 0:10:26"
+   ]
+  },
+  {
+   "k": "Moisture",
+   "v": "61-62% final, counting the roughly 7% already in the pellets. Water pools above about 62%.",
+   "s": [
+    "F18-0205",
+    "F17-0262"
+   ],
+   "w": [
+    "comb-tooth 0:10:26"
+   ]
+  },
+  {
+   "k": "Spawn rate",
+   "v": "1:20: one 6 lb grain bag per twenty 10 lb blocks.",
+   "s": [
+    "F18-0206",
+    "F17-0263"
+   ],
+   "w": [
+    "comb-tooth 0:13:35"
+   ]
+  },
+  {
+   "k": "Grain",
+   "v": "3 rye : 1 sorghum, or pure millet (preferred for masters).",
+   "s": [
+    "F18-0201"
+   ]
+  },
+  {
+   "k": "Agar",
+   "v": "Malt yeast agar. Growth visible in about 3 days.",
+   "s": [
+    "F18-0200"
+   ]
+  },
+  {
+   "k": "Opening",
+   "v": "Like lion's mane: fold bag, cut an X, slit or H, or leave in the bag to fruit from the top.",
+   "s": [
+    "F17-0267"
+   ]
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Agar plate",
+   "v": "Full plate in 2-2.5 weeks (3-3.5 if cold).",
+   "s": [
+    "F18-0200"
+   ],
+   "d": [
+    14,
+    17
+   ]
+  },
+  {
+   "k": "Master (G1, 4 lb)",
+   "v": "About 1-1.5 weeks, shake, then 1-1.5 weeks more.",
+   "s": [
+    "F18-0202"
+   ],
+   "d": [
+    14,
+    21
+   ]
+  },
+  {
+   "k": "G2 (6 lb)",
+   "v": "2-2.5 weeks. Stop at about 2 weeks if going to storage.",
+   "s": [
+    "F18-0202"
+   ],
+   "d": [
+    14,
+    17
+   ]
+  },
+  {
+   "k": "Block incubation",
+   "v": "Denser and faster than lion's mane. Textbook t21 gives no figure.",
+   "s": [
+    "F18-0209"
+   ],
+   "w": [
+    "comb-tooth 0:12:30"
+   ]
+  },
+  {
+   "k": "Block incubation, quick card",
+   "v": "Card t24 says about 10 days. The number-book chapter t21 says no figure. Treat 10 days as unconfirmed.",
+   "f": "conflict",
+   "s": [
+    "F00-0046",
+    "F18-0209"
+   ]
+  },
+  {
+   "k": "Fractalization",
+   "v": "About 5-7 days of branching after pins. Pick before it droops and turns spongy.",
+   "s": [
+    "F18-0211",
+    "F17-0269"
+   ],
+   "w": [
+    "comb-tooth 0:18:20"
+   ],
+   "d": [
+    5,
+    7
+   ]
+  },
+  {
+   "k": "Catawba knock to first harvest",
+   "v": "31 days (28-35), median of real picks.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "fruitC": {
+  "range": [
+   [
+    10,
+    15
+   ]
+  ],
+  "ideal": [
+   [
+    19,
+    21
+   ]
+  ]
+ },
+ "climate": [
+  {
+   "k": "Incubation temp",
+   "v": "19 °C (66 °F) on the bag exterior, 18 °C (64-65 °F) supply air.",
+   "s": [
+    "F18-0208",
+    "F17-0266"
+   ]
+  },
+  {
+   "k": "Fruiting temp",
+   "v": "Prefers about 19-21 °C (upper 60s °F). Tolerates 10-15 °C (the 50s °F). The 16 °C fruiting room sits in the gap between the two.",
+   "f": "conflict",
+   "s": [
+    "F18-0210",
+    "F17-0268"
+   ],
+   "w": [
+    "comb-tooth 0:13:35"
+   ],
+   "n": "CONFLICT WITH FARM FRUIT ROOM"
+  },
+  {
+   "k": "Fruiting RH",
+   "f": "nodata"
+  },
+  {
+   "k": "CO2",
+   "f": "nodata"
+  },
+  {
+   "k": "Light",
+   "f": "nodata"
+  },
+  {
+   "k": "Airflow cue",
+   "v": "Browns in too much air, goes popcorny in stagnant air.",
+   "s": [
+    "F17-0273"
+   ]
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Yield per block",
+   "f": "nodata",
+   "n": "Textbook: not stated for comb tooth (F18-0212)."
+  },
+  {
+   "k": "Catawba real yield",
+   "v": "2.03 lb/block aggregate, Feb-Jun 2026 (plan 2.0 lb). Matches blue.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  },
+  {
+   "k": "Catawba, warm months",
+   "v": "Yield up 27% and 6 days faster when outdoor temperature was 65 °F or more.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "cat": {
+  "lb": 2.03,
+  "d": 31,
+  "dr": "28-35",
+  "plan": 2.0
+ },
+ "hazards": [
+  {
+   "k": "Reported problems",
+   "v": "One grower saw no blotch, Trichoderma or odd growth. An occasional patch fails to fractalize.",
+   "s": [
+    "F17-0270"
+   ],
+   "w": [
+    "comb-tooth 0:18:20"
+   ]
+  },
+  {
+   "k": "Airflow faults",
+   "v": "Browning means too much air. Popcorn growth means stagnant air.",
+   "s": [
+    "F17-0273"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "v": "Blocks lie on their sides on wire shelves, often beside golden oysters. Heads are large, white and coral-like.",
+   "s": [
+    "F17-0271"
+   ]
+  },
+  {
+   "v": "Do not sell spawn that is auto-fruiting. It auto-fruits about half a week later than lion's mane.",
+   "s": [
+    "F17-0259"
+   ]
+  }
+ ],
+ "strains": []
+}

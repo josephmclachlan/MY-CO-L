@@ -1,0 +1,273 @@
+{
+ "id": "shiitake",
+ "order": 9,
+ "name": "SHIITAKE",
+ "latin": "Lentinula edodes",
+ "tier": "farm",
+ "form": "capstem",
+ "seed": 97,
+ "blurb": "EASY TO FRUIT, HARD TO INCUBATE. ABOUT 12 WEEKS.",
+ "overview": [
+  {
+   "k": "Skill split",
+   "v": "Easiest to fruit, hardest to incubate: roughly half the skill is incubation.",
+   "s": [
+    "F17-0274"
+   ]
+  },
+  {
+   "k": "Space",
+   "v": "6-14 weeks incubation. Needs roughly 5-10 times the incubation space of fast species.",
+   "s": [
+    "F17-0275"
+   ]
+  },
+  {
+   "k": "Strains",
+   "v": "LE3790 (Mycelia, Japanese origin). Sibling 3782 has smaller, thinner caps. Others: 321, Straw, JC, KOM.",
+   "s": [
+    "F18-0214"
+   ],
+   "w": [
+    "02-shiitake-cultivation 0:25:01"
+   ]
+  },
+  {
+   "k": "Small farms",
+   "v": "Several farms quit or call it their least profitable species: lots of space, time and cooling.",
+   "s": [
+    "F17-8012",
+    "F17-8016",
+    "F17-8017"
+   ]
+  },
+  {
+   "k": "Rack",
+   "v": "Low, ideally a separate room. Never above lion's mane: brown exudate stains white fruit.",
+   "s": [
+    "F17-0329",
+    "F17-0234"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Recipe",
+   "v": "70% red oak sawdust, 30% wheat (ground wheat, mids or bran), water only.",
+   "s": [
+    "F18-0218"
+   ]
+  },
+  {
+   "k": "Moisture",
+   "v": "64-65%. Problems above about 68%.",
+   "s": [
+    "F18-0222"
+   ],
+   "w": [
+    "02-shiitake-cultivation 0:50:10"
+   ]
+  },
+  {
+   "k": "Heat treatment",
+   "v": "Cap n Stem ultra-pasteurizes: 96-99 °C for 3 h.",
+   "s": [
+    "F18-0227"
+   ]
+  },
+  {
+   "k": "Other growers",
+   "v": "Shiitake does better sterilized or by quasi-pressure cook. Trial both if you have a pressure vessel.",
+   "f": "ctx",
+   "s": [
+    "F18-0261"
+   ]
+  },
+  {
+   "k": "Spawn rate",
+   "v": "20 blocks per 6 lb G2 (about 2.5%).",
+   "s": [
+    "F18-0228",
+    "F18-0229"
+   ]
+  },
+  {
+   "k": "Bag filter",
+   "v": "Unicorn A patch, designed for shiitake.",
+   "s": [
+    "F18-0231"
+   ]
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Block incubation",
+   "v": "About 12 weeks at Cap n Stem: colonize weeks 1-4, popcorn and buckle 5-8, brown 7-12. Range 6-14 weeks by strain.",
+   "s": [
+    "F18-0239",
+    "F18-0240"
+   ],
+   "d": [
+    84,
+    84
+   ]
+  },
+  {
+   "k": "Ready to fruit",
+   "v": "At least 75-80% browned. \"120% brown\" gives more, smaller mushrooms.",
+   "s": [
+    "F18-0243"
+   ],
+   "w": [
+    "02-shiitake-cultivation 1:26:11"
+   ]
+  },
+  {
+   "k": "After stripping",
+   "v": "Pins within about 2 days. Harvest 6-8 days from stripping.",
+   "s": [
+    "F18-0249",
+    "F18-0252"
+   ],
+   "w": [
+    "shitake-2 0:35:12"
+   ],
+   "d": [
+    6,
+    8
+   ]
+  }
+ ],
+ "fruitC": {
+  "ideal": [
+   [
+    10,
+    16
+   ]
+  ]
+ },
+ "climate": [
+  {
+   "k": "Incubation temp",
+   "v": "19 °C room. Core runs 2-3 °C hotter. Keep the core at or below about 23 °C.",
+   "s": [
+    "F18-0232",
+    "F18-0233"
+   ]
+  },
+  {
+   "k": "Room CO2",
+   "v": "Ideal about 2,500 ppm, maximum 5,000. About 500 ppm gave patchy dried blocks.",
+   "s": [
+    "F18-0235",
+    "F18-0237"
+   ]
+  },
+  {
+   "k": "Light",
+   "v": "6,500 K full spectrum, bright enough to see into the rack centre. Needed for buckling and browning.",
+   "s": [
+    "F18-0238"
+   ]
+  },
+  {
+   "k": "Fruiting temp",
+   "v": "Strain 3790: 10-16 °C, about 13 °C. A cold shock delays pinning.",
+   "s": [
+    "F18-0245",
+    "F18-0246"
+   ]
+  },
+  {
+   "k": "Strain 3782",
+   "v": "Tolerates about 10-27 °C.",
+   "f": "ctx",
+   "s": [
+    "F18-0245"
+   ]
+  },
+  {
+   "k": "Fruiting RH and CO2",
+   "f": "nodata",
+   "n": "Textbook: no numbers given (F18-0248)."
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Per 10 lb block",
+   "v": "3-5 lb (1.4-2.3 kg).",
+   "s": [
+    "F18-0254"
+   ],
+   "w": [
+    "shitake-2 0:09:21"
+   ]
+  },
+  {
+   "k": "Weak strains",
+   "v": "3782 on 5 lb blocks: 1 lb or more. Straw: about 1 lb.",
+   "f": "ctx",
+   "s": [
+    "F18-0255"
+   ]
+  },
+  {
+   "k": "Shelf life",
+   "v": "Caps picked late and flat have terrible quality and shelf life.",
+   "s": [
+    "F18-0257"
+   ]
+  },
+  {
+   "k": "Catawba figures",
+   "f": "nodata",
+   "n": "Not in the Catawba analysis."
+  }
+ ],
+ "cat": null,
+ "hazards": [
+  {
+   "k": "Duds and squishy blocks",
+   "v": "Blocks buckle and brown but never fruit; heat stress. Hold cores at or below about 23 °C.",
+   "s": [
+    "F17-0336"
+   ]
+  },
+  {
+   "k": "Popcorning",
+   "v": "Air pockets under the skin from temperature swings.",
+   "s": [
+    "F17-0337"
+   ]
+  },
+  {
+   "k": "Sloshy 3790 blocks",
+   "v": "Over-wet; anaerobic bacteria.",
+   "s": [
+    "F17-0338"
+   ]
+  },
+  {
+   "k": "Spore lung",
+   "v": "A week of harvesting 3782 gave several staff spore lung. Wear a respirator.",
+   "s": [
+    "F17-0342"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "v": "Hold incubation at 19 °C with steady light and gentle air on all sides of every block.",
+   "s": [
+    "F17-0344"
+   ]
+  },
+  {
+   "v": "Use data loggers inside a block to see real core temperatures.",
+   "s": [
+    "F17-0346"
+   ]
+  }
+ ],
+ "strains": []
+}

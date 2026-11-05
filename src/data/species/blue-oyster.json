@@ -1,0 +1,326 @@
+{
+ "id": "blue-oyster",
+ "order": 1,
+ "name": "BLUE OYSTER",
+ "latin": "Pleurotus ostreatus",
+ "tier": "plan",
+ "plan": {
+  "share": 40,
+  "note": "share of the old 100-bag split; scaled to the 130-bag run, split not yet confirmed"
+ },
+ "form": "shelf",
+ "seed": 11,
+ "blurb": "THE STAPLE. FASTEST TURNAROUND OF THE PLAN.",
+ "overview": [
+  {
+   "k": "Genus",
+   "v": "Oysters are the genus Pleurotus. Species share growth biology and differ mainly in colour and preferred temperature.",
+   "s": [
+    "F17-0003",
+    "F17-0174"
+   ],
+   "w": [
+    "history-of-pleurotus 0:05:53"
+   ]
+  },
+  {
+   "k": "Ease",
+   "v": "Easy and forgiving: colonises almost anything. Can reach fruiting readiness in complete darkness.",
+   "s": [
+    "F17-0004",
+    "F17-0006"
+   ],
+   "w": [
+    "history-of-pleurotus 0:43:07",
+    "incubation-tips-and-tricks 0:17:39"
+   ]
+  },
+  {
+   "k": "House strain",
+   "v": "POCNS is Cap n Stem's house blue oyster code. They keep it despite stroma because its 3-4 lb yields pay.",
+   "w": [
+    "stroma 0:45:39"
+   ]
+  },
+  {
+   "k": "Colour",
+   "v": "Steel Blue strain comes out near white when warm and deep blue when cold.",
+   "s": [
+    "F18-0095"
+   ]
+  },
+  {
+   "k": "Rack",
+   "v": "Middle to bottom of the rack.",
+   "s": [
+    "F17-0052"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Substrate",
+   "v": "Master's Mix: 50:50 red oak sawdust : soybean hulls. Highest-yielding mix, also richest and most fickle.",
+   "s": [
+    "F18-0081"
+   ]
+  },
+  {
+   "k": "Supplement",
+   "v": "Calcium carbonate 1-4% reported to raise yield; too much adds heat or stickiness.",
+   "s": [
+    "F18-0083"
+   ]
+  },
+  {
+   "k": "Moisture",
+   "v": "No oyster-specific figure. Use house 62-63%.",
+   "s": [
+    "F18-0084"
+   ]
+  },
+  {
+   "k": "Spawn rate",
+   "v": "One 6 lb (2.7 kg) G2 per twenty 10 lb (4.5 kg) blocks, about 3%.",
+   "s": [
+    "F18-0014"
+   ]
+  },
+  {
+   "k": "Agar",
+   "v": "PDYA to revive a stored culture.",
+   "s": [
+    "F18-0085"
+   ]
+  },
+  {
+   "k": "Grain spawn",
+   "v": "About 10-12 days. Opaque white around day 7. Hold 1-2 more weeks before fridge or use.",
+   "s": [
+    "F18-0086",
+    "F18-0087",
+    "F18-0088"
+   ]
+  },
+  {
+   "k": "Humidifier water",
+   "v": "150-250 ppm bleach prevents bacterial blotch.",
+   "s": [
+    "F18-0098"
+   ]
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Grain spawn",
+   "v": "About 10-12 days.",
+   "s": [
+    "F18-0086"
+   ],
+   "d": [
+    10,
+    12
+   ]
+  },
+  {
+   "k": "Block incubation",
+   "v": "About 10-14 days (10 lb block, clear bag). Pins straight away unless refrigerated.",
+   "s": [
+    "F18-0092"
+   ],
+   "w": [
+    "bags-and-filters 0:42:58"
+   ],
+   "d": [
+    10,
+    14
+   ]
+  },
+  {
+   "k": "Peak heat",
+   "v": "About day 11-12 for blocks. Marks the end of colonisation.",
+   "s": [
+    "F18-0089"
+   ]
+  },
+  {
+   "k": "In the fruit room",
+   "v": "Middle of the 5-15 day range: slower than shiitake and pioppino, faster than chestnut.",
+   "s": [
+    "F18-0099"
+   ],
+   "d": [
+    5,
+    15
+   ]
+  },
+  {
+   "k": "Catawba knock to first harvest",
+   "v": "23 days (20-26), median of real picks.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "fruitC": {
+  "range": [
+   [
+    13,
+    18
+   ]
+  ]
+ },
+ "climate": [
+  {
+   "k": "Incubation temp",
+   "v": "About 19 °C (66 °F) for blocks, about 18 °C (65 °F) for grain. Prevents stroma in aggressive blue strains.",
+   "s": [
+    "F18-0090"
+   ]
+  },
+  {
+   "k": "Sterilized 5 lb blocks",
+   "v": "About 22 °C (72 °F). The 10 lb ultra-pasteurized house block is the 19 °C one.",
+   "f": "ctx",
+   "s": [
+    "F18-0091"
+   ]
+  },
+  {
+   "k": "Fruiting temp",
+   "v": "13-18 °C (55-65 °F). 13 °C is slower and denser, 18 °C faster.",
+   "s": [
+    "F18-0094"
+   ],
+   "w": [
+    "01-fruit-room-design 0:14:18"
+   ]
+  },
+  {
+   "k": "CO2",
+   "v": "Keep low. High CO2 gives long stems with no caps.",
+   "s": [
+    "F18-0096"
+   ],
+   "w": [
+    "01-fruit-room-design 0:41:08"
+   ]
+  },
+  {
+   "k": "Fruiting RH",
+   "f": "nodata"
+  },
+  {
+   "k": "Light",
+   "v": "None needed in incubation. Blocks reach fruiting readiness in the dark.",
+   "s": [
+    "F18-0097"
+   ]
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Planning figure",
+   "v": "About 2 lb (0.9 kg) per 10 lb block.",
+   "s": [
+    "F18-0062",
+    "F18-0106"
+   ]
+  },
+  {
+   "k": "Cap n Stem house strain",
+   "v": "3-4 lb (1.4-1.8 kg) per block.",
+   "s": [
+    "F18-0101"
+   ]
+  },
+  {
+   "k": "Other reported",
+   "v": "About 4 lb for \"other oysters\" (block size not stated). 40 blocks gave 80-100 lb, about 2-2.5 lb each.",
+   "f": "ctx",
+   "s": [
+    "F18-0100",
+    "F18-0102"
+   ]
+  },
+  {
+   "k": "Flushes and shelf life",
+   "f": "nodata",
+   "n": "Textbook: not stated for oyster (F18-0105)."
+  }
+ ],
+ "cat": {
+  "lb": 2.03,
+  "d": 23,
+  "dr": "20-26",
+  "plan": 2.5
+ },
+ "hazards": [
+  {
+   "k": "Bacterial blotch",
+   "v": "Hits Pleurotus hardest, blue oysters and kings especially. Warm rooms drive it. Early sign: the centre pin of a cluster, or aborted pins.",
+   "s": [
+    "F17-0059",
+    "F17-0060",
+    "F17-0061"
+   ],
+   "w": [
+    "blotch-pt-2 0:29:49"
+   ]
+  },
+  {
+   "k": "Blotch control",
+   "v": "150-250 ppm bleach in humidifier water. Switch strain when blotch targets one.",
+   "s": [
+    "F17-0063"
+   ]
+  },
+  {
+   "k": "Stroma",
+   "v": "About 99% starts in the grain spawn. Spreads every expansion, cannot be cut out. Prevent with whole grade-1 grain, short of bursting, and correct spawn timing.",
+   "s": [
+    "F17-0065",
+    "F17-0066",
+    "F17-0068"
+   ]
+  },
+  {
+   "k": "Viruses",
+   "v": "A clade attacks Pleurotus: deformed fruit, essentially untreatable.",
+   "s": [
+    "F17-0064"
+   ]
+  },
+  {
+   "k": "Spores",
+   "v": "Spore load matters for staff health. Selecting phenotypes reduces it.",
+   "s": [
+    "F17-0071"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "v": "Use a CO2 controller on the fruit-room exhaust and read stem length and cap shape as your airflow gauge.",
+   "s": [
+    "F17-0072"
+   ]
+  },
+  {
+   "v": "Do not leave colonized blocks or spawn sitting. Refrigerate or fruit promptly or they pin.",
+   "s": [
+    "F17-0073"
+   ]
+  },
+  {
+   "k": "Catawba, warm season",
+   "v": "Blue ran 27% better and 2.5 days faster in warm months (their rooms are air conditioned).",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "strains": []
+}
