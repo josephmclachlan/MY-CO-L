@@ -487,6 +487,7 @@ export default function App() {
       case 'CRYO':
       case 'SODIUM':
       case 'ALERT':
+      case 'SPORE':
         update((s) => ({ ...s, look: { ...s.look, theme: cmd as ThemeName } }))
         sound.chirp()
         return say(`THEME ${cmd}`)
