@@ -96,3 +96,20 @@
 @media (prefers-reduced-motion: reduce) { .seq-steam, .seq-init { animation: none !important; } }
 .spec-strains { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; align-items: center; }
 .spec-strains .section-title { flex-basis: 100%; }
+/* clipping fixes: stage sits at the top of the module and is scrolled to its start; nothing may overflow the glass */
+.seq-stage { scroll-margin-top: 0; overflow: hidden; min-width: 0; }
+.seq-stage .section-title { white-space: normal; }
+.seq-abort { display: flex; justify-content: flex-end; min-height: 0; }
+.seq-cart { display: block; width: 100%; height: auto; overflow: visible; }
+.seq-bar-l { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .seq-stage { padding: 6px; }
+  .seq-bar { font-size: 0.78em; }
+  .pl-table { font-size: 0.8em; }
+  .pl-table th, .pl-table td { padding: 3px 3px; }
+}
+@media (max-width: 760px) {
+  /* small screens: show only the running phase and the bag count, so the cart and bars fit together */
+  .seq-bars .seq-bar.wait:not(.keep), .seq-bars .seq-bar.ok:not(.keep) { display: none; }
+  .seq-stage.finished .seq-bar { display: grid !important; }
+}

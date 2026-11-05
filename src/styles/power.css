@@ -367,32 +367,18 @@
 /* ---------- deck plan ---------- */
 
 .deck-grid {
+  /* The plan fills the width; everything about the room sits underneath (Joseph, 5 Nov 2026). */
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
-  align-items: start;
-}
-@media (max-width: 900px) {
-  .deck-grid {
-    grid-template-columns: 1fr;
-  }
 }
 .deck-frame {
   border: 1px solid var(--fg-faint);
   padding: 6px;
-  position: sticky;
-  top: 0;
-  background: var(--bg);
-  z-index: 1;
-}
-@media (max-width: 900px) {
-  .deck-frame {
-    position: static;
-  }
 }
 .deck-svg {
   width: 100%;
-  height: auto;
+  height: min(74vh, 120vw);
   display: block;
   overflow: visible;
   font-family: 'Share Tech Mono', monospace;
@@ -520,6 +506,22 @@ rect.glyph.lit {
   display: grid;
   gap: 2px;
 }
+/* Wide screens: the room readout flows into columns under the plan. */
+@media (min-width: 901px) {
+  .deck .room-readout {
+    display: block;
+    columns: 3 300px;
+    column-gap: 22px;
+    column-rule: 1px solid var(--fg-faint);
+  }
+  .deck .room-readout > * {
+    break-inside: avoid;
+  }
+  .deck .room-readout > .section-title {
+    break-after: avoid;
+    display: table;
+  }
+}
 .rr-name {
   font-family: 'Michroma', sans-serif;
   letter-spacing: 0.12em;
@@ -551,12 +553,7 @@ rect.glyph.lit {
 
 @media (max-width: 700px) {
   /* On a phone the screen itself carries the room list and live legs. */
-  .body.view-power .index-panel {
-    display: none;
-  }
-  .body.view-power {
-    grid-template-rows: minmax(0, 1fr);
-  }
+
   .status-chip {
     margin-left: 0;
   }
@@ -574,5 +571,10 @@ rect.glyph.lit {
   }
   .bd-items td:nth-child(2) {
     font-size: 0.9em;
+  }
+}
+@media (max-width: 900px) {
+  .deck-svg {
+    height: auto;
   }
 }

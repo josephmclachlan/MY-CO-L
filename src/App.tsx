@@ -620,10 +620,10 @@ export default function App() {
   if (view.name === 'module' && view.idx === VITALS_IDX)
     hints.module = 'TAP A BREAKER TO FLIP IT // TYPE A TAG (S4) OR GEN, UTILITY, HEATER A/B // F2 MENU'
   if (view.name === 'module' && view.idx === DECK_IDX)
-    hints.module = 'TAP A ROOM // TYPE LAB, PACKING, INCUBATION, FRUITING OR BOILING // F2 MENU'
+    hints.module = 'TAP A ROOM, ITS DETAIL IS BELOW THE PLAN // TYPE LAB, PACKING, INCUBATION, FRUITING OR BOILING'
 
   if (view.name === 'module' && view.idx === SPEC_IDX)
-    hints.module = 'TAP A SPECIES AT RIGHT // LEFT/RIGHT ARROWS OR TYPE A TAB (CLIMATE) // WHY? SHOWS THE SOURCE // F2 MENU'
+    hints.module = 'TAP A SPECIES IN THE LIST // LEFT/RIGHT ARROWS OR TYPE A TAB (CLIMATE) // WHY? SHOWS THE SOURCE // F2 MENU'
   if (view.name === 'module' && view.idx === SEQ_IDX)
     hints.module = 'SET BAGS, PICK SPECIES, THEN INITIATE OR COMMIT RUN TO CARGO // F2 MENU'
   if (view.name === 'module' && view.idx === CARGO_IDX)
