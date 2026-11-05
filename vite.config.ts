@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { fileURLToPath } from 'node:url'
 
 // MY/CO/L build config.
 // The PWA plugin makes the app installable and caches every screen, font and
@@ -11,9 +12,17 @@ const base = process.env.BASE_PATH || '/'
 // PREVIEW=1 builds the single-file test copy (no service worker), see scripts/build-preview.mjs.
 const preview = process.env.PREVIEW === '1'
 
+// MANUAL=1 puts the textbook in the build. Only the private test copy sets it.
+// The public build aliases the data to an empty stub, so the textbook text cannot
+// end up in it. Remove this gate once the Supabase login serves the manual.
+const manual = process.env.MANUAL === '1'
+const at = (p: string) => fileURLToPath(new URL(p, import.meta.url))
+
 export default defineConfig({
   base,
-  build: preview ? { outDir: 'dist-preview', assetsInlineLimit: 0 } : undefined,
+  define: { __MANUAL__: JSON.stringify(manual) },
+  resolve: { alias: { '@manual-data': at(manual ? './src/manual-data/manual.json' : './src/manual/empty.json') } },
+  build: preview ? { outDir: 'dist-preview', assetsInlineLimit: 0, rollupOptions: { output: { inlineDynamicImports: true } } } : undefined,
   plugins: [
     react(),
     !preview &&

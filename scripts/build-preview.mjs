@@ -6,9 +6,11 @@ import { execSync } from 'node:child_process'
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
+// The private test copy carries the textbook. The public Pages build does not.
+execSync('node scripts/build-manual.mjs', { stdio: 'inherit' })
 execSync('npx vite build', {
   stdio: 'inherit',
-  env: { ...process.env, PREVIEW: '1', BASE_PATH: './', VITE_SUPABASE_URL: '', VITE_SUPABASE_KEY: '' },
+  env: { ...process.env, PREVIEW: '1', MANUAL: '1', BASE_PATH: './', VITE_SUPABASE_URL: '', VITE_SUPABASE_KEY: '' },
 })
 
 const dir = 'dist-preview'
@@ -29,7 +31,8 @@ const js = files
   .replace(/<\/script/gi, '<\\/script')
 
 // The claude.ai page wraps this in its own <html>/<head>/<body>, so we write only the content.
-const page = `<title>MY/CO/L</title>
+const page = `<meta charset="utf-8">
+<title>MY/CO/L</title>
 <meta name="theme-color" content="#020a05">
 <style>:root{color-scheme:dark}body{background:#000}</style>
 <style>${css}</style>

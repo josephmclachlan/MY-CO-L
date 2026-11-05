@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from './settings/AppContext'
 import { THEMES, type ThemeName } from './settings/settings'
 import { Crt } from './components/Crt'
@@ -22,6 +22,11 @@ import { usePower } from './power/PowerContext'
 import { allCircuits, type RoomId } from './data/power'
 import { ROOMS } from './data/rooms'
 import { dbLinked, supabase } from './lib/supabase'
+import { Manual } from './manual/Manual'
+import { SourcePopup } from './manual/SourcePopup'
+import { ManualLinksContext } from './manual/ManualLinks'
+import { MANUAL_ON } from './manual/load'
+import type { ManualLoc } from './manual/types'
 
 type Stage = 'power' | 'boot' | 'login' | 'shell'
 type View = { name: 'menu' } | { name: 'tune' } | { name: 'help' } | { name: 'status' } | { name: 'login' } | { name: 'module'; idx: number }
@@ -31,6 +36,18 @@ const DECK_IDX = MODULES.findIndex((m) => m.key === 'DECK')
 const SPEC_IDX = MODULES.findIndex((m) => m.key === 'SPECIMEN')
 const SEQ_IDX = MODULES.findIndex((m) => m.key === 'SEQUENCE')
 const CARGO_IDX = MODULES.findIndex((m) => m.key === 'CARGO')
+const MANUAL_IDX = MODULES.findIndex((m) => m.key === 'MANUAL')
+
+/** Everything needed to put the terminal back on a screen: Back restores one of these. */
+interface Snap {
+  view: View
+  selected: number
+  specimen: number
+  specTab: Tab
+  room: RoomId
+  manualLoc: ManualLoc | null
+}
+const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
 const TITLES: Record<View['name'], string> = {
   menu: 'MAIN MENU',
@@ -55,20 +72,75 @@ export default function App() {
   const [alert, setAlert] = useState(false)
   const [reply, setReply] = useState<{ text: string; warn?: boolean; id: number } | null>(null)
   const [focusToken, setFocusToken] = useState(0)
+  const [manualLoc, setManualLoc] = useState<ManualLoc | null>(null)
+  const [popupRef, setPopupRef] = useState<string | null>(null)
+  // Back button: the screens you came from, newest last.
+  const history = useRef<Snap[]>([])
+  const [histLen, setHistLen] = useState(0)
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc }
+  const snapRef = useRef(snapNow)
+  snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
   const energising = useRef(false)
 
   // ---------- navigation ----------
 
+  const pushHist = useCallback(() => {
+    history.current.push(snapRef.current)
+    if (history.current.length > 60) history.current.shift()
+    setHistLen(history.current.length)
+  }, [])
+
   const go = useCallback(
-    (v: View) => {
+    (v: View, record = true) => {
+      if (record && !sameSpot(snapRef.current, v)) pushHist()
       setView(v)
       setSweep((n) => n + 1)
       setFocusToken((n) => n + 1)
       sound.chirp()
       if (v.name !== 'menu') setFirstMenu(false)
     },
-    [sound],
+    [sound, pushHist],
+  )
+
+  const goBack = useCallback(() => {
+    const s = history.current.pop()
+    setHistLen(history.current.length)
+    if (!s) return
+    setView(s.view)
+    setSelected(s.selected)
+    setSpecimen(s.specimen)
+    setSpecTab(s.specTab)
+    setManualLoc(s.manualLoc ? { ...s.manualLoc, n: Date.now() } : null)
+    power.setSelectedRoom(s.room)
+    setReply(null)
+    setSweep((n) => n + 1)
+    setFocusToken((n) => n + 1)
+    sound.chirp()
+    if (s.view.name !== 'menu') setFirstMenu(false)
+  }, [power, sound])
+
+  /** Open the manual at a place. A new chapter or link is a Back step; a jump within the page is not. */
+  const openManual = useCallback(
+    (loc: Omit<ManualLoc, 'n'>, push = true) => {
+      const here = snapRef.current
+      const inManual = here.view.name === 'module' && here.view.idx === MANUAL_IDX
+      if (push || !inManual) pushHist()
+      setManualLoc({ ...loc, n: Date.now() })
+      setSelected(MANUAL_IDX)
+      if (!inManual) {
+        setView({ name: 'module', idx: MANUAL_IDX })
+        setSweep((n) => n + 1)
+        setFocusToken((n) => n + 1)
+        setFirstMenu(false)
+      }
+    },
+    [pushHist],
+  )
+
+  const links = useMemo(
+    () => ({ locked: !MANUAL_ON, openSource: (ref: string) => setPopupRef(ref) }),
+    [],
   )
 
   const say = (text: string, warn?: boolean) => setReply({ text, warn, id: Date.now() })
@@ -151,6 +223,10 @@ export default function App() {
   useEffect(() => {
     if (stage !== 'shell') return
     const h = (e: KeyboardEvent) => {
+      if (e.altKey && e.key === 'ArrowLeft') {
+        e.preventDefault()
+        return goBack()
+      }
       const m = /^F([1-8])$/.exec(e.key)
       if (!m) return
       e.preventDefault()
@@ -241,6 +317,9 @@ export default function App() {
         setSelected(CARGO_IDX)
         if (!(view.name === 'module' && view.idx === CARGO_IDX)) go({ name: 'module', idx: CARGO_IDX })
         return
+      case 'BACK':
+        if (!history.current.length) return say('NOTHING TO GO BACK TO.', true)
+        return goBack()
       case 'MENU':
       case 'CORE':
         if (cmd === 'CORE') sound.whoosh()
@@ -464,6 +543,7 @@ export default function App() {
             }}
           />
         )
+      else if (view.idx === MANUAL_IDX) content = <Manual loc={manualLoc} onOpen={openManual} />
       else content = <Pending mod={MODULES[view.idx]} />
       break
   }
@@ -480,6 +560,9 @@ export default function App() {
   if (view.name === 'module' && view.idx === CARGO_IDX)
     hints.module = 'TAP AN ITEM TO RECEIVE, USE OR COUNT IT // TYPE REORDER OR CARGO // F2 MENU'
 
+  if (view.name === 'module' && view.idx === MANUAL_IDX)
+    hints.module = 'PICK A CHAPTER OR SECTION AT LEFT // TAP A LINK TO JUMP // BACK RETURNS TO WHERE YOU WERE // F2 MENU'
+
   const hint = reply ? (
     <TypeText key={reply.id} className={reply.warn ? 'warn' : ''} lines={[reply.text]} />
   ) : (
@@ -487,6 +570,7 @@ export default function App() {
   )
 
   return (
+    <ManualLinksContext.Provider value={links}>
     <Crt alert={alert}>
       {stage === 'login' ? (
         <div className="shell" style={{ gridTemplateRows: 'auto minmax(0,1fr)' }}>
@@ -513,7 +597,9 @@ export default function App() {
                       ? <SpecimenIndex index={specimen} onPick={setSpecimen} />
                       : view.name === 'module' && view.idx === CARGO_IDX
                         ? <CargoIndex />
-                        : moduleIndex
+                        : view.name === 'module' && view.idx === MANUAL_IDX
+                          ? undefined
+                          : moduleIndex
             }
             keys={keys}
             onKey={onKey}
@@ -523,14 +609,26 @@ export default function App() {
               onCommand(c)
             }}
             focusToken={focusToken}
-            bodyClass={`view-${view.name}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}`}
+            onBack={histLen > 0 ? goBack : undefined}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>
           {sweep > 0 && <div key={sweep} className="sweep" aria-hidden />}
+          {popupRef && (
+            <SourcePopup
+              refId={popupRef}
+              onClose={() => setPopupRef(null)}
+              onGoPage={(chapter, anchor, fact) => {
+                setPopupRef(null)
+                openManual({ chapter, anchor, fact })
+              }}
+            />
+          )}
         </>
       )}
     </Crt>
+    </ManualLinksContext.Provider>
   )
 }
 

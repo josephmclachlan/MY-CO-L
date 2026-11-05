@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { srcLabel } from '../data/species'
+import { SourceLink, useManualLinks } from '../manual/ManualLinks'
+import { FACT_RE } from '../manual/load'
 import type { Flag } from '../data/species/types'
 
 export interface Why {
@@ -33,6 +35,7 @@ const TAG: Record<Flag, string> = { nodata: 'NO DATA', ctx: 'CONTEXT', conflict:
  */
 export function TypedRows({ rows, instant, onDone }: Props) {
   const { settings, sound } = useApp()
+  const links = useManualLinks()
   const sizes = rows.map((r) => (r.label?.length ?? 0) + r.value.length)
   const total = sizes.reduce((a, b) => a + b, 0)
   const [shown, setShown] = useState(instant ? total : 0)
@@ -123,6 +126,7 @@ export function TypedRows({ rows, instant, onDone }: Props) {
                 {r.why.s?.map((s) => (
                   <div key={s}>
                     <span className="k">{s}</span> {srcLabel(s)}
+                    {FACT_RE.test(s) && (links.locked ? <span className="dim"> // MANUAL LOCKED, LOGIN REQUIRED</span> : <> <SourceLink id={s}>READ SECTION</SourceLink></>)}
                   </div>
                 ))}
                 {r.why.w?.map((w) => (

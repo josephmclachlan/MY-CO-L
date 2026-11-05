@@ -21,6 +21,8 @@ interface Props {
   focusToken?: number
   /** Extra class on the body, e.g. view-menu. */
   bodyClass?: string
+  /** Present when there is somewhere to go back to. */
+  onBack?: () => void
 }
 
 function useClock() {
@@ -34,7 +36,7 @@ function useClock() {
 }
 
 /** The frame every screen shares: title bar, status line, index column, prompt, hint line and F-key bar. */
-export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass }: Props) {
+export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack }: Props) {
   const { settings, sound, session } = useApp()
   const clock = useClock()
   const [cmd, setCmd] = useState('')
@@ -66,6 +68,11 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
     <div className="shell">
       <header className="titlebar">
         <span className="tb-left">
+          {onBack && (
+            <button type="button" className="back-btn" onClick={onBack} title="Back to where you were (Alt+Left)">
+              &lt; BACK
+            </button>
+          )}
           {STATION.system} <span className="tb-sep">//</span> {title}
         </span>
         <span className="tb-right">
