@@ -9,6 +9,15 @@ const GLYPHS: Record<string, string> = {
   HAZARD: '\u26A0', PROPULSION: '\u224B', LEDGER: '\u25EB', TRADE: '\u21C4', SEQUENCE: '\u25A6', MANUAL: '\u25A5',
 }
 
+/** Rotating prompt line for return visits to the menu. Original wording. */
+const GREETINGS = [
+  'SELECT A MODULE. TYPE ITS NUMBER OR NAME AT THE PROMPT.',
+  'LATTICE IS QUIET. SELECT A MODULE.',
+  'ALL STATIONS REPORTING. AWAITING YOUR INPUT.',
+  'THE CROP DOES NOT WAIT. SELECT A MODULE.',
+  'SPORE COUNT NOMINAL. SELECT A MODULE.',
+]
+
 interface Props {
   selected: number
   setSelected: (n: number) => void
@@ -19,6 +28,7 @@ interface Props {
 /** Main menu: numbered module list with the MY/CO/L logo in beside it. */
 export function Menu({ selected, setSelected, onOpen, firstShow }: Props) {
   const [listReady, setListReady] = useState(!firstShow)
+  const [greeting] = useState(() => (firstShow ? GREETINGS[0] : GREETINGS[Math.floor(Math.random() * GREETINGS.length)]))
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -46,7 +56,7 @@ export function Menu({ selected, setSelected, onOpen, firstShow }: Props) {
           group={3}
           instant={!firstShow}
           className="dim"
-          lines={[`${STATION.station} // ${STATION.place}`, 'SELECT A MODULE. TYPE ITS NUMBER OR NAME AT THE PROMPT.']}
+          lines={[`${STATION.station} // ${STATION.place}`, greeting]}
           onDone={() => setListReady(true)}
         />
         {listReady && (
