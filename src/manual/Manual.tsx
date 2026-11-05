@@ -83,7 +83,7 @@ function Reader({ data, loc, onOpen }: { data: ManualData; loc: ManualLoc | null
       <button type="button" className="manual-tocbtn" onClick={() => setTocOpen((v) => !v)}>
         {tocOpen ? 'CLOSE' : 'CONTENTS'} // CH {chapter.num}
       </button>
-      <nav className="manual-toc" aria-label="Manual contents">
+      <nav className="manual-toc" aria-label="Manual contents" data-kbd-zone="index">
         <div className="section-title">CONTENTS</div>
         <ul>
           {data.chapters.map((c) => (
@@ -108,7 +108,7 @@ function Reader({ data, loc, onOpen }: { data: ManualData; loc: ManualLoc | null
           ))}
         </ul>
       </nav>
-      <div className="manual-body" ref={bodyRef} onClick={onClick}>
+      <div className="manual-body" ref={bodyRef} onClick={onClick} data-kbd-zone="main">
         <article className="mbook" dangerouslySetInnerHTML={html} />
         <div className="manual-pager">
           <button type="button" disabled={ci === 0} onClick={() => go(ci - 1)}>

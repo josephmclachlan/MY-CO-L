@@ -731,3 +731,20 @@
 @keyframes ui-drop { from { opacity: 0; transform: translateY(-6px) scaleY(0.9); } to { opacity: 1; transform: none; } }
 .ui-select-list { animation: ui-drop 140ms ease-out; transform-origin: top; }
 @media (prefers-reduced-motion: reduce) { .ui-pick-panel, .ui-pick-grid, .ui-pick-months, .ui-select-list { animation: none !important; } }
+
+/* ---------- keyboard focus ----------
+   Arrow keys move a real focus ring around every screen (KeyNav). Anything
+   without its own focus style gets this dashed phosphor outline. */
+:focus-visible {
+  outline: 1px dashed var(--fg);
+  outline-offset: 2px;
+}
+.prompt input:focus-visible { outline: none; }
+.index-list li:focus-visible,
+li[tabindex]:focus-visible,
+tr[tabindex]:focus-visible {
+  outline: 1px solid var(--fg);
+  outline-offset: 0;
+  background: var(--bg-hi);
+}
+.menu-item:focus-visible { outline: none; border-color: var(--fg); }

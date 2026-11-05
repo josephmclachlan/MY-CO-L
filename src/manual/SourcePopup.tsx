@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { resolveRef, sectionHtml, useManual } from './load'
 
@@ -39,9 +39,19 @@ export function SourcePopup({ refId: first, onClose, onGoPage }: Props) {
     document.querySelector('.src-body .hit')?.scrollIntoView({ block: 'center' })
   }, [found])
 
+  // Keyboard: focus moves into the pop-up, and back to the WHY? key that opened it on close.
+  const boxRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null
+    boxRef.current?.querySelector<HTMLElement>('.src-x:last-of-type')?.focus({ preventScroll: true })
+    return () => {
+      if (opener?.isConnected) opener.focus({ preventScroll: true })
+    }
+  }, [])
+
   return (
     <div className="src-pop" role="dialog" aria-label="Manual section" onClick={onClose}>
-      <div className="src-box" onClick={(e) => e.stopPropagation()}>
+      <div className="src-box" ref={boxRef} onClick={(e) => e.stopPropagation()}>
         <div className="src-head">
           {trail.length > 1 && (
             <button type="button" className="src-x" onClick={() => (sound.chirp(), setTrail((t) => t.slice(0, -1)))}>

@@ -67,6 +67,8 @@ export function Menu({ selected, setSelected, onOpen, firstShow }: Props) {
                 role="option"
                 aria-selected={i === selected}
                 className={`menu-item ${i === selected ? 'sel' : ''}`}
+                tabIndex={0}
+                onFocus={() => setSelected(i)}
                 onMouseEnter={() => setSelected(i)}
                 onClick={() => onOpen(i)}
               >

@@ -83,7 +83,7 @@ export function MissionIndex({ x, set }: { x: MissionState; set: SetMission }) {
       <div className="section-title">MISSION CONTROL</div>
       <ul className="index-list">
         {MISSION_TABS.map((t) => (
-          <li key={t} className={x.tab === t ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
+          <li tabIndex={0} key={t} className={x.tab === t ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
             <span>{TAB_LABEL[t]}</span>
             {t === 'BOARD' && <span className="k">{m.rows.length}</span>}
             {t === 'TODAY' && <span className="k">{m.today.length}</span>}

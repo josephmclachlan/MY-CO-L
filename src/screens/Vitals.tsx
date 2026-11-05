@@ -384,7 +384,7 @@ export function VitalsIndex() {
           ['SUB-PANEL', 'v-sub'],
           ['DETAIL', 'v-detail'],
         ].map(([label, id]) => (
-          <li key={id} onClick={() => jump(id)}>
+          <li tabIndex={0} key={id} onClick={() => jump(id)}>
             <span>{label}</span>
           </li>
         ))}

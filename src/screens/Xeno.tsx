@@ -1141,14 +1141,14 @@ export function XenoIndex({ x, set }: { x: XenoState; set: SetXeno }) {
     <>
       <div className="section-title">STRAINS</div>
       <ul className="index-list">
-        <li className={!x.strain ? 'sel' : ''} onClick={() => (sound.chirp(), set({ strain: null, node: null }))}>
+        <li tabIndex={0} className={!x.strain ? 'sel' : ''} onClick={() => (sound.chirp(), set({ strain: null, node: null }))}>
           <span>ALL</span>
           <span className="k">{d.strains.length}</span>
         </li>
         {d.strains.map((s) => {
           const pc = pCounts(s.id, d.cultures)
           return (
-            <li key={s.id} className={`${s.id === x.strain ? 'sel' : ''} ${s.active ? '' : 'dim'}`} onClick={() => (sound.chirp(), set({ strain: s.id, node: null }))}>
+            <li tabIndex={0} key={s.id} className={`${s.id === x.strain ? 'sel' : ''} ${s.active ? '' : 'dim'}`} onClick={() => (sound.chirp(), set({ strain: s.id, node: null }))}>
               <span>
                 {s.code} {warnBy.has(s.id) ? <span className="warn">!</span> : ''}
               </span>

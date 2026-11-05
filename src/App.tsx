@@ -4,6 +4,7 @@ import { THEMES, type ThemeName } from './settings/settings'
 import { Crt } from './components/Crt'
 import { Shell, type FKey } from './components/Shell'
 import { TypeText } from './components/TypeText'
+import { useKeyNav } from './components/KeyNav'
 import { Boot } from './screens/Boot'
 import { Menu } from './screens/Menu'
 import { Tuning } from './screens/Tuning'
@@ -340,6 +341,16 @@ export default function App() {
     return () => window.removeEventListener('keydown', h)
   })
 
+  // Arrows, Enter, [ ], page keys, Backspace / Esc = BACK on every screen.
+  useKeyNav({
+    enabled: stage === 'shell',
+    onBack: () => {
+      if (!history.current.length) return false
+      goBack()
+      return true
+    },
+  })
+
   // ---------- commands ----------
 
   const onCommand = (raw: string) => {
@@ -565,24 +576,24 @@ export default function App() {
   ]
 
   const hints: Record<View['name'], string> = {
-    menu: 'ARROWS + ENTER OR TAP TO OPEN // TYPE A NUMBER OR NAME // F1 HELP',
+    menu: 'ARROWS + ENTER OR TAP TO OPEN // [ INDEX // TYPE A NUMBER OR NAME // F1 HELP',
     tune: 'DRAG A METER OR USE ARROW KEYS ON IT // TEST BUTTONS PLAY EACH LAYER // SAVED ON THIS DEVICE',
     help: 'TYPE A COMMAND AT THE PROMPT',
     status: 'F2 MENU',
     login: 'ACCOUNTS ARE MADE IN THE SUPABASE DASHBOARD',
-    module: 'F2 MENU // TYPE ANOTHER MODULE NAME TO JUMP',
+    module: 'ARROWS MOVE // [ INDEX ] PAGE // BKSP BACK // F2 MENU // TYPE ANOTHER MODULE NAME TO JUMP',
   }
 
   const moduleIndex = (
     <>
       <div className="section-title">INDEX</div>
       <ul className="index-list">
-        <li onClick={() => go({ name: 'menu' })}>
+        <li tabIndex={0} onClick={() => go({ name: 'menu' })}>
           <span>00 CORE</span>
           <span className="k">ONLINE</span>
         </li>
         {MODULES.map((m, i) => (
-          <li key={m.key} onClick={() => (setSelected(i), go({ name: 'module', idx: i }))}>
+          <li tabIndex={0} key={m.key} className={view.name === 'module' && view.idx === i ? 'sel' : ''} onClick={() => (setSelected(i), go({ name: 'module', idx: i }))}>
             <span>
               {String(m.num).padStart(2, '0')} {m.key}
             </span>
@@ -600,7 +611,7 @@ export default function App() {
           ['LOOK', 'tune-look'],
           ['SOUND', 'tune-sound'],
         ].map(([label, id]) => (
-          <li key={id} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}>
+          <li tabIndex={0} key={id} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}>
             <span>{label}</span>
           </li>
         ))}

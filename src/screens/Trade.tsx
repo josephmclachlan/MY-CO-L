@@ -47,7 +47,7 @@ export function TradeIndex({ x, set }: { x: TradeState; set: SetTrade }) {
       <div className="section-title">TRADE</div>
       <ul className="index-list">
         {TRADE_TABS.map((t) => (
-          <li key={t} className={x.tab === t ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
+          <li tabIndex={0} key={t} className={x.tab === t ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
             <span>{TAB_LABEL[t]}</span>
             {t === 'LOG' && <span className="k">{sales.length}</span>}
           </li>

@@ -122,11 +122,11 @@ export function CookIndex({ x, set }: { x: CookState; set: SetCook }) {
     <>
       <div className="section-title">COOK LOG</div>
       <ul className="index-list">
-        <li className={x.sel === null && x.tab !== 'TARGETS' ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: null, tab: 'RUN' }))}>
+        <li tabIndex={0} className={x.sel === null && x.tab !== 'TARGETS' ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: null, tab: 'RUN' }))}>
           <span>OVERVIEW + NEW RUN</span>
           <span className="k">{runs.length}</span>
         </li>
-        <li className={x.sel === null && x.tab === 'TARGETS' ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: null, tab: 'TARGETS' }))}>
+        <li tabIndex={0} className={x.sel === null && x.tab === 'TARGETS' ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: null, tab: 'TARGETS' }))}>
           <span>TARGETS + SOURCES</span>
         </li>
       </ul>
@@ -136,7 +136,7 @@ export function CookIndex({ x, set }: { x: CookState; set: SetCook }) {
         {runs.map((r) => {
           const v = info.get(r.id)?.an.verdict ?? 'pending'
           return (
-            <li key={r.id} className={r.id === x.sel ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: r.id, tab: x.tab === 'TARGETS' ? 'RUN' : x.tab }))}>
+            <li tabIndex={0} key={r.id} className={r.id === x.sel ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: r.id, tab: x.tab === 'TARGETS' ? 'RUN' : x.tab }))}>
               <span>
                 {dayShort(r.started_at)} {KIND_LABEL[r.kind]}
                 {r.bag_count ? ` ${r.bag_count}` : ''}

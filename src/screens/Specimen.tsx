@@ -245,7 +245,7 @@ export function SpecimenIndex({ index, onPick }: { index: number; onPick: (i: nu
   const row = (sp: Species, i: number) => {
     const b = planBags(sp)
     return (
-      <li key={sp.id} className={i === index ? 'sel' : ''} onClick={() => (sound.chirp(), onPick(i))}>
+      <li tabIndex={0} key={sp.id} className={i === index ? 'sel' : ''} onClick={() => (sound.chirp(), onPick(i))}>
         <span>{String(sp.order).padStart(2, '0')} {sp.name}</span>
         <span className="k">{b ? Math.round(b) : ''}</span>
       </li>

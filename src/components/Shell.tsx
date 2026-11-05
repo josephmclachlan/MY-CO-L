@@ -66,10 +66,10 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
 
   return (
     <div className="shell">
-      <header className="titlebar">
+      <header className="titlebar" data-kbd-zone="top">
         <span className="tb-left">
           {onBack && (
-            <button type="button" className="back-btn" onClick={onBack} title="Back to where you were (Alt+Left)">
+            <button type="button" className="back-btn" onClick={onBack} title="Back to where you were (Backspace, Esc or Alt+Left)">
               &lt; BACK
             </button>
           )}
@@ -87,8 +87,8 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
         <span>{settings.look.clean ? 'CLEAN' : settings.look.theme}</span>
       </div>
       <div className={`body ${index ? 'has-index' : ''} ${bodyClass ?? ''}`}>
-        <main className="panel main-panel" ref={mainRef}>{children}</main>
-        {index && <aside className="panel index-panel">{index}</aside>}
+        <main className="panel main-panel" ref={mainRef} data-kbd-zone="main">{children}</main>
+        {index && <aside className="panel index-panel" data-kbd-zone="index">{index}</aside>}
       </div>
       <form
         className="prompt"
@@ -123,7 +123,7 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
         />
       </form>
       <div className="hintline">{hint}</div>
-      <nav className="keybar" aria-label="Function keys">
+      <nav className="keybar" aria-label="Function keys" data-kbd-zone="keys">
         {keys.map((k) => (
           <button
             key={k.f}
