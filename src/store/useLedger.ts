@@ -1,5 +1,5 @@
 import { useMemo, useSyncExternalStore } from 'react'
-import { useRotation } from '../data/cropplan'
+import { usePlan } from '../data/cropplan'
 import { useTable } from './StoreContext'
 import { SPECIES } from '../data/species'
 import { buildLedger, DEFAULT_LEDGER_PREFS, planWeek, type EnergyBill, type Harvest, type LabourEntry, type Ledger, type LedgerPrefs, type WeekCost } from '../lib/ledger'
@@ -75,7 +75,7 @@ export function useLedger(): LedgerData {
   const bills = useTable<EnergyBill>('energy_bills')
   const labour = useTable<LabourEntry>('labour_entries')
   const [p] = useLedgerPrefs()
-  const rot = useRotation()
+  const rot = usePlan()
   const ledger = useMemo(
     () => buildLedger({ lots, losses, harvests, items, prices, moves, cooks, bills, labour, prefs: p }, speciesName),
     [lots, losses, harvests, items, prices, moves, cooks, bills, labour, p, rot],

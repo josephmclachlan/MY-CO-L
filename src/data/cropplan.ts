@@ -16,58 +16,61 @@ export const CORE: { key: string; bags: number }[] = [
 ]
 export const SLOT_BAGS = WEEKLY_BAGS - CORE.reduce((n, c) => n + c.bags, 0) // 16
 
-export interface Rotation {
-  id: string
-  label: string
-  cycle: string[] // species keys, one per week, repeating
-  why: string
+/** Joseph picks the secondary species himself (5 Nov 2026: "I should be able to choose, not have it prescribed").
+ *  `slot` fills every week; `weeks` overrides single weeks, keyed by week index (see weekIndex). */
+export interface CropPlan {
+  slot: string
+  weeks: Record<string, string>
 }
-
-export const ROTATIONS: Rotation[] = [
-  { id: 'gp', label: 'GOLDEN / PHOENIX', cycle: ['golden-oyster', 'phoenix-oyster'], why: 'The original plan: golden on A weeks, phoenix on B weeks.' },
-  { id: 'pink', label: 'PINK EVERY WEEK', cycle: ['pink-oyster'], why: 'Most fresh weight per shelf-day after blue (Catawba 1.44 lb, first pick 18 d).' },
-  { id: 'pgpp', label: 'PINK / GOLDEN / PINK / PHOENIX', cycle: ['pink-oyster', 'golden-oyster', 'pink-oyster', 'phoenix-oyster'], why: 'Keeps both planned oysters; pink half the time.' },
-  { id: 'spec', label: 'PINK / PIOPPINO / PINK / CHESTNUT', cycle: ['pink-oyster', 'pioppino', 'pink-oyster', 'chestnut'], why: 'Specialty variety. Chestnut stands about 65 d to first pick; pioppino wants 18-24 C.' },
-]
-export const DEFAULT_ROTATION = 'gp'
+export const DEFAULT_SLOT = 'golden-oyster'
 
 // ---------- the saved choice ----------
 
-const KEY = 'mycol.crop.v1'
+const KEY = 'mycol.crop.v2'
 const listeners = new Set<() => void>()
-let current: string = (() => {
+let current: CropPlan = (() => {
   try {
-    const v = JSON.parse(localStorage.getItem(KEY) ?? 'null')?.rotation
-    return ROTATIONS.some((r) => r.id === v) ? v : DEFAULT_ROTATION
+    const v = JSON.parse(localStorage.getItem(KEY) ?? 'null') as Partial<CropPlan> | null
+    return { slot: typeof v?.slot === 'string' ? v.slot : DEFAULT_SLOT, weeks: v?.weeks && typeof v.weeks === 'object' ? { ...v.weeks } : {} }
   } catch {
-    return DEFAULT_ROTATION
+    return { slot: DEFAULT_SLOT, weeks: {} }
   }
 })()
 
-export const getRotationId = () => current
-export const rotationById = (id: string = current) => ROTATIONS.find((r) => r.id === id) ?? ROTATIONS[0]
-export function setRotation(id: string) {
-  if (!ROTATIONS.some((r) => r.id === id) || id === current) return
-  current = id
+const save = (p: CropPlan) => {
+  current = p
   try {
-    localStorage.setItem(KEY, JSON.stringify({ rotation: id }))
+    localStorage.setItem(KEY, JSON.stringify(p))
   } catch {
     /* private mode: keep it for this session only */
   }
   listeners.forEach((l) => l())
 }
-export function useRotation(): Rotation {
-  const id = useSyncExternalStore(
+export const getPlan = () => current
+/** The species that fills the secondary slot every week. Clears single-week choices that now match it. */
+export function setSlot(key: string) {
+  const weeks = Object.fromEntries(Object.entries(current.weeks).filter(([, v]) => v !== key))
+  save({ slot: key, weeks })
+}
+/** A different species for one week only; null (or the usual species) clears it. */
+export function setWeek(iso: string, key: string | null) {
+  const weeks = { ...current.weeks }
+  const w = String(weekIndex(iso))
+  if (!key || key === current.slot) delete weeks[w]
+  else weeks[w] = key
+  save({ ...current, weeks })
+}
+export function usePlan(): CropPlan {
+  return useSyncExternalStore(
     (l) => (listeners.add(l), () => listeners.delete(l)),
     () => current,
     () => current,
   )
-  return rotationById(id)
 }
 
 // ---------- weeks ----------
 
-const ANCHOR = Date.UTC(2024, 0, 1) // a Monday; week 0 of every cycle
+const ANCHOR = Date.UTC(2024, 0, 1) // a Monday
 
 /** Whole weeks since the anchor Monday for an ISO date (YYYY-MM-DD). */
 export function weekIndex(iso: string): number {
@@ -76,44 +79,41 @@ export function weekIndex(iso: string): number {
 }
 
 /** The species in the secondary slot for the week holding this date. */
-export function slotSpecies(iso: string, rot: Rotation = rotationById()): string {
-  const n = rot.cycle.length
-  return rot.cycle[((weekIndex(iso) % n) + n) % n]
-}
-
-/** Position in the cycle, 1-based, e.g. "WEEK 2 OF 4". */
-export function cyclePos(iso: string, rot: Rotation = rotationById()): { at: number; of: number } {
-  const n = rot.cycle.length
-  return { at: (((weekIndex(iso) % n) + n) % n) + 1, of: n }
+export function slotSpecies(iso: string, plan: CropPlan = current): string {
+  return plan.weeks[String(weekIndex(iso))] ?? plan.slot
 }
 
 /** Whole bags per species for the week holding this date. */
-export function weekSplit(iso: string, rot: Rotation = rotationById()): { key: string; bags: number }[] {
-  return [...CORE, { key: slotSpecies(iso, rot), bags: SLOT_BAGS }]
+export function weekSplit(iso: string, plan: CropPlan = current): { key: string; bags: number }[] {
+  return [...CORE, { key: slotSpecies(iso, plan), bags: SLOT_BAGS }]
 }
 
-/** Share of weeks a species takes the slot (0 when it is never in it). */
-export function slotFraction(key: string, rot: Rotation = rotationById()): number {
-  return rot.cycle.filter((k) => k === key).length / rot.cycle.length
+/** A typical week, for monthly averages: the core plus the usual slot species. */
+export function averageSplit(plan: CropPlan = current): { key: string; bags: number }[] {
+  return [...CORE, { key: plan.slot, bags: SLOT_BAGS }]
 }
 
-/** Average bags per week over a full cycle (fractional for slot species). */
-export function averageSplit(rot: Rotation = rotationById()): { key: string; bags: number }[] {
-  const slot = [...new Set(rot.cycle)].map((key) => ({ key, bags: SLOT_BAGS * slotFraction(key, rot) }))
-  return [...CORE, ...slot]
+const thisWeek = () => weekIndex(new Date().toISOString().slice(0, 10))
+/** Single weeks from this week on that use this species. */
+export function upcomingWeeks(key: string, plan: CropPlan = current): number {
+  const now = thisWeek()
+  return Object.entries(plan.weeks).filter(([w, v]) => v === key && Number(w) >= now).length
 }
 
-/** Bags in a week the species runs (core every week, slot species only on its weeks), or null if not in the plan. */
-export function planBagsFor(key: string, rot: Rotation = rotationById()): number | null {
+/** True when the species is the slot species or set for an upcoming week. */
+export const inSlot = (key: string, plan: CropPlan = current) => plan.slot === key || upcomingWeeks(key, plan) > 0
+
+/** Bags in a week the species runs, or null if it is not in the plan. */
+export function planBagsFor(key: string, plan: CropPlan = current): number | null {
   const c = CORE.find((x) => x.key === key)
   if (c) return c.bags
-  return slotFraction(key, rot) > 0 ? SLOT_BAGS : null
+  return inSlot(key, plan) ? SLOT_BAGS : null
 }
 
-/** "EVERY WEEK", "1 IN 2 WEEKS", "2 IN 4 WEEKS", or null. */
-export function frequencyText(key: string, rot: Rotation = rotationById()): string | null {
+/** How often it runs, in words, or null. */
+export function frequencyText(key: string, plan: CropPlan = current): string | null {
   if (CORE.some((x) => x.key === key)) return 'EVERY WEEK'
-  const k = rot.cycle.filter((x) => x === key).length
-  if (!k) return null
-  return k === rot.cycle.length ? 'EVERY WEEK' : `${k} IN ${rot.cycle.length} WEEKS`
+  if (plan.slot === key) return 'EVERY WEEK IN THE SECONDARY SLOT, UNLESS A WEEK IS SET TO ANOTHER SPECIES'
+  const n = upcomingWeeks(key, plan)
+  return n ? `${n} UPCOMING WEEK${n > 1 ? 'S' : ''} IN THE SECONDARY SLOT` : null
 }

@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { TypeText } from '../components/TypeText'
 import { SPECIES, WEEKLY_BAGS } from '../data/species'
-import { ROTATIONS, SLOT_BAGS, cyclePos, setRotation, slotSpecies, useRotation, weekSplit } from '../data/cropplan'
+import { CORE, SLOT_BAGS, setSlot, setWeek, slotSpecies, usePlan, weekSplit } from '../data/cropplan'
+import { Select } from '../components/Select'
+import { addDays } from '../lib/xeno'
 import { nextKnockDay, todayIso } from '../lib/xeno'
 import { allot, LB_TO_KG } from '../lib/runplan'
 import { useCargo } from '../store/useCargo'
@@ -119,9 +121,9 @@ export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
   const cargo = useCargo()
   const [booked, setBooked] = useState<{ ref: string; n: number; missing: string[]; warn?: boolean } | null>(null)
   const [bags, setBags] = useState(WEEKLY_BAGS)
-  const rot = useRotation()
+  const plan = usePlan()
   const knockDay = nextKnockDay(todayIso())
-  const weekIds = weekSplit(knockDay, rot).map((x) => x.key)
+  const weekIds = weekSplit(knockDay, plan).map((x) => x.key)
   const [chosen, setChosen] = useState<string[]>(weekIds)
   const [phase, setPhase] = useState<Phase>('idle')
   const [p, setP] = useState(0)
@@ -208,7 +210,7 @@ export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
   const suggestions = [
     { label: `SINGLE: ${bestYield.name}`, why: `Highest real yield, ${bestYield.cat!.lb.toFixed(2)} lb a block (Catawba). Blue and comb tooth are level.`, ids: [bestYield.id] },
     { label: `SINGLE: ${fastest.name}`, why: `Fastest turnaround, first picks in ${fastest.cat!.d} days (Catawba).`, ids: [fastest.id] },
-    { label: 'MULTI: THIS WEEK\'S CROP PLAN', why: `Knock ${knockDay}: ${weekSplit(knockDay, rot).map((x) => `${x.bags} ${SPECIES.find((s) => s.id === x.key)?.name ?? x.key}`).join(', ')}.`, ids: weekIds },
+    { label: 'MULTI: THIS WEEK\'S CROP PLAN', why: `Knock ${knockDay}: ${weekSplit(knockDay, plan).map((x) => `${x.bags} ${SPECIES.find((s) => s.id === x.key)?.name ?? x.key}`).join(', ')}.`, ids: weekIds },
     { label: "MULTI: BLUE + LION'S MANE", why: 'The two biggest earners, in their plan ratio.', ids: ['blue-oyster', 'lions-mane'] },
   ]
   const sumLb = result.reduce((n, a) => n + (a.sp.cat ? a.bags * a.sp.cat.lb : 0), 0)
@@ -249,16 +251,29 @@ export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
         ))}
       </ul>
 
-      <div className="section-title" style={{ marginTop: 10 }}>SECONDARY SLOT // {SLOT_BAGS} BAGS A WEEK</div>
+      <div className="section-title" style={{ marginTop: 10 }}>SECONDARY SLOT // {SLOT_BAGS} BAGS A WEEK // YOUR PICK</div>
+      <div className="tiny dim">52 BLUE, 46 LION'S MANE AND 16 COMB TOOTH RUN EVERY WEEK. PICK THE SPECIES FOR THE OTHER {SLOT_BAGS} BAGS. IT FILLS EVERY WEEK UNLESS YOU SET A WEEK BELOW. SAVED ON THIS DEVICE; SPECIMEN FILES, XENOGENETICS, MISSION AND LEDGER FOLLOW IT.</div>
       <div className="pl-pick">
-        {ROTATIONS.map((r) => (
-          <button key={r.id} disabled={lock} className={r.id === rot.id ? 'sel' : ''} aria-pressed={r.id === rot.id} onClick={() => { sound.chirp(); setRotation(r.id); setChosen(weekSplit(knockDay, r).map((x) => x.key)) }}>
-            {r.id === rot.id ? '[X]' : '[ ]'} {r.label}
+        {SPECIES.filter((s) => !CORE.some((c) => c.key === s.id)).map((s) => (
+          <button key={s.id} disabled={lock} className={plan.slot === s.id ? 'sel' : ''} aria-pressed={plan.slot === s.id} onClick={() => { sound.chirp(); setSlot(s.id); setChosen(weekSplit(knockDay).map((x) => x.key)) }}>
+            {plan.slot === s.id ? '[X]' : '[ ]'} {s.name}
           </button>
         ))}
       </div>
-      <div className="tiny dim">
-        {rot.why} NEXT KNOCK {knockDay}: WEEK {cyclePos(knockDay, rot).at} OF {cyclePos(knockDay, rot).of}, {SPECIES.find((s) => s.id === slotSpecies(knockDay, rot))?.name}. THE SAME RULE FEEDS SPECIMEN FILES, XENOGENETICS, MISSION AND LEDGER. SAVED ON THIS DEVICE.
+      <div className="pl-weeks">
+        {[0, 1, 2, 3, 4, 5].map((k) => {
+          const d = addDays(knockDay, 7 * k)
+          const cur = slotSpecies(d, plan)
+          return (
+            <label key={d} className="ck-field">
+              <span>KNOCK {d}{k === 0 ? ' (NEXT)' : ''}</span>
+              <Select value={cur === plan.slot ? '' : cur} disabled={lock} onChange={(e) => { sound.chirp(); setWeek(d, e.target.value || null); if (k === 0) setChosen(weekSplit(knockDay).map((x) => x.key)) }}>
+                <option value="">USUAL: {SPECIES.find((s) => s.id === plan.slot)?.name}</option>
+                {SPECIES.filter((s) => !CORE.some((c) => c.key === s.id) && s.id !== plan.slot).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </Select>
+            </label>
+          )
+        })}
       </div>
 
       <div className="section-title" style={{ marginTop: 10 }}>SPECIES IN THIS RUN</div>
@@ -299,7 +314,7 @@ export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
         <div>POUNDS USE CATAWBA'S REAL YIELD PER 10 LB BLOCK (CONTEXT, NOT CAP N STEM'S 2 LB PLANNING FIGURE).</div>
         {result.some((a) => a.assumed) && picked.length > 1 && <div>* NOT IN THE CROP PLAN: GIVEN THE AVERAGE SHARE OF THE OTHERS. YOUR CALL.</div>}
         {missing.length > 0 && <div className="warn">NO CATAWBA FIGURE FOR: {missing.map((a) => a.sp.name).join(', ')}.</div>}
-        {picked.filter((s) => rot.cycle.includes(s.id)).length > 1 && <div>SECONDARY-SLOT SPECIES CHOSEN TOGETHER SHARE THE ONE {SLOT_BAGS}-BAG SLOT.</div>}
+        {picked.filter((s) => !CORE.some((c) => c.key === s.id) && result.find((a) => a.sp.id === s.id && !a.assumed)).length > 1 && <div>SECONDARY-SLOT SPECIES CHOSEN TOGETHER SHARE THE ONE {SLOT_BAGS}-BAG SLOT.</div>}
       </div>
 
       <div className="section-title" style={{ marginTop: 10 }}>STOCK USED // {bags} BAGS</div>

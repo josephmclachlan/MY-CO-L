@@ -1,5 +1,5 @@
 import type { Species } from '../data/species/types'
-import { CORE, SLOT_BAGS, rotationById } from '../data/cropplan'
+import { CORE, SLOT_BAGS, inSlot } from '../data/cropplan'
 
 export interface Allot {
   sp: Species
@@ -13,7 +13,7 @@ export interface Allot {
 function planWeight(id: string): { w: number; slot: boolean } | null {
   const c = CORE.find((x) => x.key === id)
   if (c) return { w: c.bags, slot: false }
-  return rotationById().cycle.includes(id) ? { w: SLOT_BAGS, slot: true } : null
+  return inSlot(id) ? { w: SLOT_BAGS, slot: true } : null
 }
 
 /** Weight of each species when splitting a run: core bags from the crop plan; slot species chosen together share one 16-bag slot. */

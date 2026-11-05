@@ -3,7 +3,7 @@ import { useApp } from '../settings/AppContext'
 import { ModelView } from '../components/ModelView'
 import { TypedRows, type Row } from '../components/TypedRows'
 import { FRUIT_ROOM_C, SPECIES, WEEKLY_BAGS, fruitVerdict, planBags, srcLabel } from '../data/species'
-import { frequencyText, rotationById, slotFraction, useRotation } from '../data/cropplan'
+import { CORE, frequencyText, getPlan, usePlan } from '../data/cropplan'
 import type { Fact, Species } from '../data/species/types'
 import { LB_TO_KG } from '../lib/runplan'
 import { useTable } from '../store/StoreContext'
@@ -55,8 +55,8 @@ function rowsFor(sp: Species, tab: Tab, strains: Strain[] = [], openHazard?: (id
         {
           id: 'o-plan',
           label: 'CROP PLAN',
-          value: bags ? `${bags} bags of the ${WEEKLY_BAGS}-bag run, ${frequencyText(sp.id)!.toLowerCase()} (secondary slot: ${rotationById().label.toLowerCase()}).` : 'Not in the current crop plan. Pick a secondary-slot rotation in PRODUCTION SEQUENCE to add it.',
-          why: { s: ['FARM-PLAN'], n: `130-bag split from the farm notes: 52 blue, 46 lion's mane, 16 comb tooth, plus a 16-bag secondary slot that rotates week to week.` },
+          value: bags ? `${bags} bags of the ${WEEKLY_BAGS}-bag run, ${frequencyText(sp.id)!.toLowerCase()}.` : 'Not in the current crop plan. Pick it for the secondary slot in PRODUCTION SEQUENCE to add it.',
+          why: { s: ['FARM-PLAN'], n: `130-bag split from the farm notes: 52 blue, 46 lion's mane, 16 comb tooth, plus a 16-bag secondary slot you choose in PRODUCTION SEQUENCE.` },
         },
         ...factRows('o', sp.overview),
         { id: 'o-str', label: 'STRAINS', value: strains.length ? strains.map((s) => `${s.code}${s.name ? ` ${s.name}` : ''}${s.active ? '' : ' (retired)'}`).join(', ') : 'None registered yet. Add them in XENOGENETICS.' },
@@ -96,7 +96,7 @@ function rowsFor(sp: Species, tab: Tab, strains: Strain[] = [], openHazard?: (id
             label: `${bags} BAGS / WEEK`,
             value: `About ${lb(bags * sp.cat.lb)} in a week it runs (${frequencyText(sp.id)!.toLowerCase()}), at Catawba's real ${sp.cat.lb.toFixed(2)} lb per block.`,
             flag: 'ctx',
-            why: { s: ['CATAWBA', 'FARM-PLAN'], n: `Bags come from the 130-bag crop plan and the chosen secondary-slot rotation. Cap n Stem's own planning figure is 2 lb per block.` },
+            why: { s: ['CATAWBA', 'FARM-PLAN'], n: `Bags come from the 130-bag crop plan and your secondary-slot choice. Cap n Stem's own planning figure is 2 lb per block.` },
           })
       }
       return [...factRows('y', sp.yield_), ...extra]
@@ -243,14 +243,14 @@ export function Specimen({ index, tab, setTab, onOpenStrain, onOpenHazard }: { i
 
 export function SpecimenIndex({ index, onPick }: { index: number; onPick: (i: number) => void }) {
   const { sound } = useApp()
-  const rot = useRotation()
+  usePlan()
   const row = (sp: Species, i: number) => {
     const b = planBags(sp)
-    const f = slotFraction(sp.id, rot)
+    const part = !!b && !CORE.some((c) => c.key === sp.id) && sp.id !== getPlan().slot
     return (
       <li key={sp.id} className={i === index ? 'sel' : ''} onClick={() => (sound.chirp(), onPick(i))}>
         <span>{String(sp.order).padStart(2, '0')} {sp.name}</span>
-        <span className="k">{b ? `${b}${f > 0 && f < 1 ? ` ${Math.round(f * rot.cycle.length)}/${rot.cycle.length}W` : ''}` : ''}</span>
+        <span className="k">{b ? `${b}${part ? '*' : ''}` : ''}</span>
       </li>
     )
   }
