@@ -13,7 +13,7 @@ power panel, rooms, stock, cultures, cooks, costs and sales. It works offline on
 - CRT glass: phosphor glow, scanlines, a real convex bulge, edge colour fringing, glare, grain and flicker,
   all on one strength slider, plus CLEAN mode for sunlight.
 - Sound made in code (Web Audio). Every sound is tied to something appearing on screen. See `docs/DESIGN.md`.
-- Supabase database schema for the whole data model (`supabase/migrations/0001_initial_schema.sql`, then `0002_cargo_and_owner_lock.sql` for CARGO and owner-only security, then `0003_genetics.sql` for XENOGENETICS, `0004_hazard_links.sql` for the HAZARD INDEX, `0005_cook_log.sql` for PROPULSION) and email login.
+- Supabase database schema for the whole data model (`supabase/migrations/0001_initial_schema.sql`, then `0002_cargo_and_owner_lock.sql` for CARGO and owner-only security, then `0003_genetics.sql` for XENOGENETICS, `0004_hazard_links.sql` for the HAZARD INDEX, `0005_cook_log.sql` for PROPULSION, `0006_ledger_trade.sql` for LEDGER and TRADE) and email login.
 - Installable, offline-capable web app (PWA).
 - Deploys to GitHub Pages now and Cloudflare Pages at launch.
 
@@ -49,6 +49,23 @@ Modules 1 and 4-9 show "NOT YET INSTALLED" until their build threads land.
 - **Labels:** printable QR labels for cultures and grain runs; scanning one opens that record.
 - P-level rule (confirmed by Joseph): a plate is one level up from what it came from; slants, water tubes, cryovials
   and LC keep their parent's level. Code: `childP()` in `src/lib/xeno.ts`.
+
+## What's in the costs and sales build (LEDGER and TRADE)
+
+- **LEDGER (module 8):** cost per block and per kg, by species and by knock week, in ₡ first and US$ second.
+  Five parts, each tagged ACTUAL, ESTIMATE, MIXED or NO DATA: consumables (CARGO stock moves at the last price,
+  else the run plan), cook energy (PROPULSION runs, else the planned week), room energy (the ICE bill less cook runs,
+  shared by bag-days in the rooms), labour (hours x your rate, switch on by default, rate blank) and equipment wear
+  (off by default). Kilos come from harvests, else Catawba yields. A PLAN WEEK of 130 blocks shows the cost before
+  any data exists.
+- **ICE bills:** type kWh, billed kW and the ₡ total; the screen checks it against the binomic tariff. With no bill,
+  a month uses the electrical package estimate (₡362,000-422,000, tagged ESTIMATE).
+- **Labour hours:** a quick log (day, who, hours, task, optional lot).
+- **TRADE (module 9):** a phone sale form (buyer, channel, species, fresh or dried, grade, kg, ₡, lot codes) that
+  fills the price and the buyer's usual channel for you. Totals and bar charts by channel and product, ₡ per week,
+  margin against LEDGER's cost per kg, a buyer list and the sales log.
+- Typed commands: `LEDGER`, `COST`, `BILLS`, `LABOUR`, `TRADE`, `SALE`, `TOTALS`, `BUYERS`.
+- Best guesses show GUESS - REVIEW on screen and are listed under SWITCHES + GUESSES (LEDGER) and GUESSES (TRADE).
 
 ## Setting it up
 
