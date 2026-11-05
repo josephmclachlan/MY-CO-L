@@ -18,14 +18,14 @@ const preview = process.env.PREVIEW === '1'
 const manual = process.env.MANUAL === '1'
 const at = (p: string) => fileURLToPath(new URL(p, import.meta.url))
 
-// The contaminant library and the cook log's context notes (src/data/cook) are paraphrased from the textbook, so its sentences follow the manual's rule:
+// The contaminant library, the species facts and the cook log's context notes are paraphrased from the textbook, so their sentences follow the manual's rule:
 // they are in the private test copy only. In the public build every fact keeps its id and tags but its
 // text (v) and note (n) are emptied here, before bundling. The screens show LOCKED in their place.
 const hazardText = (): Plugin => ({
   name: 'hazard-text-gate',
   enforce: 'pre',
   transform(code, id) {
-    if (manual || !/\/src\/data\/(hazards|patterns|cook)\/[^/]+\.json$/.test(id)) return null
+    if (manual || !/\/src\/data\/(hazards|patterns|species|cook)\/[^/]+\.json$/.test(id)) return null
     const strip = (x: unknown): unknown => {
       if (Array.isArray(x)) return x.map(strip)
       if (x && typeof x === 'object')
