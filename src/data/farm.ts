@@ -75,4 +75,5 @@ export const MODULES: ModuleDef[] = [
   { key: 'LEDGER', num: 8, name: 'LEDGER', what: 'COST OF GOODS', build: 9 },
   { key: 'TRADE', num: 9, name: 'TRADE', what: 'SALES', build: 9 },
   { key: 'SEQUENCE', num: 10, name: 'PRODUCTION SEQUENCE', what: 'BAG RUN PLANNER', build: 3 },
+  { key: 'MANUAL', num: 11, name: 'MANUAL', what: 'THE TEXTBOOK', build: 5 },
 ]

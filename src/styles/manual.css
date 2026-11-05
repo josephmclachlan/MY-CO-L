@@ -1,0 +1,96 @@
+/* MANUAL: the textbook reader, restyled in the terminal look. Colours come from the theme. */
+.body.view-manual .main-panel { padding: 0; overflow: hidden; }
+.manual { height: 100%; display: grid; grid-template-columns: minmax(180px, 28%) minmax(0, 1fr); min-height: 0; position: relative; }
+.manual-tocbtn { display: none; }
+.manual-toc { overflow: auto; border-right: 1px solid var(--fg-faint); padding: 10px 10px 16px; font-size: 0.85em; scrollbar-width: thin; scrollbar-color: var(--fg-dim) transparent; }
+.manual-toc ul { list-style: none; margin: 6px 0 0; padding: 0; }
+.manual-toc ul ul { margin: 2px 0 8px 14px; border-left: 1px solid var(--fg-faint); }
+.manual-toc button { all: unset; display: block; cursor: pointer; padding: 3px 6px; color: var(--fg-dim); line-height: 1.25; width: calc(100% - 12px); }
+.manual-toc button:hover, .manual-toc button:focus-visible { color: var(--bg); background: var(--fg-dim); }
+.manual-toc li.cur > button { color: var(--fg); background: var(--bg-hi); border-left: 3px solid var(--fg); }
+.manual-toc li.lv3 > button { padding-left: 14px; font-size: 0.92em; }
+.mt-n { color: var(--fg); margin-right: 4px; }
+.manual-body { overflow: auto; padding: 14px 18px 24px; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--fg-dim) transparent; }
+.manual-pager { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; border-top: 1px solid var(--fg-faint); padding-top: 12px; }
+.manual-pager button, .manual-tocbtn { font: inherit; color: var(--fg); background: none; border: 1px solid var(--fg-dim); padding: 4px 10px; cursor: pointer; letter-spacing: 0.08em; }
+.manual-pager button:hover:not(:disabled) { color: var(--bg); background: var(--fg-dim); }
+.manual-pager button:disabled { opacity: 0.35; cursor: default; }
+
+.mbook { line-height: 1.5; font-size: 0.95em; max-width: 90ch; overflow-wrap: anywhere; }
+.mbook h1 { font-family: 'Michroma', sans-serif; font-size: 1.15em; letter-spacing: 0.06em; margin: 0 0 12px; color: var(--fg); text-transform: uppercase; }
+.mbook h2 { font-family: 'Michroma', sans-serif; font-size: 0.95em; letter-spacing: 0.05em; margin: 26px 0 8px; padding: 3px 8px; color: var(--bg); background: var(--fg-dim); text-shadow: none; text-transform: uppercase; }
+.mbook h3 { margin: 18px 0 6px; font-size: 1em; color: var(--fg); border-bottom: 1px solid var(--fg-faint); padding-bottom: 2px; letter-spacing: 0.04em; }
+.mbook h4 { margin: 12px 0 4px; font-size: 1em; color: var(--fg-dim); }
+.mbook p, .mbook ul, .mbook ol { margin: 0 0 9px; }
+.mbook ul, .mbook ol { padding-left: 22px; }
+.mbook li { margin: 2px 0; }
+.mbook a { color: var(--fg); text-decoration: underline dotted; text-underline-offset: 3px; cursor: pointer; }
+.mbook a:hover { color: var(--bg); background: var(--fg); text-decoration: none; }
+.mbook strong { color: var(--fg); }
+.mbook code { background: var(--bg-hi); padding: 0 4px; }
+.mbook hr { border: 0; border-top: 1px solid var(--fg-faint); margin: 14px 0; }
+.mbook .tbl { overflow-x: auto; margin: 8px 0 12px; }
+.mbook table { border-collapse: collapse; font-size: 0.9em; min-width: 100%; }
+.mbook th, .mbook td { border: 1px solid var(--fg-faint); padding: 3px 7px; vertical-align: top; text-align: left; }
+.mbook th { color: var(--bg); background: var(--fg-dim); text-shadow: none; font-weight: normal; letter-spacing: 0.04em; }
+.mbook blockquote { margin: 10px 0; padding: 6px 10px 6px 12px; border: 1px solid var(--fg-dim); border-left-width: 4px; background: var(--bg-hi); }
+.mbook blockquote p:last-child { margin-bottom: 0; }
+.mbook .colabel { display: inline-block; margin-right: 8px; padding: 0 6px; font-weight: normal; letter-spacing: 0.1em; font-size: 0.8em; color: var(--bg); background: var(--fg-dim); text-shadow: none; }
+.mbook blockquote.co-warning { border-color: var(--warn, var(--fg)); }
+.mbook blockquote.co-warning .colabel { background: var(--warn, var(--fg)); }
+.mbook blockquote.co-rule { border-color: var(--fg); }
+.mbook blockquote.co-rule .colabel { background: var(--fg); }
+.mbook .fm { display: none; }
+.mbook .hit { outline: 1px solid var(--hazard, var(--fg)); outline-offset: 2px; background: color-mix(in srgb, var(--hazard, var(--fg)) 14%, transparent); }
+.mbook .flash { animation: mflash 2.2s ease-out 1; }
+@keyframes mflash { 0%, 60% { background: var(--fg-faint); } 100% { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .mbook .flash { animation: none; background: var(--fg-faint); } }
+
+/* Figures: the textbook's SVGs recoloured to the theme (line art in phosphor on the dark glass). */
+.mbook .mfig { margin: 14px 0; padding: 10px; border: 1px solid var(--fg-faint); background: var(--bg); }
+.mbook .mfig svg { display: block; width: 100%; height: auto; max-height: 70vh; }
+.mbook .mfig figcaption { margin-top: 8px; font-size: 0.85em; color: var(--fg-dim); }
+.mbook .mfig-ph { padding: 18px; border: 1px dashed var(--fg-faint); color: var(--fg-dim); text-align: center; }
+.mbook .mfig svg text { fill: var(--fg); stroke: none; font-family: 'Share Tech Mono', ui-monospace, monospace; }
+.mbook .mfig svg :where(line, polyline) { stroke: var(--fg); fill: none; }
+.mbook .mfig svg :where(rect, circle, ellipse, polygon, path) { fill: none; stroke: var(--fg-dim); }
+.mbook .mfig svg .stroke { stroke: var(--fg-dim); stroke-width: 1.5; }
+.mbook .mfig svg .fg { fill: var(--fg); }
+.mbook .mfig svg line.fg, .mbook .mfig svg polyline.fg { stroke: var(--fg); fill: none; }
+.mbook .mfig svg .muted { fill: var(--fg-dim); }
+.mbook .mfig svg line.muted, .mbook .mfig svg polyline.muted { stroke: var(--fg-dim); fill: none; }
+.mbook .mfig svg .accent { fill: var(--fg); }
+.mbook .mfig svg .accent-soft { fill: var(--fg-faint); }
+.mbook .mfig svg .c1 { fill: var(--fg-faint); }
+.mbook .mfig svg .c2 { fill: color-mix(in srgb, var(--fg-dim) 35%, transparent); }
+.mbook .mfig svg .c3 { fill: color-mix(in srgb, var(--fg) 25%, transparent); }
+.mbook .mfig svg .warn, .mbook .mfig svg .warn-soft { fill: var(--warn, var(--hazard)); }
+.mbook .mfig svg .warn-soft { fill: color-mix(in srgb, var(--warn, var(--hazard)) 30%, transparent); }
+.mbook .mfig svg .ok { fill: var(--fg); }
+.mbook .mfig svg text.muted, .mbook .mfig svg text.accent, .mbook .mfig svg text.fg { stroke: none; }
+
+/* Source pop-up: only the cited section. */
+.src-pop { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; padding: clamp(8px, 3vw, 28px); background: rgba(0, 0, 0, 0.72); }
+.src-box { width: min(100%, 880px); max-height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--bg); border: 1px solid var(--fg); box-shadow: 0 0 calc(18px * var(--glow-k, 1)) var(--glow); }
+.src-head { background: var(--fg); color: var(--bg); text-shadow: none; padding: 3px 10px; font-size: 0.8em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.src-body { overflow: auto; padding: 10px 14px; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--fg-dim) transparent; }
+.src-also { margin-top: 10px; font-size: 0.85em; }
+.src-actions { display: flex; gap: 10px; justify-content: flex-end; padding: 8px 12px; border-top: 1px solid var(--fg-faint); }
+.src-actions .why { margin: 0; padding: 4px 12px; font-size: 0.85em; }
+.src-actions .why.on { color: var(--bg); background: var(--fg); }
+
+/* Reference links in plain text (fact ids, chapter marks). */
+button.ref { font: inherit; color: var(--fg); background: none; border: 0; border-bottom: 1px dotted var(--fg); padding: 0; margin: 0 1px; cursor: pointer; text-align: left; }
+button.ref:hover, button.ref:focus-visible { color: var(--bg); background: var(--fg); }
+
+.back-btn { font: inherit; color: var(--bg); background: none; border: 1px solid var(--bg); padding: 0 8px; margin-right: 10px; cursor: pointer; letter-spacing: 0.08em; }
+.back-btn:hover, .back-btn:focus-visible { color: var(--fg); background: var(--bg); }
+
+@media (max-width: 700px) {
+  .manual { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+  .manual-tocbtn { display: block; margin: 6px; text-align: left; }
+  .manual-toc { display: none; border-right: 0; }
+  .manual.toc-open .manual-toc { display: block; grid-row: 2; }
+  .manual.toc-open .manual-body { display: none; }
+  .manual-body { padding: 10px 12px 20px; }
+}

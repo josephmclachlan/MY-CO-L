@@ -2,6 +2,7 @@ import { useRef, useState, type ReactNode } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useStoreStatus } from '../store/StoreContext'
 import { useCargo, type CargoRow } from '../store/useCargo'
+import { RefText } from '../manual/ManualLinks'
 import { TypeText } from '../components/TypeText'
 import { CATEGORIES } from '../data/cargo'
 import { ROOMS } from '../data/rooms'
@@ -155,8 +156,8 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
         {r.use ? ` // USE ${fmtQty(r.use.perWeek)} ${item.unit} A WEEK (${r.use.source})` : ' // NO WEEKLY USE YET'}
         {r.weeks !== null ? ` // ${fmtWeeks(r.weeks)} WEEKS LEFT` : ''}
       </div>
-      {r.plan && <div className="dim tiny">PLAN BASIS: {r.plan.basis}.</div>}
-      {item.notes && <div className="dim tiny">NOTE: {item.notes}</div>}
+      {r.plan && <div className="dim tiny">PLAN BASIS: <RefText text={r.plan.basis} />.</div>}
+      {item.notes && <div className="dim tiny">NOTE: <RefText text={item.notes} /></div>}
 
       <div className="cg-actions">
         <div className="cg-act">
@@ -424,7 +425,7 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
               <tr key={l.code}>
                 <td>{it?.item.name ?? l.code}</td>
                 <td>{fmtQty(l.qty)} {l.unit}</td>
-                <td className="cg-basis">{l.basis}</td>
+                <td className="cg-basis"><RefText text={l.basis} /></td>
               </tr>
             )
           })}

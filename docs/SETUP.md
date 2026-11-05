@@ -110,3 +110,11 @@ so only your email can open it.
 If Cloudflare's screen only offers **Workers** (no Pages tab): choose **Import a repository**, pick
 MY-CO-L, build command `npm run build`, deploy command `npx wrangler deploy`. The repo already has the
 `wrangler.jsonc` file this needs.
+
+## The MANUAL tab (private test copy only)
+
+The textbook lives in the MANUAL module. It is built into the private test copy only. The public GitHub Pages build shows `MANUAL LOCKED // LOGIN REQUIRED` and does not contain any textbook text (the build swaps the data for an empty file).
+
+- Make the test copy with the textbook: `npm run build:preview` (reads the chapters from `MANUAL_SRC`, default `/mnt/project-files/knowledge/01-core-knowledge/textbook`).
+- The generated data is `src/manual-data/manual.json`. It is gitignored and must never be committed.
+- Once Supabase login is linked, serve the same JSON behind the login and remove the `MANUAL` gate in `vite.config.ts`.
