@@ -1,0 +1,51 @@
+# Builds the app and publishes it to GitHub Pages every time something is
+# merged into main. Needs (once): GitHub Pro for a private repo, then
+# Settings > Pages > Source: "GitHub Actions". See docs/SETUP.md.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          # The site lives at https://<user>.github.io/<repo>/
+          BASE_PATH: /${{ github.event.repository.name }}/
+          # Optional. Set these under Settings > Secrets and variables > Actions > Variables
+          # once Supabase exists. Both are public values (the anon/publishable key).
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ vars.VITE_SUPABASE_KEY }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
