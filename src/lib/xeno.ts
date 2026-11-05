@@ -265,7 +265,7 @@ export function ageLimit(kind: CultureKind | 'G1' | 'G2', speciesKey?: string): 
     case 'cryo':
       return { warn: 548, over: 730, basis: 'made', rule: 'A vial that has sat 18-24 months: run a test line before trusting it.', src: 'F04-0061 F04-0236' }
     case 'G1':
-      return { warn: 21, over: 30, basis: 'cold', rule: 'Cold G1 masters: about a month, inspecting; beyond a month is a no-go (the only species figure given is black oyster).', src: 'F04-0088' }
+      return { warn: 21, over: 30, basis: 'cold', rule: 'Cold G1 masters: about a month, inspecting; past a month, discard the culture (the only species figure given is black oyster).', src: 'F04-0088' }
     case 'G2':
       if (speciesKey === 'lions-mane')
         return { warn: 10, over: 14, basis: 'cold', rule: "Lion's mane spawn: no more than about 2 weeks cold; it still tries to fruit.", src: 'F04-0091' }
