@@ -332,9 +332,9 @@ describe('energy and peaks', () => {
   })
   it('plans a start time: a 06:30 steam run puts the come-up inside the morning peak', () => {
     const p = plannedPeaks('steam_box', '2x4500', T0)
-    expect(p.minutes).toBe(480)
+    expect(p.minutes).toBe(660) // 7 h come-up (fab rev D) + 4 h hold
     expect(p.hits[0].label).toBe('10:00-12:30')
-    expect(p.hits[0].kwh).toBeCloseTo(9 * 0.5 + 1.5 * 2, 6) // 30 min at full 9 kW until come-up ends at 10:30, then 2 h at the hold power
+    expect(p.hits[0].kwh).toBeCloseTo(9 * 2.5, 6) // come-up runs to 13:30, so the whole 2.5 h window is at full 9 kW
   })
   it('a MegaChef batch of 4 draws 4.8 kW', () => {
     const r = run({ kind: 'megachef', pots: 4, come_up_minutes: 11, cook_minutes: 14, ended_at: null })

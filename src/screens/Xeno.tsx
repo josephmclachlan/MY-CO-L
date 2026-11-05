@@ -780,7 +780,7 @@ function LineageTab({ d, x, set, say, onLabel }: { d: XData; x: XenoState; set: 
   if (!strain || !root)
     return (
       <div className="xn-sec">
-        <div className="dim">PICK A STRAIN AT RIGHT TO SEE ITS LINE.</div>
+        <div className="dim">PICK A STRAIN IN THE LIST TO SEE ITS LINE.</div>
         <div className="xn-picker">
           {d.strains.map((s) => (
             <button key={s.id} type="button" className="btn" onClick={() => set({ strain: s.id })}>{s.code}</button>
