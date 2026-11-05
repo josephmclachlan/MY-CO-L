@@ -1,0 +1,1273 @@
+[
+ {
+  "id": "chestnut-mustard",
+  "name": "GOLDEN-MUSTARD CHESTNUT BLOCK",
+  "kind": "notcontam",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "yellow",
+   "brown"
+  ],
+  "smells": [],
+  "textures": [
+   "dry"
+  ],
+  "places": [
+   "whole"
+  ],
+  "species": [
+   "chestnut"
+  ],
+  "spot": [
+   {
+    "v": "Golden-mustard colour on chestnut blocks.",
+    "s": [
+     "F14-0101",
+     "F11-0295"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Neurospora is orange and powdery, climbs to the headspace and sporulates.",
+    "s": [
+     "F14-0036"
+    ],
+    "hz": "neurospora"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Normal ripening. New staff warned about Neurospora often mistake it.",
+    "s": [
+     "F14-0043",
+     "F14-0044"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Nothing to do. Do not throw it away.",
+    "s": [
+     "F14-0101",
+     "F11-0295"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Chestnut.",
+    "s": [
+     "F14-0101",
+     "F11-0295"
+    ]
+   }
+  ],
+  "w": [
+   "chestnut-mushrooms 0:11:23",
+   "comb-tooth 0:12:30",
+   "pioppino 0:11:37",
+   "black-oyster 0:16:39",
+   "pioppino 0:07:26",
+   "stroma 0:09:18",
+   "contamination-1 0:56:14",
+   "incubation-tips-and-tricks 0:31:08",
+   "02-shiitake-cultivation 1:15:54",
+   "insane-in-the-incubation 0:42:11"
+  ]
+ },
+ {
+  "id": "lm-ghostly",
+  "name": "GHOSTLY LION'S MANE BLOCK",
+  "kind": "notcontam",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "wispy"
+  ],
+  "places": [
+   "whole"
+  ],
+  "species": [
+   "lions-mane"
+  ],
+  "spot": [
+   {
+    "v": "Ghostly, wispy lion's mane block.",
+    "s": [
+     "F14-0102",
+     "F11-0296"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Hidden early Trichoderma looks like slightly denser matting.",
+    "s": [
+     "F14-0015"
+    ],
+    "hz": "trichoderma"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Normal; fully colonized in about 10 days. But Trichoderma can hide in it: watch for denser matting.",
+    "s": [
+     "F14-0102"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Nothing to do. Do not throw it away.",
+    "s": [
+     "F14-0102",
+     "F11-0296"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Lion's mane.",
+    "s": [
+     "F14-0102",
+     "F11-0296"
+    ]
+   }
+  ],
+  "w": [
+   "chestnut-mushrooms 0:11:23",
+   "comb-tooth 0:12:30",
+   "pioppino 0:11:37",
+   "black-oyster 0:16:39",
+   "pioppino 0:07:26",
+   "stroma 0:09:18",
+   "contamination-1 0:56:14",
+   "incubation-tips-and-tricks 0:31:08",
+   "02-shiitake-cultivation 1:15:54",
+   "insane-in-the-incubation 0:42:11"
+  ]
+ },
+ {
+  "id": "pioppino-splotchy",
+  "name": "SPLOTCHY PIOPPINO OR KING OYSTER BLOCK",
+  "kind": "notcontam",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "wispy"
+  ],
+  "places": [
+   "patches"
+  ],
+  "species": [
+   "pioppino",
+   "king-oyster"
+  ],
+  "spot": [
+   {
+    "v": "Splotchy blocks with uncolonized patches.",
+    "s": [
+     "F14-0103",
+     "F11-0294"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "See the hazard it is mistaken for.",
+    "s": [
+     "F14-0103",
+     "F11-0294"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Normal; the colonies join after about 3 weeks.",
+    "s": [
+     "F14-0103"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Nothing to do. Do not throw it away.",
+    "s": [
+     "F14-0103",
+     "F11-0294"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Pioppino and king oyster.",
+    "s": [
+     "F14-0103",
+     "F11-0294"
+    ]
+   }
+  ],
+  "w": [
+   "chestnut-mushrooms 0:11:23",
+   "comb-tooth 0:12:30",
+   "pioppino 0:11:37",
+   "black-oyster 0:16:39",
+   "pioppino 0:07:26",
+   "stroma 0:09:18",
+   "contamination-1 0:56:14",
+   "incubation-tips-and-tricks 0:31:08",
+   "02-shiitake-cultivation 1:15:54",
+   "insane-in-the-incubation 0:42:11"
+  ]
+ },
+ {
+  "id": "pearl-pillowy",
+  "name": "PILLOWY BLACK PEARL GRAIN",
+  "kind": "notcontam",
+  "stages": [
+   "grain"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "hard"
+  ],
+  "places": [
+   "patches"
+  ],
+  "species": [
+   "black-pearl"
+  ],
+  "spot": [
+   {
+    "v": "Dense, pillowy splotches in black pearl grain that are not rock-hard.",
+    "s": [
+     "F14-0104"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "True stroma is hard, never reverts to mycelium and is hot inside.",
+    "s": [
+     "F15-0140"
+    ],
+    "hz": "stroma"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Normal. True stroma is hard (poke test) and appears in older, dense zones.",
+    "s": [
+     "F14-0104",
+     "F15-0140"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Nothing to do. Do not throw it away.",
+    "s": [
+     "F14-0104"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Black pearl.",
+    "s": [
+     "F14-0104"
+    ]
+   }
+  ],
+  "w": [
+   "chestnut-mushrooms 0:11:23",
+   "comb-tooth 0:12:30",
+   "pioppino 0:11:37",
+   "black-oyster 0:16:39",
+   "pioppino 0:07:26",
+   "stroma 0:09:18",
+   "contamination-1 0:56:14",
+   "incubation-tips-and-tricks 0:31:08",
+   "02-shiitake-cultivation 1:15:54",
+   "insane-in-the-incubation 0:42:11"
+  ]
+ },
+ {
+  "id": "pioppino-grain-white",
+  "name": "DENSE WHITE PIOPPINO GRAIN",
+  "kind": "notcontam",
+  "stages": [
+   "grain"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "wispy"
+  ],
+  "places": [
+   "patches"
+  ],
+  "species": [
+   "pioppino"
+  ],
+  "spot": [
+   {
+    "v": "Dense white patches on pioppino grain.",
+    "s": [
+     "F14-0105"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "See the hazard it is mistaken for.",
+    "s": [
+     "F14-0105"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Normal; pioppino stays soft and never knits as hard as oyster.",
+    "s": [
+     "F14-0105",
+     "F15-0141"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Nothing to do. Do not throw it away.",
+    "s": [
+     "F14-0105"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Pioppino.",
+    "s": [
+     "F14-0105"
+    ]
+   }
+  ],
+  "w": [
+   "chestnut-mushrooms 0:11:23",
+   "comb-tooth 0:12:30",
+   "pioppino 0:11:37",
+   "black-oyster 0:16:39",
+   "pioppino 0:07:26",
+   "stroma 0:09:18",
+   "contamination-1 0:56:14",
+   "incubation-tips-and-tricks 0:31:08",
+   "02-shiitake-cultivation 1:15:54",
+   "insane-in-the-incubation 0:42:11"
+  ]
+ },
+ {
+  "id": "consolidation",
+  "name": "MYCELIAL CONSOLIDATION",
+  "kind": "notcontam",
+  "stages": [
+   "plate"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "hard"
+  ],
+  "places": [
+   "plate"
+  ],
+  "species": [
+   "king-oyster"
+  ],
+  "spot": [
+   {
+    "v": "An odd-looking secondary dense layer that peels off a plate.",
+    "s": [
+     "F14-0106",
+     "F03-0109"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Tough leathery crust on agar is stroma (very rare on agar).",
+    "s": [
+     "F03-0108"
+    ],
+    "hz": "stroma"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Healthy. Peel off the skin on king oyster to reach fresh tissue.",
+    "s": [
+     "F14-0106",
+     "F03-0097"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Nothing to do. Do not throw it away.",
+    "s": [
+     "F14-0106",
+     "F03-0109"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "King oyster.",
+    "s": [
+     "F14-0106",
+     "F03-0109"
+    ]
+   }
+  ],
+  "w": [
+   "cloning-a-wild-mushroom 0:05:15",
+   "cloning-a-wild-mushroom 0:07:19",
+   "cloning-a-wild-mushroom 0:11:29",
+   "history-of-pleurotus 1:09:52"
+  ]
+ },
+ {
+  "id": "hot-knock",
+  "name": "SPAWN KILLED BY HOT KNOCK",
+  "kind": "notcontam",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "dry"
+  ],
+  "places": [
+   "patches"
+  ],
+  "species": [],
+  "spot": [
+   {
+    "v": "Spawn that never grows, or only a few nodules.",
+    "s": [
+     "F14-0107",
+     "F14-0207"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "See the hazard it is mistaken for.",
+    "s": [
+     "F14-0107",
+     "F14-0207"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Blocks knocked at 38 °C (100 °F) or more kill the spawn. Often mistaken for contamination, typical with under-trained staff.",
+    "s": [
+     "F14-0207"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Cool further before knocking; aim for 27-32 °C (80-90 °F).",
+    "s": [
+     "F14-0207",
+     "F14-0260"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Not species-specific.",
+    "s": [
+     "F14-0107",
+     "F14-0207"
+    ]
+   }
+  ],
+  "w": [
+   "contamination-1 1:03:25",
+   "knock-seal-shake 0:10:47",
+   "knock-seal-shake 0:08:43",
+   "contamination-1 0:56:14",
+   "knock-seal-shake 0:16:58",
+   "myco-op-lids 0:16:28",
+   "chestnut 0:15:41",
+   "cactus-hat-mushrooms 1:25:02"
+  ]
+ },
+ {
+  "id": "contact-heat",
+  "name": "LOCAL HEAT WHERE BLOCKS TOUCH",
+  "kind": "notcontam",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "brown"
+  ],
+  "smells": [],
+  "textures": [
+   "dry"
+  ],
+  "places": [
+   "patches"
+  ],
+  "species": [],
+  "spot": [
+   {
+    "v": "Sawdust-coloured, loosely colonized patch where two blocks touch; shiitake will not buckle there.",
+    "s": [
+     "F14-0108",
+     "F11-0276"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "See the hazard it is mistaken for.",
+    "s": [
+     "F14-0108",
+     "F11-0276"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Local heat from contact. Lack of light is sometimes blamed but heat is likely.",
+    "s": [
+     "F14-0108"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Separate blocks by two hand widths.",
+    "s": [
+     "F14-0108",
+     "F14-0220"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Not species-specific.",
+    "s": [
+     "F14-0108",
+     "F11-0276"
+    ]
+   }
+  ],
+  "w": [
+   "incubation-tips-and-tricks 0:31:08",
+   "insane-in-the-incubation 0:35:01",
+   "incubation-tips-and-tricks 0:12:27",
+   "shitake-2 0:31:55",
+   "02-shiitake-cultivation 1:32:22"
+  ]
+ },
+ {
+  "id": "popcorning",
+  "name": "POPCORNING OR BLISTERING SHIITAKE",
+  "kind": "notcontam",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "brown"
+  ],
+  "smells": [],
+  "textures": [
+   "wet"
+  ],
+  "places": [
+   "whole"
+  ],
+  "species": [
+   "shiitake"
+  ],
+  "spot": [
+   {
+    "v": "Blistering and air pockets under shiitake skin that never browns.",
+    "s": [
+     "F14-0109",
+     "F11-0278"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "See the hazard it is mistaken for.",
+    "s": [
+     "F14-0109",
+     "F11-0278"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Substrate temperature swings, even 3 °C (5 °F).",
+    "s": [
+     "F14-0109",
+     "F14-0151"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Hold a steady temperature.",
+    "s": [
+     "F14-0151"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Shiitake.",
+    "s": [
+     "F14-0109",
+     "F11-0278"
+    ]
+   }
+  ],
+  "w": [
+   "incubation-tips-and-tricks 0:31:08",
+   "insane-in-the-incubation 0:35:01",
+   "incubation-tips-and-tricks 0:12:27",
+   "shitake-2 0:31:55",
+   "02-shiitake-cultivation 1:32:22"
+  ]
+ },
+ {
+  "id": "light-burn",
+  "name": "LIGHT BURN ON CHESTNUT TOPS",
+  "kind": "notcontam",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "brown"
+  ],
+  "smells": [],
+  "textures": [
+   "dry"
+  ],
+  "places": [
+   "top"
+  ],
+  "species": [
+   "chestnut"
+  ],
+  "spot": [
+   {
+    "v": "Dry, dead sawdust at the top of chestnut blocks on the top rack.",
+    "s": [
+     "F14-0110",
+     "F11-0277"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "See the hazard it is mistaken for.",
+    "s": [
+     "F14-0110",
+     "F11-0277"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Light burn from a strong 6500 K light close above, or too open a patch.",
+    "s": [
+     "F14-0110"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Chestnut low and away from lights; red light; tighter patch.",
+    "s": [
+     "F11-0277"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Chestnut.",
+    "s": [
+     "F14-0110",
+     "F11-0277"
+    ]
+   }
+  ],
+  "w": [
+   "incubation-tips-and-tricks 0:31:08",
+   "insane-in-the-incubation 0:35:01",
+   "incubation-tips-and-tricks 0:12:27",
+   "shitake-2 0:31:55",
+   "02-shiitake-cultivation 1:32:22"
+  ]
+ },
+ {
+  "id": "overcooked-outer",
+  "name": "OVERCOOKED OUTER BLOCKS",
+  "kind": "notcontam",
+  "stages": [
+   "cook",
+   "block"
+  ],
+  "colours": [
+   "brown"
+  ],
+  "smells": [],
+  "textures": [
+   "dry"
+  ],
+  "places": [
+   "whole"
+  ],
+  "species": [],
+  "spot": [
+   {
+    "v": "Outer blocks in a barrel dried and growing poorly, inner ones fine.",
+    "s": [
+     "F14-0111",
+     "F08-0223"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "See the hazard it is mistaken for.",
+    "s": [
+     "F14-0111",
+     "F08-0223"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Uneven cooking, overcooking, not contamination.",
+    "s": [
+     "F14-0111",
+     "F08-0223"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Shorter cook; load the barrel less tightly.",
+    "s": [
+     "F08-0223",
+     "F14-0174"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Not species-specific.",
+    "s": [
+     "F14-0111",
+     "F08-0223"
+    ]
+   }
+  ],
+  "w": [
+   "contamination-1 0:39:34",
+   "contamination-1 0:41:40",
+   "02-shiitake-cultivation 1:02:35",
+   "contamination-1 0:48:56",
+   "contamination-2 0:09:33",
+   "insane-in-the-incubation 0:14:17",
+   "cactus-hat-mushrooms 1:24:01",
+   "04-pasteurize-or-sterilize 1:15:35",
+   "contamination-1 0:13:33",
+   "04-pasteurize-or-sterilize 0:29:35"
+  ]
+ },
+ {
+  "id": "black-oyster-cobweb",
+  "name": "BLACK OYSTER PINNING FUZZ",
+  "kind": "notcontam",
+  "stages": [
+   "block",
+   "fruit"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "fuzzy"
+  ],
+  "places": [
+   "cut"
+  ],
+  "species": [
+   "black-pearl"
+  ],
+  "spot": [
+   {
+    "v": "Cobweb-like aerial mycelium at a cut, then amber droplets.",
+    "s": [
+     "F14-0112"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Pin mould is white fuzz that keeps spreading and may turn yellow-green.",
+    "s": [
+     "F14-0063"
+    ],
+    "hz": "pin-mould"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Normal black oyster pinning; becomes the caps.",
+    "s": [
+     "F14-0064",
+     "F14-0112"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Nothing to do. Do not throw it away.",
+    "s": [
+     "F14-0112"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Black oyster.",
+    "s": [
+     "F14-0112"
+    ]
+   }
+  ],
+  "w": [
+   "chestnut-mushrooms 0:11:23",
+   "comb-tooth 0:12:30",
+   "pioppino 0:11:37",
+   "black-oyster 0:16:39",
+   "pioppino 0:07:26",
+   "stroma 0:09:18",
+   "contamination-1 0:56:14",
+   "incubation-tips-and-tricks 0:31:08",
+   "02-shiitake-cultivation 1:15:54",
+   "insane-in-the-incubation 0:42:11"
+  ]
+ },
+ {
+  "id": "old-grain-metabolites",
+  "name": "YELLOW OR ORANGE DROPLETS ON OLD GRAIN",
+  "kind": "notcontam",
+  "stages": [
+   "grain"
+  ],
+  "colours": [
+   "yellow",
+   "orange",
+   "clear"
+  ],
+  "smells": [],
+  "textures": [
+   "wet"
+  ],
+  "places": [
+   "patches"
+  ],
+  "species": [
+   "shiitake",
+   "chestnut",
+   "pioppino"
+  ],
+  "spot": [
+   {
+    "v": "Yellow or orange metabolites on older shiitake, chestnut and pioppino grain; clear droplets on chestnut a week later.",
+    "s": [
+     "F11-0297",
+     "F05-0192"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Heavy metabolite exudate in blocks (other than shiitake) means media too rich or undercooked.",
+    "s": [
+     "F14-0078"
+    ],
+    "hz": "metabolite-exudate"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Normal ageing of the culture.",
+    "s": [
+     "F11-0297"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Nothing to do. Do not throw it away.",
+    "s": [
+     "F11-0297",
+     "F05-0192"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Shiitake, chestnut, pioppino.",
+    "s": [
+     "F11-0297",
+     "F05-0192"
+    ]
+   }
+  ],
+  "w": [
+   "history-of-pleurotus 1:26:18",
+   "contamination-1 0:44:46",
+   "04-pasteurize-or-sterilize 0:29:35",
+   "contamination-2 0:09:33",
+   "02-shiitake-cultivation 1:02:35",
+   "bacterial-blotch 0:05:53",
+   "bacterial-blotch 0:17:21",
+   "contamination-1 0:28:16",
+   "contamination-1 0:47:00",
+   "contamination-2 0:02:13"
+  ]
+ },
+ {
+  "id": "old-spawn",
+  "name": "TOUGH LEATHERY OLD SPAWN",
+  "kind": "notcontam",
+  "stages": [
+   "grain"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "hard"
+  ],
+  "places": [
+   "whole"
+  ],
+  "species": [],
+  "spot": [
+   {
+    "v": "Spawn that is a solid leathery brick and slow to leap onto substrate.",
+    "s": [
+     "F05-0188",
+     "F05-0186"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "If it is also hot and hard inside, check for stroma.",
+    "s": [
+     "F15-0142"
+    ],
+    "hz": "stroma"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Spawn left too long past colonization.",
+    "s": [
+     "F05-0188"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Use spawn just past full coverage. Long-held masters risk stroma (do not use beyond about a month in cold store).",
+    "s": [
+     "F05-0186",
+     "F15-0153"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Learn what normal looks like before you discard.",
+    "s": [
+     "F14-0101"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Not species-specific.",
+    "s": [
+     "F05-0188",
+     "F05-0186"
+    ]
+   }
+  ],
+  "w": [
+   "stroma 0:14:30",
+   "incubation-tips-and-tricks 0:33:12",
+   "stroma 0:11:21",
+   "lions-mane-1 0:27:13",
+   "stroma 0:12:24",
+   "insane-in-the-incubation 1:02:11",
+   "stroma 0:24:47",
+   "stroma 0:41:29",
+   "black-oyster 0:14:31",
+   "stroma 0:39:22"
+  ]
+ },
+ {
+  "id": "shape-faults",
+  "name": "FRUIT SHAPE FAULTS (ROOM, NOT DISEASE)",
+  "kind": "notcontam",
+  "stages": [
+   "fruit"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "mushy"
+  ],
+  "places": [
+   "cap",
+   "stem"
+  ],
+  "species": [
+   "blue-oyster",
+   "king-oyster",
+   "black-pearl",
+   "lions-mane",
+   "chestnut"
+  ],
+  "aka": "LONG STEMS, WARTY CAPS, FUSED CAPS",
+  "spot": [
+   {
+    "v": "Long stems and no caps ('cordyceps-like' oysters): high CO2. Bleached crusty flat king oyster caps: too much CO2 and too little light. Warty caps on king and black oyster: very high humidity.",
+    "s": [
+     "F15-0121",
+     "F15-0122",
+     "F15-0120"
+    ]
+   },
+   {
+    "v": "Fused mushrooms, a small cap on a cap (chestnut): excess humidity or condensation on caps; usually harmless on chestnut. Lion's mane deformities: low air exchange, high CO2, heat, dense packing. Comb tooth patch that fails to branch: cause unknown.",
+    "s": [
+     "F15-0118",
+     "F15-0126",
+     "F15-0123",
+     "F15-0125"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Bizarre deformed oyster shapes with no room cause may be a virus.",
+    "s": [
+     "F15-0124"
+    ],
+    "hz": "viruses"
+   },
+   {
+    "v": "Gills on top of caps are rose comb.",
+    "s": [
+     "F15-0110"
+    ],
+    "hz": "rose-comb"
+   }
+  ],
+  "cause": [
+   {
+    "v": "The room: CO2, humidity, light, air exchange.",
+    "s": [
+     "F15-0121",
+     "F15-0123"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "More fresh air, automated CO2, steadier humidity, even light.",
+    "s": [
+     "F12-0262",
+     "F12-0276",
+     "F12-0277"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Set CO2 exhaust (about 800-900 ppm for black oyster), swing humidity, even light.",
+    "s": [
+     "F12-0264",
+     "F15-0030"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "See the species.",
+    "s": [
+     "F15-0123"
+    ]
+   }
+  ],
+  "w": [
+   "chestnut-mushrooms 0:43:23",
+   "black-oyster 0:32:29",
+   "water-treatment 0:14:31",
+   "01-fruit-room-design 0:41:08",
+   "king-oyster 1:02:13",
+   "lions-mane-2 0:27:47",
+   "bacterial-blotch 0:44:18",
+   "comb-tooth 0:18:20",
+   "chestnut-mushrooms 0:45:40"
+  ]
+ }
+]

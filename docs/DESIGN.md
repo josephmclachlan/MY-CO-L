@@ -74,3 +74,13 @@ so history and count cannot disagree. `src/lib/stockplan.ts` works out a run's u
 ## Adding a module
 
 Each module replaces its `Pending` placeholder in `src/App.tsx` (see `MODULES` in `src/data/farm.ts`).
+
+## HAZARD INDEX (build 8)
+
+The contaminant library is data, not database rows: `src/data/hazards/*.json` (one file per group, loaded by
+`index.ts`). Each entry has spot / look-alikes / cause / treat / prevent / risk facts, every fact with textbook
+fact IDs (WHY? opens them; the textbook text itself stays out of the public build), plus colour, smell, texture,
+place and stage tags that feed the DIAGNOSE helper (`src/lib/hazard.ts`). Entries have text ids (`neurospora`).
+Losses are logged against those ids: `hazard_logs` (cultures and grain runs, new in migration 0004) and
+`lot_losses.hazard_key` (block lots). The library shows the counts. Species HAZARDS facts carry `hz` to open an entry.
+The sources name no yeast contaminant, so the YEAST kind is deliberately empty.

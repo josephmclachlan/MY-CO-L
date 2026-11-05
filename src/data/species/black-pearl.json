@@ -264,18 +264,21 @@
    "v": "Second only to blue oyster. In blocks: very dense, amber-tinted circular patches that predict poor yield.",
    "s": [
     "F17-0121"
-   ]
+   ],
+   "hz": "stroma"
   },
   {
    "k": "Blotch",
    "v": "Climbs sharply in warm rooms.",
    "s": [
     "F17-0122"
-   ]
+   ],
+   "hz": "bacterial-blotch"
   },
   {
    "k": "Rose comb",
-   "v": "Lumpy, deformed caps. Water quality blamed almost every time."
+   "v": "Lumpy, deformed caps. Water quality blamed almost every time.",
+   "hz": "rose-comb"
   },
   {
    "k": "One-flush rule",

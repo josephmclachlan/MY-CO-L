@@ -239,14 +239,16 @@
    "v": "Cauliflower-like growth after ultra-pasteurization.",
    "s": [
     "F17-0388"
-   ]
+   ],
+   "hz": "maitake-white-bacteria"
   },
   {
    "k": "Trichoderma on fruit",
    "v": "Clean the maitake room every day.",
    "s": [
     "F17-0389"
-   ]
+   ],
+   "hz": "trichoderma"
   },
   {
    "k": "Spores",

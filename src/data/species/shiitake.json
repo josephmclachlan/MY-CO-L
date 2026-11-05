@@ -238,14 +238,16 @@
    "v": "Air pockets under the skin from temperature swings.",
    "s": [
     "F17-0337"
-   ]
+   ],
+   "hz": "popcorning"
   },
   {
    "k": "Sloshy 3790 blocks",
    "v": "Over-wet; anaerobic bacteria.",
    "s": [
     "F17-0338"
-   ]
+   ],
+   "hz": "wet-bottom"
   },
   {
    "k": "Spore lung",

@@ -194,7 +194,8 @@
    "v": "Watch cap tops and streaking stems. Stays where water sits on stripped blocks.",
    "s": [
     "F17-0166"
-   ]
+   ],
+   "hz": "bacterial-blotch"
   },
   {
    "k": "Over-ventilation",
@@ -212,7 +213,8 @@
    "v": "Appear in very high humidity. Different from rose comb.",
    "s": [
     "F17-0168"
-   ]
+   ],
+   "hz": "shape-faults"
   }
  ],
  "notes": [

@@ -27,12 +27,26 @@ export function Pending({ mod }: { mod: ModuleDef }) {
           group={2}
           lines={[
             `MODULE ${mod.name} // ${mod.what}`,
-            { text: 'STATUS: NOT YET INSTALLED', cls: 'warn' },
+            { text: 'STATUS: DORMANT // NOT YET INSTALLED', cls: 'warn' },
             `SCHEDULED: BUILD ${mod.build}`,
             '',
             { text: 'TYPE MENU OR PRESS F2 TO RETURN.', cls: 'dim' },
           ]}
         />
+      )}
+      {!processing && (
+        <div className="dormant" aria-hidden="true">
+          <div className="dormant-trim" />
+          <div className="dormant-body">
+            <div className="dormant-glyph">&#9651;</div>
+            <div>
+              <div className="dormant-t">LATTICE LINK: NO CARRIER</div>
+              <div className="dormant-bar"><i /></div>
+              <div className="dim">SUBSYSTEM {mod.key} HELD IN COLD STORAGE. THE LATTICE HOLDS.</div>
+            </div>
+          </div>
+          <div className="dormant-trim" />
+        </div>
       )}
     </div>
   )

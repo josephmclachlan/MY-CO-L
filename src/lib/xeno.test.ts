@@ -22,7 +22,8 @@ import {
   type GrainRun,
   type Strain,
 } from './xeno'
-import { addCultures, addGrainRun, addLot, loadDemo, newStrain, removeDemo, setCultureStatus, setGrainStatus } from './xenoActions'
+import { addCultures, addGrainRun, addLot, contaminateCulture, loadDemo, lossGrainRun, lossLot, newStrain, removeDemo, setCultureStatus, setGrainStatus } from './xenoActions'
+import { lossCounts, type HazardLog, type LotLoss } from './hazard'
 
 const NOW = '2026-11-05'
 
@@ -160,5 +161,41 @@ describe('logging a line in the store', () => {
     expect(store.rows('cultures').length).toBeGreaterThan(5)
     await removeDemo(store, strains, store.rows<Culture>('cultures'), store.rows<GrainRun>('grain_runs'), store.rows<BlockLot>('block_lots'))
     for (const t of ['strains', 'cultures', 'grain_runs', 'block_lots']) expect(store.rows(t)).toHaveLength(0)
+  })
+
+  it('logs contamination against the hazard library and counts it', async () => {
+    const store = new Store(new MemoryBackend())
+    const s = newStrain({ species_key: 'blue-oyster', code: 'BO-01' })
+    await store.put('strains', s)
+    const [m] = await addCultures(store, { strain: s, parent: null, kind: 'slant', count: 1, existing: [] })
+    const [p1] = await addCultures(store, { strain: s, parent: m, kind: 'plate', count: 1, existing: [m] })
+    await contaminateCulture(store, p1, 'trichoderma')
+    expect(store.rows<Culture>('cultures').find((c) => c.id === p1.id)?.status).toBe('contaminated')
+    const g1 = await addGrainRun(store, { strain: s, generation: 'G1', parentCulture: m, parentRun: null, bags: 4, existing: [] })
+    await lossGrainRun(store, g1, 2, 'neurospora')
+    await lossGrainRun(store, store.rows<GrainRun>('grain_runs')[0], 3, 'neurospora') // one more bag, not three
+    const g2 = await addGrainRun(store, { strain: s, generation: 'G2', parentCulture: null, parentRun: g1, bags: 6, mastersUsed: 1, existing: store.rows<GrainRun>('grain_runs') })
+    const lot = await addLot(store, { strain: s, run: g2, lot_code: 'B1105', blocks: 10, g2Used: 1 })
+    await lossLot(store, lot, [], 4, 'neurospora', 'seal')
+    await expect(lossLot(store, lot, store.rows<LotLoss>('lot_losses'), 7, 'neurospora')).rejects.toThrow(/ALREADY LOGGED/)
+    await expect(lossLot(store, lot, [], 0, null)).rejects.toThrow(/HOW MANY/)
+    const m2 = lossCounts(store.rows<HazardLog>('hazard_logs'), store.rows<LotLoss>('lot_losses'))
+    expect(m2.get('trichoderma')).toEqual({ events: 1, bags: 1 })
+    expect(m2.get('neurospora')).toEqual({ events: 3, bags: 7 })
+    await lossLot(store, lot, store.rows<LotLoss>('lot_losses'), 6, null)
+    expect(store.rows<BlockLot>('block_lots').find((l) => l.id === lot.id)?.status).toBe('lost')
+  })
+
+  it('removing the example strain also clears its logged losses', async () => {
+    const store = new Store(new MemoryBackend())
+    await loadDemo(store, [])
+    const strains = store.rows<Strain>('strains')
+    const lot = store.rows<BlockLot>('block_lots')[0]
+    await lossLot(store, lot, [], 5, 'neurospora')
+    const c = store.rows<Culture>('cultures')[0]
+    await contaminateCulture(store, c, 'trichoderma')
+    await removeDemo(store, strains, store.rows<Culture>('cultures'), store.rows<GrainRun>('grain_runs'), store.rows<BlockLot>('block_lots'))
+    expect(store.rows('hazard_logs')).toHaveLength(0)
+    expect(store.rows('lot_losses')).toHaveLength(0)
   })
 })

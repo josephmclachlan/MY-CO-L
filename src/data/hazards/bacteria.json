@@ -1,0 +1,881 @@
+[
+ {
+  "id": "bacterial-film",
+  "name": "BACTERIA IN BLOCKS",
+  "kind": "bacteria",
+  "stages": [
+   "cook",
+   "block"
+  ],
+  "colours": [
+   "white",
+   "clear"
+  ],
+  "smells": [
+   "sour"
+  ],
+  "textures": [
+   "slimy",
+   "wet"
+  ],
+  "places": [
+   "whole",
+   "bottom"
+  ],
+  "species": [
+   "shiitake",
+   "lions-mane",
+   "maitake"
+  ],
+  "aka": "MILKY FILM, SOUR BLOCKS",
+  "spot": [
+   {
+    "v": "A milky or viscous film. On shiitake, a moist film on the outside of the block, like frost on the inside of the bag.",
+    "s": [
+     "F14-0070",
+     "F14-0071",
+     "F14-0143"
+    ]
+   },
+   {
+    "v": "A sour smell (dirty socks, fermenting wine), sometimes noticed through the patch. Blocks colonize weakly, wispy or greasy, and many species do not fruit.",
+    "s": [
+     "F14-0072",
+     "F14-0079"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Strong top and weak bottom is the stratified pattern (short hold). Hard line over a sloppy wet bottom is pooled water.",
+    "s": [
+     "F14-0074",
+     "F14-0141"
+    ],
+    "hz": "wet-bottom"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Steam kills active bacteria, but they make heat-resistant endospores; fungi do not. Ultra-pasteurization (about 100 °C / 212 °F) is not sterilization, so spores stay in every block and wake only if conditions allow.",
+    "s": [
+     "F14-0065",
+     "F14-0066",
+     "F14-0067"
+    ]
+   },
+   {
+    "v": "Heat: thermophile spores take hold around 24 °C (75 °F), and a 10 lb (4.5 kg) block core runs 2-3 °C (4-5 °F) above the room. Cores above about 21-22 °C (70-72 °F) go wrong. Heat plus high CO2 feed each other.",
+    "s": [
+     "F14-0081",
+     "F14-0082",
+     "F14-0083"
+    ]
+   },
+   {
+    "v": "Too wet (above about 62-68% moisture), a cook too short, slow cooling in or around the vessel, blocks left days before inoculation, a mix that was fermenting, or a media too rich.",
+    "s": [
+     "F14-0084",
+     "F14-0085",
+     "F14-0086",
+     "F14-0087",
+     "F14-0088",
+     "F14-0089"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Throw sour-smelling blocks away. If it came from the substrate, check cook time and temperature, whether the mix ferments, and how long it sat before processing and before inoculation.",
+    "s": [
+     "F14-0090",
+     "F14-0091",
+     "F14-0092"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Incubate at about 19 °C (66 °F) room air so big-block cores stay under about 21-22 °C. Moisture at or below the species target. Cool hot and inoculate promptly at 27-32 °C (80-90 °F).",
+    "s": [
+     "F14-0081",
+     "F14-0264",
+     "F14-0260"
+    ]
+   },
+   {
+    "v": "Check the data-logger record first when blocks go bad.",
+    "s": [
+     "F14-0129"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Shiitake: heat-driven anaerobic bacteria are a main incubation failure; the block can look fine and fail late.",
+    "s": [
+     "F14-0223",
+     "F14-0256"
+    ]
+   },
+   {
+    "v": "Lion's mane: over-spawning and heat bring bacteria. Maitake on rich 50:50 media gets heavy metabolites.",
+    "s": [
+     "F14-0254",
+     "F14-0089"
+    ]
+   }
+  ],
+  "w": [
+   "history-of-pleurotus 1:26:18",
+   "contamination-1 0:44:46",
+   "04-pasteurize-or-sterilize 0:29:35",
+   "contamination-2 0:09:33",
+   "02-shiitake-cultivation 1:02:35",
+   "bacterial-blotch 0:05:53",
+   "bacterial-blotch 0:17:21",
+   "contamination-1 0:28:16",
+   "contamination-1 0:47:00",
+   "contamination-2 0:02:13"
+  ]
+ },
+ {
+  "id": "wet-bottom",
+  "name": "WET BOTTOM, ANAEROBIC",
+  "kind": "bacteria",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "clear"
+  ],
+  "smells": [
+   "sour"
+  ],
+  "textures": [
+   "wet",
+   "slimy"
+  ],
+  "places": [
+   "bottom"
+  ],
+  "species": [
+   "lions-mane",
+   "shiitake"
+  ],
+  "aka": "SLOPPY BOTTOM",
+  "spot": [
+   {
+    "v": "A hard line of mycelium above a sloppy, wet bottom. Water pools at the bottom and goes airless. Sour smell.",
+    "s": [
+     "F14-0073",
+     "F14-0142"
+    ]
+   },
+   {
+    "v": "Strong colonization at the top and weak at the bottom of the block.",
+    "s": [
+     "F14-0074"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "A short cook gives the same strong-top, weak-bottom picture on big blocks. Check the core temperature log to tell them apart.",
+    "s": [
+     "F14-0141",
+     "F14-0085"
+    ],
+    "hz": "bacterial-film"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Too much water pooled. Above about 62% moisture, lion's mane blocks pool water at the bottom.",
+    "s": [
+     "F14-0165",
+     "F14-0142"
+    ]
+   },
+   {
+    "v": "Overly wet shiitake (strain KOM) goes anaerobic with popcorning and browning only on top, but still fruits; 3790 gives sloshy blocks that fruit poorly.",
+    "s": [
+     "F14-0080"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Reduce water and even out hydration. Aim for no moisture difference between top and bottom.",
+    "s": [
+     "F14-0142",
+     "F14-0165"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Test the moisture of incoming sawdust before changing the recipe.",
+    "s": [
+     "F14-0167"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Lion's mane and shiitake are the named cases.",
+    "s": [
+     "F14-0165",
+     "F14-0080"
+    ]
+   }
+  ],
+  "w": [
+   "history-of-pleurotus 1:26:18",
+   "contamination-1 0:44:46",
+   "04-pasteurize-or-sterilize 0:29:35",
+   "contamination-2 0:09:33",
+   "02-shiitake-cultivation 1:02:35",
+   "bacterial-blotch 0:05:53",
+   "bacterial-blotch 0:17:21",
+   "contamination-1 0:28:16",
+   "contamination-1 0:47:00",
+   "contamination-2 0:02:13"
+  ]
+ },
+ {
+  "id": "yellow-liquid",
+  "name": "YELLOW LIQUID AT BAG BOTTOM",
+  "kind": "bacteria",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "yellow"
+  ],
+  "smells": [],
+  "textures": [
+   "wet"
+  ],
+  "places": [
+   "bottom"
+  ],
+  "species": [
+   "lions-mane"
+  ],
+  "aka": "LION'S MANE METABOLITE POOL",
+  "spot": [
+   {
+    "v": "Yellow liquid at the bottom of a bag, more with rich 50:50 lion's mane blocks. Also seen during fruiting.",
+    "s": [
+     "F14-0075",
+     "F14-0144"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Yellow or orange metabolites on older shiitake, chestnut and pioppino grain are normal. Heavy exudate in a block is not.",
+    "s": [
+     "F11-0297",
+     "F14-0078"
+    ],
+    "hz": "old-grain-metabolites"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Working explanation: a core or room too hot lets dormant endospores wake, conditions go wet and airless, and the mycelium pumps out defensive metabolites.",
+    "s": [
+     "F14-0075"
+    ]
+   },
+   {
+    "v": "Heavy metabolite formation (except shiitake, which makes them normally) means media too rich or undercooked. Bacteria may then stop fruiting entirely.",
+    "s": [
+     "F14-0078",
+     "F08-0228"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Cooler incubation and a leaner mix (soy about 30-40%).",
+    "s": [
+     "F14-0144",
+     "F11-0283"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Lean mix, correct cook, steady cool room.",
+    "s": [
+     "F14-0089",
+     "F14-0144"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Lion's mane; rich maitake blocks wick exudate up into the fruit.",
+    "s": [
+     "F14-0075",
+     "F12-0294"
+    ]
+   }
+  ],
+  "w": [
+   "history-of-pleurotus 1:26:18",
+   "contamination-1 0:44:46",
+   "04-pasteurize-or-sterilize 0:29:35",
+   "contamination-2 0:09:33",
+   "02-shiitake-cultivation 1:02:35",
+   "bacterial-blotch 0:05:53",
+   "bacterial-blotch 0:17:21",
+   "contamination-1 0:28:16",
+   "contamination-1 0:47:00",
+   "contamination-2 0:02:13"
+  ]
+ },
+ {
+  "id": "dark-wet-spots",
+  "name": "DARK WET SPOTS AT INOCULATION POINTS",
+  "kind": "bacteria",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "brown",
+   "black"
+  ],
+  "smells": [],
+  "textures": [
+   "wet"
+  ],
+  "places": [
+   "spots"
+  ],
+  "species": [
+   "lions-mane"
+  ],
+  "aka": "OVER-SPAWNING HEAT",
+  "spot": [
+   {
+    "v": "Dark, wet circular spots around each inoculation point.",
+    "s": [
+     "F14-0076",
+     "F14-0145"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Poor shaking gives patchy colonization and hot grain clumps. Check how the spawn was spread before blaming bacteria.",
+    "s": [
+     "F14-0208"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Over-spawning makes extra heat and more bacteria. Overheating can kill the mycelium in ultra-pasteurized substrate.",
+    "s": [
+     "F14-0076",
+     "F14-0208"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Lower the spawn rate. Shake thoroughly.",
+    "s": [
+     "F14-0145",
+     "F08-0231"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Keep spawn at the set rate (about 20 blocks per 6 lb G2 bag).",
+    "s": [
+     "F14-0024"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Lion's mane is the named case.",
+    "s": [
+     "F14-0076"
+    ]
+   }
+  ],
+  "w": [
+   "history-of-pleurotus 1:26:18",
+   "contamination-1 0:44:46",
+   "04-pasteurize-or-sterilize 0:29:35",
+   "contamination-2 0:09:33",
+   "02-shiitake-cultivation 1:02:35",
+   "bacterial-blotch 0:05:53",
+   "bacterial-blotch 0:17:21",
+   "contamination-1 0:28:16",
+   "contamination-1 0:47:00",
+   "contamination-2 0:02:13"
+  ]
+ },
+ {
+  "id": "fermented-block",
+  "name": "FERMENTED OR HOT-KNOCKED BLOCK",
+  "kind": "bacteria",
+  "stages": [
+   "cook",
+   "block"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [
+   "sour"
+  ],
+  "textures": [
+   "wispy",
+   "wet"
+  ],
+  "places": [
+   "bottom",
+   "whole"
+  ],
+  "species": [],
+  "aka": "GNARLY BOTTOM, GREASY WISPY GROWTH",
+  "spot": [
+   {
+    "v": "The spawn dies. The bottom to middle goes gnarly with bacteria, perhaps with mould on top. The crop forms dense walled-off struggling colonies, not fast feathery rope-like growth.",
+    "s": [
+     "F14-0077",
+     "F14-0147"
+    ]
+   },
+   {
+    "v": "Weak, wispy, greasy colonization, and many species (even reishi) never fruit.",
+    "s": [
+     "F14-0079",
+     "F14-0146"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "If the spawn never grows, or only a few nodules, it was killed at 38 °C (100 °F) or more. That is not contamination.",
+    "s": [
+     "F14-0107",
+     "F14-0207"
+    ],
+    "hz": "hot-knock"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Hot blocks sat 1-3 days before reaching a filtered cool-down room, or were knocked too hot, or the block fermented before inoculation.",
+    "s": [
+     "F14-0146",
+     "F14-0147",
+     "F14-0237"
+    ]
+   },
+   {
+    "v": "Pasteurized blocks have an expiry. Left days, endospores germinate and the block ferments with a sour smell.",
+    "s": [
+     "F14-0087"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Discard the blocks. Move hot blocks straight into a filtered cool-down room and inoculate promptly at 27-32 °C (80-90 °F).",
+    "s": [
+     "F14-0146",
+     "F14-0147"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Inoculate promptly once blocks reach 27-32 °C. Never at 38 °C (100 °F) or above.",
+    "s": [
+     "F14-0260"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "All species. Case: a Midwest farm where many species, even reishi, would not fruit.",
+    "s": [
+     "F14-0237"
+    ]
+   }
+  ],
+  "w": [
+   "history-of-pleurotus 1:26:18",
+   "contamination-1 0:44:46",
+   "04-pasteurize-or-sterilize 0:29:35",
+   "contamination-2 0:09:33",
+   "02-shiitake-cultivation 1:02:35",
+   "bacterial-blotch 0:05:53",
+   "bacterial-blotch 0:17:21",
+   "contamination-1 0:28:16",
+   "contamination-1 0:47:00",
+   "contamination-2 0:02:13"
+  ]
+ },
+ {
+  "id": "fermented-grain",
+  "name": "FERMENTED GRAIN",
+  "kind": "bacteria",
+  "stages": [
+   "grain"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [
+   "sour"
+  ],
+  "textures": [
+   "wet"
+  ],
+  "places": [
+   "patches"
+  ],
+  "species": [],
+  "aka": "SPLOTCHY GRAIN AFTER A LONG SOAK",
+  "spot": [
+   {
+    "v": "Irregular, splotchy colonization on grain even after sterilization.",
+    "s": [
+     "F14-0148"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Burst grain feeds bacteria like agar. Mushy kernels and standing water are the sign, not splotches alone.",
+    "s": [
+     "F14-0169",
+     "F14-0168"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "A long soak, or drained grain left standing, starts fermenting (sugars to alcohols). Long soaks are not needed to kill endospores.",
+    "s": [
+     "F14-0170",
+     "F14-0148",
+     "F08-0232"
+    ]
+   },
+   {
+    "v": "Grain that is too wet gives mushy burst grain and standing water that breed contaminants.",
+    "s": [
+     "F14-0168"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Discard. Shorten the soak and process promptly.",
+    "s": [
+     "F14-0148"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Hydrate fully and evenly but stop short of bursting. Drain and cook without waiting.",
+    "s": [
+     "F14-0148",
+     "F15-0177"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "All grain spawn.",
+    "s": [
+     "F14-0148"
+    ]
+   }
+  ],
+  "w": [
+   "contamination-1 0:27:07",
+   "contamination-1 0:35:29",
+   "comb-tooth 0:10:26",
+   "the-fenrir 0:32:54",
+   "contamination-1 0:34:27",
+   "grain-hydration 0:09:30",
+   "lions-mane-2 0:12:37",
+   "the-fenrir 0:58:35",
+   "grain-hydration 0:26:05",
+   "alc-vs-lc 0:05:08"
+  ]
+ },
+ {
+  "id": "metabolite-exudate",
+  "name": "HEAVY METABOLITE EXUDATE",
+  "kind": "bacteria",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "yellow",
+   "brown"
+  ],
+  "smells": [],
+  "textures": [
+   "wet"
+  ],
+  "places": [
+   "patches",
+   "whole"
+  ],
+  "species": [],
+  "aka": "EXUDATE, SECTORING, WET SPOTS",
+  "spot": [
+   {
+    "v": "Heavy exudate, sectoring (uneven wedges instead of one front) and wet spots in the block.",
+    "s": [
+     "F11-0284",
+     "F14-0164"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Shiitake makes metabolites normally. Yellow or orange droplets on older grain are normal.",
+    "s": [
+     "F14-0078",
+     "F11-0297"
+    ],
+    "hz": "old-grain-metabolites"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Poorly mixed or wrongly hydrated substrate, temperature swings in incubation, or competitors, even with good steaming.",
+    "s": [
+     "F14-0164",
+     "F11-0284"
+    ]
+   },
+   {
+    "v": "Media too rich or undercooked.",
+    "s": [
+     "F14-0078"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Homogeneous mix and a stable room. Leaner mix or a better cook.",
+    "s": [
+     "F11-0284",
+     "F08-0228"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Mix well, hydrate by measure, hold room temperature steady.",
+    "s": [
+     "F14-0164"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Species other than shiitake. Rich maitake blocks wick exudate into the fruit.",
+    "s": [
+     "F14-0078",
+     "F12-0294"
+    ]
+   }
+  ],
+  "w": [
+   "history-of-pleurotus 1:26:18",
+   "contamination-1 0:44:46",
+   "04-pasteurize-or-sterilize 0:29:35",
+   "contamination-2 0:09:33",
+   "02-shiitake-cultivation 1:02:35",
+   "bacterial-blotch 0:05:53",
+   "bacterial-blotch 0:17:21",
+   "contamination-1 0:28:16",
+   "contamination-1 0:47:00",
+   "contamination-2 0:02:13"
+  ]
+ },
+ {
+  "id": "black-slime",
+  "name": "BLACK SLIME ON LION'S MANE STEMS",
+  "kind": "bacteria",
+  "stages": [
+   "fruit"
+  ],
+  "colours": [
+   "black"
+  ],
+  "smells": [],
+  "textures": [
+   "slimy"
+  ],
+  "places": [
+   "stem"
+  ],
+  "species": [
+   "lions-mane"
+  ],
+  "spot": [
+   {
+    "v": "Black slime on lion's mane stems.",
+    "s": [
+     "F15-0003",
+     "F12-0305"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Probably a different bacterium from classic blotch.",
+    "s": [
+     "F15-0003"
+    ],
+    "hz": "bacterial-blotch"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Not pinned down in the sources. Lion's mane does worse when too hot, with more bacterial infection.",
+    "s": [
+     "F15-0029"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Clean and check the water.",
+    "s": [
+     "F12-0305"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Keep lion's mane near 16 °C (60 °F) (HeCNS sweet spot); treat humidifier water.",
+    "s": [
+     "F15-0029",
+     "F15-0208"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Lion's mane.",
+    "s": [
+     "F12-0305"
+    ]
+   }
+  ],
+  "w": [
+   "bacterial-blotch 0:10:05",
+   "bacterial-blotch 0:23:00",
+   "blotch-pt-2 0:01:48",
+   "bacterial-blotch 0:09:02",
+   "blotch-pt-2 0:02:52",
+   "bacterial-blotch 0:11:06",
+   "bacterial-blotch 0:43:17",
+   "bacterial-blotch 0:41:08",
+   "hart-pola 0:16:29",
+   "bacterial-blotch 0:49:23"
+  ]
+ },
+ {
+  "id": "maitake-white-bacteria",
+  "name": "MAITAKE WHITE CAULIFLOWER FRUIT",
+  "kind": "bacteria",
+  "stages": [
+   "fruit"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "mushy"
+  ],
+  "places": [
+   "cap"
+  ],
+  "species": [
+   "maitake"
+  ],
+  "spot": [
+   {
+    "v": "Young fruits turn white with a cauliflower-like look instead of darkening.",
+    "s": [
+     "F15-0018",
+     "F12-0293"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Normal maitake darkens as it grows. White cauliflower is the warning.",
+    "s": [
+     "F15-0018"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Bacteria not killed without pressure in ultra-pasteurized blocks, worse when bags are put to fruit too early.",
+    "s": [
+     "F15-0018"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Wait longer before fruiting. Consider sterilizing.",
+    "s": [
+     "F12-0293"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Do not rush maitake to fruit. Leaner mix than 50:50 where exudate wicks into fruit.",
+    "s": [
+     "F12-0293",
+     "F12-0294"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Ultra-pasteurized maitake.",
+    "s": [
+     "F15-0018"
+    ]
+   }
+  ],
+  "w": [
+   "hart-pola 0:16:29",
+   "fruiting-tips-and-tricks 0:07:24",
+   "bacterial-blotch 0:15:15",
+   "blotch-pt-2 0:29:49",
+   "bacterial-blotch 0:28:50",
+   "king-oyster 1:05:20",
+   "how-to-grow-maitake 0:46:48"
+  ]
+ }
+]

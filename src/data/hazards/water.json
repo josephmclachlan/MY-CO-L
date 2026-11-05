@@ -1,0 +1,469 @@
+[
+ {
+  "id": "humidifier-fogger",
+  "name": "IN-ROOM FOGGER OR UNTREATED HUMIDIFIER",
+  "kind": "water",
+  "stages": [
+   "fruit"
+  ],
+  "colours": [],
+  "smells": [],
+  "textures": [
+   "wet"
+  ],
+  "places": [
+   "room",
+   "cap"
+  ],
+  "species": [
+   "blue-oyster",
+   "black-pearl"
+  ],
+  "aka": "MAIN DISEASE VECTOR",
+  "spot": [
+   {
+    "v": "Fog so dense the shelves are barely visible, a hand held in the stream gets wet, yellow caps and weekly 'I have blotch' calls. Ordinary hygrometers cannot read coarse fog.",
+    "s": [
+     "F15-0063",
+     "F15-0064",
+     "F15-0058"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Fine high-pressure mist leaves a hand dry.",
+    "s": [
+     "F15-0063"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Ultrasonic units and fogger drums INSIDE the room recirculate spores and dirt through a warm water vat. A pond fogger drum is most linked to blotch complaints.",
+    "s": [
+     "F15-0057",
+     "F15-0058"
+    ]
+   },
+   {
+    "v": "Cycle timers (30 on, 10 off) are the wrong way to control humidity.",
+    "s": [
+     "F15-0032"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Box the unit in a corner with a vent through an outside wall, so it draws outside air. Dose bleach 150-250 ppm by peristaltic pump. Clean often.",
+    "s": [
+     "F15-0066",
+     "F15-0067",
+     "F15-0087"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Best to worst: high-pressure fine fog, steam, ultrasonic outside the room, compressor misting heads, pond fogger drum, anything inside the room.",
+    "s": [
+     "F15-0061",
+     "F15-0062",
+     "F15-0059",
+     "F15-0060",
+     "F15-0058",
+     "F15-0057"
+    ]
+   },
+   {
+    "v": "One farm cured chronic blotch with a Hart high-pressure system after biocide sprays failed.",
+    "s": [
+     "F15-0069"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Oysters and king oyster most.",
+    "s": [
+     "F15-0040"
+    ]
+   }
+  ],
+  "w": [
+   "hart-pola 0:04:09",
+   "bacterial-blotch 0:19:24",
+   "01-fruit-room-design 0:46:11",
+   "bacterial-blotch 0:18:24",
+   "bacterial-blotch 0:20:26",
+   "01-fruit-room-design 0:49:11",
+   "bacterial-blotch 0:30:52",
+   "hart-pola 0:03:08",
+   "01-fruit-room-design 0:50:12",
+   "water-treatment 0:14:31"
+  ]
+ },
+ {
+  "id": "water-quality",
+  "name": "UNTREATED WATER",
+  "kind": "water",
+  "stages": [
+   "fruit",
+   "stock"
+  ],
+  "colours": [
+   "multi"
+  ],
+  "smells": [],
+  "textures": [
+   "mushy"
+  ],
+  "places": [
+   "room",
+   "cap"
+  ],
+  "species": [],
+  "aka": "MICROBES AND MINERALS IN HUMIDIFIER WATER",
+  "spot": [
+   {
+    "v": "Blotch or rose comb in your room, while a block of the same batch fruits fine on a kitchen counter. Fruit colour changes when minerals in hydration water are untreated.",
+    "s": [
+     "F15-0025",
+     "F14-0125",
+     "F12-0303"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Spawn or block-supplier faults show during incubation and across a lot, not only at fruiting.",
+    "s": [
+     "F14-0119",
+     "F14-0120"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Sediment and microbes in humidifier water reach the fruit through the air. A shallow dug well carries more microbes than a drilled well of about 200 ft (61 m). Deep wells in drought areas can carry bacterial blooms and heavy minerals.",
+    "s": [
+     "F15-0072",
+     "F15-0074",
+     "F15-0084"
+    ]
+   },
+   {
+    "v": "Water used to hydrate substrate that is then cooked rarely causes problems.",
+    "s": [
+     "F15-0073"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Chain: particulate filter, softener if hard, carbon, then RO or steam for the fruit line. Inline UV (sized in gal/h) is the cheap first line, mainly worth it on wells. Add bleach 150-250 ppm or ClO2 dosing.",
+    "s": [
+     "F15-0076",
+     "F15-0078",
+     "F15-0080",
+     "F15-0083"
+    ]
+   },
+   {
+    "v": "Example for a shallow mineral-rich coastal well, worked out with Cap n Stem: 1000 micron spin-down, 100 and 50 micron, sediment, iron filter, carbon, UV; softener for boiler feed; DI/RO for misting.",
+    "s": [
+     "F15-0086"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Use multiple barriers. Do not use Lysol, Pine-Sol or vinegar in fogger water.",
+    "s": [
+     "F15-0081",
+     "F15-0092"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Any fruiting species; oysters show it first.",
+    "s": [
+     "F15-0113"
+    ]
+   }
+  ],
+  "w": [
+   "water-treatment 0:18:40",
+   "water-treatment 0:02:55",
+   "contamination-1 0:10:25",
+   "contamination-1 0:11:33",
+   "water-treatment 0:24:52",
+   "water-treatment 0:26:40",
+   "water-treatment 0:13:29",
+   "hart-pola 0:32:53",
+   "water-treatment 0:14:31",
+   "water-treatment 0:15:32"
+  ]
+ },
+ {
+  "id": "standing-water",
+  "name": "STANDING WATER AND DRAINS",
+  "kind": "water",
+  "stages": [
+   "fruit"
+  ],
+  "colours": [],
+  "smells": [
+   "sour"
+  ],
+  "textures": [
+   "wet"
+  ],
+  "places": [
+   "room"
+  ],
+  "species": [],
+  "spot": [
+   {
+    "v": "Water pooled on fruit-room floors, in flutes of wall sheets, or in drains without traps.",
+    "s": [
+     "F15-0034",
+     "F14-0224",
+     "F14-0225"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Plenum does not need drains.",
+    "s": [
+     "F14-0224"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Standing water breeds bacterial blooms. Sewer or septic air backs up through untrapped drains and brings bacteria, including blotch.",
+    "s": [
+     "F15-0034",
+     "F14-0224"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Vacuum it out, push wash water to the drain, leave no standing water.",
+    "s": [
+     "F14-0224",
+     "F15-0202"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Floor drains with P-traps in fruit rooms. Smooth, washable walls.",
+    "s": [
+     "F15-0211",
+     "F14-0225"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "All fruiting species.",
+    "s": [
+     "F15-0034"
+    ]
+   }
+  ],
+  "w": [
+   "blotch-pt-2 0:00:48",
+   "bacterial-blotch 0:30:52",
+   "blotch-pt-2 0:02:52",
+   "black-oyster 0:32:29",
+   "fruiting-tips-and-tricks 0:07:24",
+   "lions-mane-2 0:24:44",
+   "king-oyster 0:40:32",
+   "01-fruit-room-design 0:56:17",
+   "fruiting-facilities 0:26:47",
+   "hart-pola 0:18:32"
+  ]
+ },
+ {
+  "id": "cold-condensation",
+  "name": "COLD-AIR CONDENSATION",
+  "kind": "water",
+  "stages": [
+   "fruit"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "fuzzy",
+   "wet"
+  ],
+  "places": [
+   "cap"
+  ],
+  "species": [
+   "black-pearl"
+  ],
+  "spot": [
+   {
+    "v": "Mycelium growing out of caps in cold weather. Worse: bacteria and even rose comb.",
+    "s": [
+     "F15-0031",
+     "F15-0119"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "A small cap growing on a cap on chestnut is usually harmless.",
+    "s": [
+     "F15-0126",
+     "F15-0118"
+    ],
+    "hz": "shape-faults"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Cold air holds less moisture, so humidity output that was right in summer condenses on fruit in winter.",
+    "s": [
+     "F15-0031"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Finer atomization (high-pressure fog nozzles). Stop the condensation.",
+    "s": [
+     "F15-0031",
+     "F12-0280"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Match humidity output to the season; swing humidity 70-90%.",
+    "s": [
+     "F15-0030"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Black oyster named.",
+    "s": [
+     "F12-0280"
+    ]
+   }
+  ],
+  "w": [
+   "blotch-pt-2 0:00:48",
+   "bacterial-blotch 0:30:52",
+   "blotch-pt-2 0:02:52",
+   "black-oyster 0:32:29",
+   "fruiting-tips-and-tricks 0:07:24",
+   "lions-mane-2 0:24:44",
+   "king-oyster 0:40:32",
+   "01-fruit-room-design 0:56:17",
+   "fruiting-facilities 0:26:47",
+   "hart-pola 0:18:32"
+  ]
+ },
+ {
+  "id": "spore-load",
+  "name": "FRUIT-ROOM SPORE LOAD",
+  "kind": "water",
+  "stages": [
+   "fruit",
+   "after"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "powdery"
+  ],
+  "places": [
+   "room"
+  ],
+  "species": [
+   "shiitake",
+   "maitake"
+  ],
+  "aka": "SPORES CLOGGING EQUIPMENT",
+  "spot": [
+   {
+    "v": "Spores clog ductwork in humid air and foul cooler fins and coils. Opening a full shiitake room released a cloud that broke a fan.",
+    "s": [
+     "F15-0195",
+     "F15-0197",
+     "F15-0198"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Blotch and mould are living contaminants; this is the crop's own spore load.",
+    "s": [
+     "F15-0195"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Overblown mushrooms shed more spores. Recirculating coolers and humidifiers in a spore-laden space clog and spread it.",
+    "s": [
+     "F15-0197",
+     "F15-0199"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Clean the room daily if possible: about 250 ppm bleach, power wash or wipe, push water to the drain. Keep a backup fan.",
+    "s": [
+     "F15-0202",
+     "F15-0198"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Harvest on time. Keep coolers out of the plenum and away from fruit rooms. Isopropyl foot baths make little difference.",
+    "s": [
+     "F15-0199",
+     "F15-0197",
+     "F15-0201"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Shiitake named; maitake may do the same (unconfirmed).",
+    "s": [
+     "F15-0198"
+    ]
+   }
+  ],
+  "w": [
+   "coroplast-heat-exchanger 0:06:17",
+   "coroplast-heat-exchanger 0:11:35",
+   "fruiting-facilities 0:10:14",
+   "fruiting-facilities 0:03:00",
+   "fruiting-tips-and-tricks 0:16:46",
+   "01-fruit-room-design 1:16:28",
+   "fruiting-facilities 0:23:39",
+   "01-fruit-room-design 0:12:13",
+   "fruiting-tips-and-tricks 0:02:05",
+   "fruiting-tips-and-tricks 0:01:04"
+  ]
+ }
+]
