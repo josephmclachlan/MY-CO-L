@@ -15,6 +15,8 @@ import { Vitals, VitalsIndex } from './screens/Vitals'
 import { DeckPlan, DeckIndex } from './screens/DeckPlan'
 import { Specimen, SpecimenIndex, type Tab, TABS } from './screens/Specimen'
 import { Sequence } from './screens/Sequence'
+import { Cargo, CargoIndex } from './screens/Cargo'
+import { useStoreStatus } from './store/StoreContext'
 import { SPECIES } from './data/species'
 import { usePower } from './power/PowerContext'
 import { allCircuits, type RoomId } from './data/power'
@@ -28,6 +30,7 @@ const VITALS_IDX = MODULES.findIndex((m) => m.key === 'VITALS')
 const DECK_IDX = MODULES.findIndex((m) => m.key === 'DECK')
 const SPEC_IDX = MODULES.findIndex((m) => m.key === 'SPECIMEN')
 const SEQ_IDX = MODULES.findIndex((m) => m.key === 'SEQUENCE')
+const CARGO_IDX = MODULES.findIndex((m) => m.key === 'CARGO')
 
 const TITLES: Record<View['name'], string> = {
   menu: 'MAIN MENU',
@@ -41,6 +44,7 @@ const TITLES: Record<View['name'], string> = {
 export default function App() {
   const { settings, update, sound, session } = useApp()
   const power = usePower()
+  const storeInfo = useStoreStatus()
   const [stage, setStage] = useState<Stage>('power')
   const [view, setView] = useState<View>({ name: 'menu' })
   const [firstMenu, setFirstMenu] = useState(true)
@@ -232,6 +236,11 @@ export default function App() {
         power.applyScenario('emerg')
         openVitals()
         return say('GENERATOR // EMERGENCY LIST', true)
+      case 'REORDER':
+      case 'STOCK':
+        setSelected(CARGO_IDX)
+        if (!(view.name === 'module' && view.idx === CARGO_IDX)) go({ name: 'module', idx: CARGO_IDX })
+        return
       case 'MENU':
       case 'CORE':
         if (cmd === 'CORE') sound.whoosh()
@@ -402,6 +411,7 @@ export default function App() {
               `${STATION.system} BUILD ${STATION.build}`,
               `DATABASE ........ ${!dbLinked ? 'NOT LINKED (LOCAL MODE)' : session ? `LINKED // ${session.user.email?.toUpperCase()}` : 'LINKED // LOCKED'}`,
               `NETWORK ......... ${navigator.onLine ? 'ONLINE' : 'OFFLINE // CACHED SCREENS'}`,
+              `STOCK STORAGE .. ${storeInfo.kind === 'local' ? 'LOCAL (THIS BROWSER)' : storeInfo.kind === 'remote' ? 'DATABASE' : storeInfo.kind === 'locked' ? 'LOCKED' : 'NOT SAVED'}`,
               `OFFLINE CACHE ... ${'serviceWorker' in navigator && navigator.serviceWorker.controller ? 'ACTIVE' : 'NOT YET ACTIVE'}`,
               `THEME ........... ${settings.look.clean ? 'CLEAN' : settings.look.theme}`,
               `SOUND ........... ${settings.sound.enabled ? settings.sound.mode : 'MUTED'}`,
@@ -425,6 +435,10 @@ export default function App() {
       else if (view.idx === DECK_IDX)
         content = (
           <DeckPlan
+            onOpenCargo={() => {
+              setSelected(CARGO_IDX)
+              go({ name: 'module', idx: CARGO_IDX })
+            }}
             onOpenVitals={() => {
               setSelected(VITALS_IDX)
               go({ name: 'module', idx: VITALS_IDX })
@@ -432,7 +446,24 @@ export default function App() {
           />
         )
       else if (view.idx === SPEC_IDX) content = <Specimen index={specimen} tab={specTab} setTab={setSpecTab} />
-      else if (view.idx === SEQ_IDX) content = <Sequence />
+      else if (view.idx === SEQ_IDX)
+        content = (
+          <Sequence
+            onOpenCargo={() => {
+              setSelected(CARGO_IDX)
+              go({ name: 'module', idx: CARGO_IDX })
+            }}
+          />
+        )
+      else if (view.idx === CARGO_IDX)
+        content = (
+          <Cargo
+            onOpenSequence={() => {
+              setSelected(SEQ_IDX)
+              go({ name: 'module', idx: SEQ_IDX })
+            }}
+          />
+        )
       else content = <Pending mod={MODULES[view.idx]} />
       break
   }
@@ -445,7 +476,9 @@ export default function App() {
   if (view.name === 'module' && view.idx === SPEC_IDX)
     hints.module = 'TAP A SPECIES AT RIGHT // LEFT/RIGHT ARROWS OR TYPE A TAB (CLIMATE) // WHY? SHOWS THE SOURCE // F2 MENU'
   if (view.name === 'module' && view.idx === SEQ_IDX)
-    hints.module = 'SET BAGS, PICK SPECIES, THEN INITIATE // F2 MENU'
+    hints.module = 'SET BAGS, PICK SPECIES, THEN INITIATE OR COMMIT RUN TO CARGO // F2 MENU'
+  if (view.name === 'module' && view.idx === CARGO_IDX)
+    hints.module = 'TAP AN ITEM TO RECEIVE, USE OR COUNT IT // TYPE REORDER OR CARGO // F2 MENU'
 
   const hint = reply ? (
     <TypeText key={reply.id} className={reply.warn ? 'warn' : ''} lines={[reply.text]} />
@@ -478,7 +511,9 @@ export default function App() {
                     ? <DeckIndex />
                     : view.name === 'module' && view.idx === SPEC_IDX
                       ? <SpecimenIndex index={specimen} onPick={setSpecimen} />
-                      : moduleIndex
+                      : view.name === 'module' && view.idx === CARGO_IDX
+                        ? <CargoIndex />
+                        : moduleIndex
             }
             keys={keys}
             onKey={onKey}

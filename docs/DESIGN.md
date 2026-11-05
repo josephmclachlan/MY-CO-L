@@ -54,6 +54,23 @@ Growing facts come only from Joseph's own files (Cap n Stem final). Money in col
 electricity at the real ICE tariff. One lot code (species letter + knock date MMDD, e.g. B1020) ties
 everything together.
 
+## Data store (every module reuses it)
+
+`src/lib/store.ts` is one small store over the tables in `supabase/migrations`. Screens call
+`useTable('items')` (from `src/store/StoreContext.tsx`) and `store.put / store.del`; they never talk to a backend.
+
+- **Local mode** (Supabase not linked): rows live in the browser's IndexedDB (`localdb.ts`). If the browser
+  blocks storage the store falls back to memory and CARGO says nothing is being saved.
+- **Linked mode**: the same calls go to Supabase (`remotedb.ts`) and every read is cached, so the screens still
+  open offline (read only). Row level security (migration 0002) allows only users in `allowed_users`.
+- **Backup**: `exportJson` / `importJson` (CARGO buttons). Import merges by id after checking the whole file.
+- A new module needs no database changes in local mode: its table names are already in `BACKUP_TABLES`.
+  A new Supabase table must end its migration with `select public.owner_only('public.the_table');`.
+
+CARGO keeps no stored count. An item's on-hand is the sum of its `stock_moves` (+ delivery, - use, +/- count),
+so history and count cannot disagree. `src/lib/stockplan.ts` works out a run's use from textbook facts
+(each line names its fact ID) and feeds both "weeks left" and the COMMIT RUN button.
+
 ## Adding a module
 
 Each module replaces its `Pending` placeholder in `src/App.tsx` (see `MODULES` in `src/data/farm.ts`).
