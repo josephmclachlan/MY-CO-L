@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { PickInput } from '../components/PickInput'
 import { useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useCargoPrefs, useStore } from '../store/StoreContext'
@@ -277,7 +278,7 @@ function Bills({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
       <div className="ck-box">
         <div className="section-title">TYPE AN ICE BILL</div>
         <div className="ck-fields">
-          <label className="ck-field"><span>MONTH BILLED</span><input type="month" value={month} onChange={(e) => setMonth(e.target.value)} /></label>
+          <label className="ck-field"><span>MONTH BILLED</span><PickInput type="month" value={month} onChange={(e) => setMonth(e.target.value)} /></label>
           <label className="ck-field"><span>KWH</span><input inputMode="decimal" value={kwh} placeholder="4762" onChange={(e) => setKwh(e.target.value)} /></label>
           <label className="ck-field"><span>BILLED KW (DEMAND)</span><input inputMode="decimal" value={kw} placeholder="10" onChange={(e) => setKw(e.target.value)} /></label>
           <label className="ck-field"><span>TOTAL ₡</span><input inputMode="decimal" value={crc} placeholder="392000" onChange={(e) => setCrc(e.target.value)} /></label>
@@ -358,7 +359,7 @@ function Labour({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
       <div className="ck-box">
         <div className="section-title">LOG HOURS</div>
         <div className="ck-fields">
-          <label className="ck-field"><span>DAY</span><input type="date" value={day} onChange={(e) => setDay(e.target.value)} /></label>
+          <label className="ck-field"><span>DAY</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value)} /></label>
           <label className="ck-field"><span>WHO</span><input list="lg-people" value={person} onChange={(e) => setPerson(e.target.value)} /></label>
           <label className="ck-field"><span>HOURS</span><input inputMode="decimal" value={hours} onChange={(e) => setHours(e.target.value)} /></label>
           <label className="ck-field"><span>TASK</span><input value={task} placeholder="KNOCK, HARVEST, PACK..." onChange={(e) => setTask(e.target.value)} /></label>

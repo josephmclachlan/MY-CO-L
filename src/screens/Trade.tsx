@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { PickInput } from '../components/PickInput'
 import { useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useCargoPrefs, useStore, useTable } from '../store/StoreContext'
@@ -161,7 +162,7 @@ function SaleForm({ sales, fx, say, cost, lotCodes }: { sales: Sale[]; fx: numbe
       <div className="ck-box">
         <div className="section-title">NEW SALE</div>
         <div className="ck-fields">
-          <label className="ck-field"><span>DAY</span><input type="date" value={day} onChange={(e) => setDay(e.target.value)} /></label>
+          <label className="ck-field"><span>DAY</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value)} /></label>
           <label className="ck-field">
             <span>BUYER</span>
             <input list="tr-buyers" value={buyer} placeholder="NAME (OPTIONAL)" onChange={(e) => setBuyer(e.target.value)} onBlur={(e) => fillFromBuyer(e.target.value)} />

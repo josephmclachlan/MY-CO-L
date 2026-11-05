@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { PickInput } from '../components/PickInput'
 import { useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useStore, useTable } from '../store/StoreContext'
@@ -282,7 +283,7 @@ function HarvestForm({ m, say }: { m: M; say: Say }) {
                 {GRADES.map((g) => <button key={g} type="button" className={`btn ${grade === g ? 'on' : ''}`} onClick={() => setGrade(g)}>{g}</button>)}
               </div>
             </div>
-            <label className="ck-field"><span>DAY</span><input type="date" value={day} onChange={(e) => setDay(e.target.value || todayIso())} /></label>
+            <label className="ck-field"><span>DAY</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value || todayIso())} /></label>
             {row && (
               <div className="dim">
                 {row.expKg === null ? 'EXPECTED KG: NO DATA' : `EXPECTED ${kg1(row.expKg)} KG ALL FLUSHES // LOGGED ${kg1(row.gotKg)}${after !== null ? ` -> ${kg1(after)} (${Math.round((after / row.expKg) * 100)}%)` : ''}`}
@@ -383,7 +384,7 @@ function NewLot({ m, say, done }: { m: M; say: Say; done: () => void }) {
               {species.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </Select>
           </label>
-          <label className="ck-field"><span>KNOCK DAY</span><input type="date" value={knock} onChange={(e) => (setKnock(e.target.value || todayIso()), setCode(''))} /></label>
+          <label className="ck-field"><span>KNOCK DAY</span><PickInput type="date" value={knock} onChange={(e) => (setKnock(e.target.value || todayIso()), setCode(''))} /></label>
           <label className="ck-field">
             <span>BLOCKS</span>
             <input inputMode="numeric" value={blocks} placeholder={planned ? String(planned) : '0'} onChange={(e) => setBlocks(e.target.value)} />
