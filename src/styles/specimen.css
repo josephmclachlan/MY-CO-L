@@ -94,3 +94,5 @@
 .seq-bar-n { text-align: right; }
 @media (max-width: 760px) { .seq-bar { grid-template-columns: 1fr 5.5em; } .seq-bar-t { grid-column: 1 / -1; order: 3; } }
 @media (prefers-reduced-motion: reduce) { .seq-steam, .seq-init { animation: none !important; } }
+.spec-strains { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; align-items: center; }
+.spec-strains .section-title { flex-basis: 100%; }

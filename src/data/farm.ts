@@ -28,7 +28,7 @@ export const SELF_TEST: [string, string][] = [
   ['HEPA FFU x3', 'NOMINAL'],
   ['COLD ROOMS x2', 'NOMINAL'],
   ['GENERATOR XP15000HX', 'STANDBY'],
-  ['KNOCK PLAN', '100 BLK/WK'],
+  ['KNOCK PLAN', '130 BLK/WK'],
 ]
 
 /** A plausible lot code from recent Tuesdays (knock day). */
@@ -69,7 +69,7 @@ export const MODULES: ModuleDef[] = [
   { key: 'VITALS', num: 2, name: 'VITALS', what: 'POWER AND BREAKERS', build: 2 },
   { key: 'DECK', num: 3, name: 'DECK PLAN', what: 'ROOMS AND EQUIPMENT', build: 2 },
   { key: 'CARGO', num: 4, name: 'CARGO', what: 'STOCK MANIFEST', build: 4 },
-  { key: 'XENO', num: 5, name: 'XENOGENETICS', what: 'STRAINS AND CULTURES', build: 5 },
+  { key: 'XENO', num: 5, name: 'XENOGENETICS', what: 'STRAINS AND CULTURES', build: 6 },
   { key: 'HAZARD', num: 6, name: 'HAZARD INDEX', what: 'CONTAMINANTS AND PESTS', build: 8 },
   { key: 'PROPULSION', num: 7, name: 'PROPULSION', what: 'STEAM AND COOK LOG', build: 6 },
   { key: 'LEDGER', num: 8, name: 'LEDGER', what: 'COST OF GOODS', build: 9 },
