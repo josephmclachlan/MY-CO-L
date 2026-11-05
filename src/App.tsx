@@ -554,7 +554,7 @@ export default function App() {
     hints.module = 'TAP A ROOM, ITS DETAIL IS BELOW THE PLAN // TYPE LAB, PACKING, INCUBATION, FRUITING OR BOILING'
 
   if (view.name === 'module' && view.idx === SPEC_IDX)
-    hints.module = 'TAP A SPECIES AT RIGHT // LEFT/RIGHT ARROWS OR TYPE A TAB (CLIMATE) // WHY? SHOWS THE SOURCE // F2 MENU'
+    hints.module = 'TAP A SPECIES IN THE LIST // LEFT/RIGHT ARROWS OR TYPE A TAB (CLIMATE) // WHY? SHOWS THE SOURCE // F2 MENU'
   if (view.name === 'module' && view.idx === SEQ_IDX)
     hints.module = 'SET BAGS, PICK SPECIES, THEN INITIATE OR COMMIT RUN TO CARGO // F2 MENU'
   if (view.name === 'module' && view.idx === CARGO_IDX)
@@ -610,7 +610,7 @@ export default function App() {
             }}
             focusToken={focusToken}
             onBack={histLen > 0 ? goBack : undefined}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-specimen' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>

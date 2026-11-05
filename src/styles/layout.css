@@ -282,16 +282,38 @@
 }
 
 @media (max-width: 700px) {
+  /* Phones: no index under the screen; the BACK button and the prompt do the job (Joseph, 5 Nov 2026). */
   .body.has-index {
     grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .body.has-index .index-panel {
+    display: none;
+  }
+  /* SPECIMEN keeps a one-line species strip, since the index is its only species picker. */
+  .body.view-specimen.has-index {
     grid-template-rows: minmax(0, 1fr) auto;
   }
-  .index-panel {
-    max-height: 26vh;
-  }
-  /* On a phone the index stays under the screen. */
-  .body.has-index .index-panel {
+  .body.view-specimen .index-panel {
+    display: block;
     order: 0;
+    padding: 6px 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
+  .body.view-specimen .index-panel .section-title {
+    display: none;
+  }
+  .body.view-specimen .index-panel .index-list {
+    display: inline-flex;
+    gap: 14px;
+  }
+  .body.view-specimen .index-panel .index-list li {
+    flex: none;
+  }
+  .body.view-specimen .index-panel .index-list li .k {
+    display: none;
   }
   .keybar {
     grid-template-columns: repeat(4, minmax(0, 1fr));
