@@ -1,0 +1,142 @@
+{
+ "id": "reishi",
+ "order": 13,
+ "name": "REISHI",
+ "latin": "Ganoderma lingzhi",
+ "tier": "farm",
+ "form": "bracket",
+ "seed": 137,
+ "blurb": "SLOW. CO2 DECIDES ANTLER OR CAP.",
+ "overview": [
+  {
+   "k": "Use",
+   "v": "Grown for drying, not fresh sale. Antlers and tinctures sell.",
+   "s": [
+    "F17-0466"
+   ]
+  },
+  {
+   "k": "Strain",
+   "v": "Ganoderma lingzhi via John Donahue (European origin).",
+   "s": [
+    "F18-0355"
+   ]
+  },
+  {
+   "k": "Evidence",
+   "v": "Medicinal evidence points to immune modulation; many studies are small. Do not repeat claims you cannot source.",
+   "s": [
+    "F17-0465",
+    "F17-0466"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Substrate",
+   "v": "Short logs colonize faster than long ones and give better fruit bodies than bags.",
+   "s": [
+    "F18-0356"
+   ]
+  },
+  {
+   "k": "Bags",
+   "v": "10 lb bags can turn mostly into antlers over a year.",
+   "s": [
+    "F18-0357"
+   ]
+  },
+  {
+   "k": "Recipe, spawn rate",
+   "f": "nodata"
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Incubation",
+   "v": "Months to a year in the bag.",
+   "s": [
+    "F18-0358"
+   ]
+  },
+  {
+   "k": "In-bag fruiting",
+   "v": "3-4 months for antlers to reach the bag top; up to a year.",
+   "s": [
+    "F18-0359"
+   ],
+   "d": [
+    90,
+    120
+   ]
+  },
+  {
+   "k": "Cap from stripped antlers",
+   "v": "About 1 month.",
+   "s": [
+    "F18-0358"
+   ]
+  }
+ ],
+ "fruitC": null,
+ "climate": [
+  {
+   "k": "Fruiting temp",
+   "f": "nodata"
+  },
+  {
+   "k": "RH",
+   "v": "85-95% for fruiting.",
+   "s": [
+    "F18-0360"
+   ]
+  },
+  {
+   "k": "CO2",
+   "v": "3,000-5,000 ppm in the bag gives antlers; below 1,000 ppm gives kidney caps.",
+   "s": [
+    "F18-0361"
+   ],
+   "w": [
+    "co2 0:22:58"
+   ]
+  },
+  {
+   "k": "Light",
+   "f": "nodata"
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Yield per block",
+   "f": "nodata"
+  },
+  {
+   "k": "Water content",
+   "v": "About 80%, against about 95% for most. Dries easily.",
+   "s": [
+    "F18-0363"
+   ]
+  }
+ ],
+ "cat": null,
+ "hazards": [
+  {
+   "k": "Spores and metals",
+   "v": "Heavy spore loads; wear a respirator. Can take up heavy metals from its substrate.",
+   "s": [
+    "F17-0485",
+    "F17-0486"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "v": "Fruits for months; year-old bags are mostly antler.",
+   "s": [
+    "F18-0362"
+   ]
+  }
+ ],
+ "strains": []
+}

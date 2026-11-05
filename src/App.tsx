@@ -13,6 +13,9 @@ import { Login } from './screens/Login'
 import { MODULES, STATION } from './data/farm'
 import { Vitals, VitalsIndex } from './screens/Vitals'
 import { DeckPlan, DeckIndex } from './screens/DeckPlan'
+import { Specimen, SpecimenIndex, type Tab, TABS } from './screens/Specimen'
+import { Sequence } from './screens/Sequence'
+import { SPECIES } from './data/species'
 import { usePower } from './power/PowerContext'
 import { allCircuits, type RoomId } from './data/power'
 import { ROOMS } from './data/rooms'
@@ -23,6 +26,8 @@ type View = { name: 'menu' } | { name: 'tune' } | { name: 'help' } | { name: 'st
 
 const VITALS_IDX = MODULES.findIndex((m) => m.key === 'VITALS')
 const DECK_IDX = MODULES.findIndex((m) => m.key === 'DECK')
+const SPEC_IDX = MODULES.findIndex((m) => m.key === 'SPECIMEN')
+const SEQ_IDX = MODULES.findIndex((m) => m.key === 'SEQUENCE')
 
 const TITLES: Record<View['name'], string> = {
   menu: 'MAIN MENU',
@@ -40,6 +45,8 @@ export default function App() {
   const [view, setView] = useState<View>({ name: 'menu' })
   const [firstMenu, setFirstMenu] = useState(true)
   const [selected, setSelected] = useState(0)
+  const [specimen, setSpecimen] = useState(0)
+  const [specTab, setSpecTab] = useState<Tab>('OVERVIEW')
   const [sweep, setSweep] = useState(0)
   const [alert, setAlert] = useState(false)
   const [reply, setReply] = useState<{ text: string; warn?: boolean; id: number } | null>(null)
@@ -162,6 +169,20 @@ export default function App() {
     if (mod >= 0) {
       setSelected(mod)
       return go({ name: 'module', idx: mod })
+    }
+    // Species: type a name (BLUE, LION, SHIITAKE) or a tab (CLIMATE, YIELD) while on SPECIMEN FILES.
+    const spIdx = SPECIES.findIndex((x) => x.id === raw.trim().toLowerCase().replace(/[^a-z]+/g, '-') || x.name === raw.trim().toUpperCase() || x.name.split(' ')[0] === cmd.replace("'", '') || x.name.replace("'", '').split(' ')[0] === cmd)
+    if (spIdx >= 0 && cmd.length > 2) {
+      setSpecimen(spIdx)
+      setSelected(SPEC_IDX)
+      if (!(view.name === 'module' && view.idx === SPEC_IDX)) go({ name: 'module', idx: SPEC_IDX })
+      else sound.chirp()
+      return
+    }
+    const tabHit = TABS.find((t) => t === cmd)
+    if (tabHit && view.name === 'module' && view.idx === SPEC_IDX) {
+      setSpecTab(tabHit)
+      return sound.chirp()
     }
     // Power and rooms.
     const openVitals = () => {
@@ -405,6 +426,8 @@ export default function App() {
             }}
           />
         )
+      else if (view.idx === SPEC_IDX) content = <Specimen index={specimen} tab={specTab} setTab={setSpecTab} />
+      else if (view.idx === SEQ_IDX) content = <Sequence />
       else content = <Pending mod={MODULES[view.idx]} />
       break
   }
@@ -413,6 +436,11 @@ export default function App() {
     hints.module = 'TAP A BREAKER TO FLIP IT // TYPE A TAG (S4) OR GEN, UTILITY, HEATER A/B // F2 MENU'
   if (view.name === 'module' && view.idx === DECK_IDX)
     hints.module = 'TAP A ROOM // TYPE LAB, PACKING, INCUBATION, FRUITING OR BOILING // F2 MENU'
+
+  if (view.name === 'module' && view.idx === SPEC_IDX)
+    hints.module = 'TAP A SPECIES AT RIGHT // LEFT/RIGHT ARROWS OR TYPE A TAB (CLIMATE) // WHY? SHOWS THE SOURCE // F2 MENU'
+  if (view.name === 'module' && view.idx === SEQ_IDX)
+    hints.module = 'SET BAGS, PICK SPECIES, THEN INITIATE // F2 MENU'
 
   const hint = reply ? (
     <TypeText key={reply.id} className={reply.warn ? 'warn' : ''} lines={[reply.text]} />
@@ -443,7 +471,9 @@ export default function App() {
                   ? <VitalsIndex />
                   : view.name === 'module' && view.idx === DECK_IDX
                     ? <DeckIndex />
-                    : moduleIndex
+                    : view.name === 'module' && view.idx === SPEC_IDX
+                      ? <SpecimenIndex index={specimen} onPick={setSpecimen} />
+                      : moduleIndex
             }
             keys={keys}
             onKey={onKey}

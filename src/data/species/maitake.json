@@ -1,0 +1,268 @@
+{
+ "id": "maitake",
+ "order": 10,
+ "name": "MAITAKE",
+ "latin": "Grifola frondosa",
+ "tier": "farm",
+ "form": "rosette",
+ "seed": 101,
+ "blurb": "UNFORGIVING. DO NOT DISTURB. ONE FLUSH.",
+ "overview": [
+  {
+   "k": "Seriousness",
+   "v": "Treat it like shiitake: 8-12 weeks to harvest plus about a week. Unforgiving of a botched block.",
+   "s": [
+    "F17-0349",
+    "F18-9101"
+   ]
+  },
+  {
+   "k": "Mixed rooms",
+   "v": "Does not fruit consistently alongside other species. Give it a dedicated bright, humid, slow-air room.",
+   "s": [
+    "F17-0350",
+    "F17-0392"
+   ]
+  },
+  {
+   "k": "Strains",
+   "v": "Mycelia 9827 (main), Shogun (tolerates warmer rooms), 494 (inconsistent).",
+   "s": [
+    "F18-0263"
+   ]
+  },
+  {
+   "k": "Season",
+   "v": "Naturally warmer-weather, fall-fruiting. Wild heads reach about 30 lb.",
+   "s": [
+    "F17-0351"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Recipe",
+   "v": "Low supplement, 20-40% (house 20-30%). A full 50:50 is too rich.",
+   "s": [
+    "F18-0269",
+    "F18-0270"
+   ]
+  },
+  {
+   "k": "Moisture",
+   "v": "60-61%, 61% ideal. About 63% is too wet.",
+   "s": [
+    "F18-0271"
+   ]
+  },
+  {
+   "k": "Other practices",
+   "v": "54-57% (one experienced grower); \"a couple of percent more\" for slow species.",
+   "f": "ctx",
+   "s": [
+    "F18-0272",
+    "F18-0273"
+   ]
+  },
+  {
+   "k": "Heat treatment",
+   "v": "Quasi-cook: 15 psi, cut the steam, hold at core about 99 °C. Avoid ultra-pasteurization.",
+   "s": [
+    "F18-0274"
+   ]
+  },
+  {
+   "k": "Grain spawn",
+   "v": "42-46% moisture, about 6% oak sawdust added.",
+   "s": [
+    "F18-0265",
+    "F18-0266"
+   ]
+  },
+  {
+   "k": "Spawn rate",
+   "v": "About 20 blocks per 6 lb bag.",
+   "s": [
+    "F18-0277"
+   ]
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Colonize",
+   "v": "Weeks 1-4.",
+   "s": [
+    "F18-0281"
+   ],
+   "d": [
+    28,
+    28
+   ]
+  },
+  {
+   "k": "Spider eyes",
+   "v": "Weeks 4-6.",
+   "s": [
+    "F18-0281"
+   ]
+  },
+  {
+   "k": "Fist to fingers",
+   "v": "Weeks 5-8: cut the bag then.",
+   "s": [
+    "F18-0281"
+   ],
+   "w": [
+    "how-to-grow-maitake 0:53:07"
+   ]
+  },
+  {
+   "k": "In the fruit room",
+   "v": "7-10 days if the bag is cut on time.",
+   "s": [
+    "F18-0287"
+   ],
+   "d": [
+    7,
+    10
+   ]
+  },
+  {
+   "k": "Catawba knock to first harvest",
+   "v": "59 days (55-65).",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "fruitC": {
+  "range": [
+   [
+    16,
+    21
+   ]
+  ]
+ },
+ "climate": [
+  {
+   "k": "Incubation temp",
+   "v": "19 °C for 10 lb blocks; 20 °C maximum.",
+   "s": [
+    "F18-0278"
+   ]
+  },
+  {
+   "k": "Incubation light",
+   "v": "Adequate light throughout, more than usual.",
+   "s": [
+    "F18-0279"
+   ]
+  },
+  {
+   "k": "Fruiting temp",
+   "v": "Anywhere in 16-21 °C. Some strains to about 24 °C.",
+   "s": [
+    "F18-0282"
+   ],
+   "w": [
+    "how-to-grow-maitake 1:08:20"
+   ]
+  },
+  {
+   "k": "RH",
+   "v": "90-93%, steady, from a high-pressure fog system.",
+   "s": [
+    "F18-0283"
+   ]
+  },
+  {
+   "k": "CO2",
+   "v": "Below about 1,000 ppm.",
+   "s": [
+    "F18-0284"
+   ]
+  },
+  {
+   "k": "Light",
+   "v": "Lots: about 6500 K, always on.",
+   "s": [
+    "F18-0285"
+   ]
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Per block",
+   "v": "About 2 lb (0.9 kg), one flush. A second is not recommended.",
+   "s": [
+    "F18-0289",
+    "F18-0291"
+   ],
+   "w": [
+    "how-to-grow-maitake 1:01:25"
+   ]
+  },
+  {
+   "k": "Catawba real yield",
+   "v": "About 0.67 lb/block aggregate. Far under Cap n Stem.",
+   "f": "conflict",
+   "s": [
+    "CATAWBA"
+   ]
+  },
+  {
+   "k": "Catawba, warm months",
+   "v": "Yield fell 52% and 8 days slower in warm months.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "cat": {
+  "lb": 0.67,
+  "d": 59,
+  "dr": "55-65",
+  "plan": 1.5
+ },
+ "hazards": [
+  {
+   "k": "Over-rich or wet blocks",
+   "v": "Metabolite pools, mould, hot cores.",
+   "s": [
+    "F17-0387"
+   ]
+  },
+  {
+   "k": "White bacterial fruit",
+   "v": "Cauliflower-like growth after ultra-pasteurization.",
+   "s": [
+    "F17-0388"
+   ]
+  },
+  {
+   "k": "Trichoderma on fruit",
+   "v": "Clean the maitake room every day.",
+   "s": [
+    "F17-0389"
+   ]
+  },
+  {
+   "k": "Spores",
+   "v": "Possibly heavy loads. Wear a mask.",
+   "s": [
+    "F17-0390"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "v": "Never disturb incubating blocks. Cut at fist-to-fingers.",
+   "s": [
+    "F17-0393"
+   ]
+  }
+ ],
+ "strains": []
+}

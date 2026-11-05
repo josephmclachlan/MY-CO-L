@@ -1,0 +1,185 @@
+{
+ "id": "golden-oyster",
+ "order": 4,
+ "name": "GOLDEN OYSTER",
+ "latin": "Pleurotus citrinopileatus",
+ "tier": "plan",
+ "plan": {
+  "share": 13,
+  "note": "share of the old 100-bag split; scaled to the 130-bag run, split not yet confirmed"
+ },
+ "form": "shelf",
+ "seed": 41,
+ "blurb": "FAST, WARM, PRETTY. THIN DATA IN THE SOURCES.",
+ "overview": [
+  {
+   "k": "Genus",
+   "v": "Little detailed data exists. Pleurotus biology, differs from other oysters mainly in colour and temperature preference.",
+   "s": [
+    "F17-0173",
+    "F17-0174"
+   ]
+  },
+  {
+   "k": "Character",
+   "v": "\"A fast, warm one.\" Found growing wild in many places.",
+   "s": [
+    "F17-8008"
+   ]
+  },
+  {
+   "k": "Look",
+   "v": "Golden primordia look coral-like on the blocks.",
+   "s": [
+    "F17-0178"
+   ]
+  },
+  {
+   "k": "Spread",
+   "v": "Invasive in places. Work on sporeless or low-spore strains is planned.",
+   "s": [
+    "F17-0179"
+   ],
+   "w": [
+    "shimofuri-hiratake 0:22:15"
+   ]
+  },
+  {
+   "k": "Rack",
+   "v": "Top of the rack: seems to respond more to light. Often seen on the middle shelf of a mixed room.",
+   "s": [
+    "F17-0177"
+   ],
+   "w": [
+    "fruiting-tips-and-tricks 0:17:47"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Culture storage",
+   "v": "Does not survive cryo. Keep agar plugs in sterile water at about 1 °C.",
+   "s": [
+    "F17-0176",
+    "F18-0155"
+   ],
+   "w": [
+    "02-shiitake-cultivation 0:13:46"
+   ]
+  },
+  {
+   "k": "Opening",
+   "v": "Side-fruited at Catawba (Ryan).",
+   "s": [
+    "F17-0183"
+   ]
+  },
+  {
+   "k": "Substrate",
+   "f": "nodata",
+   "n": "Textbook says treat like other oysters (F18-0159). That is not a measured figure."
+  },
+  {
+   "k": "Moisture",
+   "f": "nodata"
+  },
+  {
+   "k": "Spawn rate",
+   "f": "nodata"
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Block incubation",
+   "f": "nodata"
+  },
+  {
+   "k": "Catawba knock to first harvest",
+   "v": "26.5 days (19-31), median of real picks. Wide spread.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "fruitC": null,
+ "climate": [
+  {
+   "k": "Incubation temp",
+   "f": "nodata"
+  },
+  {
+   "k": "Fruiting temp",
+   "f": "nodata",
+   "n": "Pink, golden and phoenix temperatures are not in the sources."
+  },
+  {
+   "k": "Fruiting RH",
+   "f": "nodata"
+  },
+  {
+   "k": "CO2",
+   "f": "nodata"
+  },
+  {
+   "k": "Light",
+   "v": "Responds more to light; give it the upper shelves.",
+   "s": [
+    "F17-0177",
+    "F18-0156"
+   ]
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Yield per block",
+   "f": "nodata",
+   "n": "Cap n Stem gives no figure."
+  },
+  {
+   "k": "Catawba real yield",
+   "v": "1.28 lb/block (1.32 in their efficiency table). Plan was 1.5 lb.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  },
+  {
+   "k": "Catawba, warm months",
+   "v": "Yield up 39% and 6 days faster in warm months.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "cat": {
+  "lb": 1.28,
+  "d": 26.5,
+  "dr": "19-31",
+  "plan": 1.5
+ },
+ "hazards": [
+  {
+   "k": "Shelf life",
+   "v": "\"Look pretty, but don't hold up in the pan.\" Old pinks and goldens smell bad in the bin.",
+   "s": [
+    "F17-8008"
+   ]
+  },
+  {
+   "k": "Disease list",
+   "f": "nodata",
+   "n": "No species-specific problems recorded. General oyster hazards (blotch, stroma) are in the BLUE OYSTER file."
+  }
+ ],
+ "notes": [
+  {
+   "v": "High Country Fungi (Avery) grows Cap n Stem house pink and gold strains. His \"anti-cancer\" claim for gold is unproven.",
+   "s": [
+    "F17-0183"
+   ]
+  }
+ ],
+ "strains": []
+}
