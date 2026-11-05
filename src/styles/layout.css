@@ -663,6 +663,9 @@
 .logo.wire-static .logo-svg rect { animation: none; stroke-dashoffset: 0; }
 .logo-band { stroke-width: 2.6; }
 
+/* Module sign glyphs in the main menu. */
+.menu-item .mi-glyph { display: inline-block; width: 1.5em; color: var(--fg-dim); }
+.menu-item.sel .mi-glyph { color: var(--bg); }
 /* Dormant (not yet built) module panel: hazard trim, empty link meter. */
 .dormant { margin-top: 18px; border: 1px solid var(--fg-faint); max-width: 520px; }
 .dormant-trim { height: 8px; background: repeating-linear-gradient(-45deg, var(--hazard) 0 8px, #050505 8px 16px); opacity: 0.85; }
