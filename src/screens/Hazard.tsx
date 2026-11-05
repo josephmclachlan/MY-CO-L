@@ -47,6 +47,8 @@ export const HAZARD_START: HazardState = { mode: 'file', id: null, tab: 'SPOT', 
 type SetHazard = (p: Partial<HazardState>) => void
 
 const NO_DATA = 'NO DATA IN SOURCES'
+/** The public build empties the paraphrased text (see vite.config.ts); fact IDs and tags stay. */
+const LOCKED = 'TEXT LOCKED IN THE PUBLIC BUILD. LOG IN TO READ IT. THE SOURCE IDS BELOW STILL APPLY.'
 const narrow = () => typeof window !== 'undefined' && window.matchMedia?.('(max-width: 700px)').matches
 const join = <T extends string>(xs: T[], label: Record<T, string>) => (xs.length ? xs.map((x) => label[x]).join(', ') : NO_DATA)
 
@@ -65,7 +67,7 @@ function factRows(prefix: string, h: H, facts: Fact[], open: (id: string) => voi
     return {
       id: `${prefix}${i}`,
       label: f.k?.toUpperCase(),
-      value: f.v ?? NO_DATA,
+      value: f.v === '' ? LOCKED : f.v ?? NO_DATA,
       flag: f.f,
       link: target ? { label: `OPEN ${target.name}`, onClick: () => open(target.id) } : null,
       why: {
@@ -283,7 +285,7 @@ function Diagnose({ x, set, counts }: { x: HazardState; set: SetHazard; counts: 
   const hits = useMemo(() => (noClues(c) ? [] : diagnose(c).slice(0, 10)), [c])
   const patterns: Row[] = PATTERNS.map((p, i) => {
     const t = p.hz ? hazardById(p.hz) : undefined
-    return { id: `pt${i}`, label: 'IF', value: `${p.see}  =>  ${p.source}.`, why: { s: p.s }, link: t ? { label: `OPEN ${t.name}`, onClick: () => set({ mode: 'file', id: t.id, tab: 'SPOT' }) } : null }
+    return { id: `pt${i}`, label: 'IF', value: p.see ? `${p.see}  =>  ${p.source}.` : LOCKED, why: { s: p.s }, link: t ? { label: `OPEN ${t.name}`, onClick: () => set({ mode: 'file', id: t.id, tab: 'SPOT' }) } : null }
   })
   return (
     <div className="hz">
@@ -320,7 +322,7 @@ function Diagnose({ x, set, counts }: { x: HazardState; set: SetHazard; counts: 
                     {m.h.kind === 'notcontam' && <span className="tag"> MAY BE NORMAL</span>}
                   </span>
                   <span className="hz-hit-m">{m.hits.length ? `MATCHES: ${m.hits.join(', ')}` : `STAGE: ${c.stage ? STAGE_LABEL[c.stage] : ''}`}{m.misses.length ? ` // NOT: ${m.misses.join(', ')}` : ''}{lc ? ` // ${lc.bags} LOGGED` : ''}</span>
-                  <span className="hz-hit-s dim">{m.h.spot[0]?.v}</span>
+                  {m.h.spot[0]?.v && <span className="hz-hit-s dim">{m.h.spot[0].v}</span>}
                 </button>
               </li>
             )
