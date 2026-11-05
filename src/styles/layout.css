@@ -140,6 +140,7 @@
   inset: 0;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
+  grid-template-columns: minmax(0, 1fr);
   padding: clamp(8px, 1.6vw, 18px);
   gap: 6px;
 }
@@ -284,17 +285,17 @@
 @media (max-width: 700px) {
   /* Phones: no index under the screen; the BACK button and the prompt do the job (Joseph, 5 Nov 2026). */
   .body.has-index {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
   }
   .body.has-index .index-panel {
     display: none;
   }
-  /* SPECIMEN keeps a one-line species strip, since the index is its only species picker. */
-  .body.view-specimen.has-index {
+  /* SPECIMEN and XENOGENETICS keep a one-line strip, since their index is the species / strain picker. */
+  .body.view-strip.has-index {
     grid-template-rows: minmax(0, 1fr) auto;
   }
-  .body.view-specimen .index-panel {
+  .body.view-strip .index-panel {
     display: block;
     order: 0;
     padding: 6px 8px;
@@ -302,17 +303,17 @@
     overflow-y: hidden;
     white-space: nowrap;
   }
-  .body.view-specimen .index-panel .section-title {
+  .body.view-strip .index-panel .section-title {
     display: none;
   }
-  .body.view-specimen .index-panel .index-list {
+  .body.view-strip .index-panel .index-list {
     display: inline-flex;
     gap: 14px;
   }
-  .body.view-specimen .index-panel .index-list li {
+  .body.view-strip .index-panel .index-list li {
     flex: none;
   }
-  .body.view-specimen .index-panel .index-list li .k {
+  .body.view-strip .index-panel .index-list li .k {
     display: none;
   }
   .keybar {
@@ -654,3 +655,4 @@
 .logo.wire-static .nodes circle { opacity: 1; }
 .logo-svg rect { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw var(--draw) linear forwards; }
 .logo.wire-static .logo-svg rect { animation: none; stroke-dashoffset: 0; }
+.logo-band { stroke-width: 2.6; }

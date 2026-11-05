@@ -5,6 +5,8 @@ import { TypedRows, type Row } from '../components/TypedRows'
 import { FRUIT_ROOM_C, PLAN_BASE_BAGS, SPECIES, WEEKLY_BAGS, fruitVerdict, planBags, srcLabel } from '../data/species'
 import type { Fact, Species } from '../data/species/types'
 import { LB_TO_KG } from '../lib/runplan'
+import { useTable } from '../store/StoreContext'
+import type { Strain } from '../lib/xeno'
 
 export const TABS = ['OVERVIEW', 'CULTIVATION', 'TIMELINE', 'CLIMATE', 'YIELD', 'HAZARDS', 'NOTES', 'SOURCES'] as const
 export type Tab = (typeof TABS)[number]
@@ -36,7 +38,7 @@ function sourceStats(sp: Species) {
   return { ids, vids, facts: all.length, gaps: all.filter((f) => f.f === 'nodata').length, conflicts: all.filter((f) => f.f === 'conflict').length }
 }
 
-function rowsFor(sp: Species, tab: Tab): Row[] {
+function rowsFor(sp: Species, tab: Tab, strains: Strain[] = []): Row[] {
   const lb = (x: number) => `${x.toFixed(2)} lb (${(x * LB_TO_KG).toFixed(2)} kg)`
   switch (tab) {
     case 'OVERVIEW': {
@@ -51,7 +53,7 @@ function rowsFor(sp: Species, tab: Tab): Row[] {
           why: { s: ['FARM-PLAN'], n: `Original split was written for ${PLAN_BASE_BAGS} bags; scaled to ${WEEKLY_BAGS}. The ${WEEKLY_BAGS}-bag split is not confirmed.` },
         },
         ...factRows('o', sp.overview),
-        { id: 'o-str', label: 'STRAINS', value: sp.strains.length ? sp.strains.map((s) => s.name).join(', ') : 'None logged yet. The strain tracker fills this (XENOGENETICS).' },
+        { id: 'o-str', label: 'STRAINS', value: strains.length ? strains.map((s) => `${s.code}${s.name ? ` ${s.name}` : ''}${s.active ? '' : ' (retired)'}`).join(', ') : 'None registered yet. Add them in XENOGENETICS.' },
       ]
     }
     case 'CULTIVATION':
@@ -151,12 +153,15 @@ function Bars({ sp }: { sp: Species }) {
   )
 }
 
-export function Specimen({ index, tab, setTab }: { index: number; tab: Tab; setTab: (t: Tab) => void }) {
+export function Specimen({ index, tab, setTab, onOpenStrain }: { index: number; tab: Tab; setTab: (t: Tab) => void; onOpenStrain?: (id: string) => void }) {
   const { sound } = useApp()
   const sp = SPECIES[index]
   const [skip, setSkip] = useState(false)
   const [done, setDone] = useState(false)
-  const rows = useMemo(() => rowsFor(sp, tab), [sp, tab])
+  const allStrains = useTable<Strain>('strains')
+  const strains = useMemo(() => allStrains.filter((s) => s.species_key === sp.id).sort((a, b) => a.code.localeCompare(b.code)), [allStrains, sp.id])
+  const strainKey = strains.map((s) => s.id + s.code + s.name + s.active).join('|')
+  const rows = useMemo(() => rowsFor(sp, tab, strains), [sp, tab, strainKey])
 
   useEffect(() => {
     setSkip(false)
@@ -203,6 +208,16 @@ export function Specimen({ index, tab, setTab }: { index: number; tab: Tab; setT
         <div className="spec-model">
           <ModelView sp={sp} />
           <div className="spec-cap tiny dim">{sp.blurb}</div>
+          {strains.length > 0 && onOpenStrain && (
+            <div className="spec-strains">
+              <div className="section-title">STRAINS ON FILE</div>
+              {strains.map((s) => (
+                <button key={s.id} type="button" className="btn" onClick={() => onOpenStrain(s.id)} title="Open in XENOGENETICS">
+                  {s.code}{s.name ? ` ${s.name.toUpperCase()}` : ''}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

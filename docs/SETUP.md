@@ -64,6 +64,9 @@ the address, so this is for testing until launch, before your MycoWizards refere
    in GitHub, copy it, paste, **Run**. It adds the stock tables CARGO needs and makes every table readable and
    writable by your login only (anyone else who somehow signed in would see nothing). Make your login (this step)
    BEFORE running it, because it adds everyone who exists at that moment to the allowed list.
+   **Then the genetics lab.** Same way: copy `supabase/migrations/0003_genetics.sql`, paste, **Run**. It lets the
+   XENOGENETICS screen store strains by species, master (P0) cultures, water tubes and cryovials, grain-run status
+   and cold-storage dates. Run each file once, in number order.
 7. **Copy the two public values.** **Project Settings** (gear icon) > **API Keys** (or **Data API**):
    - the **Project URL** (looks like `https://abcd1234.supabase.co`)
    - the **publishable** key (or, on older screens, the **anon public** key).
