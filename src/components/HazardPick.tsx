@@ -1,3 +1,4 @@
+import { Select } from './Select'
 import { HAZARDS } from '../data/hazards'
 import { KIND_LABEL, KIND_ORDER, lossPickList } from '../lib/hazard'
 
@@ -8,7 +9,7 @@ import { KIND_LABEL, KIND_ORDER, lossPickList } from '../lib/hazard'
 export function HazardPick({ value, onChange, label = 'What was it' }: { value: string; onChange: (v: string) => void; label?: string }) {
   const list = lossPickList(HAZARDS)
   return (
-    <select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)} className="hz-pick">
+    <Select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)} className="hz-pick">
       <option value="">NOT SURE WHAT IT WAS</option>
       {KIND_ORDER.map((k) => {
         const items = list.filter((h) => h.kind === k)
@@ -20,6 +21,6 @@ export function HazardPick({ value, onChange, label = 'What was it' }: { value: 
           </optgroup>
         ) : null
       })}
-    </select>
+    </Select>
   )
 }

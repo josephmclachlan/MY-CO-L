@@ -1,3 +1,4 @@
+import { Select } from '../components/Select'
 import { useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useCargoPrefs, useStore } from '../store/StoreContext'
@@ -83,10 +84,10 @@ export function Ledger({ x, set, say, onOpenTrade, onOpenCargo }: { x: LedgerSta
     <div className="cook ledger">
       <label className="ck-picker">
         <span>SHOW</span>
-        <select value={x.sel} onChange={(e) => (sound.chirp(), set({ sel: e.target.value as LedgerSel }))}>
+        <Select value={x.sel} onChange={(e) => (sound.chirp(), set({ sel: e.target.value as LedgerSel }))}>
           {PICKS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
           {d.ledger.weeks.map((w) => <option key={w.week} value={`week:${w.week}`}>{weekLabel(w.week)} // {w.all.blocks} BLOCKS</option>)}
-        </select>
+        </Select>
       </label>
       {x.sel === 'overview' && <Overview d={d} fx={fx} set={set} onOpenTrade={onOpenTrade} onOpenCargo={onOpenCargo} />}
       {x.sel === 'bills' && <Bills d={d} fx={fx} say={say} />}
@@ -363,10 +364,10 @@ function Labour({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
           <label className="ck-field"><span>TASK</span><input value={task} placeholder="KNOCK, HARVEST, PACK..." onChange={(e) => setTask(e.target.value)} /></label>
           <label className="ck-field">
             <span>LOT (OPTIONAL)</span>
-            <select value={lot} onChange={(e) => setLot(e.target.value)}>
+            <Select value={lot} onChange={(e) => setLot(e.target.value)}>
               <option value="">SHARE OVER LOTS IN THE ROOMS</option>
               {lots.map((l) => <option key={l.id} value={l.id}>{l.lot_code} // {speciesName(l.species_key)} // {l.bag_count}</option>)}
-            </select>
+            </Select>
           </label>
         </div>
         <datalist id="lg-people">{people.map((x) => <option key={x} value={x} />)}</datalist>

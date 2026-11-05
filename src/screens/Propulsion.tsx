@@ -1,3 +1,4 @@
+import { Select } from '../components/Select'
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useStore, useTable } from '../store/StoreContext'
@@ -205,7 +206,7 @@ export function Propulsion({
     <div className="cook">
       <label className="ck-picker">
         <span>RUN</span>
-        <select
+        <Select
           value={x.sel ?? (x.tab === 'TARGETS' ? '__targets' : '')}
           onChange={(e) => {
             sound.chirp()
@@ -221,7 +222,7 @@ export function Propulsion({
               {r.bag_count ? ` ${r.bag_count}` : ''} // {VERDICT_TEXT[d.info.get(r.id)?.an.verdict ?? 'pending']}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       {!run && x.tab !== 'TARGETS' && <Overview d={d} set={set} say={say} onOpenVitals={onOpenVitals} onPrint={() => setPrinting('blank')} />}
       {!run && x.tab === 'TARGETS' && <Targets />}
@@ -566,11 +567,11 @@ function RunTab({ run, info, say, set, onOpenHazard, onOpenXeno, onOpenVitals, o
           <Field label={unitHeat} value={run.heater_on_min === null ? '' : String(run.heater_on_min)} inputMode="decimal" onSave={saveNum('heater_on_min')} hint="FROM THE CONTROLLER, IF IT SHOWS IT" />
           <label className="ck-field wide">
             <span>LINKED SEQUENCE RUN</span>
-            <select value={run.seq_run_ref ?? ''} onChange={(e) => pickSeq(e.target.value)}>
+            <Select value={run.seq_run_ref ?? ''} onChange={(e) => pickSeq(e.target.value)}>
               <option value="">NONE</option>
               {seqRuns.map((s) => <option key={s.ref} value={s.ref}>{s.ref} // {s.note || 'BOOKED RUN'}</option>)}
               {run.seq_run_ref && !seq && <option value={run.seq_run_ref}>{run.seq_run_ref}</option>}
-            </select>
+            </Select>
             <em>{seqRuns.length ? 'RUNS BOOKED WITH COMMIT RUN TO CARGO IN SEQUENCE.' : 'NO BOOKED RUNS YET. USE COMMIT RUN TO CARGO IN SEQUENCE.'} <button type="button" className="ck-link" onClick={onOpenSequence}>OPEN SEQUENCE</button></em>
           </label>
           <Field label="NOTES" value={run.notes ?? ''} placeholder="DOOR OPENINGS, WATER, WHAT WENT WRONG" onSave={(v) => void save({ notes: v || null })} wide />
@@ -760,9 +761,9 @@ function ReadingsTab({ run, an, readings, say }: { run: CookRun; an: RunAnalysis
             <input type="checkbox" checked={remind} onChange={(e) => { setRemind(e.target.checked); setDue(false); setNextDue(Date.now() + every * MIN) }} />
             <span>REMIND ME EVERY</span>
           </label>
-          <select value={every} onChange={(e) => { setEvery(Number(e.target.value)); setNextDue(Date.now() + Number(e.target.value) * MIN); setDue(false) }} aria-label="Reminder interval in minutes">
+          <Select value={every} onChange={(e) => { setEvery(Number(e.target.value)); setNextDue(Date.now() + Number(e.target.value) * MIN); setDue(false) }} aria-label="Reminder interval in minutes">
             {[5, 10, 15, 20, 30, 60].map((n) => <option key={n} value={n}>{n} MIN</option>)}
-          </select>
+          </Select>
           {remind && <span className={due ? 'warn ck-due' : 'dim'}>{due ? 'READING DUE NOW' : `NEXT IN ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`}</span>}
         </div>
         <div className="tiny dim">THE REMINDER ONLY WORKS WHILE THIS SCREEN IS OPEN AND THE PHONE IS AWAKE. FOR A LONG RUN USE A LOGGER AND IMPORT THE FILE.</div>

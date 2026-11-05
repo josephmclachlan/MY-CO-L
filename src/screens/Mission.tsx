@@ -1,3 +1,4 @@
+import { Select } from '../components/Select'
 import { useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useStore, useTable } from '../store/StoreContext'
@@ -105,9 +106,9 @@ export function Mission({ x, set, say }: { x: MissionState; set: SetMission; say
     <div className="cook ledger">
       <label className="ck-picker">
         <span>SHOW</span>
-        <select value={x.tab} onChange={(e) => (sound.chirp(), set({ tab: e.target.value as MissionTab }))}>
+        <Select value={x.tab} onChange={(e) => (sound.chirp(), set({ tab: e.target.value as MissionTab }))}>
           {MISSION_TABS.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
-        </select>
+        </Select>
       </label>
       {x.tab === 'BOARD' && <Board m={m} say={say} />}
       {x.tab === 'TODAY' && <Today m={m} />}
@@ -266,9 +267,9 @@ function HarvestForm({ m, say }: { m: M; say: Say }) {
           <>
             <label className="ck-field">
               <span>LOT</span>
-              <select value={row?.lot.id ?? ''} onChange={(e) => (setLotId(e.target.value), setFlush(''))}>
+              <Select value={row?.lot.id ?? ''} onChange={(e) => (setLotId(e.target.value), setFlush(''))}>
                 {active.map((r) => <option key={r.lot.id} value={r.lot.id}>{r.lot.lot_code} {speciesName(r.lot.species_key)} // {r.lot.status.toUpperCase()}</option>)}
-              </select>
+              </Select>
             </label>
             <div className="ck-fields ck-quick">
               <label className="ck-field"><span>KG</span><input inputMode="decimal" autoFocus value={kg} placeholder="0.0" onChange={(e) => setKg(e.target.value)} /></label>
@@ -378,9 +379,9 @@ function NewLot({ m, say, done }: { m: M; say: Say; done: () => void }) {
         <div className="ck-fields">
           <label className="ck-field">
             <span>SPECIES</span>
-            <select value={sp} onChange={(e) => (setSp(e.target.value), setStrainId(''), setGrainId(''), setCode(''))}>
+            <Select value={sp} onChange={(e) => (setSp(e.target.value), setStrainId(''), setGrainId(''), setCode(''))}>
               {species.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            </Select>
           </label>
           <label className="ck-field"><span>KNOCK DAY</span><input type="date" value={knock} onChange={(e) => (setKnock(e.target.value || todayIso()), setCode(''))} /></label>
           <label className="ck-field">
@@ -397,24 +398,24 @@ function NewLot({ m, say, done }: { m: M; say: Say; done: () => void }) {
         <div className="ck-fields">
           <label className="ck-field">
             <span>STRAIN</span>
-            <select value={strainId} onChange={(e) => (setStrainId(e.target.value), setGrainId(''))}>
+            <Select value={strainId} onChange={(e) => (setStrainId(e.target.value), setGrainId(''))}>
               <option value="">NOT SET</option>
               {strains.map((s) => <option key={s.id} value={s.id}>{s.code}{s.name ? ` ${s.name}` : ''}</option>)}
-            </select>
+            </Select>
           </label>
           <label className="ck-field">
             <span>GRAIN RUN (G2)</span>
-            <select value={grainId} onChange={(e) => setGrainId(e.target.value)}>
+            <Select value={grainId} onChange={(e) => setGrainId(e.target.value)}>
               <option value="">NOT SET</option>
               {grain.map((g) => <option key={g.id} value={g.id}>{g.label ?? `G2 ${g.inoculated_on}`} // {g.bag_count - (g.bags_lost || 0)} BAGS</option>)}
-            </select>
+            </Select>
           </label>
           <label className="ck-field">
             <span>COOK RUN (STEAM)</span>
-            <select value={cookId} onChange={(e) => setCookId(e.target.value)}>
+            <Select value={cookId} onChange={(e) => setCookId(e.target.value)}>
               <option value="">NOT SET</option>
               {cooks.map((c) => <option key={c.id} value={c.id}>{(c.started_at ?? c.created_at ?? '').slice(0, 10)} {c.unit_label ?? c.kind.toUpperCase()}{c.bag_count ? ` // ${c.bag_count} BAGS` : ''}</option>)}
-            </select>
+            </Select>
           </label>
         </div>
         <label className="ck-field"><span>NOTES</span><input value={notes} onChange={(e) => setNotes(e.target.value)} /></label>

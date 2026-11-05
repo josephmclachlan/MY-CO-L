@@ -295,6 +295,16 @@
   .body.view-strip.has-index {
     grid-template-rows: minmax(0, 1fr) auto;
   }
+  /* SPECIMEN FILES: the full species list under the screen, as it was before the strip (Joseph, 5 Nov 2026). */
+  .body.view-fullindex.has-index {
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  .body.view-fullindex .index-panel {
+    display: block;
+    order: 0;
+    max-height: 26vh;
+    overflow-y: auto;
+  }
   .body.view-strip .index-panel {
     display: block;
     order: 0;
@@ -677,3 +687,18 @@
 @keyframes dormant-pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
 @keyframes dormant-scan { 0% { left: 1px; } 50% { left: calc(100% - 16px); } 100% { left: 1px; } }
 @media (prefers-reduced-motion: reduce) { .dormant-glyph, .dormant-bar i { animation: none; } }
+
+/* In-app drop-down (replaces the phone's system picker). */
+.ui-select { position: relative; display: inline-block; max-width: 100%; vertical-align: middle; }
+.ui-select-btn { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; max-width: 100%; min-height: 34px; padding: 5px 8px; font: inherit; color: var(--fg); background: var(--bg-hi); border: 1px solid var(--fg-dim); text-align: left; cursor: pointer; }
+.ui-select-btn:focus-visible, .ui-select.open .ui-select-btn { outline: none; border-color: var(--fg); box-shadow: 0 0 0 1px var(--fg); }
+.ui-select-btn:disabled { opacity: 0.5; cursor: default; }
+.ui-select-val { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ui-select-caret { color: var(--fg-dim); }
+.ui-select-list { position: absolute; z-index: 40; left: 0; top: calc(100% + 2px); min-width: 100%; max-width: min(88vw, 520px); max-height: min(42vh, 320px); overflow-y: auto; margin: 0; padding: 0; list-style: none; background: var(--bg); border: 1px solid var(--fg); box-shadow: 0 0 calc(14px * var(--glow-k, 1)) var(--glow); }
+.ui-select.up .ui-select-list { top: auto; bottom: calc(100% + 2px); }
+.ui-select-opt { padding: 8px 10px; cursor: pointer; white-space: normal; color: var(--fg); }
+.ui-select-opt.cur { color: var(--fg); text-decoration: underline; }
+.ui-select-opt.hi { background: var(--fg); color: var(--bg); text-shadow: none; }
+.ui-select-opt.off { opacity: 0.4; cursor: default; }
+.ui-select-group { padding: 4px 10px; color: var(--fg-dim); font-size: 0.8em; letter-spacing: 0.12em; border-top: 1px solid var(--fg-faint); }

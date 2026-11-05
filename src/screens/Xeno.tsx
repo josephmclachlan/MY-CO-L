@@ -1,3 +1,4 @@
+import { Select } from '../components/Select'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import qrcode from 'qrcode-generator'
@@ -270,11 +271,11 @@ function StrainsTab({ d, x, set, say, onOpenSpecies }: { d: XData; x: XenoState;
             <Field label="SOURCE" value={sel.source ?? ''} onSave={(v) => void run(() => store.put('strains', { ...sel, source: v || null }), 'SOURCE SAVED')} />
             <label className="cg-field">
               <span>SPECIES</span>
-              <select value={sel.species_key} onChange={(e) => void run(() => store.put('strains', { ...sel, species_key: e.target.value }), 'SPECIES SAVED')}>
+              <Select value={sel.species_key} onChange={(e) => void run(() => store.put('strains', { ...sel, species_key: e.target.value }), 'SPECIES SAVED')}>
                 {SPECIES.map((s) => (
                   <option key={s.id} value={s.id}>{s.name}</option>
                 ))}
-              </select>
+              </Select>
             </label>
             <Field label="NOTES" wide value={sel.notes ?? ''} placeholder="NONE" onSave={(v) => void run(() => store.put('strains', { ...sel, notes: v || null }), 'NOTES SAVED')} />
           </div>
@@ -294,11 +295,11 @@ function StrainsTab({ d, x, set, say, onOpenSpecies }: { d: XData; x: XenoState;
 
       <div className="section-title rr-sec">REGISTER A STRAIN</div>
       <div className="cg-add xn-add">
-        <select aria-label="Species" value={sp} onChange={(e) => setSp(e.target.value)}>
+        <Select aria-label="Species" value={sp} onChange={(e) => setSp(e.target.value)}>
           {SPECIES.map((s) => (
             <option key={s.id} value={s.id}>{s.name}</option>
           ))}
-        </select>
+        </Select>
         <input aria-label="Strain code" placeholder={suggested} value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} style={{ width: '7em' }} />
         <input aria-label="Strain name" placeholder="NAME" value={name} onChange={(e) => setName(e.target.value)} />
         <input aria-label="Source" placeholder="SOURCE" value={source} onChange={(e) => setSource(e.target.value)} />
@@ -351,16 +352,16 @@ function AddMaster({ strain, d, say }: { strain: Strain; d: XData; say: Say }) {
   return (
     <div className="cg-add xn-add">
       <span className="dim tiny">ADD A MASTER OR A BOUGHT CULTURE:</span>
-      <select aria-label="Kind" value={kind} onChange={(e) => (setKind(e.target.value as CultureKind), setP(e.target.value === 'plate' ? '1' : '0'))}>
+      <Select aria-label="Kind" value={kind} onChange={(e) => (setKind(e.target.value as CultureKind), setP(e.target.value === 'plate' ? '1' : '0'))}>
         {(['cryo', 'slant', 'water', 'plate', 'liquid', 'spore_print'] as CultureKind[]).map((k) => (
           <option key={k} value={k}>{KIND_LABEL[k]}</option>
         ))}
-      </select>
-      <select aria-label="P-level" value={p} onChange={(e) => setP(e.target.value)}>
+      </Select>
+      <Select aria-label="P-level" value={p} onChange={(e) => setP(e.target.value)}>
         {[0, 1, 2, 3, 4].map((i) => (
           <option key={i} value={i}>{pLabel(i)}</option>
         ))}
-      </select>
+      </Select>
       <input aria-label="How many" inputMode="numeric" value={n} onChange={(e) => setN(e.target.value)} style={{ width: '3.5em' }} />
       <input aria-label="Made on" type="date" value={made} onChange={(e) => setMade(e.target.value)} />
       <input aria-label="Location" placeholder="LOCATION" value={loc} onChange={(e) => setLoc(e.target.value)} style={{ width: '9em' }} />
@@ -605,11 +606,11 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
             <div className="cg-act">
               <div className="cg-act-t">TRANSFER // MAKE A COPY</div>
               <span className="xn-inline">
-                <select aria-label="Make" value={kind} onChange={(e) => setKind(e.target.value as CultureKind)}>
+                <Select aria-label="Make" value={kind} onChange={(e) => setKind(e.target.value as CultureKind)}>
                   {(['plate', 'slant', 'liquid', 'water', 'cryo'] as CultureKind[]).map((x) => (
                     <option key={x} value={x}>{KIND_LABEL[x]}</option>
                   ))}
-                </select>
+                </Select>
                 <Num label="HOW MANY" value={n} set={setN} />
               </span>
               <button type="button" className="btn" onClick={() => void run(() => addCultures(store, { strain, parent: c, kind, count: Number(n) || 1, existing: d.cultures }), `${n} ${KIND_LABEL[kind]} ${pLabel(nextP)} LOGGED`)}>
@@ -894,12 +895,12 @@ function PlannerTab({ d, set }: { d: XData; set: SetXeno }) {
               </label>
               <label className="xn-num">
                 <span>STRAIN</span>
-                <select value={r.strain?.id ?? ''} onChange={(e) => save({ ...prefs, strain: { ...prefs.strain, [r.key]: e.target.value } })} disabled={!r.options.length}>
+                <Select value={r.strain?.id ?? ''} onChange={(e) => save({ ...prefs, strain: { ...prefs.strain, [r.key]: e.target.value } })} disabled={!r.options.length}>
                   {!r.options.length && <option value="">NONE ON FILE</option>}
                   {r.options.map((s) => (
                     <option key={s.id} value={s.id}>{s.code}{s.name ? ` ${s.name}` : ''}</option>
                   ))}
-                </select>
+                </Select>
               </label>
             </div>
             <div className="xn-chain">

@@ -1,3 +1,4 @@
+import { Select } from '../components/Select'
 import { useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useCargoPrefs, useStore, useTable } from '../store/StoreContext'
@@ -71,9 +72,9 @@ export function Trade({ x, set, say, onOpenLedger }: { x: TradeState; set: SetTr
     <div className="cook ledger">
       <label className="ck-picker">
         <span>SHOW</span>
-        <select value={x.tab} onChange={(e) => (sound.chirp(), set({ tab: e.target.value as TradeTab }))}>
+        <Select value={x.tab} onChange={(e) => (sound.chirp(), set({ tab: e.target.value as TradeTab }))}>
           {TRADE_TABS.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
-        </select>
+        </Select>
       </label>
       {x.tab === 'SALE' && <SaleForm sales={sales} fx={cp.fx} say={say} cost={cost} lotCodes={d.lots.map((l) => l.lot_code)} />}
       {x.tab === 'TOTALS' && <Totals sales={sales} fx={cp.fx} cost={cost} noPrices={d.plan.all.parts.consumables.basis === 'NONE'} onOpenLedger={onOpenLedger} />}
@@ -170,9 +171,9 @@ function SaleForm({ sales, fx, say, cost, lotCodes }: { sales: Sale[]; fx: numbe
         <div className="ck-field"><span>CHANNEL <Guess /></span><Buttons value={channel} options={CHANNELS} onPick={setChannel} /></div>
         <label className="ck-field">
           <span>SPECIES</span>
-          <select value={sp} onChange={(e) => (setSp(e.target.value), setPrice(''))}>
+          <Select value={sp} onChange={(e) => (setSp(e.target.value), setPrice(''))}>
             {SALE_SPECIES.map((s) => <option key={s} value={s}>{speciesName(s)}</option>)}
-          </select>
+          </Select>
         </label>
         <div className="ck-fields">
           <div className="ck-field"><span>FORM</span><Buttons value={form} options={FORMS} onPick={(f) => (setForm(f), setPrice(''))} /></div>
