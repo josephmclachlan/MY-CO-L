@@ -18,7 +18,7 @@ import { isTypingKey, pickNext, type Box, type Dir } from '../lib/keynav'
  */
 
 const FOCUSABLE =
-  'button:not([disabled]), a[href], input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  'summary, button:not([disabled]), a[href], input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 const POPUP = '.ui-pick.open .ui-pick-panel, .src-box'
 const OPEN_ANY = '.ui-select.open, .ui-pick.open, .src-pop'
 const PROMPT = '.prompt input'
@@ -28,6 +28,11 @@ const box = (el: Element): Box => {
   return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }
 }
 const shown = (el: Element) => {
+  // Inside a closed <details> (e.g. the hazard filters on a phone) an item still has a box but can't take focus.
+  const shut = el.closest('details:not([open])')
+  if (shut && !el.closest('summary')) return false
+  const cv = (el as HTMLElement & { checkVisibility?: (o?: object) => boolean }).checkVisibility
+  if (cv && !cv.call(el, { visibilityProperty: true })) return false
   const r = el.getBoundingClientRect()
   if (r.width === 0 && r.height === 0) return false
   const st = getComputedStyle(el)
@@ -106,6 +111,33 @@ export function useKeyNav(opts: { enabled: boolean; onBack: () => boolean }) {
       lastBox = box(t)
       lastZone = zoneOf(t)?.getAttribute('data-kbd-zone') ?? null
     }
+
+    /** Pressing an item can re-draw the screen and drop focus on nothing. Put it back on the nearest item. */
+    const rescue = () => {
+      if (document.activeElement && document.activeElement !== document.body) return
+      if (!lastBox || document.querySelector('.src-pop')) return
+      const zone = zoneByName(lastZone ?? 'main') ?? zoneByName('main')
+      if (!zone) return
+      const sc = scrollerOf(zone)
+      const cx0 = (lastBox.left + lastBox.right) / 2
+      const cy0 = (lastBox.top + lastBox.bottom) / 2
+      let best: Element | null = null
+      let bestD = Infinity
+      for (const el of items(zone)) {
+        if (!inView(el, sc)) continue
+        const b = box(el)
+        const d = Math.hypot((b.left + b.right) / 2 - cx0, (b.top + b.bottom) / 2 - cy0)
+        if (d < bestD) (bestD = d), (best = el)
+      }
+      if (best) (best as HTMLElement).focus({ preventScroll: true })
+      else landIn(zone, false, false)
+    }
+    const timers: number[] = []
+    const rescueSoon = () => {
+      for (const ms of [50, 250, 700]) timers.push(window.setTimeout(rescue, ms))
+    }
+    // Keyboard mode: a strong focus ring shows while you use keys, and hides again when you tap or click.
+    const onPointer = () => document.documentElement.classList.remove('kbd')
 
     /** Best item in a zone to land on: the selected one if visible, else the first (or last) on screen. */
     const landIn = (zone: HTMLElement, fromEnd = false, remember = true) => {
@@ -209,6 +241,12 @@ export function useKeyNav(opts: { enabled: boolean; onBack: () => boolean }) {
       const o = ref.current
       if (e.defaultPrevented || e.ctrlKey || e.metaKey) return
       const active = document.activeElement
+      document.documentElement.classList.add('kbd')
+      if (active && active !== document.body && !isPrompt(active)) {
+        lastBox = box(active)
+        lastZone = zoneOf(active)?.getAttribute('data-kbd-zone') ?? lastZone
+      }
+      if (e.key === 'Enter' || e.key === ' ') rescueSoon()
       const handled = () => {
         e.preventDefault()
         e.stopPropagation()
@@ -315,7 +353,11 @@ export function useKeyNav(opts: { enabled: boolean; onBack: () => boolean }) {
     window.addEventListener('keydown', onKey, true)
     document.addEventListener('focusin', onFocusIn)
     document.addEventListener('focusout', onFocusOut)
+    document.addEventListener('pointerdown', onPointer)
     return () => {
+      timers.forEach((t) => window.clearTimeout(t))
+      document.removeEventListener('pointerdown', onPointer)
+      document.documentElement.classList.remove('kbd')
       window.removeEventListener('keydown', onKey, true)
       document.removeEventListener('focusin', onFocusIn)
       document.removeEventListener('focusout', onFocusOut)

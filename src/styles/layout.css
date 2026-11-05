@@ -767,3 +767,17 @@ tr[tabindex]:focus-visible {
   background: var(--bg-hi);
 }
 .menu-item:focus-visible { outline: none; border-color: var(--fg); }
+/* While you use the keyboard (KeyNav adds html.kbd), every focused item gets the
+   same bright ring and glow, so you can always see where you are, even on tiles
+   and chips whose own focus style is faint. A tap or click turns it off. */
+html.kbd :focus:not(.prompt input):not([data-kbd-zone]) {
+  outline: 2px solid var(--fg) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 calc(10px * var(--glow-k, 1)) var(--glow) !important;
+  background-image: linear-gradient(var(--fg-faint), var(--fg-faint));
+}
+html.kbd [data-kbd-zone]:focus {
+  outline: 1px dashed var(--fg) !important;
+  outline-offset: -3px !important;
+}
+html.kbd .deck-room:focus .deck-hit { stroke: var(--fg); stroke-width: 3; }
