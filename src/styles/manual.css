@@ -1,8 +1,8 @@
 /* MANUAL: the textbook reader, restyled in the terminal look. Colours come from the theme. */
-.body.view-manual .main-panel { padding: 0; overflow: hidden; }
-.manual { height: 100%; display: grid; grid-template-columns: minmax(180px, 28%) minmax(0, 1fr); min-height: 0; position: relative; }
+.body.view-manual .main-panel { padding: 0; overflow: hidden; position: relative; }
+.manual { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(180px, 28%) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); min-height: 0; }
 .manual-tocbtn { display: none; }
-.manual-toc { overflow: auto; border-right: 1px solid var(--fg-faint); padding: 10px 10px 16px; font-size: 0.85em; scrollbar-width: thin; scrollbar-color: var(--fg-dim) transparent; }
+.manual-toc { overflow-y: auto; min-height: 0; overscroll-behavior: contain; touch-action: pan-y; border-right: 1px solid var(--fg-faint); padding: 10px 10px 16px; font-size: 0.85em; scrollbar-width: thin; scrollbar-color: var(--fg-dim) transparent; }
 .manual-toc ul { list-style: none; margin: 6px 0 0; padding: 0; }
 .manual-toc ul ul { margin: 2px 0 8px 14px; border-left: 1px solid var(--fg-faint); }
 .manual-toc button { all: unset; display: block; cursor: pointer; padding: 3px 6px; color: var(--fg-dim); line-height: 1.25; width: calc(100% - 12px); }
@@ -10,7 +10,7 @@
 .manual-toc li.cur > button { color: var(--fg); background: var(--bg-hi); border-left: 3px solid var(--fg); }
 .manual-toc li.lv3 > button { padding-left: 14px; font-size: 0.92em; }
 .mt-n { color: var(--fg); margin-right: 4px; }
-.manual-body { overflow: auto; padding: 14px 18px 24px; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--fg-dim) transparent; }
+.manual-body { overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: 14px 18px 24px; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--fg-dim) transparent; }
 .manual-pager { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; border-top: 1px solid var(--fg-faint); padding-top: 12px; }
 .manual-pager button, .manual-tocbtn { font: inherit; color: var(--fg); background: none; border: 1px solid var(--fg-dim); padding: 4px 10px; cursor: pointer; letter-spacing: 0.08em; }
 .manual-pager button:hover:not(:disabled) { color: var(--bg); background: var(--fg-dim); }
