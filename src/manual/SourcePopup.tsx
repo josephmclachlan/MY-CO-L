@@ -11,8 +11,10 @@ interface Props {
 
 /** A pop-up that shows only the cited section, with an option to go to the full page. */
 export function SourcePopup({ refId: first, onClose, onGoPage }: Props) {
-  const [refId, setRef] = useState(first)
-  useEffect(() => setRef(first), [first])
+  // Links inside the pop-up swap its section; BACK steps through them.
+  const [trail, setTrail] = useState<string[]>([first])
+  useEffect(() => setTrail([first]), [first])
+  const refId = trail[trail.length - 1]
   const { sound } = useApp()
   const state = useManual(true)
   const data = state.status === 'ready' ? state.data : null
@@ -41,10 +43,18 @@ export function SourcePopup({ refId: first, onClose, onGoPage }: Props) {
     <div className="src-pop" role="dialog" aria-label="Manual section" onClick={onClose}>
       <div className="src-box" onClick={(e) => e.stopPropagation()}>
         <div className="src-head">
-          <span>
+          {trail.length > 1 && (
+            <button type="button" className="src-x" onClick={() => (sound.chirp(), setTrail((t) => t.slice(0, -1)))}>
+              &lt; BACK
+            </button>
+          )}
+          <span className="src-title">
             MANUAL // {refId}
             {found && ` // CH ${found.r.chapter.num} ${found.r.chapter.title.toUpperCase()}`}
           </span>
+          <button type="button" className="src-x" onClick={() => (sound.chirp(), onClose())}>
+            CLOSE X
+          </button>
         </div>
         <div
           className="src-body"
@@ -53,7 +63,7 @@ export function SourcePopup({ refId: first, onClose, onGoPage }: Props) {
             if (!href?.startsWith('#')) return
             e.preventDefault()
             sound.chirp()
-            setRef(href.slice(1))
+            setTrail((t) => [...t, href.slice(1)])
           }}
         >
           {state.status === 'locked' && <div className="warn">MANUAL LOCKED // LOGIN REQUIRED</div>}

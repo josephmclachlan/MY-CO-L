@@ -72,7 +72,10 @@
 /* Source pop-up: only the cited section. */
 .src-pop { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; padding: clamp(8px, 3vw, 28px); background: rgba(0, 0, 0, 0.72); }
 .src-box { width: min(100%, 880px); max-height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--bg); border: 1px solid var(--fg); box-shadow: 0 0 calc(18px * var(--glow-k, 1)) var(--glow); }
-.src-head { background: var(--fg); color: var(--bg); text-shadow: none; padding: 3px 10px; font-size: 0.8em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.src-head { display: flex; align-items: center; gap: 10px; background: var(--fg); color: var(--bg); text-shadow: none; padding: 3px 10px; font-size: 0.8em; }
+.src-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.src-x { font: inherit; color: var(--bg); background: none; border: 1px solid var(--bg); padding: 0 8px; cursor: pointer; white-space: nowrap; }
+.src-x:hover { color: var(--fg); background: var(--bg); }
 .src-body { overflow: auto; padding: 10px 14px; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--fg-dim) transparent; }
 .src-also { margin-top: 10px; font-size: 0.85em; }
 .src-actions { display: flex; gap: 10px; justify-content: flex-end; padding: 8px 12px; border-top: 1px solid var(--fg-faint); }
