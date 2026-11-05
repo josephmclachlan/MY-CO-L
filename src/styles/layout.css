@@ -375,6 +375,7 @@
 }
 .wire polygon,
 .wire path,
+.wire rect,
 .wire circle {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -607,3 +608,19 @@
     animation: none;
   }
 }
+
+/* MY/CO/L logo: Three.js globe behind an SVG band, emblem and wordmark. */
+.logo { position: relative; }
+.logo-globe { position: absolute; inset: 0 0 25% 0; }
+.logo-cap { fill: var(--bg); }
+.logo-svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 0 calc(4px * var(--glow-k)) var(--glow)); }
+.logo-band { fill: var(--bg); stroke: var(--fg); }
+.logo-word { fill: var(--fg); stroke: none; font-family: var(--font-head, inherit); font-size: 26px; font-weight: 700; letter-spacing: 0.14em; animation: nodes 0.3s linear calc(var(--draw) * 0.7) both; }
+.logo-corp { fill: var(--fg); stroke: none; font-size: 13.5px; font-weight: 700; letter-spacing: 0.12em; animation: nodes 0.3s linear calc(var(--draw) * 0.7) both; }
+.logo-tag { fill: var(--fg-dim); stroke: none; font-size: 11px; letter-spacing: 0.3em; animation: nodes 0.3s linear calc(var(--draw) * 0.9) both; }
+.logo.wire-static .logo-corp, .logo.wire-static .logo-word, .logo.wire-static .logo-corp { fill: var(--fg); stroke: none; font-size: 13.5px; font-weight: 700; letter-spacing: 0.12em; animation: nodes 0.3s linear calc(var(--draw) * 0.7) both; }
+.logo-tag { animation: none; opacity: 1; }
+.logo .wire-static path, .logo.wire-static .wire path, .logo.wire-static .wire rect, .logo.wire-static .wire circle { animation: none; stroke-dashoffset: 0; }
+.logo.wire-static .nodes circle { opacity: 1; }
+.logo-svg rect { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw var(--draw) linear forwards; }
+.logo.wire-static .logo-svg rect { animation: none; stroke-dashoffset: 0; }
