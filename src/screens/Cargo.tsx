@@ -1,3 +1,4 @@
+import { Select } from '../components/Select'
 import { useRef, useState, type ReactNode } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useStoreStatus } from '../store/StoreContext'
@@ -165,10 +166,10 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
           <input aria-label="Quantity received" inputMode="decimal" placeholder={`QTY (${item.unit})`} value={qty} onChange={(e) => setQty(e.target.value)} />
           <span className="cg-price">
             <input aria-label="Price per unit" inputMode="decimal" placeholder={`PRICE PER ${item.unit.toUpperCase()}`} value={price} onChange={(e) => setPrice(e.target.value)} />
-            <select aria-label="Currency" value={cur} onChange={(e) => setCur(e.target.value as 'CRC' | 'USD')}>
+            <Select aria-label="Currency" value={cur} onChange={(e) => setCur(e.target.value as 'CRC' | 'USD')}>
               <option value="CRC">₡</option>
               <option value="USD">US$</option>
-            </select>
+            </Select>
           </span>
           <input aria-label="Supplier for this delivery" placeholder={item.supplier ? `SUPPLIER (${item.supplier})` : 'SUPPLIER'} value={supplier} onChange={(e) => setSupplier(e.target.value)} />
           <span className="cg-btns">
@@ -196,19 +197,19 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
         <Field label="SUPPLIER" value={item.supplier ?? ''} wide placeholder="NOT SET" onSave={(v) => void patch({ supplier: v || null })} />
         <label className="cg-field">
           <span>ROOM</span>
-          <select value={item.room ?? ''} onChange={(e) => void patch({ room: (e.target.value || null) as RoomId | null })}>
+          <Select value={item.room ?? ''} onChange={(e) => void patch({ room: (e.target.value || null) as RoomId | null })}>
             <option value="">NONE</option>
             {ROOMS.map((room) => (
               <option key={room.id} value={room.id}>{room.name}{room.nameGuess ? ' (UNCONFIRMED NAME)' : ''}</option>
             ))}
-          </select>
+          </Select>
         </label>
         <label className="cg-field">
           <span>CATEGORY</span>
-          <select value={item.category ?? ''} onChange={(e) => void patch({ category: e.target.value || null })}>
+          <Select value={item.category ?? ''} onChange={(e) => void patch({ category: e.target.value || null })}>
             <option value="">OTHER</option>
             {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
+          </Select>
         </label>
         <Field label="NOTES" value={item.notes ?? ''} wide placeholder="NONE" onSave={(v) => void patch({ notes: v || null })} />
       </div>
@@ -368,10 +369,10 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
         <div className="cg-add">
           <input aria-label="Item name" placeholder="ITEM NAME" value={nu.name} onChange={(e) => setNu({ ...nu, name: e.target.value })} />
           <input aria-label="Unit" placeholder="UNIT (KG, BAGS)" value={nu.unit} onChange={(e) => setNu({ ...nu, unit: e.target.value })} />
-          <select aria-label="Category" value={nu.category} onChange={(e) => setNu({ ...nu, category: e.target.value })}>
+          <Select aria-label="Category" value={nu.category} onChange={(e) => setNu({ ...nu, category: e.target.value })}>
             <option value="">OTHER</option>
             {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
+          </Select>
           <button type="button" className="btn on" onClick={addItem}>ADD</button>
         </div>
       )}
@@ -404,10 +405,10 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
       <div className="cg-plan">
         <label className="cg-field inline">
           <span>SUBSTRATE COMES AS</span>
-          <select value={prefs.form} onChange={(e) => setPrefs({ form: e.target.value as 'separate' | 'combo' })}>
+          <Select value={prefs.form} onChange={(e) => setPrefs({ form: e.target.value as 'separate' | 'combo' })}>
             <option value="separate">SAWDUST + SOY HULLS</option>
             <option value="combo">COMBO PELLETS 50:50</option>
-          </select>
+          </Select>
         </label>
         {prefs.form === 'separate' && (
           <label className="cg-field inline">

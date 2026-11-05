@@ -1,3 +1,4 @@
+import { Select } from '../components/Select'
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { SHEET_COLS, type SheetCol } from '../data/cook'
@@ -52,13 +53,13 @@ export function Pick<T extends string>({ label, value, options, onPick, wide }: 
   return (
     <label className={`ck-field ${wide ? 'wide' : ''}`}>
       <span>{label}</span>
-      <select value={value} onChange={(e) => onPick(e.target.value as T)}>
+      <Select value={value} onChange={(e) => onPick(e.target.value as T)}>
         {options.map((o) => (
           <option key={o.id} value={o.id}>
             {o.label}
           </option>
         ))}
-      </select>
+      </Select>
     </label>
   )
 }
@@ -426,11 +427,11 @@ export function CsvImport({ run, zones, onImport, say }: { run: CookRun; zones: 
           {chan.map((c, i) => (
             <div key={c.col} className="ck-chan">
               <span className="ck-cn" title={c.name}>{c.name}</span>
-              <select value={c.unit} onChange={(e) => set(i, { unit: e.target.value as 'F' | 'C' | 'PSI' })} aria-label={`Unit of ${c.name}`}>
+              <Select value={c.unit} onChange={(e) => set(i, { unit: e.target.value as 'F' | 'C' | 'PSI' })} aria-label={`Unit of ${c.name}`}>
                 <option value="F">DEG F</option>
                 <option value="C">DEG C</option>
                 <option value="PSI">PSI</option>
-              </select>
+              </Select>
               <input list="ck-zones" value={c.zone} onChange={(e) => set(i, { zone: e.target.value.toUpperCase() })} placeholder="PROBE NAME, EMPTY = SKIP" aria-label={`Probe name for ${c.name}`} />
             </div>
           ))}
