@@ -13,7 +13,7 @@ power panel, rooms, stock, cultures, cooks, costs and sales. It works offline on
 - CRT glass: phosphor glow, scanlines, a real convex bulge, edge colour fringing, glare, grain and flicker,
   all on one strength slider, plus CLEAN mode for sunlight.
 - Sound made in code (Web Audio). Every sound is tied to something appearing on screen. See `docs/DESIGN.md`.
-- Supabase database schema for the whole data model (`supabase/migrations/0001_initial_schema.sql`, then `0002_cargo_and_owner_lock.sql` for CARGO and owner-only security) and email login.
+- Supabase database schema for the whole data model (`supabase/migrations/0001_initial_schema.sql`, then `0002_cargo_and_owner_lock.sql` for CARGO and owner-only security, then `0003_genetics.sql` for XENOGENETICS) and email login.
 - Installable, offline-capable web app (PWA).
 - Deploys to GitHub Pages now and Cloudflare Pages at launch.
 
@@ -35,6 +35,20 @@ power panel, rooms, stock, cultures, cooks, costs and sales. It works offline on
 Room names and where each machine sits are marked UNCONFIRMED on screen until checked.
 
 Modules 1 and 4-9 show "NOT YET INSTALLED" until their build threads land.
+
+## What's in the genetics build (XENOGENETICS, module 5)
+
+- **Strains:** register each strain (code like LM-01, species, name, source; Cap n Stem by default), retire or edit it.
+  SPECIMEN FILES lists the strains on file for each species and opens them here.
+- **Stock:** live cultures per strain counted by level on hatched meters (master = P0, then P1-P4), LC, G1 masters
+  and G2 bags on the shelf, and cold-storage and age warnings with the textbook fact behind each limit.
+- **Lineage:** a line-art tree per strain, master to plates, LC, G1, G2 and block lots. Tap a node to log a transfer,
+  a G1 or G2 run, a block lot, a move to the fridge, or contamination.
+- **Planner:** starts from the 130-bag weekly plan and works back to G2 bags, G1 masters and plates per strain with
+  dates, then checks the shelf and flags shortfalls. Ratios from t07 and t09, shown with their fact ids.
+- **Labels:** printable QR labels for cultures and grain runs; scanning one opens that record.
+- P-level rule (confirmed by Joseph): a plate is one level up from what it came from; slants, water tubes, cryovials
+  and LC keep their parent's level. Code: `childP()` in `src/lib/xeno.ts`.
 
 ## Setting it up
 

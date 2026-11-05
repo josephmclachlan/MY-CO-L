@@ -140,6 +140,7 @@
   inset: 0;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
+  grid-template-columns: minmax(0, 1fr);
   padding: clamp(8px, 1.6vw, 18px);
   gap: 6px;
 }
@@ -279,7 +280,7 @@
 
 @media (max-width: 700px) {
   .body.has-index {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
   }
   .index-panel {
