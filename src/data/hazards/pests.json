@@ -1,0 +1,328 @@
+[
+ {
+  "id": "fungus-gnats",
+  "name": "FUNGUS GNATS AND FLIES",
+  "kind": "pest",
+  "stages": [
+   "fruit",
+   "block",
+   "after"
+  ],
+  "colours": [
+   "black"
+  ],
+  "smells": [],
+  "textures": [],
+  "places": [
+   "room",
+   "cap"
+  ],
+  "species": [
+   "king-oyster",
+   "blue-oyster"
+  ],
+  "aka": "FLIES BRING BLOTCH",
+  "spot": [
+   {
+    "v": "Small flying insects in the room, on shelves and sticky traps. Flies bring blotch. King oyster is hard to grow without fly problems.",
+    "s": [
+     "F15-0186",
+     "F15-8004"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Identification and biology of fungus gnats, phorid flies and mites are NOT covered in the sources.",
+    "s": [
+     "F15-0193",
+     "F15-0216"
+    ],
+    "f": "nodata"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Open doors and gaps. Compost near entrances. Case: fungus gnats wiped out the POCNS blue oyster at Catawba (Ryan).",
+    "s": [
+     "F15-0187",
+     "F15-0194"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Catawba's response: tape every gap, fit magnetic bug screens on every opening, hang sticky traps everywhere (about 8 per room or one per shelf). Keep compost away from entrances.",
+    "s": [
+     "F15-0194"
+    ],
+    "f": "ctx"
+   }
+  ],
+  "prevent": [
+   {
+    "v": "A coarse filter on a humidifier box intake keeps bugs out.",
+    "s": [
+     "F15-0188"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "King oyster; fluffy POCNS-type blue oysters were devastated at Catawba.",
+    "s": [
+     "F15-0186",
+     "F15-8004"
+    ]
+   }
+  ],
+  "w": [
+   "shimofuri-hiratake 0:03:36",
+   "fruiting-tips-and-tricks 0:03:16",
+   "bacterial-blotch 0:24:41",
+   "blotch-pt-2 0:02:52",
+   "grain-hydration 0:45:56",
+   "stroma 0:31:01",
+   "grain-hydration 0:02:09",
+   "stroma 0:34:09",
+   "03-substrate-composition 0:54:40",
+   "combo-pellets 0:10:44"
+  ]
+ },
+ {
+  "id": "grain-insects",
+  "name": "GRAIN INSECTS",
+  "kind": "pest",
+  "stages": [
+   "stock",
+   "grain"
+  ],
+  "colours": [],
+  "smells": [],
+  "textures": [],
+  "places": [
+   "whole"
+  ],
+  "species": [],
+  "aka": "GNATS, GRUBS, MOTHS IN GRAIN",
+  "spot": [
+   {
+    "v": "Gnats and live grubs, broken grain and debris in totes; sorghum is attacked far faster than other grains, even in dry climate-controlled super sacks.",
+    "s": [
+     "F15-0190"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Moth-damaged sorghum bursts when cooked and can trigger stroma.",
+    "s": [
+     "F15-0173"
+    ],
+    "hz": "stroma"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Poor grain sources and slow turnover. Early local Maine grain was about 50% bugs and debris.",
+    "s": [
+     "F15-0190"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Do not use. Ask experienced growers for good sources and ask suppliers about cleaning and grade.",
+    "s": [
+     "F15-0190",
+     "F14-0159"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Store grain and pellets dry, indoors, and turn the stock over fast. A grain cleaner (vacuum plus sieves) helps small growers.",
+    "s": [
+     "F15-0215",
+     "F15-0183"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Sorghum most. Millet and feed-store bags also seen.",
+    "s": [
+     "F15-0190"
+    ]
+   }
+  ],
+  "w": [
+   "shimofuri-hiratake 0:03:36",
+   "fruiting-tips-and-tricks 0:03:16",
+   "bacterial-blotch 0:24:41",
+   "blotch-pt-2 0:02:52",
+   "grain-hydration 0:45:56",
+   "stroma 0:31:01",
+   "grain-hydration 0:02:09",
+   "stroma 0:34:09",
+   "03-substrate-composition 0:54:40",
+   "combo-pellets 0:10:44"
+  ]
+ },
+ {
+  "id": "rodents",
+  "name": "RATS AND RODENTS",
+  "kind": "pest",
+  "stages": [
+   "stock"
+  ],
+  "colours": [],
+  "smells": [],
+  "textures": [],
+  "places": [
+   "whole"
+  ],
+  "species": [],
+  "spot": [
+   {
+    "v": "Rodent-chewed sacks, droppings in feed-store bags. Rats love raw soy pellets and bore through warehouse walls for grain.",
+    "s": [
+     "F15-0190",
+     "F15-0191"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Combo pellets (sawdust and soy hulls) are ignored by rats, unlike pure soy hull pellets.",
+    "s": [
+     "F15-0192"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Open stores of soy pellets and grain.",
+    "s": [
+     "F15-0191"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Pest control is an ongoing war.",
+    "s": [
+     "F15-0191"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Indoor dry storage. Combo pellets for one farm meant no chewed sacks or infested batches.",
+    "s": [
+     "F15-0192",
+     "F15-0215"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Not species-specific.",
+    "s": [
+     "F15-0191"
+    ]
+   }
+  ],
+  "w": [
+   "shimofuri-hiratake 0:03:36",
+   "fruiting-tips-and-tricks 0:03:16",
+   "bacterial-blotch 0:24:41",
+   "blotch-pt-2 0:02:52",
+   "grain-hydration 0:45:56",
+   "stroma 0:31:01",
+   "grain-hydration 0:02:09",
+   "stroma 0:34:09",
+   "03-substrate-composition 0:54:40",
+   "combo-pellets 0:10:44"
+  ]
+ },
+ {
+  "id": "culture-hitchhikers",
+  "name": "PESTS AND MITES IN SHARED CULTURES",
+  "kind": "pest",
+  "stages": [
+   "plate"
+  ],
+  "colours": [],
+  "smells": [],
+  "textures": [],
+  "places": [
+   "plate"
+  ],
+  "species": [],
+  "aka": "HITCHHIKERS ON CULTURES, LOGS AND BLOCKS",
+  "spot": [
+   {
+    "v": "Mites or insects on shared cultures; a culture 'sometimes is not what it says it is'.",
+    "s": [
+     "F15-8001"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Bought-in cultures and imported logs and blocks can carry hitchhikers. Some overseas producers use formaldehyde as a cheap sterilant and many do not use autoclaves.",
+    "s": [
+     "F15-8001",
+     "F15-8003"
+    ],
+    "f": "ctx"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Sending cultures between farms can spread viruses, insects or mites.",
+    "s": [
+     "F15-8001"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "No treatment in the sources.",
+    "s": [
+     "F15-8001"
+    ],
+    "f": "nodata"
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Track where every culture came from and who kept it before you. Use genetic testing when you can. Mites are named only in passing.",
+    "s": [
+     "F15-8001"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Not species-specific.",
+    "s": [
+     "F15-8001"
+    ]
+   }
+  ],
+  "w": [
+   "bacterial-blotch 0:44:18",
+   "stroma 0:05:10",
+   "bacterial-blotch 0:46:20",
+   "pod-66 1:03:19",
+   "shimofuri-hiratake 0:03:36",
+   "fruiting-tips-and-tricks 0:03:16",
+   "bacterial-blotch 0:24:41",
+   "blotch-pt-2 0:02:52",
+   "grain-hydration 0:45:56",
+   "stroma 0:31:01"
+  ]
+ }
+]

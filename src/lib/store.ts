@@ -17,7 +17,7 @@ export type Row = { id: string } & Record<string, unknown>
  *  sensor_readings is left out on purpose: it grows without limit. */
 export const BACKUP_TABLES = [
   'species', 'strains', 'cultures', 'rooms', 'circuits', 'equipment', 'cook_runs', 'cook_readings',
-  'grain_runs', 'block_lots', 'contaminants', 'lot_losses', 'harvests', 'sales', 'sale_lots',
+  'grain_runs', 'block_lots', 'contaminants', 'lot_losses', 'hazard_logs', 'harvests', 'sales', 'sale_lots',
   'items', 'item_prices', 'stock_moves', 'energy_bills', 'labour_entries', 'reference_entries',
 ] as const
 

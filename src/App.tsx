@@ -17,6 +17,8 @@ import { Specimen, SpecimenIndex, type Tab, TABS } from './screens/Specimen'
 import { Sequence } from './screens/Sequence'
 import { Cargo, CargoIndex } from './screens/Cargo'
 import { Xeno, XenoIndex, XENO_TABS, type XenoState } from './screens/Xeno'
+import { Hazard, HazardIndex, HAZARD_START, HAZARD_TABS, type HazardState } from './screens/Hazard'
+import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
 import { useStoreStatus, useTable } from './store/StoreContext'
 import { SPECIES } from './data/species'
@@ -40,6 +42,7 @@ const SEQ_IDX = MODULES.findIndex((m) => m.key === 'SEQUENCE')
 const CARGO_IDX = MODULES.findIndex((m) => m.key === 'CARGO')
 const MANUAL_IDX = MODULES.findIndex((m) => m.key === 'MANUAL')
 const XENO_IDX = MODULES.findIndex((m) => m.key === 'XENO')
+const HAZARD_IDX = MODULES.findIndex((m) => m.key === 'HAZARD')
 
 /** Everything needed to put the terminal back on a screen: Back restores one of these. */
 interface Snap {
@@ -50,6 +53,7 @@ interface Snap {
   room: RoomId
   manualLoc: ManualLoc | null
   xeno: XenoState
+  hazard: HazardState
 }
 const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
@@ -80,11 +84,13 @@ export default function App() {
   const [popupRef, setPopupRef] = useState<string | null>(null)
   const [xeno, setXenoState] = useState<XenoState>({ tab: 'STRAINS', strain: null, node: null })
   const setXeno = useCallback((p: Partial<XenoState>) => setXenoState((x) => ({ ...x, ...p })), [])
+  const [hazard, setHazardState] = useState<HazardState>(HAZARD_START)
+  const setHazard = useCallback((p: Partial<HazardState>) => setHazardState((h) => ({ ...h, ...p })), [])
   const strains = useTable<Strain>('strains')
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno }
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -120,6 +126,7 @@ export default function App() {
     setSpecTab(s.specTab)
     setManualLoc(s.manualLoc ? { ...s.manualLoc, n: Date.now() } : null)
     setXenoState(s.xeno)
+    setHazardState(s.hazard)
     power.setSelectedRoom(s.room)
     setReply(null)
     setSweep((n) => n + 1)
@@ -159,6 +166,14 @@ export default function App() {
     setXeno(p)
     setSelected(XENO_IDX)
     if (!here) go({ name: 'module', idx: XENO_IDX }, false)
+    else sound.chirp()
+  }
+  const openHazard = (p: Partial<HazardState>) => {
+    const here = view.name === 'module' && view.idx === HAZARD_IDX
+    if (!here) pushHist()
+    setHazard({ mode: 'file', ...p })
+    setSelected(HAZARD_IDX)
+    if (!here) go({ name: 'module', idx: HAZARD_IDX }, false)
     else sound.chirp()
   }
   const openSpecies = (key: string) => {
@@ -307,6 +322,16 @@ export default function App() {
       return sound.chirp()
     }
     if (cmd === 'GENETICS' || cmd === 'LAB' || cmd === 'STRAINS' || cmd === 'LABELS') return openXeno(cmd === 'LABELS' ? { tab: 'LABELS' } : cmd === 'STRAINS' ? { tab: 'STRAINS' } : {})
+    // Contaminants: type a name (TRICHODERMA, BLOTCH), DIAGNOSE, or on the HAZARD INDEX a tab name (CAUSE).
+    const hzTab = HAZARD_TABS.find((t) => t === cmd)
+    if (hzTab && view.name === 'module' && view.idx === HAZARD_IDX) {
+      setHazard({ tab: hzTab })
+      return sound.chirp()
+    }
+    if (['HAZARDS', 'CONTAM', 'CONTAMINANTS', 'CONTAMINATION', 'PESTS'].includes(cmd)) return openHazard({ id: null })
+    if (cmd === 'DIAGNOSE' || cmd === 'DIAGNOSIS') return openHazard({ mode: 'diagnose' })
+    const hzHit = findHazard(raw)
+    if (hzHit) return openHazard({ id: hzHit.id, tab: 'SPOT' })
     // Power and rooms.
     const openVitals = () => {
       setSelected(VITALS_IDX)
@@ -566,7 +591,8 @@ export default function App() {
             }}
           />
         )
-      else if (view.idx === SPEC_IDX) content = <Specimen index={specimen} tab={specTab} setTab={setSpecTab} onOpenStrain={(id) => openXeno({ strain: id, node: null, tab: 'LINEAGE' })} />
+      else if (view.idx === SPEC_IDX) content = <Specimen index={specimen} tab={specTab} setTab={setSpecTab} onOpenStrain={(id) => openXeno({ strain: id, node: null, tab: 'LINEAGE' })} onOpenHazard={(id) => openHazard({ id, tab: 'SPOT' })} />
+      else if (view.idx === HAZARD_IDX) content = <Hazard x={hazard} set={setHazard} onOpenSpecies={(id) => { setSpecTab('HAZARDS'); openSpecies(id) }} onGoLog={() => openXeno({})} />
       else if (view.idx === XENO_IDX) content = <Xeno x={xeno} set={setXeno} say={say} onOpenSpecies={openSpecies} />
       else if (view.idx === SEQ_IDX)
         content = (
@@ -605,6 +631,8 @@ export default function App() {
 
   if (view.name === 'module' && view.idx === XENO_IDX)
     hints.module = 'TAP A STRAIN AT RIGHT // TYPE A CODE (LM-01) OR A TAB (LINEAGE, PLANNER) // TAP A NODE TO LOG THE NEXT STEP // F2 MENU'
+  if (view.name === 'module' && view.idx === HAZARD_IDX)
+    hints.module = 'PICK AN ENTRY AT LEFT // DIAGNOSE LISTS LIKELY MATCHES // TYPE A NAME (BLOTCH) OR A TAB (CAUSE) // WHY? SHOWS THE SOURCE // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
     hints.module = 'PICK A CHAPTER OR SECTION AT LEFT // TAP A LINK TO JUMP // BACK RETURNS TO WHERE YOU WERE // F2 MENU'
 
@@ -644,6 +672,8 @@ export default function App() {
                         ? <CargoIndex />
                         : view.name === 'module' && view.idx === MANUAL_IDX
                           ? undefined
+                          : view.name === 'module' && view.idx === HAZARD_IDX
+                            ? <HazardIndex x={hazard} set={setHazard} />
                           : view.name === 'module' && view.idx === XENO_IDX
                             ? <XenoIndex x={xeno} set={setXeno} />
                           : moduleIndex
@@ -657,7 +687,7 @@ export default function App() {
             }}
             focusToken={focusToken}
             onBack={histLen > 0 ? goBack : undefined}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === SPEC_IDX || view.idx === XENO_IDX) ? ' view-strip' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>

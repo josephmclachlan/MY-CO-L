@@ -1,6 +1,7 @@
 // Writes for XENOGENETICS. Screens call these; they build complete rows and hand them to the Store.
 
 import { uuid, type Store } from './store'
+import type { HazardLog, LotLoss } from './hazard'
 import {
   childP,
   cultureLabel,
@@ -160,6 +161,64 @@ export async function setCultureStatus(store: Store, c: Culture, status: Culture
   await store.put('cultures', { ...c, status, cold_since })
 }
 
+/** Write one loss against a library entry (null = not sure what it was). */
+export async function logHazard(
+  store: Store,
+  o: { hazard_key: string | null; source_kind: HazardLog['source_kind']; source_id: string; strain_id: string | null; bag_count: number; notes?: string | null },
+): Promise<HazardLog> {
+  const row: HazardLog = {
+    id: uuid(),
+    hazard_key: o.hazard_key || null,
+    source_kind: o.source_kind,
+    source_id: o.source_id,
+    strain_id: o.strain_id,
+    bag_count: Math.max(0, Math.floor(o.bag_count)),
+    noted_on: todayIso(),
+    notes: o.notes ?? null,
+    created_at: new Date().toISOString(),
+  }
+  await store.put('hazard_logs', row)
+  return row
+}
+
+/** Mark a culture contaminated and record what it was. */
+export async function contaminateCulture(store: Store, c: Culture, hazardKey: string | null): Promise<void> {
+  await setCultureStatus(store, c, 'contaminated')
+  await logHazard(store, { hazard_key: hazardKey, source_kind: 'culture', source_id: c.id, strain_id: c.strain_id, bag_count: 1 })
+}
+
+/** Set the grain run's bags lost; the extra bags since the last figure are logged against the entry. */
+export async function lossGrainRun(store: Store, g: GrainRun, bagsLost: number, hazardKey: string | null): Promise<void> {
+  const lost = Math.min(g.bag_count, Math.max(0, Math.floor(bagsLost)))
+  const extra = lost - (g.bags_lost || 0)
+  await setGrainStatus(store, g, g.status, lost)
+  if (extra > 0) await logHazard(store, { hazard_key: hazardKey, source_kind: 'grain', source_id: g.id, strain_id: g.strain_id, bag_count: extra })
+}
+
+export const lotLosses = (all: LotLoss[], lotId: string) => all.filter((l) => l.block_lot_id === lotId)
+export const lotBagsLost = (all: LotLoss[], lotId: string) => lotLosses(all, lotId).reduce((n, l) => n + l.bag_count, 0)
+
+/** Blocks lost from a lot. Losing every block ends the lot. */
+export async function lossLot(store: Store, l: BlockLot, existing: LotLoss[], bags: number, hazardKey: string | null, cause?: string | null): Promise<LotLoss> {
+  const n = Math.floor(bags)
+  if (!(n > 0)) throw new Error('HOW MANY BLOCKS WERE LOST?')
+  const already = lotBagsLost(existing, l.id)
+  if (already + n > l.bag_count) throw new Error(`THIS LOT HAS ${l.bag_count} BLOCKS AND ${already} ARE ALREADY LOGGED LOST.`)
+  const row: LotLoss = {
+    id: uuid(),
+    block_lot_id: l.id,
+    hazard_key: hazardKey || null,
+    bag_count: n,
+    cause: cause ?? null,
+    noted_on: todayIso(),
+    notes: null,
+    created_at: new Date().toISOString(),
+  }
+  await store.put('lot_losses', row)
+  if (already + n >= l.bag_count) await setLotStatus(store, l, 'lost')
+  return row
+}
+
 export async function setGrainStatus(store: Store, g: GrainRun, status: GrainStatus, bagsLost?: number): Promise<void> {
   const cold_since = status === 'cold_storage' ? (g.status === 'cold_storage' ? g.cold_since : todayIso()) : g.cold_since
   // Losing some bags does not end the run; losing all of them does.
@@ -216,6 +275,10 @@ export async function removeDemo(store: Store, strains: Strain[], cultures: Cult
   const s = strains.find((x) => x.code === DEMO_CODE)
   if (!s) return
   const gIds = new Set(runs.filter((g) => g.strain_id === s.id).map((g) => g.id))
+  const lotIds = new Set(lots.filter((l) => l.strain_id === s.id || (l.grain_run_id && gIds.has(l.grain_run_id))).map((l) => l.id))
+  await Promise.all([store.ensure('hazard_logs'), store.ensure('lot_losses')])
+  await store.del('hazard_logs', store.rows<HazardLog>('hazard_logs').filter((h) => h.strain_id === s.id).map((h) => h.id))
+  await store.del('lot_losses', store.rows<LotLoss>('lot_losses').filter((h) => lotIds.has(h.block_lot_id)).map((h) => h.id))
   await store.del('block_lots', lots.filter((l) => l.strain_id === s.id || (l.grain_run_id && gIds.has(l.grain_run_id))).map((l) => l.id))
   // Children before parents, for the database's foreign keys.
   const gs = runs.filter((g) => g.strain_id === s.id).sort((a, b) => (a.generation === b.generation ? 0 : a.generation === 'G2' ? -1 : 1))

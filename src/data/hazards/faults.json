@@ -1,0 +1,663 @@
+[
+ {
+  "id": "bag-failure",
+  "name": "BAG SEAL, GUSSET OR PATCH FAILURE",
+  "kind": "other",
+  "stages": [
+   "cook",
+   "block"
+  ],
+  "colours": [
+   "multi",
+   "orange",
+   "green"
+  ],
+  "smells": [],
+  "textures": [
+   "fuzzy",
+   "powdery"
+  ],
+  "places": [
+   "seal",
+   "bottom",
+   "top"
+  ],
+  "species": [],
+  "aka": "PIN LEAKS",
+  "spot": [
+   {
+    "v": "Mould starting at a break in the bottom gusset or at the top seal while the rest of the bag is well colonized. Sporadic across a batch, always at the same spots.",
+    "s": [
+     "F14-0214",
+     "F14-0116",
+     "F14-0137"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Many colours across the lot is air, not bags. All blocks from one spawn bag is spawn.",
+    "s": [
+     "F14-0114",
+     "F14-0117"
+    ],
+    "hz": "rainbow"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Uneven or weak seals, seals too hot (micro-perforations, mainly the top seal after inoculation), filter patches with defects. Bag makers change plastic often. Problems can hide in a very clean facility.",
+    "s": [
+     "F14-0212",
+     "F14-0215",
+     "F14-0216",
+     "F14-0217"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Seal test: the film must tear before the seal does. Squeeze test: a sealed A-patch bag should let little air out. Change bag lot or supplier.",
+    "s": [
+     "F14-0212",
+     "F14-0213",
+     "F14-0137"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Test every new bag lot (seal, squeeze, gussets, patches). B patches pass air quickly, which alone does not mean more Neurospora risk.",
+    "s": [
+     "F14-0262",
+     "F14-0213"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Not species-specific. Mostly Neurospora or other moulds follow.",
+    "s": [
+     "F14-0049"
+    ]
+   }
+  ],
+  "w": [
+   "knock-seal-shake 0:13:50",
+   "neurospora 0:44:58",
+   "contamination-1 0:16:50",
+   "contamination-1 0:17:40",
+   "contamination-1 0:17:53",
+   "contamination-1 0:18:54",
+   "bags-and-filters 0:29:33",
+   "stroma 0:20:41",
+   "contamination-1 0:49:58"
+  ]
+ },
+ {
+  "id": "undercooked",
+  "name": "UNDERCOOKED SUBSTRATE",
+  "kind": "other",
+  "stages": [
+   "cook",
+   "block"
+  ],
+  "colours": [
+   "multi",
+   "green"
+  ],
+  "smells": [],
+  "textures": [
+   "fuzzy"
+  ],
+  "places": [
+   "patches",
+   "bottom"
+  ],
+  "species": [
+   "shiitake"
+  ],
+  "aka": "STEAMING FAILURE, SHORT HOLD",
+  "spot": [
+   {
+    "v": "Patchy contamination across the batch with many types and uneven colonization and yield. Sporadic chunky spots over about 2 weeks in some bags. Strong top and weak or airless bottom on big blocks.",
+    "s": [
+     "F14-0115",
+     "F14-0118",
+     "F14-0141"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Outer blocks in an over-packed barrel dried and poor, inner ones fine, is overcooking, not contamination.",
+    "s": [
+     "F14-0111",
+     "F14-0174"
+    ],
+    "hz": "overcooked-outer"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Core of the hardest-to-heat block not held above 93 °C (200 °F) long enough, or an over-packed barrel whose inner blocks stay cold. Textbook: at least 2-3 h, at most 4-6 h, measured. The farm plan holds 4 h (Joseph, 5 Nov 2026).",
+    "s": [
+     "F14-0173",
+     "F14-0174"
+    ],
+    "f": "ctx"
+   }
+  ],
+  "treat": [
+   {
+    "v": "Raise the temperature or extend the hold, log the core with a thermocouple, and discard the affected blocks.",
+    "s": [
+     "F14-0141",
+     "F14-0129"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Start with the cook logger record before changing anything else. Moulds die by about 66 °C (150 °F); endospores need pressure.",
+    "s": [
+     "F14-0129",
+     "F14-0180"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Shiitake can look fine all the way and fail late from an undercook.",
+    "s": [
+     "F14-0123",
+     "F14-0256"
+    ]
+   }
+  ],
+  "w": [
+   "contamination-1 0:39:34",
+   "contamination-1 0:41:40",
+   "02-shiitake-cultivation 1:02:35",
+   "contamination-1 0:48:56",
+   "contamination-2 0:09:33",
+   "insane-in-the-incubation 0:14:17",
+   "cactus-hat-mushrooms 1:24:01",
+   "04-pasteurize-or-sterilize 1:15:35",
+   "contamination-1 0:13:33",
+   "04-pasteurize-or-sterilize 0:29:35"
+  ]
+ },
+ {
+  "id": "dirty-cooldown",
+  "name": "DIRTY COOL-DOWN",
+  "kind": "other",
+  "stages": [
+   "cook"
+  ],
+  "colours": [
+   "multi",
+   "orange",
+   "green"
+  ],
+  "smells": [],
+  "textures": [
+   "fuzzy"
+  ],
+  "places": [
+   "whole",
+   "seal"
+  ],
+  "species": [],
+  "aka": "THE BIGGEST SINGLE SOURCE",
+  "spot": [
+   {
+    "v": "Rainbow moulds or Neurospora a few days after knocking, racks nearest a door or window worst. Hot blocks left waiting 1-3 days give weak, greasy growth.",
+    "s": [
+     "F14-0114",
+     "F14-0232",
+     "F14-0237"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "A cook failure shows as patchy, many types, uneven yield; a dirty cool-down shows many colours with otherwise good colonization.",
+    "s": [
+     "F14-0115",
+     "F14-0114"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Most widespread contamination comes from improper cool-down. Bags are not truly sealed while cooling; an unpressurized vessel or container pulls in dirty air; blocks are susceptible as they cool toward 38 °C (100 °F).",
+    "s": [
+     "F14-0181",
+     "F14-0175",
+     "F14-0176",
+     "F14-0184"
+    ]
+   },
+   {
+    "v": "Shipping containers with wooden floors, water troughs and leaky doors are 'an open buffet'. Hand-loading, dropped racks, barrels wheeled into clean areas add risk.",
+    "s": [
+     "F14-0187",
+     "F14-0189",
+     "F14-0190",
+     "F14-0191"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Test: seal extra bags, cook and cool them with the batch, incubate unopened. Growth means dirty cool-down air.",
+    "s": [
+     "F14-0128"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Move blocks at 93 °C (200 °F) or more in racks, with welding gloves, straight into a positive-pressure HEPA room, below 38 °C in a few hours. Keep cool-down apart from incubation.",
+    "s": [
+     "F14-0183",
+     "F14-0185",
+     "F14-0192",
+     "F14-0259"
+    ]
+   },
+   {
+    "v": "Cooling in a vessel back-pressurized with HEPA air is acceptable; the strictest practice never cools pasteurized blocks in the vessel.",
+    "s": [
+     "F14-0182",
+     "F14-0193"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Not species-specific.",
+    "s": [
+     "F14-0181"
+    ]
+   }
+  ],
+  "w": [
+   "neurospora 0:37:45",
+   "contamination-1 0:53:07",
+   "contamination-1 0:51:00",
+   "contamination-2 0:15:48",
+   "04-pasteurize-or-sterilize 0:33:38",
+   "neurospora 0:44:58",
+   "neurospora 0:42:57",
+   "contamination-1 0:54:09",
+   "filters-and-flowhoods 0:12:15",
+   "steam-generation 0:21:54"
+  ]
+ },
+ {
+  "id": "lab-air",
+  "name": "LEAKING OR RECIRCULATED LAB AIR",
+  "kind": "other",
+  "stages": [
+   "plate",
+   "grain",
+   "block"
+  ],
+  "colours": [
+   "multi",
+   "green",
+   "grey",
+   "black",
+   "orange"
+  ],
+  "smells": [],
+  "textures": [
+   "fuzzy"
+  ],
+  "places": [
+   "room",
+   "whole"
+  ],
+  "species": [],
+  "aka": "BAD FILTERS, NEGATIVE PRESSURE",
+  "spot": [
+   {
+    "v": "Recurring green, brown, black or orange moulds over months. Different moulds on settle plates in front of the hood. A rising rate of every contaminant despite a wall of flowhoods.",
+    "s": [
+     "F14-0095",
+     "F14-0140",
+     "F14-0235",
+     "F03-0099"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Technique alone can contaminate a whole lot: skin shedding, spawn bag held outside the flow, fingers in bags.",
+    "s": [
+     "F14-0204"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Recirculating AC, heat pump or fan in the clean room; ceiling ducts blowing onto hoods; cheap 'HEPA' (99.7-99.9% instead of 99.999997%); damaged bottom edge of a mini-pleat filter; a switched-off filter soaking up humidity and spores; clogged pre-filters.",
+    "s": [
+     "F14-0194",
+     "F14-0195",
+     "F14-0197",
+     "F14-0198",
+     "F14-0199",
+     "F14-0233"
+    ]
+   },
+   {
+    "v": "Traffic and removing bad bags in the same room as the knock table.",
+    "s": [
+     "F14-0201",
+     "F14-0239"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Check pressure; plate-test or particle-count across the filter; inspect the bottom edge for breaks. Replace damaged filters. Observe first, then buy parts.",
+    "s": [
+     "F14-0130",
+     "F14-0140",
+     "F14-0007"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "No recirculating units in the lab or cool-down room. Keep filters running, vacuum grain out of the base, add an angle-iron stop at the table edge, keep the room for one job.",
+    "s": [
+     "F14-0194",
+     "F14-0198",
+     "F14-0199",
+     "F14-0201",
+     "F14-0239"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Chestnut and maitake lose first; lion's mane shows it early.",
+    "s": [
+     "F14-0251",
+     "F14-0252",
+     "F14-0254"
+    ]
+   }
+  ],
+  "w": [
+   "lab-design 0:16:41",
+   "dirty-lab 0:06:00",
+   "dirty-lab 0:14:26",
+   "insane-in-the-incubation 0:55:41",
+   "dirty-lab 0:23:40",
+   "05-microproblems 0:23:37",
+   "05-microproblems 0:24:37",
+   "lab-design 1:03:46",
+   "lab-design 0:48:13"
+  ]
+ },
+ {
+  "id": "wet-stock",
+  "name": "WET OR MOULDY RAW MATERIAL",
+  "kind": "other",
+  "stages": [
+   "stock",
+   "cook"
+  ],
+  "colours": [
+   "multi",
+   "green"
+  ],
+  "smells": [
+   "bad"
+  ],
+  "textures": [
+   "wet",
+   "fuzzy"
+  ],
+  "places": [
+   "whole"
+  ],
+  "species": [
+   "lions-mane"
+  ],
+  "aka": "SAWDUST, PELLETS, SUPPLEMENT, DIRTY MIXERS",
+  "spot": [
+   {
+    "v": "Clumpy super sacks of supplement (probably wet once), flooded or mouldy sawdust piles, a wet pellet chunk stuck in a mixer that turned foul, sawdust arriving at about 70% moisture.",
+    "s": [
+     "F14-0157",
+     "F14-0161",
+     "F14-0245",
+     "F14-0246"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Properly hot-composted sawdust is effectively self-sanitized.",
+    "s": [
+     "F14-0156"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Microbial load follows the moisture the material has seen. Soft-wood sawdust such as cedar suppresses mycelium. A nutrient-rich cake from a grimy mixer can survive steam.",
+    "s": [
+     "F14-0156",
+     "F14-0158",
+     "F14-0162"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Do not use clumpy wet supplement. Measure incoming moisture. Clean mixers daily with an intensive weekly clean.",
+    "s": [
+     "F14-0157",
+     "F14-0246",
+     "F14-0161"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Store dry and indoors. Check the sawdust is the species ordered. Combo pellets worked better than raw sawdust after one flood.",
+    "s": [
+     "F14-0156",
+     "F14-0158",
+     "F14-0249"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Lion's mane showed it first in the 70%-sawdust case.",
+    "s": [
+     "F14-0246"
+    ]
+   }
+  ],
+  "w": [
+   "contamination-1 0:10:25",
+   "water-treatment 0:03:55",
+   "water-treatment 0:11:23",
+   "contamination-1 0:22:01",
+   "contamination-1 0:29:18",
+   "03-substrate-composition 0:29:55",
+   "contamination-1 0:25:05",
+   "grain-hydration 0:53:12",
+   "king-oyster 0:32:15"
+  ]
+ },
+ {
+  "id": "pesticide-residue",
+  "name": "PESTICIDE OR FUNGICIDE ON GRAIN",
+  "kind": "other",
+  "stages": [
+   "grain",
+   "stock"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "wispy"
+  ],
+  "places": [
+   "patches"
+  ],
+  "species": [],
+  "spot": [
+   {
+    "v": "Patchy, odd colonization and failure to fruit.",
+    "s": [
+     "F14-0149"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Fermented grain gives splotchy growth too; check soak time first.",
+    "s": [
+     "F14-0148"
+    ],
+    "hz": "fermented-grain"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Conventional millet and oats are often desiccated with glyphosate before harvest, and conventional rye may get fungicide. Supplier assurances may not be verifiable.",
+    "s": [
+     "F14-0160"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Switch to organic grain.",
+    "s": [
+     "F14-0149"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Use only organic grain, as Cap n Stem does.",
+    "s": [
+     "F14-0160"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "All grain spawn.",
+    "s": [
+     "F14-0160"
+    ]
+   }
+  ],
+  "w": [
+   "contamination-1 0:10:25",
+   "water-treatment 0:03:55",
+   "water-treatment 0:11:23",
+   "contamination-1 0:22:01",
+   "contamination-1 0:29:18",
+   "03-substrate-composition 0:29:55",
+   "contamination-1 0:25:05",
+   "grain-hydration 0:53:12",
+   "king-oyster 0:32:15"
+  ]
+ },
+ {
+  "id": "low-co2-drying",
+  "name": "LOW-CO2 DRYING IN INCUBATION",
+  "kind": "other",
+  "stages": [
+   "block"
+  ],
+  "colours": [
+   "brown"
+  ],
+  "smells": [],
+  "textures": [
+   "dry"
+  ],
+  "places": [
+   "whole"
+  ],
+  "species": [
+   "shiitake"
+  ],
+  "aka": "TOO MUCH AIR EXCHANGE",
+  "spot": [
+   {
+    "v": "Patchy, splotchy, drying blocks; bags losing weight through the patch.",
+    "s": [
+     "F14-0150",
+     "F14-0222"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Often mistaken for contamination.",
+    "s": [
+     "F14-0222"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Too much air exchange (CO2 about 500 ppm), for example from using the incubation HVAC to condition other rooms.",
+    "s": [
+     "F14-0222",
+     "F11-0272"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Hold CO2 in the incubation band; give incubation its own HVAC.",
+    "s": [
+     "F11-0272"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Separate incubation HVAC; steady load in the room.",
+    "s": [
+     "F14-0150",
+     "F11-0273"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Shiitake named.",
+    "s": [
+     "F14-0222"
+    ]
+   }
+  ],
+  "w": [
+   "incubation-tips-and-tricks 0:31:08",
+   "insane-in-the-incubation 0:35:01",
+   "incubation-tips-and-tricks 0:12:27",
+   "shitake-2 0:31:55",
+   "02-shiitake-cultivation 1:32:22"
+  ]
+ }
+]

@@ -1,0 +1,103 @@
+[
+ {
+  "see": "Many different moulds, plus bacteria, across a lot",
+  "source": "Air during cool-down or in the lab",
+  "s": [
+   "F14-0114"
+  ],
+  "hz": "dirty-cooldown"
+ },
+ {
+  "see": "Patchy through the batch, many types, uneven colonization and yield",
+  "source": "Steaming failure",
+  "s": [
+   "F14-0115"
+  ],
+  "hz": "undercooked"
+ },
+ {
+  "see": "Sporadic, but always near the gussets or the top seal",
+  "source": "Bag manufacturing defect",
+  "s": [
+   "F14-0116"
+  ],
+  "hz": "bag-failure"
+ },
+ {
+  "see": "All blocks (say 20) from one 6 lb (2.7 kg) spawn bag go green",
+  "source": "Spawn",
+  "s": [
+   "F14-0117"
+  ],
+  "hz": "trichoderma"
+ },
+ {
+  "see": "Sporadic chunky spots over 2 weeks, not in every bag of the lot",
+  "source": "Undercooked substrate rather than spawn",
+  "s": [
+   "F14-0118"
+  ],
+  "hz": "undercooked"
+ },
+ {
+  "see": "Many blocks from one spawn lot fail during incubation",
+  "source": "Spawn or substrate supplier. Trace by lot",
+  "s": [
+   "F14-0119"
+  ]
+ },
+ {
+  "see": "Problem only at fruiting",
+  "source": "The fruit room, not the spawn or block supplier",
+  "s": [
+   "F14-0120"
+  ],
+  "hz": "humidifier-fogger"
+ },
+ {
+  "see": "Systemic across everything",
+  "source": "Equipment: the cook or the cool-down air, not a working flowhood unless it has a break",
+  "s": [
+   "F14-0121"
+  ],
+  "hz": "dirty-cooldown"
+ },
+ {
+  "see": "Sporadic infiltration across a whole lot",
+  "source": "Technique, damaged filters or irregular airflow",
+  "s": [
+   "F14-0122"
+  ],
+  "hz": "lab-air"
+ },
+ {
+  "see": "Shiitake surface contamination even after browning and buckling",
+  "source": "Insufficient cook",
+  "s": [
+   "F14-0123"
+  ],
+  "hz": "undercooked"
+ },
+ {
+  "see": "Problem shows only on lion's mane",
+  "source": "A systemic fault that hardier species out-compete. Do not blame the culture",
+  "s": [
+   "F14-0124"
+  ]
+ },
+ {
+  "see": "Bought-in blocks fail in your room but fruit fine on a kitchen counter",
+  "source": "Your environment, usually water or humidification",
+  "s": [
+   "F14-0125"
+  ],
+  "hz": "water-quality"
+ },
+ {
+  "see": "Fresh bags perspiring heavily early in colonization",
+  "source": "Likely to contaminate within one or two weeks",
+  "s": [
+   "F14-0126"
+  ]
+ }
+]

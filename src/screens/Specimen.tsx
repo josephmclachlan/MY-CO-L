@@ -7,14 +7,16 @@ import type { Fact, Species } from '../data/species/types'
 import { LB_TO_KG } from '../lib/runplan'
 import { useTable } from '../store/StoreContext'
 import type { Strain } from '../lib/xeno'
+import { hazardById, hazardsForSpecies } from '../data/hazards'
 
 export const TABS = ['OVERVIEW', 'CULTIVATION', 'TIMELINE', 'CLIMATE', 'YIELD', 'HAZARDS', 'NOTES', 'SOURCES'] as const
 export type Tab = (typeof TABS)[number]
 
 const NO_DATA = 'NO DATA IN SOURCES'
 
-function factRows(prefix: string, facts: Fact[]): Row[] {
+function factRows(prefix: string, facts: Fact[], openHazard?: (id: string) => void): Row[] {
   return facts.map((f, i) => {
+    const target = f.hz && openHazard ? hazardById(f.hz) : undefined
     const nodata = f.f === 'nodata'
     const hasSrc = !!(f.s?.length || f.w?.length || f.n)
     return {
@@ -22,6 +24,7 @@ function factRows(prefix: string, facts: Fact[]): Row[] {
       label: f.k?.toUpperCase(),
       value: f.v ?? NO_DATA,
       flag: f.f,
+      link: target ? { label: 'OPEN HAZARD FILE', onClick: () => openHazard!(target.id) } : null,
       why: hasSrc || nodata ? { s: f.s, w: f.w, n: f.n ?? (nodata ? 'No figure in textbook t20, t21, t24 or t25 or the manual chapters. Nothing is filled from outside.' : undefined) } : null,
     }
   })
@@ -38,7 +41,7 @@ function sourceStats(sp: Species) {
   return { ids, vids, facts: all.length, gaps: all.filter((f) => f.f === 'nodata').length, conflicts: all.filter((f) => f.f === 'conflict').length }
 }
 
-function rowsFor(sp: Species, tab: Tab, strains: Strain[] = []): Row[] {
+function rowsFor(sp: Species, tab: Tab, strains: Strain[] = [], openHazard?: (id: string) => void): Row[] {
   const lb = (x: number) => `${x.toFixed(2)} lb (${(x * LB_TO_KG).toFixed(2)} kg)`
   switch (tab) {
     case 'OVERVIEW': {
@@ -96,7 +99,7 @@ function rowsFor(sp: Species, tab: Tab, strains: Strain[] = []): Row[] {
       return [...factRows('y', sp.yield_), ...extra]
     }
     case 'HAZARDS':
-      return [...factRows('h', sp.hazards), { id: 'h-lib', value: 'FULL CONTAMINANT LIBRARY: HAZARD INDEX (NOT YET INSTALLED).' }]
+      return [...factRows('h', sp.hazards, openHazard), { id: 'h-lib', value: `FULL CONTAMINANT LIBRARY: HAZARD INDEX. ${hazardsForSpecies(sp.id).length} ENTRIES NAME ${sp.name}. THEY ARE LISTED BELOW.` }]
     case 'NOTES':
       return factRows('n', sp.notes)
     case 'SOURCES': {
@@ -153,7 +156,7 @@ function Bars({ sp }: { sp: Species }) {
   )
 }
 
-export function Specimen({ index, tab, setTab, onOpenStrain }: { index: number; tab: Tab; setTab: (t: Tab) => void; onOpenStrain?: (id: string) => void }) {
+export function Specimen({ index, tab, setTab, onOpenStrain, onOpenHazard }: { index: number; tab: Tab; setTab: (t: Tab) => void; onOpenStrain?: (id: string) => void; onOpenHazard?: (id: string) => void }) {
   const { sound } = useApp()
   const sp = SPECIES[index]
   const [skip, setSkip] = useState(false)
@@ -161,7 +164,7 @@ export function Specimen({ index, tab, setTab, onOpenStrain }: { index: number; 
   const allStrains = useTable<Strain>('strains')
   const strains = useMemo(() => allStrains.filter((s) => s.species_key === sp.id).sort((a, b) => a.code.localeCompare(b.code)), [allStrains, sp.id])
   const strainKey = strains.map((s) => s.id + s.code + s.name + s.active).join('|')
-  const rows = useMemo(() => rowsFor(sp, tab, strains), [sp, tab, strainKey])
+  const rows = useMemo(() => rowsFor(sp, tab, strains, onOpenHazard), [sp, tab, strainKey])
 
   useEffect(() => {
     setSkip(false)
@@ -203,6 +206,17 @@ export function Specimen({ index, tab, setTab, onOpenStrain }: { index: number; 
           <TypedRows rows={rows} instant={skip} onDone={() => setDone(true)} />
           {(done || skip) && tab === 'TIMELINE' && <Bars sp={sp} />}
           {tab === 'CLIMATE' && <TempScale sp={sp} />}
+          {(done || skip) && tab === 'HAZARDS' && onOpenHazard && (
+            <div className="spec-strains">
+              <div className="section-title">ON THE HAZARD INDEX FOR {sp.name}</div>
+              {hazardsForSpecies(sp.id).length === 0 && <div className="dim tiny">NO ENTRY NAMES THIS SPECIES.</div>}
+              {hazardsForSpecies(sp.id).map((h) => (
+                <button key={h.id} type="button" className="btn" onClick={() => onOpenHazard(h.id)} title="Open the hazard file">
+                  {h.name}
+                </button>
+              ))}
+            </div>
+          )}
           {!done && !skip && <div className="dim tiny spec-skip">TAP TO SKIP TYPING</div>}
         </div>
         <div className="spec-model">

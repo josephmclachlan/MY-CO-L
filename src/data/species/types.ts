@@ -14,6 +14,7 @@ export interface Fact {
   w?: string[] // video or podcast reference, e.g. "lions-mane-2 0:24:44"
   n?: string // short note
   d?: [number, number] // duration in days (timeline bars)
+  hz?: string // id of a HAZARD INDEX entry this fact opens
 }
 
 export interface TempBands {
