@@ -45,6 +45,7 @@ export default function App() {
   const [reply, setReply] = useState<{ text: string; warn?: boolean; id: number } | null>(null)
   const [focusToken, setFocusToken] = useState(0)
   const alertTimer = useRef<number | null>(null)
+  const energising = useRef(false)
 
   // ---------- navigation ----------
 
@@ -264,16 +265,20 @@ export default function App() {
   // ---------- render ----------
 
   if (stage === 'power') {
+    // A full tap (click) or key press is what browsers accept to allow sound.
+    // Wait until sound is running so the boot swoop isn't lost.
+    const energise = () => {
+      if (energising.current) return
+      energising.current = true
+      void sound.unlock().then(() => setStage('boot'))
+    }
     return (
       <Crt powered={false}>
         <div
           className="power"
           role="button"
           tabIndex={0}
-          onPointerDown={() => {
-            sound.unlock()
-            setStage('boot')
-          }}
+          onClick={energise}
         >
           <div>
             <div className="dot" />
@@ -283,7 +288,7 @@ export default function App() {
             </div>
           </div>
         </div>
-        <PowerKeyCatcher onPress={() => (sound.unlock(), setStage('boot'))} />
+        <PowerKeyCatcher onPress={energise} />
       </Crt>
     )
   }

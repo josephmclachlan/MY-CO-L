@@ -77,11 +77,15 @@ export class SoundEngine {
     return this.ctx !== null && this.ctx.state === 'running'
   }
 
-  /** Browsers only allow sound after a tap or key press. Call from one. */
-  unlock(): void {
+  /**
+   * Browsers only allow sound after a full tap (click) or key press, so call
+   * this from one. Resolves once sound is actually running (or after 800 ms),
+   * so the boot can wait for it and its first sounds aren't lost.
+   */
+  unlock(): Promise<void> {
     if (!this.ctx) {
       const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-      if (!Ctx) return
+      if (!Ctx) return Promise.resolve()
       const ctx = new Ctx()
       this.ctx = ctx
       this.master = ctx.createGain()
@@ -100,9 +104,33 @@ export class SoundEngine {
       this.noise = ctx.createBuffer(1, len, ctx.sampleRate)
       const d = this.noise.getChannelData(0)
       for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1
+      // When sound starts running (now or later), start whatever the screen
+      // already asked for: hum, drone, chatter.
+      ctx.onstatechange = () => {
+        if (ctx.state === 'running') this.onRunning()
+      }
       this.apply(this.settings)
     }
-    if (this.ctx.state === 'suspended') void this.ctx.resume()
+    const ctx = this.ctx
+    // iPhones only unlock sound when something actually plays inside the tap,
+    // so play one silent sample right now.
+    try {
+      const silent = ctx.createBufferSource()
+      silent.buffer = ctx.createBuffer(1, 1, ctx.sampleRate)
+      silent.connect(ctx.destination)
+      silent.start()
+    } catch {
+      // ignore
+    }
+    if (ctx.state === 'running') return Promise.resolve()
+    const resumed = ctx.resume().catch(() => undefined)
+    const timeout = new Promise<void>((r) => window.setTimeout(r, 800))
+    return Promise.race([resumed, timeout]).then(() => undefined)
+  }
+
+  private onRunning() {
+    this.apply(this.settings)
+    if (this.droneHolds > 0 && !this.droneGain) this.buildDrone()
   }
 
   /** Apply new slider values. Called whenever settings change. */
@@ -125,8 +153,9 @@ export class SoundEngine {
     if (!s.enabled) {
       this.stopChatterLoop()
       this.alarm(false)
-    } else if (this.chatterHolds > 0) {
-      this.startChatterLoop()
+    } else {
+      if (this.chatterHolds > 0) this.startChatterLoop()
+      if (this.droneHolds > 0 && !this.droneGain) this.buildDrone()
     }
   }
 
@@ -362,6 +391,10 @@ export class SoundEngine {
   /** A screen is working. Pair with droneOff(). */
   droneOn(): void {
     this.droneHolds++
+    this.buildDrone()
+  }
+
+  private buildDrone(): void {
     const ctx = this.live()
     if (!ctx) return
     if (!this.droneGain) {
