@@ -322,6 +322,10 @@
   .tb-right {
     display: none;
   }
+  /* Long screen names (SPECIMEN FILES, XENOGENETICS) were cut off; the BACK button already says where we are. */
+  .tb-sys {
+    display: none;
+  }
 }
 
 /* ---------- menu ---------- */

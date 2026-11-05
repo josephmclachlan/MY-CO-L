@@ -73,7 +73,7 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
               &lt; BACK
             </button>
           )}
-          {STATION.system} <span className="tb-sep">//</span> {title}
+          <span className="tb-sys">{STATION.system} <span className="tb-sep">//</span> </span>{title}
         </span>
         <span className="tb-right">
           {STATION.company} <span className="tb-sep">//</span> {STATION.station}
