@@ -259,7 +259,7 @@ export function ageLimit(kind: CultureKind | 'G1' | 'G2', speciesKey?: string): 
     case 'plate':
       return { warn: 60, over: 90, basis: 'made', rule: 'Discard plates older than 3 months, yellowed or with droplets.', src: 'F03-0268' }
     case 'slant':
-      return { warn: 183, over: 243, basis: 'made', rule: 'Slants 6-8 months old have been used; one farm now refreshes them sooner.', src: 'F04-0070' }
+      return { warn: 183, over: 243, basis: 'made', rule: 'Slants of 6-8 months have been used. One farm now renews them earlier.', src: 'F04-0070' }
     case 'water':
       return { warn: 183, over: 365, basis: 'made', rule: 'Check stored cultures every 6-12 months. Water-tube lifetimes are anecdotal ("months to years").', src: 'F04-0236 F04-0244' }
     case 'cryo':
@@ -271,7 +271,7 @@ export function ageLimit(kind: CultureKind | 'G1' | 'G2', speciesKey?: string): 
         return { warn: 10, over: 14, basis: 'cold', rule: "Lion's mane spawn: no more than about 2 weeks cold; it still tries to fruit.", src: 'F04-0091' }
       if (speciesKey === 'comb-tooth')
         return { warn: 10, over: 14, basis: 'cold', rule: 'Comb tooth G2: stop at about 2 weeks, before it fruits.', src: 'F04-0090' }
-      return { warn: 14, over: 21, basis: 'cold', rule: 'G2 bags: definitely 2 weeks cold; 3 weeks pushes the limit for any mushroom.', src: 'F04-0089' }
+      return { warn: 14, over: 21, basis: 'cold', rule: 'G2 bags: plan on 2 weeks in the fridge at most. 3 weeks is the outer limit for any species.', src: 'F04-0089' }
     default:
       return null // LC in the fridge is "being tested" (F04-0096); spore prints: nothing in the sources
   }
@@ -305,7 +305,7 @@ export function grainAge(g: GrainRun, speciesKey: string, now = todayIso()): Age
   if (g.status === 'cold_storage') return checkAge(lim, g.inoculated_on, g.cold_since ?? g.inoculated_on, now)
   // Not chilled yet: masters are fully grown about 2 weeks after inoculation, use or chill by week 3 (F05-0143, F05-0148).
   const days = daysBetween(g.inoculated_on, now)
-  if (g.generation === 'G1' && days > 21) return { state: 'warn', days, limit: { warn: 21, over: 21, basis: 'made', rule: 'Fully grown about 2 weeks after inoculation; use it or chill it by week 3.', src: 'F05-0143 F05-0148' }, text: `${days} D, USE OR CHILL` }
+  if (g.generation === 'G1' && days > 21) return { state: 'warn', days, limit: { warn: 21, over: 21, basis: 'made', rule: 'Fully grown at about 2 weeks. Use it, or put it in the fridge, by week 3.', src: 'F05-0143 F05-0148' }, text: `${days} D, USE OR CHILL` }
   return { state: 'ok', days, limit: lim, text: `${days} D SINCE INOCULATION` }
 }
 
