@@ -5,7 +5,8 @@ import { useApp } from '../settings/AppContext'
 import { useStore, useTable } from '../store/StoreContext'
 import { useCargo } from '../store/useCargo'
 import { speciesName } from '../store/useLedger'
-import { SPECIES, planBags } from '../data/species'
+import { SPECIES } from '../data/species'
+import { weekSplit } from '../data/cropplan'
 import { GRADES } from '../data/ledger'
 import { HazardPick } from '../components/HazardPick'
 import { hazardName, type LotLoss } from '../lib/hazard'
@@ -324,8 +325,7 @@ function NewLot({ m, say, done }: { m: M; say: Say; done: () => void }) {
   const [grainId, setGrainId] = useState('')
   const [cookId, setCookId] = useState('')
   const planned = (() => {
-    const s = SPECIES.find((x) => x.id === sp)
-    const b = s ? planBags(s) : null
+    const b = weekSplit(knock).find((x) => x.key === sp)?.bags ?? null
     return b ? Math.round(b) : null
   })()
   const [blocks, setBlocks] = useState('')

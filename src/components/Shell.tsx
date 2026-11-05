@@ -40,6 +40,8 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
   const { settings, sound, session } = useApp()
   const clock = useClock()
   const [cmd, setCmd] = useState('')
+  // Phones show F1-F4 and a MORE key; MORE opens F5-F8 underneath.
+  const [more, setMore] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const mainRef = useRef<HTMLElement>(null)
   const [online, setOnline] = useState(() => navigator.onLine)
@@ -123,18 +125,25 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
         />
       </form>
       <div className="hintline">{hint}</div>
-      <nav className="keybar" aria-label="Function keys" data-kbd-zone="keys">
+      <nav className={`keybar ${more ? 'more-open' : ''}`} aria-label="Function keys" data-kbd-zone="keys">
         {keys.map((k) => (
           <button
             key={k.f}
             type="button"
-            className={`fkey ${k.active ? 'active' : ''}`}
-            onClick={() => onKey(k.f)}
+            className={`fkey ${k.f > 4 ? 'fkey-extra' : ''} ${k.active ? 'active' : ''}`}
+            onClick={() => {
+              setMore(false)
+              onKey(k.f)
+            }}
           >
             <span className="fnum">F{k.f}</span>
             <span className="flabel">{k.label}</span>
           </button>
         ))}
+        <button type="button" className={`fkey fkey-more ${more ? 'active' : ''}`} aria-expanded={more} onClick={() => setMore((m) => !m)}>
+          <span className="fnum">F5-F8</span>
+          <span className="flabel">{more ? 'LESS' : 'MORE'}</span>
+        </button>
       </nav>
     </div>
   )

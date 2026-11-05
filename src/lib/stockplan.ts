@@ -7,8 +7,9 @@ import { LB_TO_KG } from './runplan'
 export const PLAN = {
   /** Dry matter in one 10 lb block: 4 lb (F07-0096). A figure of about 3.3 lb is also quoted. */
   dryLbPerBag: 4,
-  /** Master's Mix is 50:50 sawdust : soy hulls (F06-0001); soy never above 50% (F06-0207). */
-  soyShare: 0.5,
+  /** Master's Mix is 50:50 sawdust : soy hulls (F06-0001); soy never above 50% (F06-0207).
+   *  Default 40% (60:40): the textbook's start for a hot, humid site (t25, F23-0095). Joseph asked for 60:40 / 55:45 / 50:50 switches, 5 Nov 2026. */
+  soyShare: 0.4,
   /** House spawn rate: one 6 lb G2 bag per 20 blocks, about 0.3 lb (136 g) of spawn per block (F05-0014, F07-0001). */
   spawnLbPerBag: 0.3,
   g2Lb: 6,
@@ -38,7 +39,7 @@ export interface UseLine {
 export const round1 = (n: number) => Math.round(n * 10) / 10
 
 export interface RunOptions {
-  /** Share of the dry mix that is soy hulls. Default 0.5, capped at 0.5. */
+  /** Share of the dry mix that is soy hulls. Default 0.4, capped at 0.5. */
   soyShare?: number
   form?: SubstrateForm
 }

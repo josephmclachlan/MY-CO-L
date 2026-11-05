@@ -245,6 +245,9 @@
   grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 5px;
 }
+.keybar .fkey-more {
+  display: none;
+}
 .fkey {
   font: inherit;
   color: var(--fg);
@@ -326,8 +329,20 @@
   .body.view-strip .index-panel .index-list li .k {
     display: none;
   }
+  /* One row on phones: F1-F4 and MORE. MORE opens F5-F8 as a second row. */
   .keybar {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .keybar .fkey-extra {
+    display: none;
+  }
+  .keybar.more-open .fkey-extra {
+    display: flex;
+  }
+  .keybar .fkey-more {
+    display: flex;
+    grid-column: 5;
+    grid-row: 1;
   }
   .tb-right {
     display: none;
@@ -390,8 +405,12 @@
     order: -1;
   }
   /* The logo scales as one piece: container sets the size, globe and overlay fill it. */
+  .menu-wire {
+    gap: 2px;
+  }
+  /* Smaller on phones so all twelve modules fit under it (Joseph: smaller, not removed). */
   .menu-wire .logo {
-    width: min(260px, 78vw) !important;
+    width: min(150px, 42vw) !important;
     height: auto !important;
     aspect-ratio: 260 / 200;
   }

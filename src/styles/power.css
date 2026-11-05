@@ -578,3 +578,20 @@ rect.glyph.lit {
     height: auto;
   }
 }
+
+/* Phones: the plan is drawn about a third of its size, so its room names need to be bigger to read. */
+@media (max-width: 700px) {
+  .deck-label {
+    font-size: 28px;
+    letter-spacing: 0.02em;
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 6px;
+  }
+  .deck-kw {
+    font-size: 22px;
+  }
+  .deck-room .deck-kw {
+    transform: translateY(10px);
+  }
+}

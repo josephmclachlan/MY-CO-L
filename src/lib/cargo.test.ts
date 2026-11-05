@@ -10,10 +10,10 @@ const mv = (id: string, qty: number, reason = 'use', days = 0): Move => ({ ...ne
 
 describe('run plan stock use', () => {
   const by = (n: number, o = {}) => new Map(runLines(n, o).map((l) => [l.code, l]))
-  it('130 bags: 4 lb dry per bag split 50:50', () => {
+  it('130 bags: 4 lb dry per bag split 60:40 by default (hot, humid site)', () => {
     const m = by(130)
-    expect(m.get('SAWDUST')!.book).toBeCloseTo(117.9, 1)
-    expect(m.get('SOY-HULL')!.book).toBeCloseTo(117.9, 1)
+    expect(m.get('SAWDUST')!.book).toBeCloseTo(141.5, 1)
+    expect(m.get('SOY-HULL')!.book).toBeCloseTo(94.3, 1)
     expect(m.get('BAG-10')!.book).toBe(130)
   })
   it('grain follows the 0.3 lb spawn rate, G1 masters and hydration', () => {
@@ -109,7 +109,7 @@ describe('store', () => {
     expect(onHandMap(s.rows<Move>('stock_moves')).get(saw.id)).toBe(480)
     const r = await bookRun(s, 'RUN-1', runLines(130), items, '130 BAGS')
     expect(r.booked).toBe(5)
-    expect(onHandMap(s.rows<Move>('stock_moves')).get(saw.id)).toBeCloseTo(480 - 117.9, 1)
+    expect(onHandMap(s.rows<Move>('stock_moves')).get(saw.id)).toBeCloseTo(480 - 141.5, 1)
     await undoRun(s, 'RUN-1')
     expect(onHandMap(s.rows<Move>('stock_moves')).get(saw.id)).toBe(480)
     expect(s.rows('item_prices')).toHaveLength(1)

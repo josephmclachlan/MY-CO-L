@@ -222,7 +222,7 @@ function Overview({ set, counts }: { set: SetHazard; counts: Map<string, { event
     <div className="hz">
       <div className="section-title">HAZARD INDEX</div>
       <p>
-        {HAZARDS.filter((h) => h.kind !== 'notcontam').length} contaminants, pests, diseases and faults, and {HAZARDS.filter((h) => h.kind === 'notcontam').length} things that only look like trouble. Every readout has a WHY? that shows its source. Pick an entry at left, or describe what you see.
+        {HAZARDS.filter((h) => h.kind !== 'notcontam').length} contaminants, pests, diseases and faults, and {HAZARDS.filter((h) => h.kind === 'notcontam').length} things that only look like trouble. Every readout has a WHY? that shows its source. Pick an entry from the list, or describe what you see.
       </p>
       <div className="hz-chips">
         <button type="button" className="btn on" onClick={() => (sound.chirp(), set({ mode: 'diagnose' }))}>DIAGNOSE: DESCRIBE WHAT YOU SEE</button>

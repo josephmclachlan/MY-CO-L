@@ -149,8 +149,9 @@ export function useKeyNav(opts: { enabled: boolean; onBack: () => boolean }) {
         // Focus is on the panel itself (no items): arrows scroll it, or step into an item if one appeared.
         if (items(zone).length) return void landIn(zone, dir === 'up', false)
         const sc = scrollerOf(zone)
-        if (dir === 'up' || dir === 'down') scrollBy(sc, (dir === 'down' ? 1 : -1) * (sc?.clientHeight ?? 0) * 0.3)
-        return
+        if ((dir === 'up' || dir === 'down') && scrollBy(sc, (dir === 'down' ? 1 : -1) * (sc?.clientHeight ?? 0) * 0.3)) return
+        // At the end of the page: cross to the F-keys, BACK or the index like any item would.
+        return cross(zone, box(zone), dir)
       }
       const cur = from && from !== document.body ? box(from) : lastBox
       if (!cur) return void landIn(zone, dir === 'up')
@@ -179,17 +180,29 @@ export function useKeyNav(opts: { enabled: boolean; onBack: () => boolean }) {
         if (scrollBy(sc, (dir === 'down' ? 1 : -1) * h * 0.6)) return
       }
       if (popup) return
+      cross(zone, cur, dir)
+    }
+
+    const cross = (zone: HTMLElement, cur: Box, dir: Dir) => {
       const seen = new Set<Element>()
       const others: Element[] = []
       for (const z of allZones()) {
         if (z === zone) continue
         const zsc = scrollerOf(z)
-        for (const el of items(z)) if (!zone.contains(el) && !seen.has(el) && inView(el, zsc)) seen.add(el), others.push(el)
+        const list = items(z)
+        // A page with nothing to press (HELP, STATUS) is itself the place to go back to.
+        if (!list.length && !z.contains(zone) && !zone.contains(z) && !seen.has(z)) seen.add(z), others.push(z)
+        for (const el of list) if (!zone.contains(el) && !seen.has(el) && inView(el, zsc)) seen.add(el), others.push(el)
       }
       // Up and down only cross to what sits above or below (F-keys, BACK), never sideways into the index.
       const reach = dir === 'up' || dir === 'down' ? others.filter((el) => { const b = box(el); return b.right > cur.left && b.left < cur.right }) : others
       const j = pickNext(cur, reach.map(box), dir)
-      if (j >= 0) focusEl(reach[j])
+      if (j < 0) return
+      const to = reach[j]
+      if (to.hasAttribute('data-kbd-zone')) {
+        ;(to as HTMLElement).tabIndex = -1
+        ;(to as HTMLElement).focus({ preventScroll: true })
+      } else focusEl(to)
     }
 
     const onKey = (e: KeyboardEvent) => {

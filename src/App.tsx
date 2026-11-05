@@ -750,19 +750,19 @@ export default function App() {
     hints.module = 'TAP AN ITEM TO RECEIVE, USE OR COUNT IT // TYPE REORDER OR CARGO // F2 MENU'
 
   if (view.name === 'module' && view.idx === XENO_IDX)
-    hints.module = 'TAP A STRAIN AT RIGHT // TYPE A CODE (LM-01) OR A TAB (LINEAGE, PLANNER) // TAP A NODE TO LOG THE NEXT STEP // F2 MENU'
+    hints.module = 'TAP A STRAIN IN THE LIST // TYPE A CODE (LM-01) OR A TAB (LINEAGE, PLANNER) // TAP A NODE TO LOG THE NEXT STEP // F2 MENU'
   if (view.name === 'module' && view.idx === HAZARD_IDX)
-    hints.module = 'PICK AN ENTRY AT LEFT // DIAGNOSE LISTS LIKELY MATCHES // TYPE A NAME (BLOTCH) OR A TAB (CAUSE) // WHY? SHOWS THE SOURCE // F2 MENU'
+    hints.module = 'PICK AN ENTRY FROM THE LIST // DIAGNOSE LISTS LIKELY MATCHES // TYPE A NAME (BLOTCH) OR A TAB (CAUSE) // WHY? SHOWS THE SOURCE // F2 MENU'
   if (view.name === 'module' && view.idx === COOK_IDX)
-    hints.module = 'PICK A RUN AT LEFT OR START ONE // QUICK-ADD READINGS ON A PHONE // TYPE A TAB (CURVE, READINGS, SHEET) // F2 MENU'
+    hints.module = 'PICK A RUN FROM THE LIST OR START ONE // QUICK-ADD READINGS ON A PHONE // TYPE A TAB (CURVE, READINGS, SHEET) // F2 MENU'
   if (view.name === 'module' && view.idx === LEDGER_IDX)
-    hints.module = 'PICK AT LEFT // NO TAG = LOGGED, ESTIMATE = FROM THE PLAN // TYPE BILLS, LABOUR OR TRADE // F2 MENU'
+    hints.module = 'PICK FROM THE LIST // NO TAG = LOGGED, ESTIMATE = FROM THE PLAN // TYPE BILLS, LABOUR OR TRADE // F2 MENU'
   if (view.name === 'module' && view.idx === TRADE_IDX)
     hints.module = 'NEW SALE: KG, TAP CHANNEL, SAVE // TYPE TOTALS, BUYERS OR LOG // MARGIN USES LEDGER COST // F2 MENU'
   if (view.name === 'module' && view.idx === MISSION_IDX)
     hints.module = 'BOARD SHOWS EVERY ACTIVE LOT // TYPE TODAY, HARVEST OR LOT // KG LOGGED FEEDS LEDGER AND TRADE // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
-    hints.module = 'PICK A CHAPTER OR SECTION AT LEFT // TAP A LINK TO JUMP // BACK RETURNS TO WHERE YOU WERE // F2 MENU'
+    hints.module = 'PICK A CHAPTER OR SECTION FROM THE CONTENTS // TAP A LINK TO JUMP // BACK RETURNS TO WHERE YOU WERE // F2 MENU'
 
   const hint = reply ? (
     <TypeText key={reply.id} className={reply.warn ? 'warn' : ''} lines={[reply.text]} />
