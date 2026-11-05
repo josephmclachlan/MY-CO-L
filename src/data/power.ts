@@ -119,6 +119,7 @@ export const HEATER_OPTIONS: Record<HeaterOption, { label: string; short: string
 // ---------------------------------------------------------------- circuits
 // Room assignments marked roomGuess come from Joseph's floor plan, the HVAC
 // plan and the 15 Oct 2026 grain workflow note. They wait on Joseph's answer.
+// Confirmed by Joseph 5 Nov 2026: 75X in the lab; 2 x 36k mini-splits in packing.
 
 const it = (id: string, name: string, qty: number, w: number, room: RoomId, est = true, roomGuess = true): Item => ({
   id,
@@ -135,13 +136,13 @@ export const MAIN: Circuit[] = [
     id: 'c34', tag: '5-6', panel: 'main', leg: 'B', v: 240, breaker: '25 A 2-POLE', wire: '#10 CU', cls: 'base', em: false,
     name: 'LENNOX 36K BTU MINI-SPLIT #1', short: 'LENNOX 36K #1',
     note: 'Inverter, cooling only, SEER 18. 3,200 W is an estimate until the outdoor-unit nameplate arrives.',
-    items: [it('lennox36a', 'Lennox 36k BTU mini-split #1', 1, 3200, 'packing')],
+    items: [it('lennox36a', 'Lennox 36k BTU mini-split #1', 1, 3200, 'packing', true, false)],
   },
   {
     id: 'c56', tag: '7-8', panel: 'main', leg: 'B', v: 240, breaker: '25 A 2-POLE', wire: '#10 CU', cls: 'base', em: false,
     name: 'LENNOX 36K BTU MINI-SPLIT #2', short: 'LENNOX 36K #2',
     note: 'Same as #1. Stagger compressor starts.',
-    items: [it('lennox36b', 'Lennox 36k BTU mini-split #2', 1, 3200, 'packing')],
+    items: [it('lennox36b', 'Lennox 36k BTU mini-split #2', 1, 3200, 'packing', true, false)],
   },
   {
     id: 'c78', tag: '9-10', panel: 'main', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
@@ -180,7 +181,7 @@ export const MAIN: Circuit[] = [
     id: 'x75', tag: '17', panel: 'main', leg: 'L1', v: 120, breaker: '20 A 1-POLE', wire: '#12 CU', cls: 'int', em: false,
     name: 'ALL AMERICAN 75X ELECTRIC STERILIZER', short: '75X STERILIZER',
     note: 'Never runs with the MegaChefs or the steam heater. The one load that unbalances the legs (+13.8 A on L1).',
-    items: [it('aa75x', 'All American 75X electric sterilizer (110 V)', 1, 1650, 'lab', false)],
+    items: [it('aa75x', 'All American 75X electric sterilizer (110 V)', 1, 1650, 'lab', false, false)],
   },
   {
     id: 'pump', tag: '18', panel: 'main', leg: 'L2', v: 120, breaker: '20 A 1-POLE', wire: '#12 CU', cls: 'int', em: false,
