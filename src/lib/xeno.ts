@@ -52,6 +52,7 @@ export interface GrainRun extends Row {
   parent_bags_used: number | null // masters (G1 bags) used to make this G2 run
   bag_count: number
   bags_lost: number
+  cook_run_id?: string | null // the PROPULSION cook that sterilized this grain
   inoculated_on: string
   status: GrainStatus
   cold_since: string | null
@@ -72,6 +73,7 @@ export interface BlockLot extends Row {
   strain_id: string | null
   grain_run_id: string | null
   g2_bags_used: number | null
+  cook_run_id?: string | null // the PROPULSION steam run these blocks were pasteurized in
   bag_count: number
   knock_date: string
   status: LotStatus

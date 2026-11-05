@@ -71,7 +71,7 @@ export const MODULES: ModuleDef[] = [
   { key: 'CARGO', num: 4, name: 'CARGO', what: 'STOCK MANIFEST', build: 4 },
   { key: 'XENO', num: 5, name: 'XENOGENETICS', what: 'STRAINS AND CULTURES', build: 6 },
   { key: 'HAZARD', num: 6, name: 'HAZARD INDEX', what: 'CONTAMINANTS AND PESTS', build: 8 },
-  { key: 'PROPULSION', num: 7, name: 'PROPULSION', what: 'STEAM AND COOK LOG', build: 6 },
+  { key: 'PROPULSION', num: 7, name: 'PROPULSION', what: 'STEAM AND COOK LOG', build: 9 },
   { key: 'LEDGER', num: 8, name: 'LEDGER', what: 'COST OF GOODS', build: 9 },
   { key: 'TRADE', num: 9, name: 'TRADE', what: 'SALES', build: 9 },
   { key: 'SEQUENCE', num: 10, name: 'PRODUCTION SEQUENCE', what: 'BAG RUN PLANNER', build: 3 },
