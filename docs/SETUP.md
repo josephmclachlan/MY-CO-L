@@ -60,6 +60,10 @@ the address, so this is for testing until launch, before your MycoWizards refere
    *Allow new users to sign up*, then **Save**.
 6. **Make your login.** **Authentication** > **Users** > **Add user** > **Create new user**. Enter your email
    and a passcode, tick **Auto Confirm User**, press **Create user**.
+   **Then lock it to you.** Back in **SQL Editor** > **New query**, open `supabase/migrations/0002_cargo_and_owner_lock.sql`
+   in GitHub, copy it, paste, **Run**. It adds the stock tables CARGO needs and makes every table readable and
+   writable by your login only (anyone else who somehow signed in would see nothing). Make your login (this step)
+   BEFORE running it, because it adds everyone who exists at that moment to the allowed list.
 7. **Copy the two public values.** **Project Settings** (gear icon) > **API Keys** (or **Data API**):
    - the **Project URL** (looks like `https://abcd1234.supabase.co`)
    - the **publishable** key (or, on older screens, the **anon public** key).
@@ -70,6 +74,10 @@ the address, so this is for testing until launch, before your MycoWizards refere
    - Name `VITE_SUPABASE_KEY`, value: the publishable (or anon) key
 9. Re-run **Actions** > **Deploy to GitHub Pages** > **Run workflow**. The app now shows **DB LOCKED**.
    Press **F8 LOGIN** and sign in with the email and passcode from step 6.
+
+**Moving your local CARGO data across.** If you used the app in local mode first: before linking, open CARGO and press
+**EXPORT BACKUP** on the device that holds your counts. After linking and logging in, open CARGO and press
+**IMPORT BACKUP** and pick that file. It merges by id, so importing twice does no harm.
 
 Good to know: a free Supabase project pauses after a week with no use. Your data is kept; open the Supabase
 dashboard and press **Restore** to wake it.
@@ -102,3 +110,11 @@ so only your email can open it.
 If Cloudflare's screen only offers **Workers** (no Pages tab): choose **Import a repository**, pick
 MY-CO-L, build command `npm run build`, deploy command `npx wrangler deploy`. The repo already has the
 `wrangler.jsonc` file this needs.
+
+## The MANUAL tab (private test copy only)
+
+The textbook lives in the MANUAL module. It is built into the private test copy only. The public GitHub Pages build shows `MANUAL LOCKED // LOGIN REQUIRED` and does not contain any textbook text (the build swaps the data for an empty file).
+
+- Make the test copy with the textbook: `npm run build:preview` (reads the chapters from `MANUAL_SRC`, default `/mnt/project-files/knowledge/01-core-knowledge/textbook`).
+- The generated data is `src/manual-data/manual.json`. It is gitignored and must never be committed.
+- Once Supabase login is linked, serve the same JSON behind the login and remove the `MANUAL` gate in `vite.config.ts`.

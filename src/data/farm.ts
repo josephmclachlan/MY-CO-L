@@ -8,7 +8,7 @@ export const STATION = {
   place: 'PLAYA NEGRA // LIMON // CR',
   system: 'MY/CO/L',
   longName: 'MYCOLOGICAL CONTROL LATTICE',
-  build: '0.2.0',
+  build: '0.3.0',
 }
 
 // Species letters used in lot codes (species letter + knock date MMDD, e.g. B1020).
@@ -74,4 +74,6 @@ export const MODULES: ModuleDef[] = [
   { key: 'PROPULSION', num: 7, name: 'PROPULSION', what: 'STEAM AND COOK LOG', build: 6 },
   { key: 'LEDGER', num: 8, name: 'LEDGER', what: 'COST OF GOODS', build: 9 },
   { key: 'TRADE', num: 9, name: 'TRADE', what: 'SALES', build: 9 },
+  { key: 'SEQUENCE', num: 10, name: 'PRODUCTION SEQUENCE', what: 'BAG RUN PLANNER', build: 3 },
+  { key: 'MANUAL', num: 11, name: 'MANUAL', what: 'THE TEXTBOOK', build: 5 },
 ]

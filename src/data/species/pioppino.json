@@ -1,0 +1,192 @@
+{
+ "id": "pioppino",
+ "order": 12,
+ "name": "PIOPPINO",
+ "latin": "Agrocybe aegerita",
+ "tier": "farm",
+ "form": "cluster",
+ "seed": 127,
+ "blurb": "FAST AND WARM-LOVING IN THE FRUIT ROOM.",
+ "overview": [
+  {
+   "k": "Character",
+   "v": "Fast, warm-loving, tough. Ideal conditions are very different from oyster.",
+   "s": [
+    "F17-0441"
+   ]
+  },
+  {
+   "k": "Sensitivity",
+   "v": "Needs a steady metabolic rate; shows up any variable that is off.",
+   "s": [
+    "F17-0451"
+   ]
+  },
+  {
+   "k": "Grain source",
+   "v": "Changing grain supplier can change fruit body form dramatically: \"rule number one\".",
+   "s": [
+    "F17-0443"
+   ]
+  },
+  {
+   "k": "Strain",
+   "v": "AACN house code, possibly not true A. aegerita.",
+   "s": [
+    "F18-0337"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Substrate",
+   "v": "Master's Mix 50:50 from combo pellets.",
+   "s": [
+    "F18-0341"
+   ]
+  },
+  {
+   "k": "Spawn rate",
+   "v": "One 6 lb bag per 20 blocks.",
+   "s": [
+    "F18-0342"
+   ]
+  },
+  {
+   "k": "Grain spawn",
+   "v": "3-4 weeks; ready when yellow or orange droplets appear.",
+   "s": [
+    "F18-0340"
+   ]
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Agar",
+   "v": "2-3 weeks per plate.",
+   "s": [
+    "F18-0338"
+   ],
+   "d": [
+    14,
+    21
+   ]
+  },
+  {
+   "k": "Block incubation",
+   "v": "About 3 weeks for patchy colonies to join. Shipped at about 3 weeks.",
+   "s": [
+    "F18-0345",
+    "F18-0346"
+   ],
+   "w": [
+    "pioppino 0:11:37"
+   ],
+   "d": [
+    21,
+    21
+   ]
+  },
+  {
+   "k": "Pin cue",
+   "v": "Fluff, then amber droplets, then a carpet of pins.",
+   "s": [
+    "F18-0348"
+   ]
+  },
+  {
+   "k": "Catawba knock to first harvest",
+   "v": "34 days (28-40).",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "fruitC": {
+  "ideal": [
+   [
+    18,
+    24
+   ]
+  ]
+ },
+ "climate": [
+  {
+   "k": "Incubation",
+   "v": "Same room as chestnut, about 19 °C. Little heat given off.",
+   "s": [
+    "F18-0343",
+    "F18-0344"
+   ]
+  },
+  {
+   "k": "Fruiting temp",
+   "v": "18-24 °C ideal, tolerates 27-29 °C. Warmer is faster. The 16 °C room is below range.",
+   "f": "conflict",
+   "s": [
+    "F18-0349"
+   ],
+   "n": "BELOW RANGE FOR FARM FRUIT ROOM"
+  },
+  {
+   "k": "Light",
+   "v": "Lights on once the pin carpet forms.",
+   "s": [
+    "F18-0350"
+   ]
+  },
+  {
+   "k": "RH and CO2",
+   "f": "nodata"
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Per block",
+   "v": "\"Very high\"; no figure given.",
+   "s": [
+    "F18-0352"
+   ]
+  },
+  {
+   "k": "Catawba real yield",
+   "v": "About 0.86 lb/block (0.75 by lot match).",
+   "f": "conflict",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "cat": {
+  "lb": 0.86,
+  "d": 34,
+  "dr": "28-40",
+  "plan": 1.25
+ },
+ "hazards": [
+  {
+   "k": "Trichoderma",
+   "v": "First of the common species to show it; attracts far more green mould than maitake.",
+   "s": [
+    "F17-0459"
+   ]
+  },
+  {
+   "k": "Bad culture or cook",
+   "v": "Flat glossy slick top that never pins. No fluff is a warning sign.",
+   "s": [
+    "F17-0460"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "v": "Mix its rows with oyster or chestnut in incubation so heat evens out.",
+   "s": [
+    "F18-0344"
+   ]
+  }
+ ],
+ "strains": []
+}

@@ -1,0 +1,132 @@
+{
+ "id": "phoenix-oyster",
+ "order": 5,
+ "name": "PHOENIX OYSTER",
+ "latin": null,
+ "tier": "plan",
+ "plan": {
+  "share": 13,
+  "note": "share of the old 100-bag split; scaled to the 130-bag run, split not yet confirmed"
+ },
+ "form": "shelf",
+ "seed": 53,
+ "blurb": "NOT NAMED IN THE SOURCES. CATAWBA ITALIAN OYSTER IS THE STAND-IN.",
+ "overview": [
+  {
+   "k": "Identity",
+   "v": "Phoenix is not named in the textbook or manual. The farm plan uses Catawba's Italian oyster figures as the stand-in.",
+   "s": [
+    "FARM-PLAN"
+   ]
+  },
+  {
+   "k": "Species name",
+   "f": "nodata"
+  },
+  {
+   "k": "Genus rule",
+   "v": "Oysters share Pleurotus biology and differ mainly in colour and temperature preference.",
+   "f": "ctx",
+   "s": [
+    "F17-0003"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Substrate",
+   "f": "nodata"
+  },
+  {
+   "k": "Moisture",
+   "f": "nodata"
+  },
+  {
+   "k": "Spawn rate",
+   "f": "nodata"
+  },
+  {
+   "k": "Culture storage",
+   "f": "nodata"
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Block incubation",
+   "f": "nodata"
+  },
+  {
+   "k": "Catawba Italian oyster, knock to first harvest",
+   "v": "21 days (19-24), median of real picks.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ],
+   "n": "Stand-in only."
+  }
+ ],
+ "fruitC": null,
+ "climate": [
+  {
+   "k": "Incubation temp",
+   "f": "nodata"
+  },
+  {
+   "k": "Fruiting temp",
+   "f": "nodata",
+   "n": "Pink, golden and phoenix temperatures are not in the sources."
+  },
+  {
+   "k": "Fruiting RH",
+   "f": "nodata"
+  },
+  {
+   "k": "CO2",
+   "f": "nodata"
+  },
+  {
+   "k": "Light",
+   "f": "nodata"
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Yield per block",
+   "f": "nodata"
+  },
+  {
+   "k": "Catawba Italian oyster, real yield",
+   "v": "1.09 lb/block (plan was 1.75). Stand-in only.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  },
+  {
+   "k": "Catawba, trend",
+   "v": "Big in summer 2024, then nearly dropped from their mix.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "cat": {
+  "lb": 1.09,
+  "d": 21,
+  "dr": "19-24",
+  "plan": 1.75
+ },
+ "hazards": [
+  {
+   "k": "Disease list",
+   "f": "nodata"
+  }
+ ],
+ "notes": [
+  {
+   "v": "Ask Joseph which strain and supplier this is, then add it to the strain list."
+  }
+ ],
+ "strains": []
+}

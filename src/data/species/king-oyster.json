@@ -1,0 +1,230 @@
+{
+ "id": "king-oyster",
+ "order": 8,
+ "name": "KING OYSTER",
+ "latin": "Pleurotus eryngii",
+ "tier": "farm",
+ "form": "capstem",
+ "seed": 83,
+ "blurb": "A CRAFT CROP. COLD, BRIGHT, CYCLIC CO2.",
+ "overview": [
+  {
+   "k": "Role",
+   "v": "A craft crop, not a meal ticket. Not worth growing without cooling and air handling.",
+   "s": [
+    "F17-0130"
+   ]
+  },
+  {
+   "k": "Selling",
+   "v": "Sells like hotcakes. A single steak-like mushroom is less intimidating than clusters.",
+   "s": [
+    "F17-0165"
+   ]
+  },
+  {
+   "k": "Wild",
+   "v": "Mediterranean and North African varieties on carrot-family plants. Weakly parasitic.",
+   "s": [
+    "F17-0128"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Substrate",
+   "v": "Soy-based Master's Mix made consistent fruiting possible.",
+   "s": [
+    "F18-0137"
+   ]
+  },
+  {
+   "k": "Moisture",
+   "v": "62-63% total (pellet mix).",
+   "s": [
+    "F18-0138"
+   ]
+  },
+  {
+   "k": "Spawn rate",
+   "v": "Industry standard, no number given. Low rates lengthen colonisation and cut yield sharply.",
+   "s": [
+    "F18-0139"
+   ]
+  },
+  {
+   "k": "Spawn timing",
+   "v": "Use just-colonized spawn. 0.5-1 week extra makes a brick with some stroma.",
+   "s": [
+    "F18-0140"
+   ]
+  },
+  {
+   "k": "Not for straw",
+   "v": "Straw logs went badly."
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Block incubation",
+   "v": "14-18 days. Some 10. Up to 3 weeks if spawn is poorly spread.",
+   "s": [
+    "F18-0141"
+   ],
+   "w": [
+    "king-oyster 0:27:06"
+   ],
+   "d": [
+    14,
+    18
+   ]
+  },
+  {
+   "k": "Fruit promptly",
+   "v": "Move to fruit as soon as colonized. Left too long they skin over.",
+   "s": [
+    "F17-0170"
+   ]
+  },
+  {
+   "k": "Days to pin and harvest",
+   "f": "nodata",
+   "n": "Textbook: not stated (F18-0153)."
+  },
+  {
+   "k": "Catawba knock to first harvest",
+   "v": "36 days (31-39), median of real picks.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "fruitC": {
+  "ideal": [
+   [
+    10,
+    16
+   ]
+  ]
+ },
+ "climate": [
+  {
+   "k": "Fruiting temp",
+   "v": "10-16 °C (50-60 °F) ideal. Trouble above 16 °C. No reliable pinning above about 17 °C. The 16 °C room is at the edge.",
+   "s": [
+    "F18-0142",
+    "F17-0169"
+   ],
+   "w": [
+    "king-oyster 0:40:32"
+   ],
+   "n": "EDGE OF RANGE"
+  },
+  {
+   "k": "Catawba practice",
+   "v": "Ryan grows kings at about 65 °F (18 °C) with extra AC.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  },
+  {
+   "k": "RH",
+   "v": "Fairly high and steady. Constant fresh-air exchange leaves RH flat at 80-85%, which is not wanted. No target number.",
+   "s": [
+    "F18-0144"
+   ]
+  },
+  {
+   "k": "CO2",
+   "v": "Cyclic control from a CO2 controller, not a constant fan. High CO2 gives pale, flat caps.",
+   "s": [
+    "F18-0145"
+   ],
+   "w": [
+    "king-oyster 0:41:36"
+   ]
+  },
+  {
+   "k": "Light",
+   "v": "Bright, even and intense. Strongly light-triggered; fruits from the top centre.",
+   "s": [
+    "F18-0147",
+    "F18-0148"
+   ]
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Per block",
+   "v": "About 2-2.25 lb (0.9-1.0 kg), not the 4 lb of other oysters.",
+   "s": [
+    "F18-0150"
+   ],
+   "w": [
+    "king-oyster 1:05:20"
+   ]
+  },
+  {
+   "k": "Catawba real yield",
+   "v": "About 0.86 lb/block aggregate (0.6-0.75 by lot match). Far under Cap n Stem's figure.",
+   "f": "conflict",
+   "s": [
+    "CATAWBA"
+   ]
+  },
+  {
+   "k": "Shelf life",
+   "v": "Long; stores very well.",
+   "s": [
+    "F18-0152"
+   ]
+  }
+ ],
+ "cat": {
+  "lb": 0.86,
+  "d": 36,
+  "dr": "31-39",
+  "plan": 1.25
+ },
+ "hazards": [
+  {
+   "k": "Blotch",
+   "v": "Watch cap tops and streaking stems. Stays where water sits on stripped blocks.",
+   "s": [
+    "F17-0166"
+   ]
+  },
+  {
+   "k": "Over-ventilation",
+   "v": "Early failures: 250 CFM fans running constantly, no CO2 meter.",
+   "s": [
+    "F18-0146",
+    "F17-0167"
+   ],
+   "w": [
+    "king-oyster 0:51:55"
+   ]
+  },
+  {
+   "k": "Warty caps",
+   "v": "Appear in very high humidity. Different from rose comb.",
+   "s": [
+    "F17-0168"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "v": "Fruit cold, bright and evenly lit, with cyclic CO2 control.",
+   "s": [
+    "F17-0169"
+   ],
+   "w": [
+    "king-oyster 0:40:32"
+   ]
+  }
+ ],
+ "strains": []
+}

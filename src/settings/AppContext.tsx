@@ -26,6 +26,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
     sound.apply(settings.sound)
   }, [settings, sound])
 
+  // Safety net: if sound is ever still locked (a reload, a skipped boot, a
+  // browser that refused the first tap), the next tap or key press unlocks it.
+  useEffect(() => {
+    const kick = () => {
+      if (!sound.ready) void sound.unlock()
+    }
+    const opts = { capture: true }
+    window.addEventListener('click', kick, opts)
+    window.addEventListener('keydown', kick, opts)
+    window.addEventListener('touchend', kick, opts)
+    return () => {
+      window.removeEventListener('click', kick, opts)
+      window.removeEventListener('keydown', kick, opts)
+      window.removeEventListener('touchend', kick, opts)
+    }
+  }, [sound])
+
   useEffect(() => {
     if (!supabase) return
     void supabase.auth.getSession().then(({ data }) => setSession(data.session))

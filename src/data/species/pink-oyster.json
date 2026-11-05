@@ -1,0 +1,165 @@
+{
+ "id": "pink-oyster",
+ "order": 6,
+ "name": "PINK OYSTER",
+ "latin": "Pleurotus djamor",
+ "tier": "plan",
+ "plan": {
+  "share": 0,
+  "note": "share of the old 100-bag split; scaled to the 130-bag run, split not yet confirmed"
+ },
+ "form": "shelf",
+ "seed": 61,
+ "blurb": "FASTEST IN CATAWBA'S DATA. MADE FOR HEAT.",
+ "overview": [
+  {
+   "k": "Genus",
+   "v": "Little detailed data exists. Treated like other oysters. Pleurotus biology.",
+   "s": [
+    "F17-0173",
+    "F17-0174"
+   ]
+  },
+  {
+   "k": "History",
+   "v": "In 1963 Bano and Srivastava grew P. flabellatus (a pink oyster now placed in P. djamor) on paddy straw in India.",
+   "s": [
+    "F17-0175",
+    "F18-0157"
+   ],
+   "w": [
+    "history-of-pleurotus 1:11:54"
+   ]
+  },
+  {
+   "k": "Heat advice",
+   "v": "Cap n Stem's advice to growers in hot places: \"grow some pinks.\" A Memphis grower cranked out oysters in a greenhouse he could not hold below 27-32 °C.",
+   "w": [
+    "Bluff City Fungi podcast with Cap n Stem"
+   ]
+  },
+  {
+   "k": "Farm plan",
+   "v": "Pink oyster is recommended to add to the crop plan (not yet in the 100 bags).",
+   "s": [
+    "FARM-PLAN"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Culture storage",
+   "v": "Does not survive cryo. Keep agar plugs in sterile water.",
+   "s": [
+    "F17-0176",
+    "F18-0155"
+   ],
+   "w": [
+    "02-shiitake-cultivation 0:13:46"
+   ]
+  },
+  {
+   "k": "Substrate",
+   "f": "nodata",
+   "n": "Textbook says treat like other oysters (F18-0159). That is not a measured figure."
+  },
+  {
+   "k": "Moisture",
+   "f": "nodata"
+  },
+  {
+   "k": "Spawn rate",
+   "f": "nodata"
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Block incubation",
+   "f": "nodata"
+  },
+  {
+   "k": "Catawba knock to first harvest",
+   "v": "18 days (15-21), the fastest of all their species.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "fruitC": null,
+ "climate": [
+  {
+   "k": "Incubation temp",
+   "f": "nodata"
+  },
+  {
+   "k": "Fruiting temp",
+   "f": "nodata",
+   "n": "Pink, golden and phoenix temperatures are not in the sources."
+  },
+  {
+   "k": "Fruiting RH",
+   "f": "nodata"
+  },
+  {
+   "k": "CO2",
+   "f": "nodata"
+  },
+  {
+   "k": "Light",
+   "f": "nodata"
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Yield per block",
+   "f": "nodata",
+   "n": "Cap n Stem gives no figure."
+  },
+  {
+   "k": "Catawba real yield",
+   "v": "1.44 lb/block (plan was 1.5).",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  },
+  {
+   "k": "Catawba seasonality",
+   "v": "Knocked only Apr-Sep; none in winter. About 50 blocks a week in summer 2026.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "cat": {
+  "lb": 1.44,
+  "d": 18,
+  "dr": "15-21",
+  "plan": 1.5
+ },
+ "hazards": [
+  {
+   "k": "Shelf life",
+   "v": "\"Look pretty, but don't hold up in the pan.\" Old pinks smell bad in the bin.",
+   "s": [
+    "F17-8008"
+   ]
+  },
+  {
+   "k": "Disease list",
+   "f": "nodata",
+   "n": "No species-specific problems recorded. General oyster hazards are in the BLUE OYSTER file."
+  }
+ ],
+ "notes": [
+  {
+   "v": "Highest $ per block per 30 shelf days in Catawba's ranking, because it turns so fast.",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "strains": []
+}

@@ -1,0 +1,255 @@
+{
+ "id": "chestnut",
+ "order": 11,
+ "name": "CHESTNUT",
+ "latin": "Pholiota adiposa",
+ "tier": "farm",
+ "form": "capstem",
+ "seed": 113,
+ "blurb": "SLOW, COLD, FOGGY. SHORT SHELF LIFE.",
+ "overview": [
+  {
+   "k": "Name",
+   "v": "Sold as Pholiota adiposa; the binomial is disputed.",
+   "s": [
+    "F17-0395"
+   ]
+  },
+  {
+   "k": "Core message",
+   "v": "Stable in the lab, but ripen well past full colonisation, keep out of strong light, cut decisively, fruit cold and foggy.",
+   "s": [
+    "F17-0396",
+    "F17-0438"
+   ]
+  },
+  {
+   "k": "Warning",
+   "v": "Some people get digestive distress. Customers who react may avoid all mushrooms.",
+   "s": [
+    "F17-0399"
+   ]
+  },
+  {
+   "k": "Buffer crop",
+   "v": "Fruitable year-round at lower yield. Ripened blocks can sit without fruiting.",
+   "s": [
+    "F17-0401"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Recipe",
+   "v": "Master's Mix in 10 lb blocks, or combo pellets. Raw sawdust only in 5 lb blocks.",
+   "s": [
+    "F18-0304",
+    "F18-0305"
+   ]
+  },
+  {
+   "k": "Moisture",
+   "v": "61-62%.",
+   "s": [
+    "F18-0306"
+   ]
+  },
+  {
+   "k": "Spawn rate",
+   "v": "One 6 lb G2 per about 20 blocks.",
+   "s": [
+    "F18-0307"
+   ]
+  },
+  {
+   "k": "Cut",
+   "v": "Shallow slice off the top, 3-6 mm.",
+   "s": [
+    "F18-0324"
+   ]
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Colonize",
+   "v": "2.5-3 weeks.",
+   "s": [
+    "F18-0314"
+   ],
+   "d": [
+    18,
+    21
+   ]
+  },
+  {
+   "k": "Ripen",
+   "v": "1-2 weeks or more, until a caramel rust-coloured ring forms.",
+   "s": [
+    "F18-0314"
+   ],
+   "w": [
+    "chestnut 0:18:48"
+   ],
+   "d": [
+    7,
+    14
+   ]
+  },
+  {
+   "k": "Pin after cut",
+   "v": "7-10 days.",
+   "s": [
+    "F18-0325"
+   ],
+   "d": [
+    7,
+    10
+   ]
+  },
+  {
+   "k": "Pins to harvest",
+   "v": "A further 7-12 days.",
+   "s": [
+    "F18-0326"
+   ],
+   "d": [
+    7,
+    12
+   ]
+  },
+  {
+   "k": "Catawba knock to first harvest",
+   "v": "65 days (61-70).",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "fruitC": {
+  "range": [
+   [
+    10,
+    18
+   ]
+  ],
+  "ideal": [
+   [
+    13,
+    16
+   ]
+  ]
+ },
+ "climate": [
+  {
+   "k": "Incubation temp",
+   "v": "About 19 °C. Swings between 16 and 19 °C trigger pins.",
+   "s": [
+    "F18-0310"
+   ]
+  },
+  {
+   "k": "Incubation light",
+   "v": "Lower than most. 6500 K close above burns the mycelium.",
+   "s": [
+    "F18-0313"
+   ]
+  },
+  {
+   "k": "Fruiting temp",
+   "v": "13-16 °C ideal, up to 18 °C. Poor or no pinning at 18-21 °C.",
+   "s": [
+    "F18-0318"
+   ],
+   "w": [
+    "chestnut-mushrooms 0:42:20"
+   ]
+  },
+  {
+   "k": "RH",
+   "v": "90-95% for pinning, 88-90% after. Dense hydrofogger fog.",
+   "s": [
+    "F18-0322"
+   ],
+   "w": [
+    "chestnut 0:23:07"
+   ]
+  },
+  {
+   "k": "CO2",
+   "v": "Below about 900 ppm.",
+   "s": [
+    "F18-0323"
+   ]
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Target",
+   "v": "2-3 lb (0.9-1.4 kg) or more from a 10 lb pellet block.",
+   "s": [
+    "F18-0330"
+   ]
+  },
+  {
+   "k": "Raw sawdust",
+   "v": "1-1.5 lb on a 5 lb block.",
+   "f": "ctx",
+   "s": [
+    "F18-0330"
+   ]
+  },
+  {
+   "k": "Shelf life",
+   "v": "Short. Harvest with gills still partly covered.",
+   "s": [
+    "F18-0333"
+   ]
+  },
+  {
+   "k": "Catawba real yield",
+   "v": "About 1.41 lb/block (plan was 2.0).",
+   "f": "conflict",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "cat": {
+  "lb": 1.41,
+  "d": 65,
+  "dr": "61-70",
+  "plan": 2.0
+ },
+ "hazards": [
+  {
+   "k": "Contamination",
+   "v": "Less tenacious than oyster. Many blocks with internal Trichoderma point to the substrate.",
+   "s": [
+    "F17-0435"
+   ]
+  },
+  {
+   "k": "Too hot",
+   "v": "Trichoderma blooms on block tops.",
+   "s": [
+    "F18-0320"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "v": "Patience: new growers mistake slow pinning for failure.",
+   "s": [
+    "F17-0437"
+   ]
+  },
+  {
+   "v": "Rack: bottom.",
+   "s": [
+    "F17-0432"
+   ]
+  }
+ ],
+ "strains": []
+}

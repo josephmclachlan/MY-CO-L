@@ -8,15 +8,21 @@ import '@fontsource/barlow-condensed/600.css'
 import './styles/crt.css'
 import './styles/layout.css'
 import './styles/power.css'
+import './styles/specimen.css'
+import './styles/cargo.css'
+import './styles/manual.css'
 import { AppProvider } from './settings/AppContext'
 import { PowerProvider } from './power/PowerContext'
+import { StoreProvider } from './store/StoreContext'
 import App from './App'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppProvider>
       <PowerProvider>
-        <App />
+        <StoreProvider>
+          <App />
+        </StoreProvider>
       </PowerProvider>
     </AppProvider>
   </StrictMode>,

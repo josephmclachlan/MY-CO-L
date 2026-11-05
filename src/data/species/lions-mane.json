@@ -1,0 +1,371 @@
+{
+ "id": "lions-mane",
+ "order": 2,
+ "name": "LION'S MANE",
+ "latin": "Hericium erinaceus",
+ "tier": "plan",
+ "plan": {
+  "share": 35,
+  "note": "share of the old 100-bag split; scaled to the 130-bag run, split not yet confirmed"
+ },
+ "form": "pom",
+ "seed": 23,
+ "blurb": "FICKLE BUT PAYS. TWO FLUSHES AT CAP N STEM.",
+ "overview": [
+  {
+   "k": "Role",
+   "v": "Grown for flavour, gourmet and medicinal appeal. Nearly every farm grows it. Fickle, needs consistent attention.",
+   "s": [
+    "F17-0184"
+   ]
+  },
+  {
+   "k": "Indicator species",
+   "v": "A farm-wide fault (pasteurization, moisture, temperature, light, a mould source) may show only on lion's mane. Do not blame the culture first.",
+   "s": [
+    "F17-0186"
+   ]
+  },
+  {
+   "k": "Strains",
+   "v": "HeCNS (the Leighton Banks strain). The other common US strain is Pow (HePow).",
+   "s": [
+    "F18-0161"
+   ]
+  },
+  {
+   "k": "Sizing",
+   "v": "About 1 lb (0.45 kg) is a softball-sized piece.",
+   "s": [
+    "F18-0195"
+   ]
+  },
+  {
+   "k": "Rack",
+   "v": "Top of the rack: responds to light.",
+   "s": [
+    "F17-0233"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Substrate",
+   "v": "Master's Mix (50% soy) in 10 lb blocks is the commercial recipe.",
+   "s": [
+    "F18-0172"
+   ]
+  },
+  {
+   "k": "Supplement suggestion",
+   "v": "30-40% soy suggested as a better range.",
+   "f": "ctx",
+   "s": [
+    "F18-0173"
+   ]
+  },
+  {
+   "k": "Moisture",
+   "v": "At or below about 62%, or water pools at the bottom of the block.",
+   "s": [
+    "F18-0174"
+   ],
+   "w": [
+    "comb-tooth 0:10:26",
+    "contamination-1 0:34:27"
+   ]
+  },
+  {
+   "k": "Moisture case",
+   "v": "One farm cut to about 56% and it did not help. The real problem was sawdust arriving at about 70%.",
+   "f": "ctx",
+   "s": [
+    "F18-0175"
+   ]
+  },
+  {
+   "k": "Grain",
+   "v": "Oats rather than rye, about 56% moisture. Low 40s % is too dry.",
+   "s": [
+    "F18-0167"
+   ]
+  },
+  {
+   "k": "Grain moisture, other practice",
+   "v": "A stable about 46%, kernel to kernel.",
+   "f": "ctx",
+   "s": [
+    "F18-0168"
+   ],
+   "w": [
+    "lions-mane-1 0:43:02"
+   ]
+  },
+  {
+   "k": "Spawn rate",
+   "v": "20 blocks per 6 lb G2 (range 12-30), about 0.3 lb (140 g) of grain per block.",
+   "s": [
+    "F18-0176"
+   ]
+  },
+  {
+   "k": "Agar",
+   "v": "Malt yeast agar (MYA) with activated charcoal.",
+   "s": [
+    "F18-0164"
+   ]
+  },
+  {
+   "k": "Cryo",
+   "v": "10% glycerol, about 3 mL per vial, -80 °C.",
+   "s": [
+    "F18-0162"
+   ]
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Agar to plate edge",
+   "v": "1.5-2 weeks.",
+   "s": [
+    "F18-0165"
+   ],
+   "d": [
+    10,
+    14
+   ]
+  },
+  {
+   "k": "Grain spawn (G1 and G2)",
+   "v": "18-21 °C for 1.5-2 weeks. Cold-hold spawn about 2 weeks at most.",
+   "s": [
+    "F18-0170",
+    "F18-0171"
+   ],
+   "d": [
+    10,
+    14
+   ]
+  },
+  {
+   "k": "Block incubation",
+   "v": "Schedule about 12 days, workable 10-18.",
+   "s": [
+    "F18-0178"
+   ],
+   "w": [
+    "lions-mane-2 0:22:38"
+   ],
+   "d": [
+    10,
+    18
+   ]
+  },
+  {
+   "k": "Block incubation, other reports",
+   "v": "About 10 days (comb-tooth video) or about 2 weeks (lions-mane-1).",
+   "f": "ctx",
+   "s": [
+    "F18-0177"
+   ],
+   "w": [
+    "comb-tooth 0:12:30"
+   ]
+  },
+  {
+   "k": "In the fruit room",
+   "v": "14-20 days to harvest in rooms at about 16-17 °C. Cue: even spine elongation.",
+   "s": [
+    "F18-0188"
+   ],
+   "w": [
+    "lions-mane-2 0:28:50"
+   ],
+   "d": [
+    14,
+    20
+   ]
+  },
+  {
+   "k": "Flushes",
+   "v": "2 commercially.",
+   "s": [
+    "F18-0190"
+   ]
+  },
+  {
+   "k": "Catawba knock to first harvest",
+   "v": "24 days (22-27), median of real picks.",
+   "f": "ctx",
+   "s": [
+    "CATAWBA"
+   ]
+  }
+ ],
+ "fruitC": {
+  "range": [
+   [
+    13,
+    18
+   ]
+  ],
+  "best": 16
+ },
+ "climate": [
+  {
+   "k": "Incubation light",
+   "v": "Near zero for spawn. Dim for blocks, or they pin early.",
+   "s": [
+    "F18-0180"
+   ],
+   "w": [
+    "incubation-tips-and-tricks 0:26:55"
+   ]
+  },
+  {
+   "k": "Fruiting temp",
+   "v": "13-18 °C (55-65 °F), sweet spot about 16 °C (60 °F) for HeCNS.",
+   "s": [
+    "F18-0181"
+   ],
+   "w": [
+    "lions-mane-2 0:24:44"
+   ]
+  },
+  {
+   "k": "Customer farm",
+   "v": "Room observed at about 16-19 °C.",
+   "f": "ctx",
+   "s": [
+    "F18-0182"
+   ]
+  },
+  {
+   "k": "Fruiting RH",
+   "v": "Upper 80s to low 90s %. Swings help.",
+   "s": [
+    "F18-0183"
+   ]
+  },
+  {
+   "k": "CO2",
+   "v": "Exhaust on at about 800 ppm, run down to about 450.",
+   "s": [
+    "F18-0185"
+   ],
+   "w": [
+    "lions-mane-2 0:27:47"
+   ]
+  },
+  {
+   "k": "CO2, other practice",
+   "v": "On at 900, off at 600-700 ppm. A 1,500/600 band is too wide.",
+   "f": "ctx",
+   "s": [
+    "F18-0186"
+   ],
+   "w": [
+    "lions-mane-1 1:16:08"
+   ]
+  },
+  {
+   "k": "Light",
+   "v": "Ambient full spectrum, moderately triggered by light.",
+   "s": [
+    "F18-0187"
+   ]
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Two flushes",
+   "v": "About 2 lb then 1.5 lb (0.9 then 0.7 kg).",
+   "s": [
+    "F18-0190"
+   ]
+  },
+  {
+   "k": "In-bag fruiting",
+   "v": "50 blocks gave about 122 lb (55 kg) fresh, 13.3 lb dry. Dry is 10-11% of fresh.",
+   "f": "ctx",
+   "s": [
+    "F18-0193"
+   ],
+   "w": [
+    "low-tech-dehydration 0:09:25"
+   ]
+  },
+  {
+   "k": "Before soy hulls",
+   "v": "About 0.5 lb from 5 lb blocks.",
+   "f": "ctx",
+   "s": [
+    "F18-0192"
+   ]
+  },
+  {
+   "k": "Shelf life",
+   "v": "Handles handling and cold storage well, but bruises easily. No days given.",
+   "s": [
+    "F18-0196"
+   ]
+  }
+ ],
+ "cat": {
+  "lb": 1.63,
+  "d": 24,
+  "dr": "22-27",
+  "plan": 1.75
+ },
+ "hazards": [
+  {
+   "k": "Hidden Trichoderma",
+   "v": "Hides in faint early colonisation as slightly denser, different off-white matting until it sporulates green.",
+   "s": [
+    "F17-0242"
+   ]
+  },
+  {
+   "k": "Yellow liquid",
+   "v": "At the bag bottom with rich 50:50 substrate. Hypothesis: hot cores wake bacterial spores.",
+   "s": [
+    "F17-0243"
+   ]
+  },
+  {
+   "k": "Blotch",
+   "v": "Slow fruiting exposes it. One grower's blotch vanished after switching from constant to cyclic, CO2-triggered air exchange.",
+   "s": [
+    "F17-0244"
+   ]
+  },
+  {
+   "k": "Agar slurry",
+   "v": "Inoculating with agar slurry failed.",
+   "s": [
+    "F17-0246"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "v": "Keep spawn and blocks dim and temperature steady. Light and swings make it pin early.",
+   "s": [
+    "F17-0247"
+   ]
+  },
+  {
+   "v": "Cut at the pillowy stage, decisively and into the mat.",
+   "s": [
+    "F17-0248"
+   ]
+  },
+  {
+   "v": "For mixed clamshells many small clusters beat one big brain.",
+   "s": [
+    "F17-0249"
+   ]
+  }
+ ],
+ "strains": []
+}
