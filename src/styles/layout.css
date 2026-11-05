@@ -624,3 +624,5 @@
 .logo.wire-static .nodes circle { opacity: 1; }
 .logo-svg rect { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw var(--draw) linear forwards; }
 .logo.wire-static .logo-svg rect { animation: none; stroke-dashoffset: 0; }
+.logo-mono { fill: var(--fg); stroke: none; font-size: 15px; font-weight: 700; letter-spacing: 0.08em; }
+.logo-a .logo-band { stroke-width: 2.6; }
