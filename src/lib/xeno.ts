@@ -74,6 +74,7 @@ export interface BlockLot extends Row {
   grain_run_id: string | null
   g2_bags_used: number | null
   cook_run_id?: string | null // the PROPULSION steam run these blocks were pasteurized in
+  to_fruiting_on?: string | null // day the lot was moved into the fruiting room (MISSION CONTROL)
   bag_count: number
   knock_date: string
   status: LotStatus
