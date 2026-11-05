@@ -35,8 +35,20 @@ export function PickInput({ type, value, onChange, clearable, disabled, 'aria-la
     return () => { document.removeEventListener('pointerdown', away); document.removeEventListener('keydown', esc, true) }
   }, [open])
 
+  const btn = useRef<HTMLButtonElement>(null)
+  const wasOpen = useRef(false)
   useEffect(() => {
-    if (open) panel.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    if (open) {
+      panel.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      // Keyboard: start on the chosen day (or today) so arrows move around the grid.
+      const first = panel.current?.querySelector<HTMLElement>('.sel') ?? panel.current?.querySelector<HTMLElement>('.today') ?? panel.current?.querySelector<HTMLElement>('button')
+      first?.focus({ preventScroll: true })
+    } else if (wasOpen.current) {
+      // Closed: put focus back on the field's own button so navigation carries on from here.
+      const a = document.activeElement
+      if (!a || a === document.body || root.current?.contains(a)) btn.current?.focus({ preventScroll: true })
+    }
+    wasOpen.current = open
   }, [open])
 
   const set = (v: string) => onChange({ target: { value: v } })
@@ -60,7 +72,7 @@ export function PickInput({ type, value, onChange, clearable, disabled, 'aria-la
 
   return (
     <span className={`ui-pick ${open ? 'open' : ''}`} ref={root}>
-      <button type="button" className="ui-select-btn" disabled={disabled} aria-haspopup="dialog" aria-expanded={open} aria-controls={id} aria-label={ariaLabel} onClick={toggle}>
+      <button ref={btn} type="button" className="ui-select-btn" disabled={disabled} aria-haspopup="dialog" aria-expanded={open} aria-controls={id} aria-label={ariaLabel} onClick={toggle}>
         <span className={`ui-select-val ${shown ? '' : 'dim'}`}>{shown || (type === 'time' ? '--:--' : 'NOT SET')}</span>
         <span className="ui-select-caret" aria-hidden="true">{type === 'time' ? '◷' : '▦'}</span>
       </button>
@@ -89,8 +101,27 @@ function DatePanel({ value, onPick }: { value: string; onPick: (v: string) => vo
   const [dir, setDir] = useState(1)
   const go = (by: number) => { setDir(by < 0 ? -1 : 1); setView((v) => shiftMonth(v.y, v.m, by)) }
   const today = isoDate(n.getFullYear(), n.getMonth() + 1, n.getDate())
+  const refocus = useRef<number | null>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (refocus.current == null) return
+    const btns = Array.from(gridRef.current?.querySelectorAll<HTMLButtonElement>('button') ?? [])
+    const want = Math.min(refocus.current, btns.length)
+    refocus.current = null
+    btns.find((b) => Number(b.textContent) === want)?.focus({ preventScroll: true })
+  }, [view])
   return (
-    <div className="ui-pick-date">
+    <div
+      className="ui-pick-date"
+      onKeyDown={(e) => {
+        // PAGE UP / PAGE DOWN flip months (with SHIFT, years); focus stays on the same day.
+        if (e.key !== 'PageUp' && e.key !== 'PageDown') return
+        e.preventDefault()
+        const day = Number((document.activeElement as HTMLElement | null)?.closest('.ui-pick-grid button')?.textContent) || 1
+        refocus.current = day
+        go((e.key === 'PageUp' ? -1 : 1) * (e.shiftKey ? 12 : 1))
+      }}
+    >
       <div className="ui-pick-head">
         <button type="button" aria-label="Previous year" onClick={() => go(-12)}>&laquo;</button>
         <button type="button" aria-label="Previous month" onClick={() => go(-1)}>&lsaquo;</button>
@@ -99,7 +130,7 @@ function DatePanel({ value, onPick }: { value: string; onPick: (v: string) => vo
         <button type="button" aria-label="Next year" onClick={() => go(12)}>&raquo;</button>
       </div>
       <div className="ui-pick-dow">{DOW.map((d) => <span key={d}>{d}</span>)}</div>
-      <div className={`ui-pick-grid ${dir < 0 ? 'from-l' : 'from-r'}`} key={`${view.y}-${view.m}`}>
+      <div ref={gridRef} className={`ui-pick-grid ${dir < 0 ? 'from-l' : 'from-r'}`} key={`${view.y}-${view.m}`}>
         {monthGrid(view.y, view.m).flat().map((d, i) => {
           if (!d) return <span key={i} />
           const iso = isoDate(view.y, view.m, d)

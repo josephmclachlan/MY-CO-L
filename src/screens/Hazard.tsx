@@ -247,7 +247,7 @@ function Overview({ set, counts }: { set: SetHazard; counts: Map<string, { event
           <div className="dim tiny">{total.events} LOSSES // {total.bags} BAGS AND BLOCKS IN ALL</div>
           <ul className="index-list hz-top">
             {top.map(([key, c]) => (
-              <li key={key} onClick={() => (sound.chirp(), set({ id: key, tab: 'LOSSES' }))}>
+              <li tabIndex={0} key={key} onClick={() => (sound.chirp(), set({ id: key, tab: 'LOSSES' }))}>
                 <span>{hazardName(key)}</span>
                 <span className="k">{c.bags}</span>
               </li>
@@ -381,7 +381,7 @@ export function HazardIndex({ x, set }: { x: HazardState; set: SetHazard }) {
             {list.filter((h) => h.kind === k).map((h) => {
               const c = counts.get(h.id)
               return (
-                <li key={h.id} className={x.mode === 'file' && h.id === x.id ? 'sel' : ''} onClick={() => (sound.chirp(), set({ mode: 'file', id: h.id, tab: x.id === h.id ? x.tab : 'SPOT' }))}>
+                <li tabIndex={0} key={h.id} className={x.mode === 'file' && h.id === x.id ? 'sel' : ''} onClick={() => (sound.chirp(), set({ mode: 'file', id: h.id, tab: x.id === h.id ? x.tab : 'SPOT' }))}>
                   <span className="hz-li">
                     <HazardGlyph kind={h.kind} size={14} /> {h.name}
                   </span>

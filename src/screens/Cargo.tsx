@@ -387,7 +387,7 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
           <thead><tr><th>ITEM</th><th>ON HAND</th><th>REORDER AT</th><th>WEEKS</th><th>LEAD</th><th>SUPPLIER</th><th>LAST PRICE</th></tr></thead>
           <tbody>
             {low.map((r) => (
-              <tr key={r.item.id} className="warn" onClick={() => (setOpenId(r.item.id), document.getElementById(`cg-${r.item.id}`)?.scrollIntoView({ block: 'center', behavior: 'smooth' }))}>
+              <tr tabIndex={0} key={r.item.id} className="warn" onClick={() => (setOpenId(r.item.id), document.getElementById(`cg-${r.item.id}`)?.scrollIntoView({ block: 'center', behavior: 'smooth' }))}>
                 <td>{r.item.name}</td>
                 <td>{fmtQty(r.onHand)} {r.item.unit}</td>
                 <td>{r.item.reorder_point === null ? '--' : fmtQty(r.item.reorder_point)}</td>
@@ -501,7 +501,7 @@ export function CargoIndex() {
     <>
       <div className="section-title">CARGO</div>
       <ul className="index-list">
-        <li onClick={() => (sound.chirp(), document.querySelector('.cargo')?.scrollIntoView({ behavior: 'smooth' }))}>
+        <li tabIndex={0} onClick={() => (sound.chirp(), document.querySelector('.cargo')?.scrollIntoView({ behavior: 'smooth' }))}>
           <span>REORDER</span>
           <span className={low ? 'k warn' : 'k'}>{low}</span>
         </li>
@@ -509,7 +509,7 @@ export function CargoIndex() {
           const n = rows.filter((r) => (r.item.category ?? 'OTHER') === c || (c === 'OTHER' && !CATEGORIES.includes((r.item.category ?? '') as never))).length
           if (!n) return null
           return (
-            <li key={c} onClick={() => (sound.chirp(), document.getElementById(`cgcat-${c.replace(/\W+/g, '-')}`)?.scrollIntoView({ behavior: 'smooth' }))}>
+            <li tabIndex={0} key={c} onClick={() => (sound.chirp(), document.getElementById(`cgcat-${c.replace(/\W+/g, '-')}`)?.scrollIntoView({ behavior: 'smooth' }))}>
               <span>{c}</span>
               <span className="k">{n}</span>
             </li>

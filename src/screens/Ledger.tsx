@@ -61,7 +61,7 @@ export function LedgerIndex({ x, set }: { x: LedgerState; set: SetLedger }) {
       <div className="section-title">LEDGER</div>
       <ul className="index-list">
         {PICKS.map((p) => (
-          <li key={p.id} className={x.sel === p.id ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: p.id }))}>
+          <li tabIndex={0} key={p.id} className={x.sel === p.id ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: p.id }))}>
             <span>{p.label}</span>
           </li>
         ))}
@@ -70,7 +70,7 @@ export function LedgerIndex({ x, set }: { x: LedgerState; set: SetLedger }) {
       <ul className="index-list ck-index">
         {ledger.weeks.length === 0 && <li className="dim"><span>NO LOTS LOGGED YET</span></li>}
         {ledger.weeks.map((w) => (
-          <li key={w.week} className={x.sel === `week:${w.week}` ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: `week:${w.week}` }))}>
+          <li tabIndex={0} key={w.week} className={x.sel === `week:${w.week}` ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: `week:${w.week}` }))}>
             <span>{weekLabel(w.week)}</span>
             <span className="k">{w.all.blocks}</span>
           </li>

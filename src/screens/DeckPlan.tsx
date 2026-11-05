@@ -322,7 +322,7 @@ export function DeckIndex() {
         {ROOMS.map((r) => {
           const alarm = inAlarm(r, on, warns)
           return (
-            <li
+            <li tabIndex={0}
               key={r.id}
               className={selectedRoom === r.id ? 'sel' : ''}
               onClick={() => {

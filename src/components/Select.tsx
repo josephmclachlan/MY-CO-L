@@ -89,7 +89,19 @@ export function Select({ value, onChange, children, disabled, className, 'aria-l
     else if (e.key === 'ArrowDown') { e.preventDefault(); e.stopPropagation(); setHi((h) => Math.min(opts.length - 1, h + 1)) }
     else if (e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); setHi((h) => Math.max(0, h - 1)) }
     else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); pick(hi) }
+    else if (e.key === 'Home' || e.key === 'PageUp') { e.preventDefault(); e.stopPropagation(); setHi((h) => (e.key === 'Home' ? 0 : Math.max(0, h - 8))) }
+    else if (e.key === 'End' || e.key === 'PageDown') { e.preventDefault(); e.stopPropagation(); setHi((h) => (e.key === 'End' ? opts.length - 1 : Math.min(opts.length - 1, h + 8))) }
     else if (e.key === 'Tab') setOpen(false)
+    else if (e.key.length === 1 && /\S/.test(e.key)) {
+      // Type a letter to jump to the next option that starts with it.
+      e.preventDefault()
+      e.stopPropagation()
+      const ch = e.key.toUpperCase()
+      for (let k = 1; k <= opts.length; k++) {
+        const j = (hi + k) % opts.length
+        if (!opts[j].disabled && opts[j].label.trim().toUpperCase().startsWith(ch)) { setHi(j); break }
+      }
+    }
   }
 
   let lastGroup: string | undefined
