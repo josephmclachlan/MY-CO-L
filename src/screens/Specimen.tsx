@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { ModelView } from '../components/ModelView'
 import { TypedRows, type Row } from '../components/TypedRows'
-import { FRUIT_ROOM_C, PLAN_BASE_BAGS, SPECIES, WEEKLY_BAGS, fruitVerdict, planBags, srcLabel } from '../data/species'
+import { FRUIT_ROOM_C, SPECIES, WEEKLY_BAGS, fruitVerdict, planBags, srcLabel } from '../data/species'
+import { frequencyText, rotationById, slotFraction, useRotation } from '../data/cropplan'
 import type { Fact, Species } from '../data/species/types'
 import { LB_TO_KG } from '../lib/runplan'
 import { useTable } from '../store/StoreContext'
@@ -54,8 +55,8 @@ function rowsFor(sp: Species, tab: Tab, strains: Strain[] = [], openHazard?: (id
         {
           id: 'o-plan',
           label: 'CROP PLAN',
-          value: bags ? `About ${bags.toFixed(1)} bags a week at ${WEEKLY_BAGS} (${sp.plan!.note}).` : sp.plan ? `${sp.plan.note}.` : 'Not in the crop plan. Listed as a farm species in the textbook.',
-          why: { s: ['FARM-PLAN'], n: `Original split was written for ${PLAN_BASE_BAGS} bags; scaled to ${WEEKLY_BAGS}. The ${WEEKLY_BAGS}-bag split is not confirmed.` },
+          value: bags ? `${bags} bags of the ${WEEKLY_BAGS}-bag run, ${frequencyText(sp.id)!.toLowerCase()} (secondary slot: ${rotationById().label.toLowerCase()}).` : 'Not in the current crop plan. Pick a secondary-slot rotation in PRODUCTION SEQUENCE to add it.',
+          why: { s: ['FARM-PLAN'], n: `130-bag split from the farm notes: 52 blue, 46 lion's mane, 16 comb tooth, plus a 16-bag secondary slot that rotates week to week.` },
         },
         ...factRows('o', sp.overview),
         { id: 'o-str', label: 'STRAINS', value: strains.length ? strains.map((s) => `${s.code}${s.name ? ` ${s.name}` : ''}${s.active ? '' : ' (retired)'}`).join(', ') : 'None registered yet. Add them in XENOGENETICS.' },
@@ -92,10 +93,10 @@ function rowsFor(sp: Species, tab: Tab, strains: Strain[] = [], openHazard?: (id
         if (bags)
           extra.push({
             id: 'y-week',
-            label: `${Math.round(bags)} BAGS / WEEK`,
-            value: `About ${lb(bags * sp.cat.lb)} a week at Catawba's real ${sp.cat.lb.toFixed(2)} lb per block.`,
+            label: `${bags} BAGS / WEEK`,
+            value: `About ${lb(bags * sp.cat.lb)} in a week it runs (${frequencyText(sp.id)!.toLowerCase()}), at Catawba's real ${sp.cat.lb.toFixed(2)} lb per block.`,
             flag: 'ctx',
-            why: { s: ['CATAWBA', 'FARM-PLAN'], n: `Bags are the original split scaled from ${PLAN_BASE_BAGS} to ${WEEKLY_BAGS}. Cap n Stem's own planning figure is 2 lb per block.` },
+            why: { s: ['CATAWBA', 'FARM-PLAN'], n: `Bags come from the 130-bag crop plan and the chosen secondary-slot rotation. Cap n Stem's own planning figure is 2 lb per block.` },
           })
       }
       return [...factRows('y', sp.yield_), ...extra]
@@ -242,21 +243,23 @@ export function Specimen({ index, tab, setTab, onOpenStrain, onOpenHazard }: { i
 
 export function SpecimenIndex({ index, onPick }: { index: number; onPick: (i: number) => void }) {
   const { sound } = useApp()
+  const rot = useRotation()
   const row = (sp: Species, i: number) => {
     const b = planBags(sp)
+    const f = slotFraction(sp.id, rot)
     return (
       <li key={sp.id} className={i === index ? 'sel' : ''} onClick={() => (sound.chirp(), onPick(i))}>
         <span>{String(sp.order).padStart(2, '0')} {sp.name}</span>
-        <span className="k">{b ? Math.round(b) : ''}</span>
+        <span className="k">{b ? `${b}${f > 0 && f < 1 ? ` ${Math.round(f * rot.cycle.length)}/${rot.cycle.length}W` : ''}` : ''}</span>
       </li>
     )
   }
   return (
     <>
       <div className="section-title">CROP PLAN</div>
-      <ul className="index-list">{SPECIES.map((s, i) => (s.tier === 'plan' ? row(s, i) : null))}</ul>
+      <ul className="index-list">{SPECIES.map((s, i) => (planBags(s) ? row(s, i) : null))}</ul>
       <div className="section-title" style={{ marginTop: 10 }}>OTHER FARM SPECIES</div>
-      <ul className="index-list">{SPECIES.map((s, i) => (s.tier === 'farm' ? row(s, i) : null))}</ul>
+      <ul className="index-list">{SPECIES.map((s, i) => (!planBags(s) ? row(s, i) : null))}</ul>
     </>
   )
 }

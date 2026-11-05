@@ -29,13 +29,7 @@ export function iceBill(kwh: number, billedKw: number | null): number {
 // ---------- the crop (farm facts, Joseph 5 Nov 2026) ----------
 
 export const WEEK_BAGS = 130
-/** The 130-bag split from the farm notes. Golden alternates with phoenix week to week. */
-export const PLAN_SPLIT: { key: string; bags: number }[] = [
-  { key: 'blue-oyster', bags: 52 },
-  { key: 'lions-mane', bags: 46 },
-  { key: 'comb-tooth', bags: 16 },
-  { key: 'golden-oyster', bags: 16 },
-]
+// The weekly split (core + rotating secondary slot) lives in src/data/cropplan.ts.
 
 export const LB_KG = 0.45359237
 
@@ -47,6 +41,8 @@ export const YIELD_LB: Record<string, { lb: number; guess?: boolean; note: strin
   'golden-oyster': { lb: 1.28, note: 'CATAWBA RECORDS' },
   'phoenix-oyster': { lb: 1.09, note: "CATAWBA'S ITALIAN OYSTER AS A STAND-IN" },
   'pink-oyster': { lb: 1.44, note: 'CATAWBA RECORDS' },
+  chestnut: { lb: 1.41, note: 'CATAWBA RECORDS' },
+  pioppino: { lb: 0.86, note: 'CATAWBA RECORDS' },
 }
 
 /** Days a block sits in the rooms, knock to last pick. Knock to first harvest is from the farm facts;
@@ -58,6 +54,8 @@ export const ROOM_DAYS: Record<string, { first: number; pick: number }> = {
   'golden-oyster': { first: 26.5, pick: 7 },
   'phoenix-oyster': { first: 21, pick: 7 },
   'pink-oyster': { first: 18, pick: 7 },
+  chestnut: { first: 65, pick: 7 },
+  pioppino: { first: 34, pick: 7 },
 }
 export const ROOM_DAYS_OTHER = { first: 30, pick: 14 } // GUESS for species with no figure
 export const roomDays = (key: string) => {

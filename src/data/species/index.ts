@@ -1,4 +1,5 @@
 import type { Species, Fact, TempBands } from './types'
+import { planBagsFor } from '../cropplan'
 
 const mods = import.meta.glob('./*.json', { eager: true, import: 'default' }) as Record<string, Species>
 
@@ -10,9 +11,9 @@ export const PLAN_BASE_BAGS = 100
 /** Fruiting room set point from the HVAC plan (1 Nov 2026): 16 C, band 14-17, max 18. */
 export const FRUIT_ROOM_C = 16
 
+/** Bags in a week this species runs, from the crop plan and the chosen secondary-slot rotation (src/data/cropplan.ts). */
 export function planBags(sp: Species): number | null {
-  if (!sp.plan || sp.plan.share <= 0) return null
-  return (sp.plan.share / PLAN_BASE_BAGS) * WEEKLY_BAGS
+  return planBagsFor(sp.id)
 }
 
 export type Verdict = { level: 'ideal' | 'range' | 'edge' | 'conflict' | 'none'; text: string }

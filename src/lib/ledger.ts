@@ -8,7 +8,8 @@
 //   LABOUR        hours from labour_entries x the hourly rate (switch and rate in LEDGER)
 //   WEAR          optional ₡ per block
 
-import { BILL_ESTIMATE_MID, ICE, LB_KG, PLAN_SPLIT, WEEK_BAGS, YIELD_LB, roomDays } from '../data/ledger'
+import { BILL_ESTIMATE_MID, ICE, LB_KG, WEEK_BAGS, YIELD_LB, roomDays } from '../data/ledger'
+import { averageSplit, weekSplit } from '../data/cropplan'
 import { ICE_RATE_CRC } from '../data/cook'
 import { plannedPeaks, segKwh, type CookRun } from './cook'
 import { runLines } from './stockplan'
@@ -191,7 +192,7 @@ export function planWeekCookCrc(): number {
 
 /** Bag-days in the rooms in a month of a full 130-bag farm (steady state). */
 export function planBagDaysPerMonth(): number {
-  return PLAN_SPLIT.reduce((n, s) => n + (s.bags * roomDays(s.key)) / 7, 0) * DAYS_PER_MONTH
+  return averageSplit().reduce((n, s) => n + (s.bags * roomDays(s.key)) / 7, 0) * DAYS_PER_MONTH
 }
 
 /** Room energy per bag-day for a month with no bill: the package estimate less planned cooks, over a full farm. */
@@ -420,7 +421,7 @@ export function buildLedger(inp: LedgerInput, speciesName: (key: string) => stri
 
 /** A standard 130-bag week, all estimates: what the cost should look like before any data exists. */
 export function planWeek(inp: Pick<LedgerInput, 'items' | 'prices' | 'prefs'>, knock: string, speciesName?: (k: string) => string): WeekCost {
-  const lots: LedgerLot[] = PLAN_SPLIT.map((s) => ({ id: `plan-${s.key}`, lot_code: 'PLAN', species_key: s.key, bag_count: s.bags, knock_date: knock, status: 'incubating' }))
+  const lots: LedgerLot[] = weekSplit(knock).map((s) => ({ id: `plan-${s.key}`, lot_code: 'PLAN', species_key: s.key, bag_count: s.bags, knock_date: knock, status: 'incubating' }))
   const l = buildLedger({ ...inp, lots, losses: [], harvests: [], moves: [], cooks: [], bills: [], labour: [] }, speciesName)
   return l.weeks[0]
 }

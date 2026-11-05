@@ -416,6 +416,15 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
             <input inputMode="numeric" defaultValue={Math.round(prefs.soyShare * 100)} key={prefs.soyShare} onBlur={(e) => { const v = num(e.target.value); if (v !== null) setPrefs({ soyShare: Math.min(50, Math.max(0, v)) / 100 }) }} />
           </label>
         )}
+        {prefs.form === 'separate' && (
+          <div className="cg-field inline cg-mix">
+            <span>MIX SAWDUST : SOY</span>
+            {[[0.4, '60:40', 'HOT, HUMID SITE START (TEXTBOOK T25)'], [0.45, '55:45', 'CATAWBA\'S MIDDLE OPTION'], [0.5, '50:50', "CAP N STEM'S MASTER'S MIX"]].map(([v, l, t]) => (
+              <button key={l as string} type="button" title={t as string} className={`btn${Math.abs(prefs.soyShare - (v as number)) < 0.001 ? ' on' : ''}`} aria-pressed={Math.abs(prefs.soyShare - (v as number)) < 0.001} onClick={() => setPrefs({ soyShare: v as number })}>{l as string}</button>
+            ))}
+            <span className="dim tiny">OR TYPE ANY SOY % (0-50) IN THE BOX. 60:40 IS THE DEFAULT FOR A HOT, HUMID SITE; RAISE SOY ONLY IF INCUBATION HEAT AND BLOTCH STAY UNDER CONTROL.</span>
+          </div>
+        )}
       </div>
       <table className="pl-table">
         <thead><tr><th>ITEM</th><th>PER WEEK</th><th>HOW IT IS WORKED OUT</th></tr></thead>

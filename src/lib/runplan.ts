@@ -1,4 +1,5 @@
 import type { Species } from '../data/species/types'
+import { CORE, SLOT_BAGS, rotationById } from '../data/cropplan'
 
 export interface Allot {
   sp: Species
@@ -8,16 +9,23 @@ export interface Allot {
   assumed: boolean // true when the species has no share in the crop plan
 }
 
-/** Weight of each species when splitting a run: its crop-plan share, golden and phoenix halved when both are chosen. */
+/** Plan weight of a species: its core bags, or its share of the secondary slot (src/data/cropplan.ts). */
+function planWeight(id: string): { w: number; slot: boolean } | null {
+  const c = CORE.find((x) => x.key === id)
+  if (c) return { w: c.bags, slot: false }
+  return rotationById().cycle.includes(id) ? { w: SLOT_BAGS, slot: true } : null
+}
+
+/** Weight of each species when splitting a run: core bags from the crop plan; slot species chosen together share one 16-bag slot. */
 export function weights(chosen: Species[]): { sp: Species; w: number; assumed: boolean }[] {
-  const both = chosen.some((s) => s.id === 'golden-oyster') && chosen.some((s) => s.id === 'phoenix-oyster')
-  const shares = chosen.filter((s) => (s.plan?.share ?? 0) > 0).map((s) => s.plan!.share)
-  const fallback = shares.length ? shares.reduce((a, b) => a + b, 0) / shares.length : 1
-  return chosen.map((sp) => {
-    const sh = sp.plan?.share ?? 0
-    const base = sh > 0 ? sh : fallback
-    const w = both && (sp.id === 'golden-oyster' || sp.id === 'phoenix-oyster') && sh > 0 ? base / 2 : base
-    return { sp, w, assumed: sh <= 0 }
+  const pw = chosen.map((s) => planWeight(s.id))
+  const slotCount = pw.filter((x) => x?.slot).length
+  const known = pw.filter((x): x is { w: number; slot: boolean } => !!x).map((x) => (x.slot ? x.w / slotCount : x.w))
+  const fallback = known.length ? known.reduce((a, b) => a + b, 0) / known.length : 1
+  return chosen.map((sp, i) => {
+    const x = pw[i]
+    if (!x) return { sp, w: fallback, assumed: true }
+    return { sp, w: x.slot ? x.w / slotCount : x.w, assumed: false }
   })
 }
 

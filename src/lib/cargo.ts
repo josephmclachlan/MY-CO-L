@@ -142,7 +142,7 @@ export interface CargoPrefs {
 }
 const KEY = 'mycol.cargo.v1'
 export function loadPrefs(): CargoPrefs {
-  const d: CargoPrefs = { fx: DEFAULT_FX, form: 'separate', soyShare: 0.5 }
+  const d: CargoPrefs = { fx: DEFAULT_FX, form: 'separate', soyShare: 0.4 }
   try {
     const s = JSON.parse(localStorage.getItem(KEY) ?? '{}') as Partial<CargoPrefs>
     return {
