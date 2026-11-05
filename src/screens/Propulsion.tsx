@@ -737,7 +737,7 @@ function ReadingsTab({ run, an, readings, say }: { run: CookRun; an: RunAnalysis
     <div className="ck-read">
       <section className={`ck-box ${due ? 'due' : ''}`}>
         <div className="section-title">QUICK ADD A READING</div>
-        {run.kind === 'steam_box' && <div className="dim tiny">PUT THE NEEDLE IN THE COLDEST BAG: BOTTOM SHELF, DOOR SIDE (CORE). THE CORE DECIDES THE RUN. BOX AIR IS FOR COMPARISON ONLY.</div>}
+        {run.kind === 'steam_box' && <div className="dim tiny">PUT THE NEEDLE IN THE COLDEST BAG: BOTTOM SHELF, CENTRE (CORE, FAB REV D). THE CORE DECIDES THE RUN. BOX AIR IS FOR COMPARISON ONLY.</div>}
         <div className="ck-unit">
           <button type="button" className={`btn ${unit === 'F' ? 'on' : ''}`} onClick={() => setU('F')}>DEG F</button>
           <button type="button" className={`btn ${unit === 'C' ? 'on' : ''}`} onClick={() => setU('C')}>DEG C</button>

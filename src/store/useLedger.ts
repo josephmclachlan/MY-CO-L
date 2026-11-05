@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useRates } from './useRates'
+import { usePlan } from '../data/cropplan'
 import { useTable } from './StoreContext'
 import { SPECIES } from '../data/species'
 import { buildLedger, planWeek, type EnergyBill, type Harvest, type LabourEntry, type Ledger, type LedgerPrefs, type WeekCost } from '../lib/ledger'
@@ -39,11 +40,12 @@ export function useLedger(): LedgerData {
   const bills = useTable<EnergyBill>('energy_bills')
   const labour = useTable<LabourEntry>('labour_entries')
   const rt = useRates()
+  const rot = usePlan()
   const p: LedgerPrefs = useMemo(() => ({ labourOn: rt.labourOn, rate: rt.labourRate, wearOn: rt.wearOn, wearPerBlock: rt.wearPerBlock }), [rt])
   const ledger = useMemo(
     () => buildLedger({ lots, losses, harvests, items, prices, moves, cooks, bills, labour, prefs: p }, speciesName),
-    [lots, losses, harvests, items, prices, moves, cooks, bills, labour, p, rt],
+    [lots, losses, harvests, items, prices, moves, cooks, bills, labour, p, rt, rot],
   )
-  const plan = useMemo(() => planWeek({ items, prices, prefs: p }, nextTuesday(), speciesName), [items, prices, p, rt])
+  const plan = useMemo(() => planWeek({ items, prices, prefs: p }, nextTuesday(), speciesName), [items, prices, p, rt, rot])
   return { ledger, plan, bills, labour, lots, harvests, prefs: p }
 }

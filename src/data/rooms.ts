@@ -79,7 +79,7 @@ export const ROOMS: Room[] = [
     rect: { x: 190, y: 90, w: 230, h: 250 },
     setPoints: [
       { label: 'STEAM CORE', value: '93 C' },
-      { label: 'HOLD', value: 'NOT SETTLED: 2 H VS 4-6 H' },
+      { label: 'HOLD', value: '4 H ONCE THE COLDEST CORE PASSES 93 C' },
       { label: 'CYCLE', value: 'WEEKLY, 16-18 H' },
       { label: 'AIR', value: 'OWN EXTRACTOR, KEPT APART' },
     ],

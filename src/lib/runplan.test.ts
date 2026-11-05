@@ -16,7 +16,7 @@ describe('run planner', () => {
   it('handles any bag count', () => {
     for (const n of [1, 7, 50, 100, 333]) expect(allot(n, pick('blue-oyster', 'lions-mane', 'pink-oyster')).reduce((s, x) => s + x.bags, 0)).toBe(n)
   })
-  it('halves golden and phoenix when both are chosen', () => {
+  it('golden and phoenix share the secondary slot when both are chosen', () => {
     const a = allot(26, pick('golden-oyster', 'phoenix-oyster'))
     expect(a[0].bags).toBe(13)
     expect(a[1].bags).toBe(13)

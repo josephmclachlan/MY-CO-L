@@ -12,6 +12,8 @@ import { PART_KEYS, PART_LABEL, addDays, type Basis, type Cost, type EnergyBill,
 import { fmtCrc, fmtUsd, today } from '../lib/cargo'
 import { uuid } from '../lib/store'
 import { Confirm, Field, Guess } from './CookParts'
+import { weekSplit } from '../data/cropplan'
+import { nextKnockDay, todayIso } from '../lib/xeno'
 
 // LEDGER: cost of goods. ₡ first, US$ second. Every figure says if it is ACTUAL or an ESTIMATE.
 
@@ -206,7 +208,7 @@ function Overview({ d, fx, set, onOpenTrade, onOpenCargo }: { d: LedgerData; fx:
         </>
       )}
       <div className="section-title">PLAN WEEK // 130 BLOCKS // ALL ESTIMATES</div>
-      <div className="dim tiny">A STANDARD WEEK (52 BLUE, 46 LION'S MANE, 16 CORAL, 16 GOLDEN) BEFORE ANY DATA. CARGO PRICES, PLANNED COOKS, THE PACKAGE BILL ESTIMATE, CATAWBA YIELDS.</div>
+      <div className="dim tiny">A STANDARD WEEK ({weekSplit(nextKnockDay(todayIso())).map((x) => `${x.bags} ${speciesName(x.key)}`).join(', ')}) BEFORE ANY DATA. THE SECONDARY SLOT IS THE SPECIES YOU PICK IN PRODUCTION SEQUENCE. CARGO PRICES, PLANNED COOKS, THE PACKAGE BILL ESTIMATE, CATAWBA YIELDS.</div>
       <CostCard c={plan.all} fx={fx} title="PLAN WEEK" />
       {plan.species.map((c) => <CostCard key={c.key} c={c} fx={fx} />)}
       <div className="ck-box">

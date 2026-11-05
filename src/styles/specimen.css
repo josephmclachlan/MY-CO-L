@@ -113,3 +113,4 @@
   .seq-bars .seq-bar.wait:not(.keep), .seq-bars .seq-bar.ok:not(.keep) { display: none; }
   .seq-stage.finished .seq-bar { display: grid !important; }
 }
+.pl-weeks { display: grid; grid-template-columns: repeat(auto-fill, minmax(14em, 1fr)); gap: 6px 10px; margin-top: 6px; }
