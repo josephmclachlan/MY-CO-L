@@ -3,8 +3,11 @@ import { PickInput } from '../components/PickInput'
 import { useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useCargoPrefs, useStore } from '../store/StoreContext'
-import { speciesName, useLedger, useLedgerPrefs, type LedgerData } from '../store/useLedger'
-import { BILL_ESTIMATE, BILL_ESTIMATE_MID, ICE, LEDGER_GUESSES, iceBill } from '../data/ledger'
+import { speciesName, useLedger, type LedgerData } from '../store/useLedger'
+import { useRatesEditor } from '../store/useRates'
+import { estimateMid, iceBill, rates } from '../lib/rates'
+import { Prices } from './Prices'
+import { ICE } from '../data/ledger'
 import { PART_KEYS, PART_LABEL, addDays, type Basis, type Cost, type EnergyBill, type LabourEntry, type WeekCost } from '../lib/ledger'
 import { fmtCrc, fmtUsd, today } from '../lib/cargo'
 import { uuid } from '../lib/store'
@@ -47,7 +50,7 @@ const PICKS: { id: LedgerSel; label: string }[] = [
   { id: 'overview', label: 'OVERVIEW + PLAN WEEK' },
   { id: 'bills', label: 'ICE BILLS' },
   { id: 'labour', label: 'LABOUR HOURS' },
-  { id: 'settings', label: 'SWITCHES + GUESSES' },
+  { id: 'settings', label: 'PRICES + COSTS' },
 ]
 
 export function LedgerIndex({ x, set }: { x: LedgerState; set: SetLedger }) {
@@ -95,7 +98,7 @@ export function Ledger({ x, set, say, onOpenTrade, onOpenCargo }: { x: LedgerSta
       {x.sel === 'overview' && <Overview d={d} fx={fx} set={set} onOpenTrade={onOpenTrade} onOpenCargo={onOpenCargo} />}
       {x.sel === 'bills' && <Bills d={d} fx={fx} say={say} />}
       {x.sel === 'labour' && <Labour d={d} fx={fx} say={say} />}
-      {x.sel === 'settings' && <Settings />}
+      {x.sel === 'settings' && <Prices say={say} onOpenCargo={onOpenCargo} />}
       {x.sel.startsWith('week:') && (week ? <Week w={week} fx={fx} /> : <div className="dim">THAT WEEK HAS NO LOTS ANY MORE.</div>)}
     </div>
   )
@@ -211,7 +214,7 @@ function Overview({ d, fx, set, onOpenTrade, onOpenCargo }: { d: LedgerData; fx:
       <div className="ck-box">
         <div className="section-title">ROOM ENERGY BY MONTH</div>
         {ledger.months.length === 0 ? (
-          <div className="dim">NO LOTS OR BILLS YET. UNTIL A BILL IS TYPED IN, A MONTH USES THE PACKAGE ESTIMATE {fmtCrc(BILL_ESTIMATE.low)}-{fmtCrc(BILL_ESTIMATE.high)} ({fmtUsd(BILL_ESTIMATE.low, fx)}-{fmtUsd(BILL_ESTIMATE.high, fx)}).</div>
+          <div className="dim">NO LOTS OR BILLS YET. UNTIL A BILL IS TYPED IN, A MONTH USES THE ESTIMATE {fmtCrc(rates().ice.estimateLow)}-{fmtCrc(rates().ice.estimateHigh)} ({fmtUsd(rates().ice.estimateLow, fx)}-{fmtUsd(rates().ice.estimateHigh, fx)}), SET ON PRICES + COSTS.</div>
         ) : (
           <div className="ck-scroll">
             <table className="lg-table">
@@ -287,19 +290,19 @@ function Bills({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
         </div>
         {check !== null && (
           <div className={`lg-check ${c !== null && Math.abs(c - check) / check > 0.1 ? 'warn' : ''}`}>
-            THE TARIFF SAYS {fmtCrc(check)} ({fmtUsd(check, fx)}) FOR {k?.toLocaleString('en-US')} KWH AT {Math.max(w ?? ICE.demandMinKw, ICE.demandMinKw)} KW.
+            THE TARIFF SAYS {fmtCrc(check)} ({fmtUsd(check, fx)}) FOR {k?.toLocaleString('en-US')} KWH AT {Math.max(w ?? rates().ice.demandMinKw, rates().ice.demandMinKw)} KW.
             {c !== null && ` THE BILL IS ${c >= check ? '+' : ''}${(((c - check) / check) * 100).toFixed(0)}%.`}
             {c !== null && Math.abs(c - check) / check > 0.1 && ' MORE THAN 10% OFF: CHECK THE FIGURES OR ASK ICE WHICH TARIFF YOU ARE ON.'}
           </div>
         )}
-        <div className="dim tiny">{ICE.source}</div>
+        <div className="dim tiny">TARIFF FIGURES ARE ON PRICES + COSTS. {ICE.source}</div>
         <div className="ck-btns"><button type="button" className="btn on" onClick={() => void save()}>SAVE BILL</button></div>
       </div>
       <div className="ck-box">
         <div className="section-title">BILLS</div>
         {list.length === 0 ? (
           <div className="dim">
-            NO BILLS YET. UNTIL THEN EVERY MONTH USES THE ESTIMATE {fmtCrc(BILL_ESTIMATE_MID)} ({fmtUsd(BILL_ESTIMATE_MID, fx)}) <span className="lg-tag estimate">ESTIMATE</span>, THE MIDDLE OF {BILL_ESTIMATE.source}.
+            NO BILLS YET. UNTIL THEN EVERY MONTH USES THE ESTIMATE {fmtCrc(estimateMid())} ({fmtUsd(estimateMid(), fx)}) <span className="lg-tag estimate">ESTIMATE</span>, THE MIDDLE OF THE RANGE ON PRICES + COSTS (BUILT-IN: THE ELECTRICAL PACKAGE).
           </div>
         ) : (
           <div className="ck-scroll">
@@ -333,7 +336,8 @@ function Bills({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
 
 function Labour({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
   const store = useStore()
-  const [p, setP] = useLedgerPrefs()
+  const [rt, saveRt] = useRatesEditor()
+  const p = { rate: rt.labourRate, labourOn: rt.labourOn }
   const [day, setDay] = useState(today())
   const [person, setPerson] = useState('')
   const [hours, setHours] = useState('')
@@ -380,9 +384,9 @@ function Labour({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
       <div className="ck-box">
         <div className="section-title">RATE</div>
         <div className="ck-fields">
-          <Field label="₡ PER HOUR (BLANK = HOURS ONLY)" value={p.rate === null ? '' : String(p.rate)} inputMode="decimal" onSave={(v) => setP({ rate: num(v) })} />
+          <Field label="₡ PER HOUR (BLANK = HOURS ONLY)" value={p.rate === null ? '' : String(p.rate)} inputMode="decimal" onSave={(v) => void saveRt({ labourRate: num(v) }).then(() => say('LABOUR RATE SAVED'), (e: Error) => say(e.message.toUpperCase(), true))} />
         </div>
-        {!p.labourOn && <div className="lg-warn">LABOUR IS SWITCHED OFF IN SWITCHES + GUESSES, SO IT IS NOT IN THE COST.</div>}
+        {!p.labourOn && <div className="lg-warn">LABOUR IS SWITCHED OFF ON PRICES + COSTS, SO IT IS NOT IN THE COST.</div>}
       </div>
       <div className="ck-box">
         <div className="section-title">HOURS LOGGED</div>
@@ -406,34 +410,6 @@ function Labour({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
             </table>
           </div>
         )}
-      </div>
-    </div>
-  )
-}
-
-// ---------- switches ----------
-
-function Settings() {
-  const [p, setP] = useLedgerPrefs()
-  const [cp, setCp] = useCargoPrefs()
-  return (
-    <div className="lg-stack">
-      <div className="ck-box">
-        <div className="section-title">WHAT GOES INTO THE COST</div>
-        <label className="ck-check"><input type="checkbox" checked={p.labourOn} onChange={(e) => setP({ labourOn: e.target.checked })} /> LABOUR IN THE COST <Guess /></label>
-        <div className="ck-fields">
-          <Field label="LABOUR ₡ PER HOUR (BLANK = HOURS ONLY)" value={p.rate === null ? '' : String(p.rate)} inputMode="decimal" onSave={(v) => setP({ rate: num(v) })} />
-        </div>
-        <label className="ck-check"><input type="checkbox" checked={p.wearOn} onChange={(e) => setP({ wearOn: e.target.checked })} /> EQUIPMENT WEAR <Guess /></label>
-        <div className="ck-fields">
-          <Field label="WEAR ₡ PER BLOCK" value={p.wearPerBlock === null ? '' : String(p.wearPerBlock)} inputMode="decimal" disabled={!p.wearOn} onSave={(v) => setP({ wearPerBlock: num(v) })} />
-          <Field label="₡ PER US$ (SHARED WITH CARGO)" value={String(cp.fx)} inputMode="decimal" onSave={(v) => { const n = num(v); if (n && n > 0) setCp({ fx: n }) }} />
-        </div>
-        <div className="dim tiny">THESE SWITCHES ARE SAVED ON THIS DEVICE ONLY.</div>
-      </div>
-      <div className="ck-box">
-        <div className="section-title">BEST GUESSES WAITING FOR JOSEPH <Guess /></div>
-        <ul className="ck-guesses">{LEDGER_GUESSES.map((g) => <li key={g}>{g}</li>)}</ul>
       </div>
     </div>
   )

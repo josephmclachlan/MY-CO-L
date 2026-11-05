@@ -4,12 +4,14 @@ import { useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useCargoPrefs, useStore, useTable } from '../store/StoreContext'
 import { speciesName, useLedger } from '../store/useLedger'
-import { CHANNELS, FORMS, GRADES, SALE_SPECIES, TRADE_GUESSES, defaultPrice, type Channel, type Form } from '../data/ledger'
+import { CHANNELS, FORMS, GRADES, SALE_SPECIES, TRADE_GUESSES, type Channel, type Form } from '../data/ledger'
 import { addDays, costPerKg, weekOf, type Basis } from '../lib/ledger'
 import { between, buyers, byChannel, byProduct, lastSaleTo, lotLooksRight, margin, newSale, parseLots, weekly, type Sale, type Total } from '../lib/trade'
 import { fmtCrc, fmtUsd, today } from '../lib/cargo'
 import { Confirm, Guess } from './CookParts'
 import { Money, Tag } from './Ledger'
+import { salePrice } from '../lib/rates'
+import { useRates } from '../store/useRates'
 
 // TRADE: sales. Quick entry on a phone, totals and charts by channel and product, margin against LEDGER.
 
@@ -63,7 +65,7 @@ export function TradeIndex({ x, set }: { x: TradeState; set: SetTrade }) {
   )
 }
 
-export function Trade({ x, set, say, onOpenLedger }: { x: TradeState; set: SetTrade; say: Say; onOpenLedger: () => void }) {
+export function Trade({ x, set, say, onOpenLedger, onOpenPrices }: { x: TradeState; set: SetTrade; say: Say; onOpenLedger: () => void; onOpenPrices: () => void }) {
   const { sound } = useApp()
   const sales = useSales()
   const [cp] = useCargoPrefs()
@@ -77,7 +79,7 @@ export function Trade({ x, set, say, onOpenLedger }: { x: TradeState; set: SetTr
           {TRADE_TABS.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
         </Select>
       </label>
-      {x.tab === 'SALE' && <SaleForm sales={sales} fx={cp.fx} say={say} cost={cost} lotCodes={d.lots.map((l) => l.lot_code)} />}
+      {x.tab === 'SALE' && <SaleForm sales={sales} fx={cp.fx} say={say} cost={cost} lotCodes={d.lots.map((l) => l.lot_code)} onOpenPrices={onOpenPrices} />}
       {x.tab === 'TOTALS' && <Totals sales={sales} fx={cp.fx} cost={cost} noPrices={d.plan.all.parts.consumables.basis === 'NONE'} onOpenLedger={onOpenLedger} />}
       {x.tab === 'BUYERS' && <Buyers sales={sales} fx={cp.fx} />}
       {x.tab === 'LOG' && <Log sales={sales} fx={cp.fx} say={say} />}
@@ -106,7 +108,7 @@ function Buttons<T extends string>({ value, options, onPick }: { value: T; optio
   )
 }
 
-function SaleForm({ sales, fx, say, cost, lotCodes }: { sales: Sale[]; fx: number; say: Say; cost: (k: string) => { perKg: number | null; basis: Basis }; lotCodes: string[] }) {
+function SaleForm({ sales, fx, say, cost, lotCodes, onOpenPrices }: { sales: Sale[]; fx: number; say: Say; onOpenPrices: () => void; cost: (k: string) => { perKg: number | null; basis: Basis }; lotCodes: string[] }) {
   const store = useStore()
   const [day, setDay] = useState(today())
   const [buyer, setBuyer] = useState('')
@@ -119,9 +121,10 @@ function SaleForm({ sales, fx, say, cost, lotCodes }: { sales: Sale[]; fx: numbe
   const [amount, setAmount] = useState('') // blank = kg x price
   const [lots, setLots] = useState('')
   const [notes, setNotes] = useState('')
-  const def = defaultPrice(sp, form)
+  const rt = useRates()
+  const def = salePrice(sp, form, rt)
   const k = num(kg)
-  const pr = num(price) ?? def?.mid ?? null
+  const pr = num(price) ?? def.price
   const auto = k !== null && pr !== null ? Math.round(k * pr) : null
   const amt = num(amount) ?? auto
   const codes = parseLots(lots)
@@ -184,8 +187,8 @@ function SaleForm({ sales, fx, say, cost, lotCodes }: { sales: Sale[]; fx: numbe
           <label className="ck-field"><span>KG</span><input inputMode="decimal" value={kg} placeholder="0.0" onChange={(e) => setKg(e.target.value)} /></label>
           <label className="ck-field">
             <span>₡ PER KG</span>
-            <input inputMode="decimal" value={price} placeholder={def ? String(def.mid) : 'TYPE IT'} onChange={(e) => setPrice(e.target.value)} />
-            {def && <em>DEFAULT {fmtCrc(def.mid)} (RANGE {fmtCrc(def.lo)}-{fmtCrc(def.hi)}){def.guess ? ' GUESS - REVIEW' : ''}</em>}
+            <input inputMode="decimal" value={price} placeholder={def.price ? String(def.price) : 'TYPE IT'} onChange={(e) => setPrice(e.target.value)} />
+            <em>{def.price ? `${def.mine ? 'YOUR PRICE' : 'BUILT-IN'} ${fmtCrc(def.price)}. ` : 'NO PRICE SET. '}<button type="button" className="ck-link" onClick={onOpenPrices}>SET PRICES</button></em>
           </label>
           <label className="ck-field">
             <span>₡ AMOUNT</span>

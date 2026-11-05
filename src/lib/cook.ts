@@ -15,8 +15,6 @@ import {
   F_THRESHOLDS,
   F_Z_C,
   GAP_WARN_MIN,
-  ICE_RATE_CRC,
-  ICE_TAX,
   isJudged,
   MEGACHEF_W,
   MEGA_COMEUP,
@@ -35,6 +33,7 @@ import {
 } from '../data/cook'
 import { ICE_PEAKS, HEATER_OPTIONS, type HeaterOption } from '../data/power'
 import type { Row } from './store'
+import { rates } from './rates'
 
 export const MIN = 60000
 const HOUR = 3600000
@@ -664,7 +663,8 @@ export function energyFor(run: CookRun, an: RunAnalysis): Energy {
   const peaks = peakOverlap(profile)
   const peakEst = peaks.reduce((n, p) => n + p.kwh, 0)
   const peakKwh = kwh !== null && est > 0 ? (kwh * peakEst) / est : 0
-  return { kwh, basis, cost: kwh === null ? null : kwh * ICE_RATE_CRC, costTax: kwh === null ? null : kwh * ICE_RATE_CRC * ICE_TAX, profile, peaks, peakKwh, watts }
+  const r = rates().ice
+  return { kwh, basis, cost: kwh === null ? null : kwh * r.energyCrcPerKwh, costTax: kwh === null ? null : kwh * r.energyCrcPerKwh * r.tax, profile, peaks, peakKwh, watts }
 }
 
 /** The "if you start now" check, before any readings exist. */

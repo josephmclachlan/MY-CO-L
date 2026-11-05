@@ -25,6 +25,7 @@ import { Mission, MissionIndex, MISSION_START, type MissionState } from './scree
 import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
 import { useStoreStatus, useTable } from './store/StoreContext'
+import { useRates } from './store/useRates'
 import { SPECIES } from './data/species'
 import { usePower } from './power/PowerContext'
 import { allCircuits, type RoomId } from './data/power'
@@ -107,6 +108,7 @@ export default function App() {
   const [mission, setMissionState] = useState<MissionState>(MISSION_START)
   const setMission = useCallback((p: Partial<MissionState>) => setMissionState((c) => ({ ...c, ...p })), [])
   const strains = useTable<Strain>('strains')
+  useRates() // keeps the prices and costs from PRICES + COSTS live for every screen's maths
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
@@ -398,6 +400,7 @@ export default function App() {
     // Costs and sales: LEDGER, BILLS, LABOUR; TRADE, SALE, TOTALS, BUYERS.
     if (['COST', 'COSTS', 'COGS'].includes(cmd)) return openLedger({ sel: 'overview' })
     if (cmd === 'BILL' || cmd === 'BILLS') return openLedger({ sel: 'bills' })
+    if (cmd === 'PRICES' || cmd === 'PRICE' || cmd === 'RATES') return openLedger({ sel: 'settings' })
     if (cmd === 'LABOUR' || cmd === 'LABOR' || cmd === 'HOURS') return openLedger({ sel: 'labour' })
     if (['SALE', 'SALES', 'SELL', 'SOLD'].includes(cmd)) return openTrade({ tab: 'SALE' })
     const trTab = TRADE_TABS.find((t) => t === cmd)
@@ -720,7 +723,7 @@ export default function App() {
           />
         )
       else if (view.idx === MISSION_IDX) content = <Mission x={mission} set={setMission} say={say} />
-      else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} />
+      else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} onOpenPrices={() => openLedger({ sel: 'settings' })} />
       else if (view.idx === MANUAL_IDX) content = <Manual loc={manualLoc} onOpen={openManual} />
       else content = <Pending mod={MODULES[view.idx]} />
       break

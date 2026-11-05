@@ -7,8 +7,6 @@ import { usePower } from '../power/PowerContext'
 import {
   DEFAULT_PURPOSE,
   DEFAULT_ZONES,
-  ICE_RATE_CRC,
-  ICE_RATE_SOURCE,
   KIND_LABEL,
   KIND_LONG,
   PURPOSE_LABEL,
@@ -43,6 +41,8 @@ import type { HazardLog, LotLoss } from '../lib/hazard'
 import { outcomeFor } from '../lib/cookOutcome'
 import type { BlockLot, GrainRun } from '../lib/xeno'
 import type { Move } from '../lib/cargo'
+import { rates } from '../lib/rates'
+import { useRates } from '../store/useRates'
 import { Confirm, CsvImport, Curve, Field, Guess, Pick, PrintSheet, SheetTable } from './CookParts'
 
 export type CookTab = 'RUN' | 'CURVE' | 'READINGS' | 'SHEET' | 'TARGETS'
@@ -81,6 +81,7 @@ function useCook() {
   const raw = useTable<CookRun>('cook_runs')
   const readings = useTable<CookReading>('cook_readings')
   const now = useNow()
+  const rt = useRates() // a rate change on PRICES + COSTS re-prices every run
   const runs = useMemo(() => [...raw].sort((a, b) => (b.started_at ?? b.created_at ?? '').localeCompare(a.started_at ?? a.created_at ?? '')), [raw])
   const info = useMemo(() => {
     const m = new Map<string, RunInfo>()
@@ -89,10 +90,11 @@ function useCook() {
       m.set(r.id, { an, en: energyFor(r, an) })
     }
     return m
-  }, [runs, readings, now])
+  }, [runs, readings, now, rt])
   return { store, runs, readings, info, now }
 }
 
+const rateNote = () => `ICE ENERGY ₡${rates().ice.energyCrcPerKwh}/KWH (SET ON LEDGER > PRICES + COSTS). BEFORE ${Math.round((rates().ice.tax - 1) * 100)}% TAXES AND THE DEMAND CHARGE.`
 const VERDICT_TEXT = { pending: 'OPEN', pass: 'PASS', fail: 'FAIL' } as const
 const STATUS_TEXT: Record<Status, string> = { pass: 'PASS', fail: 'FAIL', warn: 'WARN', short: 'SHORT', info: 'INFO', none: '--' }
 const crc = (n: number | null | undefined) => (n === null || n === undefined ? '--' : `₡${Math.round(n).toLocaleString('en-US')}`)
@@ -319,7 +321,7 @@ function Overview({ d, set, say, onOpenVitals, onPrint }: { d: ReturnType<typeof
         <span>RUNS <b>{d.runs.length}</b></span>
         <span>CLOSED <b>{done.length}</b></span>
         <span>PASSED <b>{passed}</b></span>
-        <span>THIS MONTH <b>{mRuns.length}</b> RUNS, <b>{kwhText(mKwh)}</b>, <b>{crc(mKwh * ICE_RATE_CRC)}</b></span>
+        <span>THIS MONTH <b>{mRuns.length}</b> RUNS, <b>{kwhText(mKwh)}</b>, <b>{crc(mKwh * rates().ice.energyCrcPerKwh)}</b></span>
       </div>
 
       <div className="ck-box">
@@ -424,7 +426,7 @@ function Targets() {
           {c.v !== '' && <div className="tiny dim">{c.source}</div>}
         </div>
       ))}
-      <div className="tiny dim ck-rate">{ICE_RATE_SOURCE}</div>
+      <div className="tiny dim ck-rate">{rateNote()}</div>
     </div>
   )
 }
@@ -523,7 +525,7 @@ function RunTab({ run, info, say, set, onOpenHazard, onOpenXeno, onOpenVitals, o
         <div className="section-title">ENERGY</div>
         <div className="ck-kv">
           <span>ENERGY</span><b>{kwhText(en.kwh)} {en.basis ? `(${en.basis})` : ''}</b>
-          <span>COST AT ₡{ICE_RATE_CRC}/KWH</span><b>{crc(en.cost)} <span className="dim">{en.costTax !== null && `(${crc(en.costTax)} WITH 16% TAXES)`}</span></b>
+          <span>COST AT ₡{rates().ice.energyCrcPerKwh}/KWH</span><b>{crc(en.cost)} <span className="dim">{en.costTax !== null && `(${crc(en.costTax)} WITH ${Math.round((rates().ice.tax - 1) * 100)}% TAXES)`}</span></b>
           {run.bag_count && en.kwh !== null ? (<><span>PER BAG</span><b>{(en.kwh / run.bag_count).toFixed(2)} KWH // {crc((en.cost ?? 0) / run.bag_count)}</b></>) : null}
           {en.watts > 0 && (<><span>FULL POWER</span><b>{en.watts.toLocaleString('en-US')} W {isSteam && <button type="button" className="ck-link" onClick={onOpenVitals}>({HEATER_OPTIONS[run.heater_option ?? '2x4500'].short} FROM VITALS)</button>}</b></>)}
         </div>
@@ -541,7 +543,7 @@ function RunTab({ run, info, say, set, onOpenHazard, onOpenXeno, onOpenVitals, o
         ) : (
           en.profile.length > 0 && <div className="tiny">CLEAR OF THE ICE PEAK WINDOWS ({ICE_PEAKS.map((w) => `${w.from}-${w.to}`).join(', ')}).</div>
         )}
-        <div className="tiny dim">{ICE_RATE_SOURCE} THE RUN'S HEATER LOAD ALSO RAISES THE MONTH'S DEMAND ABOVE 8 KW, WHICH IS BILLED ON TOP.</div>
+        <div className="tiny dim">{rateNote()} THE RUN'S HEATER LOAD ALSO RAISES THE MONTH'S DEMAND ABOVE 8 KW, WHICH IS BILLED ON TOP.</div>
       </section>
 
       <Outcome run={run} onOpenHazard={onOpenHazard} onOpenXeno={onOpenXeno} say={say} guard={guard} purpose={purpose} />

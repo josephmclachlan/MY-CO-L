@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { BILL_ESTIMATE, iceBill, defaultPrice } from '../data/ledger'
+import { BILL_ESTIMATE } from '../data/ledger'
+import { DEFAULT_RATES, iceBill, mergeRates, salePrice, setLiveRates } from './rates'
 import { buildLedger, DEFAULT_LEDGER_PREFS, mergeBasis, planRoomRate, planWeek, weekOf, costPerKg, type LedgerInput, type LedgerLot } from './ledger'
 import type { CookRun } from './cook'
 
@@ -109,10 +110,41 @@ describe('ledger', () => {
   })
 })
 
-describe('prices', () => {
-  it('oysters mid ₡11,500, lion\'s mane +20%', () => {
-    expect(defaultPrice('blue-oyster', 'fresh')!.mid).toBe(11500)
-    expect(defaultPrice('lions-mane', 'fresh')!.mid).toBe(13800)
-    expect(defaultPrice('blue-oyster', 'dried')).toBeNull()
+describe('prices and costs', () => {
+  it('oysters ₡11,500, lion\'s mane +20%, no dried default', () => {
+    expect(salePrice('blue-oyster', 'fresh', DEFAULT_RATES)).toEqual({ price: 11500, mine: false })
+    expect(salePrice('lions-mane', 'fresh', DEFAULT_RATES).price).toBe(13800)
+    expect(salePrice('blue-oyster', 'dried', DEFAULT_RATES).price).toBeNull()
+  })
+  it('your price wins over the built-in one', () => {
+    const r = mergeRates({ sale: { 'blue-oyster': { fresh: 12500, dried: -3 } } })
+    expect(salePrice('blue-oyster', 'fresh', r)).toEqual({ price: 12500, mine: true })
+    expect(salePrice('blue-oyster', 'dried', r).price).toBeNull() // a bad figure is dropped
+  })
+  it('a saved record keeps defaults for anything missing or broken', () => {
+    const r = mergeRates({ fx: 'x', ice: { energyCrcPerKwh: 70, tax: -1 }, labourRate: 2500 })
+    expect(r.fx).toBe(510)
+    expect(r.ice.energyCrcPerKwh).toBe(70)
+    expect(r.ice.tax).toBe(1.16)
+    expect(r.labourRate).toBe(2500)
+  })
+  it('a new electricity rate reaches the bill check and the ledger', () => {
+    const base = iceBill(4000, 10, DEFAULT_RATES)
+    const dear = mergeRates({ ice: { energyCrcPerKwh: 59.67 * 2 } })
+    expect(iceBill(4000, 10, dear)).toBeCloseTo(base + 4000 * 59.67 * 1.16)
+    const lots = [lot({ id: 'a' })]
+    const before = buildLedger(empty(lots)).weeks[0].all.parts.room.crc
+    setLiveRates(mergeRates({ ice: { estimateLow: 724000, estimateHigh: 844000 } }))
+    try {
+      expect(buildLedger(empty(lots)).weeks[0].all.parts.room.crc).toBeGreaterThan(before * 1.9)
+    } finally {
+      setLiveRates(DEFAULT_RATES)
+    }
+  })
+  it('labour rate and wear come from the prefs', () => {
+    const labour = [{ id: 'h1', worked_on: '2026-11-03', person: 'J', hours: 2, task: null, block_lot_id: null, notes: null }]
+    const l = buildLedger(empty([lot({ id: 'a' })], { labour, prefs: { labourOn: true, rate: 1500, wearOn: true, wearPerBlock: 50 } }))
+    expect(l.weeks[0].all.parts.labour.crc).toBe(3000)
+    expect(l.weeks[0].all.parts.wear.crc).toBe(5000)
   })
 })

@@ -5,26 +5,12 @@ export { GUESS } from './cook'
 
 // ---------- ICE bill (electrical package, 4 Nov 2026: calculations/build_data.py) ----------
 
-/** Binomic tariff: energy + demand above 8 kW (10 kW minimum), fixed charge, x1.16 taxes. */
+// The numbers themselves are editable on PRICES + COSTS (src/lib/rates.ts). These are the source notes.
 export const ICE = {
-  energyCrcPerKwh: 59.67,
-  demandCrcPerKw: 9861.68,
-  demandFreeKw: 8,
-  demandMinKw: 10,
-  fixedCrc: 7924.29,
-  tax: 1.16,
-  source: 'ELECTRICAL PACKAGE 4 NOV 2026 (BUILD_DATA.PY): ₡59.67/KWH + ₡9,861.68/KW ABOVE 8 KW (10 KW MIN) + ₡7,924 FIXED, X1.16 TAXES',
+  source: 'BUILT-IN: ELECTRICAL PACKAGE 4 NOV 2026 (BUILD_DATA.PY): ₡59.67/KWH + ₡9,861.68/KW ABOVE 8 KW (10 KW MIN) + ₡7,924 FIXED, X1.16 TAXES',
 }
-
 /** The package's monthly bill range at the central HVAC case (4,762 kWh): heavy loads off peak vs heater on a hot peak. */
-export const BILL_ESTIMATE = { low: 362000, high: 422000, kwh: 4762, source: 'ELECTRICAL PACKAGE: ₡362,000-422,000 PER MONTH, CENTRAL HVAC CASE, 4,762 KWH' }
-export const BILL_ESTIMATE_MID = (BILL_ESTIMATE.low + BILL_ESTIMATE.high) / 2
-
-/** What ICE should bill for a month, from the meter figures. */
-export function iceBill(kwh: number, billedKw: number | null): number {
-  const kw = Math.max(billedKw ?? ICE.demandMinKw, ICE.demandMinKw)
-  return (ICE.fixedCrc + ICE.energyCrcPerKwh * kwh + Math.max(0, kw - ICE.demandFreeKw) * ICE.demandCrcPerKw) * ICE.tax
-}
+export const BILL_ESTIMATE = { kwh: 4762, source: 'ELECTRICAL PACKAGE: ₡362,000-422,000 PER MONTH, CENTRAL HVAC CASE, 4,762 KWH' }
 
 // ---------- the crop (farm facts, Joseph 5 Nov 2026) ----------
 
@@ -93,16 +79,7 @@ export const SALE_SPECIES = ['blue-oyster', 'lions-mane', 'comb-tooth', 'golden-
 export const OYSTER_PRICE: [number, number] = [10000, 13000]
 export const PREMIUM = 1.2
 export const PREMIUM_SPECIES = new Set(['lions-mane', 'comb-tooth'])
-export function defaultPrice(key: string, form: Form): { lo: number; hi: number; mid: number; guess: boolean } | null {
-  if (form !== 'fresh') return null
-  const prem = PREMIUM_SPECIES.has(key)
-  const oyster = key.endsWith('-oyster') || key === 'black-pearl'
-  if (!prem && !oyster) return null
-  const k = prem ? PREMIUM : 1
-  const lo = OYSTER_PRICE[0] * k
-  const hi = OYSTER_PRICE[1] * k
-  return { lo, hi, mid: (lo + hi) / 2, guess: prem }
-}
+// The price used on the sale form: salePrice() in src/lib/rates.ts (your price, else this default).
 
 // ---------- the guesses, listed on screen ----------
 
