@@ -5,7 +5,7 @@ export const HELP_LINES = [
   '  MENU            MAIN MENU',
   '  1-9 OR NAME     OPEN A MODULE (E.G. 2 OR VITALS)',
   '  TUNE            LOOK AND SOUND SETTINGS',
-  '  THEME <NAME>    PHOSPHOR, CRYO, SODIUM OR ALERT',
+  '  THEME <NAME>    PHOSPHOR, CRYO, SODIUM, SPORE OR ALERT',
   '  CLEAN           SUNLIGHT MODE ON OR OFF',
   '  MUTE            SOUND ON OR OFF',
   '  CHATTER / TICK  SOUND MODE',

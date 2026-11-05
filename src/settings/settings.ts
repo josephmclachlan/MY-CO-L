@@ -2,8 +2,8 @@
 // Settings are saved on this device (localStorage), so phone and laptop can be
 // tuned differently: a phone speaker wants different levels than a laptop.
 
-export type ThemeName = 'PHOSPHOR' | 'CRYO' | 'SODIUM' | 'ALERT'
-export const THEMES: ThemeName[] = ['PHOSPHOR', 'CRYO', 'SODIUM', 'ALERT']
+export type ThemeName = 'PHOSPHOR' | 'CRYO' | 'SODIUM' | 'ALERT' | 'SPORE'
+export const THEMES: ThemeName[] = ['PHOSPHOR', 'CRYO', 'SODIUM', 'ALERT', 'SPORE']
 
 export type DataFont = 'SHARE TECH MONO' | 'VT323'
 export type SoundMode = 'CHATTER' | 'TICK'

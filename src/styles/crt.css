@@ -38,6 +38,15 @@
   --glow: rgba(255, 90, 74, 0.6);
   --warn: #ffe0d8;
 }
+/* SPORE: bioluminescent violet, a fifth screen colour (keep or drop). */
+:root[data-theme='SPORE'] {
+  --fg: #c58bff;
+  --fg-dim: #8a58c4;
+  --fg-faint: #2e1648;
+  --bg: #07020d;
+  --bg-hi: #12061f;
+  --glow: rgba(197, 139, 255, 0.55);
+}
 
 html,
 body,
