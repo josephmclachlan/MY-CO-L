@@ -7,13 +7,17 @@ import '@fontsource/barlow-condensed/500.css'
 import '@fontsource/barlow-condensed/600.css'
 import './styles/crt.css'
 import './styles/layout.css'
+import './styles/power.css'
 import { AppProvider } from './settings/AppContext'
+import { PowerProvider } from './power/PowerContext'
 import App from './App'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppProvider>
-      <App />
+      <PowerProvider>
+        <App />
+      </PowerProvider>
     </AppProvider>
   </StrictMode>,
 )
