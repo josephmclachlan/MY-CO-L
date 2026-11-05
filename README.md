@@ -13,7 +13,7 @@ power panel, rooms, stock, cultures, cooks, costs and sales. It works offline on
 - CRT glass: phosphor glow, scanlines, a real convex bulge, edge colour fringing, glare, grain and flicker,
   all on one strength slider, plus CLEAN mode for sunlight.
 - Sound made in code (Web Audio). Every sound is tied to something appearing on screen. See `docs/DESIGN.md`.
-- Supabase database schema for the whole data model (`supabase/migrations/0001_initial_schema.sql`, then `0002_cargo_and_owner_lock.sql` for CARGO and owner-only security, then `0003_genetics.sql` for XENOGENETICS) and email login.
+- Supabase database schema for the whole data model (`supabase/migrations/0001_initial_schema.sql`, then `0002_cargo_and_owner_lock.sql` for CARGO and owner-only security, then `0003_genetics.sql` for XENOGENETICS, `0004_hazard_links.sql` for the HAZARD INDEX, `0005_cook_log.sql` for PROPULSION) and email login.
 - Installable, offline-capable web app (PWA).
 - Deploys to GitHub Pages now and Cloudflare Pages at launch.
 

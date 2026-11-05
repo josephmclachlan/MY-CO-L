@@ -97,7 +97,7 @@
 
 .xeno-print { display: none; }
 @media print {
-  body > *:not(.xeno-print) { display: none !important; }
+  body > *:not(.xeno-print):not(.cook-print) { display: none !important; }
   html, body { background: #fff !important; }
   .xeno-print { display: flex !important; flex-wrap: wrap; gap: 0; }
   .xeno-print .xl-label { border: 1px dotted #bbb; break-inside: avoid; }
