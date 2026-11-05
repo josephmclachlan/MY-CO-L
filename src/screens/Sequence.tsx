@@ -3,6 +3,10 @@ import { useApp } from '../settings/AppContext'
 import { TypeText } from '../components/TypeText'
 import { PLAN_BASE_BAGS, SPECIES, WEEKLY_BAGS } from '../data/species'
 import { allot, LB_TO_KG } from '../lib/runplan'
+import { useCargo } from '../store/useCargo'
+import { runLines } from '../lib/stockplan'
+import { bookRun } from '../lib/cargoActions'
+import { fmtQty, nextRunRef, onHandMap } from '../lib/cargo'
 
 // Cart capacity from the steam-box design (rev D): 130 x 10 lb bags per cart.
 const CART_BAGS = 130
@@ -108,8 +112,10 @@ function Bar({ label, p, state }: { label: string; p: number; state: 'wait' | 'r
   )
 }
 
-export function Sequence() {
+export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
   const { sound } = useApp()
+  const cargo = useCargo()
+  const [booked, setBooked] = useState<{ ref: string; n: number; missing: string[]; warn?: boolean } | null>(null)
   const [bags, setBags] = useState(WEEKLY_BAGS)
   const [chosen, setChosen] = useState<string[]>(SPECIES.filter((s) => (s.plan?.share ?? 0) > 0).map((s) => s.id))
   const [phase, setPhase] = useState<Phase>('idle')
@@ -266,6 +272,63 @@ export function Sequence() {
         {missing.length > 0 && <div className="warn">NO CATAWBA FIGURE FOR: {missing.map((a) => a.sp.name).join(', ')}.</div>}
         {picked.some((s) => s.id === 'golden-oyster') && picked.some((s) => s.id === 'phoenix-oyster') && <div>GOLDEN AND PHOENIX SHARE ONE PLAN SLOT (A WEEKS / B WEEKS), SO EACH GETS HALF.</div>}
       </div>
+
+      <div className="section-title" style={{ marginTop: 10 }}>STOCK USED // {bags} BAGS</div>
+      {(() => {
+        const lines = runLines(bags, { form: cargo.prefs.form, soyShare: cargo.prefs.soyShare })
+        const hand = onHandMap(cargo.moves)
+        const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+        const already = cargo.moves.some((m) => m.run_ref?.startsWith(`RUN-${today}`) && m.notes?.startsWith(`${bags} BAGS`))
+        const rowsFor = lines.map((l) => ({ l, it: cargo.items.find((i) => i.code === l.code) }))
+        const short = rowsFor.filter(({ l, it }) => it && (hand.get(it.id) ?? 0) - l.book < 0)
+        const note = `${bags} BAGS: ${result.filter((a) => a.bags > 0).map((a) => `${a.sp.name} ${a.bags}`).join(', ')}`.slice(0, 200)
+        const commit = async () => {
+          const ref = nextRunRef(cargo.moves)
+          try {
+            const r = await bookRun(cargo.store, ref, lines, cargo.items, note)
+            sound.granted()
+            setBooked({ ref, n: r.booked, missing: r.missing })
+          } catch (e) {
+            sound.chirp()
+            setBooked({ ref, n: 0, missing: [], warn: true })
+            window.alert(e instanceof Error ? e.message : String(e))
+          }
+        }
+        return (
+          <div className="cg-run">
+            <table className="pl-table">
+              <thead><tr><th>ITEM</th><th>USES</th><th>ON HAND</th><th>AFTER</th></tr></thead>
+              <tbody>
+                {rowsFor.map(({ l, it }) => {
+                  const h = it ? hand.get(it.id) ?? 0 : 0
+                  return (
+                    <tr key={l.code}>
+                      <td>{it?.name ?? `${l.code} (MISSING)`}</td>
+                      <td>{fmtQty(l.book)} {l.unit}</td>
+                      <td>{it ? fmtQty(h) : '--'}</td>
+                      <td className={it && h - l.book < 0 ? 'warn' : ''}>{it ? fmtQty(h - l.book) : '--'}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+            <div className="tiny dim">WORKED OUT FROM 4 LB DRY PER 10 LB BAG, {cargo.prefs.form === 'combo' ? 'COMBO PELLETS' : `${Math.round((1 - cargo.prefs.soyShare) * 100)}:${Math.round(cargo.prefs.soyShare * 100)} SAWDUST : SOY HULLS`}, AND 0.3 LB OF G2 SPAWN PER BAG (1 X 6 LB PER 20). SEE CARGO FOR EACH SOURCE.</div>
+            {short.length > 0 && <div className="warn tiny">{short.length} ITEM{short.length > 1 ? 'S' : ''} WOULD GO BELOW ZERO. COUNT YOUR STOCK IN CARGO FIRST FOR TRUE NUMBERS.</div>}
+            {already && <div className="warn tiny">A RUN OF {bags} BAGS WAS ALREADY BOOKED TODAY. BOOKING AGAIN USES THE STOCK TWICE.</div>}
+            <div className="seq-go">
+              <button className="hz" disabled={!cargo.ready || bags < 1 || !lines.length} onClick={() => void commit()}>
+                {already ? 'BOOK AGAIN' : 'COMMIT RUN TO CARGO'}
+              </button>
+              <button onClick={onOpenCargo}>OPEN CARGO</button>
+            </div>
+            {booked && !booked.warn && (
+              <div className="tiny">
+                BOOKED {booked.n} MOVES AS {booked.ref}.{booked.missing.length ? ` NOT BOOKED, ITEM DELETED: ${booked.missing.join(', ')}.` : ''} UNDO IT UNDER RUNS BOOKED IN CARGO.
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       <div className="seq-go">
         <button className="seq-init" disabled={running || !picked.length || bags < 1} onClick={start}>

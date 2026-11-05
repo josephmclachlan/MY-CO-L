@@ -8,7 +8,7 @@ export const STATION = {
   place: 'PLAYA NEGRA // LIMON // CR',
   system: 'MY/CO/L',
   longName: 'MYCOLOGICAL CONTROL LATTICE',
-  build: '0.2.0',
+  build: '0.3.0',
 }
 
 // Species letters used in lot codes (species letter + knock date MMDD, e.g. B1020).

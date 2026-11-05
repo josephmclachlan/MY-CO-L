@@ -5,6 +5,8 @@ import { allCircuits, OUTLET_ROOM, type Circuit } from '../data/power'
 import { ROOMS, roomAlarms, roomById, type Room } from '../data/rooms'
 import { itemWatts, type Warning } from '../lib/power'
 import { TypeText } from '../components/TypeText'
+import { useCargo } from '../store/useCargo'
+import { fmtQty } from '../lib/cargo'
 import { BreakerBox, fmtW } from './Vitals'
 
 // Equipment glyphs on the plan. Each lights up when its breaker is on.
@@ -179,8 +181,9 @@ function Plan() {
 }
 
 /** Everything about the selected room. */
-function RoomReadout({ onOpenVitals }: { onOpenVitals: () => void }) {
+function RoomReadout({ onOpenVitals, onOpenCargo }: { onOpenVitals: () => void; onOpenCargo: () => void }) {
   const { config, on, reading, selectedRoom, warns, state } = usePower()
+  const { rows } = useCargo()
   const room = roomById(selectedRoom)!
   const circuits = allCircuits(config.heater)
   const items = circuits.flatMap((c) => c.items.filter((i) => i.room === room.id).map((i) => ({ i, c })))
@@ -266,21 +269,40 @@ function RoomReadout({ onOpenVitals }: { onOpenVitals: () => void }) {
       </div>
 
       <div className="section-title rr-sec">INVENTORY</div>
-      <div className="placeholder">
-        <div className="dim tiny">NO STOCK LINKED. ROOM INVENTORY ARRIVES WITH CARGO (BUILD 4).</div>
-      </div>
+      {(() => {
+        const mine = rows.filter((r) => r.item.room === room.id)
+        const low = mine.filter((r) => r.state === 'LOW' || r.state === 'OUT').length
+        return (
+          <div className="placeholder">
+            {mine.length === 0 ? (
+              <div className="dim tiny">NO STOCK ITEMS ARE ASSIGNED TO THIS ROOM. PICK A ROOM ON EACH ITEM IN CARGO.</div>
+            ) : (
+              <>
+                {mine.map((r) => (
+                  <div key={r.item.id} className="cg-inv-row">
+                    <span className={r.state === 'LOW' || r.state === 'OUT' ? 'warn' : ''}>{r.item.name}</span>
+                    <span className={r.state === 'LOW' || r.state === 'OUT' ? 'warn' : 'dim'}>{r.counted ? `${fmtQty(r.onHand)} ${r.item.unit}` : 'NO COUNT'}{r.state === 'LOW' || r.state === 'OUT' ? ` // ${r.state}` : ''}</span>
+                  </div>
+                ))}
+                <div className="dim tiny" style={{ marginTop: 4 }}>{mine.length} ITEMS{low ? `, ${low} TO REORDER` : ''}. ROOM ASSIGNMENTS ARE A STARTING GUESS, LIKE THE ROOM NAMES.</div>
+              </>
+            )}
+            <button type="button" className="btn" style={{ marginTop: 6 }} onClick={onOpenCargo}>OPEN CARGO</button>
+          </div>
+        )
+      })()}
     </div>
   )
 }
 
 /** DECK PLAN: the farm as a line drawing. Tap a room for its equipment, circuits, load and set points. */
-export function DeckPlan({ onOpenVitals }: { onOpenVitals: () => void }) {
+export function DeckPlan({ onOpenVitals, onOpenCargo }: { onOpenVitals: () => void; onOpenCargo: () => void }) {
   const { state } = usePower()
   return (
     <div className={`deck ${state.source === 'generator' ? 'gen-mode' : ''}`}>
       <div className="deck-grid">
         <Plan />
-        <RoomReadout onOpenVitals={onOpenVitals} />
+        <RoomReadout onOpenVitals={onOpenVitals} onOpenCargo={onOpenCargo} />
       </div>
       <div className="dim tiny" style={{ marginTop: 8 }}>
         LAYOUT FROM YOUR FLOOR PLAN. ROOM NAMES AND WHERE EACH MACHINE SITS ARE MARKED UNCONFIRMED UNTIL YOU CHECK THEM.

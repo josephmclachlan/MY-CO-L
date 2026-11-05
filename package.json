@@ -1,7 +1,7 @@
 {
   "name": "my-co-l",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "MY/CO/L - MYcological COntrol Lattice. Farm terminal for Negra Bay Biologics, Talamanca Station.",
   "type": "module",
   "scripts": {
