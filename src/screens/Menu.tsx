@@ -10,7 +10,7 @@ interface Props {
   firstShow: boolean
 }
 
-/** Main menu: numbered module list with the MY/CO/L wireframe drawing in beside it. */
+/** Main menu: numbered module list with the MY/CO/L logo in beside it. */
 export function Menu({ selected, setSelected, onOpen, firstShow }: Props) {
   const [listReady, setListReady] = useState(!firstShow)
 
