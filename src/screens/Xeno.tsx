@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { PickInput } from '../components/PickInput'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import qrcode from 'qrcode-generator'
@@ -363,7 +364,7 @@ function AddMaster({ strain, d, say }: { strain: Strain; d: XData; say: Say }) {
         ))}
       </Select>
       <input aria-label="How many" inputMode="numeric" value={n} onChange={(e) => setN(e.target.value)} style={{ width: '3.5em' }} />
-      <input aria-label="Made on" type="date" value={made} onChange={(e) => setMade(e.target.value)} />
+      <PickInput aria-label="Made on" type="date" value={made} onChange={(e) => setMade(e.target.value)} />
       <input aria-label="Location" placeholder="LOCATION" value={loc} onChange={(e) => setLoc(e.target.value)} style={{ width: '9em' }} />
       <button
         type="button"
@@ -694,7 +695,7 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
               <Num label="G2 BAGS USED" value={g2used} set={setG2used} />
               <label className="xn-num">
                 <span>KNOCK DAY</span>
-                <input type="date" value={knock} onChange={(e) => setKnock(e.target.value || todayIso())} />
+                <PickInput type="date" value={knock} onChange={(e) => setKnock(e.target.value || todayIso())} />
               </label>
               <label className="xn-num">
                 <span>LOT CODE</span>
@@ -873,7 +874,7 @@ function PlannerTab({ d, set }: { d: XData; set: SetXeno }) {
       <div className="xn-plan-top">
         <label className="xn-num">
           <span>KNOCK DAY</span>
-          <input type="date" value={knock} onChange={(e) => save({ ...prefs, knock: e.target.value || null })} />
+          <PickInput type="date" value={knock} onChange={(e) => save({ ...prefs, knock: e.target.value || null })} />
         </label>
         <span className="tiny">
           {tot.blocks} BLOCKS // {tot.g2} G2 // {tot.g1} G1 // {tot.plates} PLATES

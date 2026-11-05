@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { PickInput } from '../components/PickInput'
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useStore, useTable } from '../store/StoreContext'
@@ -324,8 +325,8 @@ function Overview({ d, set, say, onOpenVitals, onPrint }: { d: ReturnType<typeof
       <div className="ck-box">
         <div className="section-title">START A RUN</div>
         <div className="ck-row">
-          <label className="ck-field"><span>START DATE (COSTA RICA)</span><input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
-          <label className="ck-field"><span>START TIME</span><input type="time" value={time} onChange={(e) => setTime(e.target.value)} /></label>
+          <label className="ck-field"><span>START DATE (COSTA RICA)</span><PickInput type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
+          <label className="ck-field"><span>START TIME</span><PickInput type="time" clearable value={time} onChange={(e) => setTime(e.target.value)} /></label>
           <button type="button" className="btn" onClick={() => (setDate(crParts(Date.now()).date), setTime(crParts(Date.now()).time))}>NOW</button>
         </div>
         {!startOk && <div className="warn">PICK A DATE AND TIME.</div>}
@@ -738,7 +739,7 @@ function ReadingsTab({ run, an, readings, say }: { run: CookRun; an: RunAnalysis
         <div className="ck-unit">
           <button type="button" className={`btn ${unit === 'F' ? 'on' : ''}`} onClick={() => setU('F')}>DEG F</button>
           <button type="button" className={`btn ${unit === 'C' ? 'on' : ''}`} onClick={() => setU('C')}>DEG C</button>
-          <label className="ck-field inline"><span>TIME (EMPTY = NOW)</span><input type="time" value={time} onChange={(e) => setTime(e.target.value)} /></label>
+          <label className="ck-field inline"><span>TIME (EMPTY = NOW)</span><PickInput type="time" clearable value={time} onChange={(e) => setTime(e.target.value)} /></label>
         </div>
         <div className="ck-fields ck-quick">
           {zones.map((z) => (

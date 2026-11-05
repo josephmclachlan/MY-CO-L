@@ -58,7 +58,7 @@ export function Select({ value, onChange, children, disabled, className, 'aria-l
   const openList = () => {
     if (disabled) return
     const r = root.current?.getBoundingClientRect()
-    setUp(!!r && r.bottom > window.innerHeight * 0.6 && r.top > window.innerHeight * 0.3)
+    setUp(!!r && window.innerHeight - r.bottom < 300 && r.top > window.innerHeight - r.bottom)
     setHi(Math.max(0, cur))
     setOpen(true)
   }
@@ -110,7 +110,7 @@ export function Select({ value, onChange, children, disabled, className, 'aria-l
         <span className="ui-select-caret" aria-hidden="true">{open ? '▴' : '▾'}</span>
       </button>
       {open && (
-        <ul className="ui-select-list" id={id} role="listbox" ref={list}>
+        <ul className="ui-select-list" id={id} role="listbox" ref={list} onClick={(e) => e.preventDefault()}>
           {opts.map((o, i) => {
             const head = o.group && o.group !== lastGroup ? <li className="ui-select-group" role="presentation" key={`g${i}`}>{o.group}</li> : null
             lastGroup = o.group

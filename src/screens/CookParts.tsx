@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { PickInput } from '../components/PickInput'
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { SHEET_COLS, type SheetCol } from '../data/cook'
@@ -34,6 +35,9 @@ export function Field({ label, value, onSave, type = 'text', wide, placeholder, 
   return (
     <label className={`ck-field ${wide ? 'wide' : ''}`}>
       <span>{label}</span>
+      {type === 'date' || type === 'time' || type === 'month' ? (
+        <PickInput type={type} value={draft} disabled={disabled} clearable onChange={(e) => (setDraft(e.target.value), e.target.value !== value && onSave(e.target.value))} />
+      ) : (
       <input
         type={type}
         value={draft}
@@ -44,6 +48,7 @@ export function Field({ label, value, onSave, type = 'text', wide, placeholder, 
         onBlur={commit}
         onKeyDown={(e) => e.key === 'Enter' && (e.currentTarget.blur(), commit())}
       />
+      )}
       {hint && <em>{hint}</em>}
     </label>
   )
