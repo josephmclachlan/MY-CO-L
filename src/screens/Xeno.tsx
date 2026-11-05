@@ -4,6 +4,8 @@ import qrcode from 'qrcode-generator'
 import { useApp } from '../settings/AppContext'
 import { useStore, useStoreStatus, useTable } from '../store/StoreContext'
 import { RefText } from '../manual/ManualLinks'
+import { HazardPick } from '../components/HazardPick'
+import { hazardName, type LotLoss } from '../lib/hazard'
 import { SPECIES } from '../data/species'
 import { allot } from '../lib/runplan'
 import { WEEKLY_BAGS } from '../data/species'
@@ -48,6 +50,11 @@ import {
   loadDemo,
   newStrain,
   removeDemo,
+  contaminateCulture,
+  lossGrainRun,
+  lossLot,
+  lotBagsLost,
+  lotLosses as lossesOfLot,
   setCultureStatus,
   setGrainStatus,
   setLotStatus,
@@ -70,8 +77,9 @@ function useXenoData() {
   const cultures = useTable<Culture>('cultures')
   const runs = useTable<GrainRun>('grain_runs')
   const lots = useTable<BlockLot>('block_lots')
+  const lotLoss = useTable<LotLoss>('lot_losses')
   const sorted = useMemo(() => [...strains].sort((a, b) => a.code.localeCompare(b.code)), [strains])
-  return { strains: sorted, cultures, runs, lots }
+  return { strains: sorted, cultures, runs, lots, lotLoss }
 }
 type XData = ReturnType<typeof useXenoData>
 
@@ -543,6 +551,8 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
   const [bags, setBags] = useState('12')
   const [masters, setMasters] = useState('1')
   const [lost, setLost] = useState('')
+  const [haz, setHaz] = useState('')
+  const [lotLostN, setLotLostN] = useState('')
   const [blocks, setBlocks] = useState('20')
   const [g2used, setG2used] = useState('1')
   const [knock, setKnock] = useState(todayIso())
@@ -553,6 +563,13 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
   useEffect(() => {
     setLotCode(`${letter}${mmdd(knock)}`)
   }, [knock, letter])
+
+  // A pick made on one record must not carry over to the next.
+  useEffect(() => {
+    setHaz('')
+    setLotLostN('')
+    setLost('')
+  }, [k])
 
   if (type === 's') return <div className="dim tiny">THE STRAIN. ADD A MASTER UNDER STOCK, THEN TAP IT HERE TO MAKE TRANSFERS.</div>
 
@@ -621,7 +638,12 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
           {c.status !== 'cold_storage' && live && <button type="button" className="btn" onClick={() => void run(() => setCultureStatus(store, c, 'cold_storage'), 'INTO COLD STORAGE')}>TO FRIDGE</button>}
           {c.status !== 'clean' && <button type="button" className="btn" onClick={() => void run(() => setCultureStatus(store, c, 'clean'), 'MARKED CLEAN')}>CLEAN / OUT OF FRIDGE</button>}
           {live && <button type="button" className="btn" onClick={() => void run(() => setCultureStatus(store, c, 'used_up'), 'MARKED USED UP')}>USED UP</button>}
-          {c.status !== 'contaminated' && <button type="button" className="btn hazard" onClick={() => void run(() => setCultureStatus(store, c, 'contaminated'), 'CONTAMINATION LOGGED')}>CONTAMINATED</button>}
+          {c.status !== 'contaminated' && (
+            <>
+              <HazardPick value={haz} onChange={setHaz} />
+              <button type="button" className="btn hazard" onClick={() => void run(() => contaminateCulture(store, c, haz || null), `CONTAMINATION LOGGED: ${hazardName(haz || null)}`)}>CONTAMINATED</button>
+            </>
+          )}
           {c.status !== 'discarded' && <button type="button" className="btn" onClick={() => void run(() => setCultureStatus(store, c, 'discarded'), 'DISCARDED')}>DISCARD</button>}
           <Confirm label="DELETE RECORD" disabled={kids} onYes={() => void run(() => store.del('cultures', c.id), 'RECORD DELETED').then(() => set({ node: null }))} />
         </div>
@@ -701,7 +723,8 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
         <div className="cg-add xn-add">
           <span className="dim tiny">CONTAMINATION: BAGS LOST IN TOTAL</span>
           <input aria-label="Bags lost" inputMode="numeric" placeholder={String(g.bags_lost || 0)} value={lost} onChange={(e) => setLost(e.target.value)} style={{ width: '4em' }} />
-          <button type="button" className="btn hazard" onClick={() => void run(() => setGrainStatus(store, g, g.status, Number(lost) || 0), `${Number(lost) || 0} BAGS MARKED LOST`).then(() => setLost(''))}>
+          <HazardPick value={haz} onChange={setHaz} />
+          <button type="button" className="btn hazard" onClick={() => void run(() => lossGrainRun(store, g, Number(lost) || 0, haz || null), `${Number(lost) || 0} BAGS MARKED LOST: ${hazardName(haz || null)}`).then(() => setLost(''))}>
             LOG LOSS
           </button>
           {g.generation === 'G1' && <span className="dim tiny">STROMA MULTIPLIES ABOUT 10X PER EXPANSION; SCREEN MASTERS HARDEST (<RefText text="F05-0010" />).</span>}
@@ -728,6 +751,19 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
         <button type="button" className={`btn hazard ${l.status === 'lost' ? 'on' : ''}`} onClick={() => void run(() => setLotStatus(store, l, 'lost'), 'LOT MARKED LOST')}>LOST</button>
         <Confirm label="DELETE LOT" onYes={() => void run(() => store.del('block_lots', l.id), 'LOT DELETED').then(() => set({ node: null }))} />
       </div>
+      <div className="cg-add xn-add">
+        <span className="dim tiny">CONTAMINATION: BLOCKS LOST ({lotBagsLost(d.lotLoss, l.id)} OF {l.bag_count} LOGGED)</span>
+        <input aria-label="Blocks lost" inputMode="numeric" placeholder="HOW MANY" value={lotLostN} onChange={(e) => setLotLostN(e.target.value)} style={{ width: '5em' }} />
+        <HazardPick value={haz} onChange={setHaz} />
+        <button type="button" className="btn hazard" onClick={() => void run(() => lossLot(store, l, d.lotLoss, Number(lotLostN) || 0, haz || null), `${Number(lotLostN) || 0} BLOCKS MARKED LOST: ${hazardName(haz || null)}`).then((ok) => ok && setLotLostN(''))}>
+          LOG LOSS
+        </button>
+      </div>
+      {lossesOfLot(d.lotLoss, l.id).length > 0 && (
+        <div className="dim tiny">
+          {lossesOfLot(d.lotLoss, l.id).map((x) => `${x.noted_on} ${x.bag_count} ${hazardName(x.hazard_key)}`).join(' // ')}
+        </div>
+      )}
       <div className="cg-fields">
         <Field label="NOTES" wide value={l.notes ?? ''} placeholder="NONE" onSave={(v) => void run(() => store.put('block_lots', { ...l, notes: v || null }), 'SAVED')} />
       </div>

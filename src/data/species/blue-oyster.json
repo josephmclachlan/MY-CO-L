@@ -267,14 +267,16 @@
    ],
    "w": [
     "blotch-pt-2 0:29:49"
-   ]
+   ],
+   "hz": "bacterial-blotch"
   },
   {
    "k": "Blotch control",
    "v": "150-250 ppm bleach in humidifier water. Switch strain when blotch targets one.",
    "s": [
     "F17-0063"
-   ]
+   ],
+   "hz": "bacterial-blotch"
   },
   {
    "k": "Stroma",
@@ -283,14 +285,16 @@
     "F17-0065",
     "F17-0066",
     "F17-0068"
-   ]
+   ],
+   "hz": "stroma"
   },
   {
    "k": "Viruses",
    "v": "A clade attacks Pleurotus: deformed fruit, essentially untreatable.",
    "s": [
     "F17-0064"
-   ]
+   ],
+   "hz": "viruses"
   },
   {
    "k": "Spores",

@@ -1,0 +1,521 @@
+[
+ {
+  "id": "bacterial-blotch",
+  "name": "BACTERIAL BLOTCH",
+  "kind": "disease",
+  "stages": [
+   "fruit",
+   "after"
+  ],
+  "colours": [
+   "yellow",
+   "brown"
+  ],
+  "smells": [],
+  "textures": [
+   "slimy",
+   "wet"
+  ],
+  "places": [
+   "cap",
+   "cut",
+   "stem"
+  ],
+  "species": [
+   "blue-oyster",
+   "king-oyster",
+   "black-pearl",
+   "lions-mane",
+   "maitake"
+  ],
+  "aka": "PSEUDOMONAS TOLAASII",
+  "spot": [
+   {
+    "v": "Slight yellowing of caps is the early sign (yellowing on oysters means poor humidification). Small yellow-brown caps scattered among healthy black oysters.",
+    "s": [
+     "F15-0011",
+     "F15-0019"
+    ]
+   },
+   {
+    "v": "Goopy golden or rusty lesions at cut sites where water collects, after normal colonization: the room is the source. Tan, goopy blue oysters mean the room got too warm.",
+    "s": [
+     "F15-0012",
+     "F15-0013"
+    ]
+   },
+   {
+    "v": "King oyster: first marks on caps and streaking on stems. Oysters: symptoms at cluster bases, the centre pin, or aborting pins.",
+    "s": [
+     "F15-0014",
+     "F15-0015",
+     "F15-0016"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Black slime on lion's mane stems is probably a different bacterium.",
+    "s": [
+     "F15-0003"
+    ],
+    "hz": "black-slime"
+   },
+   {
+    "v": "Warty caps (very high humidity) and fused or doubled caps are shape faults, not blotch.",
+    "s": [
+     "F15-0120",
+     "F15-0118"
+    ],
+    "hz": "shape-faults"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Waterborne in the fruit room: any droplet can carry it. Most growers now get it in the room, not from the block, and it shows once fruit forms.",
+    "s": [
+     "F15-0006",
+     "F15-0020",
+     "F15-0021"
+    ]
+   },
+   {
+    "v": "Warmth (peaks in summer and shoulder seasons), constant saturation putting droplets on caps, timer-run foggers, cold air with unchanged humidification, standing water, packed rooms, slow-fruiting species.",
+    "s": [
+     "F15-0028",
+     "F15-0030",
+     "F15-0031",
+     "F15-0032",
+     "F15-0034",
+     "F15-0035",
+     "F15-0036"
+    ]
+   },
+   {
+    "v": "Humidifier design and untreated water are the root causes.",
+    "s": [
+     "F15-0037",
+     "F15-0024"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Pull blotched fruit on sight. Never box it with good fruit: it spreads in the cooler.",
+    "s": [
+     "F15-0048",
+     "F15-0049",
+     "F15-0212"
+    ]
+   },
+   {
+    "v": "Triage: switch strains to confuse the pathogen, even at lower yield. Short-term peroxide in humidifier water at about 0.1% (1.5 qt / 1.4 L of 3% in 10 gal / 38 L) as a rescue, then stop.",
+    "s": [
+     "F15-0050",
+     "F15-0090",
+     "F15-0105"
+    ]
+   },
+   {
+    "v": "Dilute bleach spray works quickly but do not sell sprayed mushrooms. Do not spray 2.5-3% peroxide on fruit. Do not use vinegar or rice water.",
+    "s": [
+     "F15-0052",
+     "F15-0053",
+     "F15-0054"
+    ]
+   },
+   {
+    "v": "Standard dose: bleach 150-250 ppm, as on large industrial farms. Another figure given is 150-200 ppm.",
+    "s": [
+     "F15-0087",
+     "F15-0088"
+    ],
+    "f": "ctx"
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Humidifier out of the room or ducted to outside air. Fine mist, filtered water, then RO or steam, plus 150-250 ppm bleach or ClO2.",
+    "s": [
+     "F15-0207",
+     "F15-0208"
+    ]
+   },
+   {
+    "v": "Swing humidity 70-90% instead of holding it saturated. Keep kings 10-16 °C (50-60 °F), lion's mane about 16 °C (60 °F). Trapped floor drains, no standing water.",
+    "s": [
+     "F15-0209",
+     "F15-0210",
+     "F15-0211"
+    ]
+   },
+   {
+    "v": "Rotate strains now and then. Soy at 50% was linked to blotch at one farm, cut to 35-40%.",
+    "s": [
+     "F15-0047",
+     "F15-0039"
+    ]
+   },
+   {
+    "v": "Test: take a block of the batch out of the room and fruit it on a kitchen counter. If it fruits fine, the room's water is the cause.",
+    "s": [
+     "F15-0025",
+     "F14-0125"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Pleurotus most: blue oyster and king oyster. Black oyster climbs sharply in warm rooms.",
+    "s": [
+     "F15-0040",
+     "F15-0028"
+    ]
+   },
+   {
+    "v": "Lion's mane does poorly when hot. Shiitake is resistant. Chestnut is not a direct problem. Comb tooth: none seen.",
+    "s": [
+     "F15-0029",
+     "F15-0043",
+     "F15-0044",
+     "F15-0045"
+    ]
+   },
+   {
+    "v": "Some king oyster strains are hit and others not; rotate if one is targeted.",
+    "s": [
+     "F15-0046"
+    ]
+   }
+  ],
+  "w": [
+   "bacterial-blotch 0:10:05",
+   "bacterial-blotch 0:23:00",
+   "blotch-pt-2 0:01:48",
+   "bacterial-blotch 0:09:02",
+   "blotch-pt-2 0:02:52",
+   "bacterial-blotch 0:11:06",
+   "bacterial-blotch 0:43:17",
+   "bacterial-blotch 0:41:08",
+   "hart-pola 0:16:29",
+   "bacterial-blotch 0:49:23"
+  ]
+ },
+ {
+  "id": "rose-comb",
+  "name": "ROSE COMB",
+  "kind": "disease",
+  "stages": [
+   "fruit"
+  ],
+  "colours": [
+   "multi"
+  ],
+  "smells": [],
+  "textures": [
+   "mushy"
+  ],
+  "places": [
+   "cap"
+  ],
+  "species": [
+   "blue-oyster",
+   "black-pearl"
+  ],
+  "aka": "GILLS ON TOP OF CAPS",
+  "spot": [
+   {
+    "v": "Gill tissue forming on the tops of caps, the mushroom 'gravitationally confused'. Odd colours, mushy deformities and poor texture can come with it.",
+    "s": [
+     "F15-0110",
+     "F15-0111"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Warty caps on king and black oyster in very high humidity are a different fault.",
+    "s": [
+     "F15-0110",
+     "F15-0120"
+    ],
+    "hz": "shape-faults"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Fix first: the humidifier water and the room's breathing cycle. Too little air exchange, droplets on caps, and cold-weather condensation are the room-management causes.",
+    "s": [
+     "F15-0111",
+     "F15-0112",
+     "F15-0117"
+    ]
+   },
+   {
+    "v": "Water: when one farm is the outlier on the same spawn lot, the cause is 'always water' (about 9.9 in 10): untreated well or even city water. Minerals settling on caps are a hypothesis, not established.",
+    "s": [
+     "F15-0113",
+     "F15-0115",
+     "F15-0116"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Steam humidification or RO, which deliver mineral-free moisture. Correct the breathing cycle.",
+    "s": [
+     "F15-0114",
+     "F15-0117"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Treat water before the fogger. Do not recirculate fogger condensate through a barrel.",
+    "s": [
+     "F15-0076",
+     "F15-0116"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Black oyster: lumpy, deformed caps blamed on water quality. Blue oyster too.",
+    "s": [
+     "F15-0113"
+    ]
+   }
+  ],
+  "w": [
+   "water-treatment 0:14:31",
+   "fruiting-facilities 0:26:47",
+   "black-oyster 0:32:29",
+   "water-treatment 0:15:32",
+   "water-treatment 0:19:41",
+   "water-treatment 0:20:44",
+   "water-treatment 0:22:47",
+   "chestnut-mushrooms 0:43:23",
+   "01-fruit-room-design 0:41:08",
+   "king-oyster 1:02:13"
+  ]
+ },
+ {
+  "id": "viruses",
+  "name": "VIRUSES",
+  "kind": "disease",
+  "stages": [
+   "fruit",
+   "block"
+  ],
+  "colours": [],
+  "smells": [],
+  "textures": [],
+  "places": [
+   "whole",
+   "cap"
+  ],
+  "species": [
+   "blue-oyster",
+   "king-oyster",
+   "black-pearl"
+  ],
+  "spot": [
+   {
+    "v": "Bizarre deformed oyster shapes. A whole group of viruses attacks Pleurotus. Common and essentially untreatable.",
+    "s": [
+     "F15-0124",
+     "F15-0127",
+     "F12-0286"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Room faults (CO2, humidity, heat) give malformed fruit too. Rule those out first.",
+    "s": [
+     "F15-0121",
+     "F15-0123"
+    ],
+    "hz": "shape-faults"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Spread by sharing cultures between farms; a culture may carry viruses, insects or mites. A South Korea outbreak was linked to a few strains distributed nationally.",
+    "s": [
+     "F15-8001",
+     "F15-0128"
+    ]
+   },
+   {
+    "v": "Virus-weakened crops are more prone to blotch.",
+    "s": [
+     "F15-0127"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Replace the culture line. There is no treatment.",
+    "s": [
+     "F12-0286",
+     "F15-0127"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Keep a record of where each culture came from and who kept it before you. Genetic testing is getting cheaper.",
+    "s": [
+     "F15-8001"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Pleurotus (oysters).",
+    "s": [
+     "F15-0127"
+    ]
+   }
+  ],
+  "w": [
+   "bacterial-blotch 0:44:18",
+   "stroma 0:05:10",
+   "bacterial-blotch 0:46:20",
+   "pod-66 1:03:19"
+  ]
+ },
+ {
+  "id": "stroma",
+  "name": "STROMA",
+  "kind": "disease",
+  "stages": [
+   "plate",
+   "grain",
+   "block",
+   "fruit"
+  ],
+  "colours": [
+   "white",
+   "yellow",
+   "orange"
+  ],
+  "smells": [],
+  "textures": [
+   "hard"
+  ],
+  "places": [
+   "patches",
+   "whole"
+  ],
+  "species": [
+   "blue-oyster",
+   "black-pearl",
+   "king-oyster"
+  ],
+  "aka": "NOT A CONTAMINANT",
+  "spot": [
+   {
+    "v": "Dense white to cream, lumpy, hard masses; in black pearl, amber- or orange-tinted circular patches. Hard (the poke test), never reverts to mycelium, dense outside and mushy and hot inside (about 38 °C / 100 °F in one bag).",
+    "s": [
+     "F15-0138",
+     "F15-0139",
+     "F15-0140",
+     "F15-0142",
+     "F15-0146"
+    ]
+   },
+   {
+    "v": "Can form as a 'golf ball' in the core while the outside looks clean. Small spots swell to huge masses in days; visible in blocks within about 5 days of inoculation.",
+    "s": [
+     "F15-0143",
+     "F15-0144",
+     "F15-0152"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Dense pillowy black pearl grain that is not rock-hard is normal. Pioppino grain patches stay soft and fluffy. A peelable skin on a plate is consolidation.",
+    "s": [
+     "F14-0104",
+     "F15-0141",
+     "F15-0134"
+    ],
+    "hz": "pearl-pillowy"
+   }
+  ],
+  "cause": [
+   {
+    "v": "About 99% starts in grain spawn; nearly never on agar. It is the crop's own stress response: burst or mushy grain and loose starch make dense clumps whose metabolism spikes heat and CO2.",
+    "s": [
+     "F15-0148",
+     "F15-0133",
+     "F15-0158",
+     "F15-0159"
+    ]
+   },
+   {
+    "v": "Also: overcooked wheat or barley, over-mixed grain, poorly mixed supplement balls in blocks, greasy bag batches, moth-damaged sorghum, and core temperatures over 19 °C (66 °F) at peak metabolism.",
+    "s": [
+     "F15-0161",
+     "F15-0163",
+     "F15-0172",
+     "F15-0173",
+     "F15-0166"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Cannot be cut out. Each expansion multiplies it about tenfold, so one bit in a master spreads through every bag. Screen and discard. Fruit is not sellable, maybe usable as powder.",
+    "s": [
+     "F15-0151",
+     "F15-0156",
+     "F15-0182"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Whole grade 1 grain; hydrate to just short of bursting; additives under 1% (one farm uses about 0.15%); break up inoculum; ambient about 18 °C (65 °F) for grain and 19 °C (66 °F) for blocks; use spawn on time.",
+    "s": [
+     "F15-0176",
+     "F15-0177",
+     "F15-0178",
+     "F15-0179",
+     "F15-0180",
+     "F15-0181"
+    ]
+   },
+   {
+    "v": "Cold-stored masters keep about a month; do not use beyond that.",
+    "s": [
+     "F15-0153"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Mostly an oyster problem: the blue oyster house line first, then black oyster. Black pearl stromas when too hot. King oyster left 0.5-1 week past colonization consolidates with some stroma.",
+    "s": [
+     "F15-0167",
+     "F15-0165"
+    ]
+   }
+  ],
+  "w": [
+   "stroma 0:58:08",
+   "stroma 0:01:03",
+   "insane-in-the-incubation 1:02:11",
+   "stroma 0:03:05",
+   "stroma 0:25:49",
+   "stroma 0:02:03",
+   "stroma 0:09:18",
+   "stroma 0:08:16",
+   "bacterial-blotch 0:44:18",
+   "stroma 0:13:26"
+  ]
+ }
+]

@@ -323,21 +323,24 @@
    "v": "Hides in faint early colonisation as slightly denser, different off-white matting until it sporulates green.",
    "s": [
     "F17-0242"
-   ]
+   ],
+   "hz": "trichoderma"
   },
   {
    "k": "Yellow liquid",
    "v": "At the bag bottom with rich 50:50 substrate. Hypothesis: hot cores wake bacterial spores.",
    "s": [
     "F17-0243"
-   ]
+   ],
+   "hz": "yellow-liquid"
   },
   {
    "k": "Blotch",
    "v": "Slow fruiting exposes it. One grower's blotch vanished after switching from constant to cyclic, CO2-triggered air exchange.",
    "s": [
     "F17-0244"
-   ]
+   ],
+   "hz": "bacterial-blotch"
   },
   {
    "k": "Agar slurry",

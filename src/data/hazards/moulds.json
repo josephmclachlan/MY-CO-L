@@ -1,0 +1,705 @@
+[
+ {
+  "id": "trichoderma",
+  "name": "TRICHODERMA",
+  "kind": "mould",
+  "stages": [
+   "grain",
+   "block",
+   "fruit"
+  ],
+  "colours": [
+   "green",
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "powdery",
+   "fuzzy"
+  ],
+  "places": [
+   "patches",
+   "whole",
+   "top"
+  ],
+  "species": [
+   "lions-mane",
+   "chestnut",
+   "pioppino",
+   "maitake"
+  ],
+  "aka": "GREEN MOULD",
+  "spot": [
+   {
+    "v": "Green once it sporulates. Before that it hides in faint early colonization, most easily on lion's mane: slightly denser matting and a slightly different off-white.",
+    "s": [
+     "F14-0015",
+     "F14-0016"
+    ]
+   },
+   {
+    "v": "Green sporulation inside many blocks cut from one substrate run points at the substrate. Green in every block made from one spawn bag points at that spawn bag.",
+    "s": [
+     "F14-0017",
+     "F14-0132",
+     "F14-0133"
+    ]
+   },
+   {
+    "v": "Also grows as green, blue or rainbow mould on racks and walls that were not cleaned between loads.",
+    "s": [
+     "F14-0018"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "A healthy ghostly, wispy lion's mane block is normal. Watch it for denser matting before you call it clean.",
+    "s": [
+     "F14-0102",
+     "F11-0296"
+    ],
+    "hz": "lm-ghostly"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Substrate that is too dry. Growers see it tolerate wider moisture and temperature ranges than the crop.",
+    "s": [
+     "F14-0019",
+     "F14-0021",
+     "F14-0166"
+    ],
+    "n": "Growers' observation, not measured."
+   },
+   {
+    "v": "Under-colonized or dried-out grain kernels, because filter patches are not airtight.",
+    "s": [
+     "F14-0022",
+     "F14-0134"
+    ]
+   },
+   {
+    "v": "Loose, wispy colonization (lion's mane is a net with large holes) and too many blocks per spawn bag. Lion's mane runs 20 per 6 lb (2.7 kg) bag; about 12-30 is acceptable and risk climbs above 30.",
+    "s": [
+     "F14-0023",
+     "F14-0024"
+    ]
+   },
+   {
+    "v": "B-patch bags raised one farm's rate sharply. Chestnut fruited too hot blooms green on top.",
+    "s": [
+     "F14-0025",
+     "F14-0026",
+     "F14-0135"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "A small contained patch in a corner of a sealed bag can still be fruited and yield well, for blocks you fruit yourself. Do not sell it.",
+    "s": [
+     "F14-0030",
+     "F14-0031"
+    ]
+   },
+   {
+    "v": "A little on the bottom of a fruiting block does not invade the fruit and is far less serious than blotch.",
+    "s": [
+     "F14-0032"
+    ]
+   },
+   {
+    "v": "Green in every block from one spawn bag: discard that spawn lot and trace the grain cook and technique.",
+    "s": [
+     "F14-0133"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Hydrate grain fully and evenly. Keep substrate moisture right, and measure what arrives (one farm blamed its mix when the sawdust came in at about 70%).",
+    "s": [
+     "F14-0134",
+     "F14-0166",
+     "F14-0167"
+    ]
+   },
+   {
+    "v": "Stay at or under 30 blocks per spawn bag. Clean racks, walls and floors before every load. Cool the chestnut room.",
+    "s": [
+     "F14-0024",
+     "F14-0204",
+     "F14-0135"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Pioppino is the first to show it and attracts more than maitake.",
+    "s": [
+     "F14-0028",
+     "F14-0253"
+    ]
+   },
+   {
+    "v": "Lion's mane: its wispy growth lets it in, and it is the early-warning species for systemic faults.",
+    "s": [
+     "F14-0023",
+     "F14-0254"
+    ]
+   },
+   {
+    "v": "Chestnut: more mould on grain than oyster, and blooms on top when fruited hot.",
+    "s": [
+     "F14-0251",
+     "F14-0026"
+    ]
+   },
+   {
+    "v": "Maitake picks it up easily, with 1-2 weeks of exposed media after any disturbance.",
+    "s": [
+     "F14-0027",
+     "F14-0252"
+    ]
+   }
+  ],
+  "w": [
+   "lions-mane-2 0:19:25",
+   "bacterial-blotch 0:04:50",
+   "fruiting-tips-and-tricks 0:01:04",
+   "neurospora 0:58:38",
+   "contamination-1 0:44:46",
+   "the-fenrir 0:32:54",
+   "chestnut-mushrooms 0:18:28",
+   "lions-mane-1 1:20:16",
+   "lions-mane-2 0:18:18",
+   "bags-and-filters 0:18:02"
+  ]
+ },
+ {
+  "id": "neurospora",
+  "name": "NEUROSPORA",
+  "kind": "mould",
+  "stages": [
+   "grain",
+   "cook",
+   "block",
+   "fruit"
+  ],
+  "colours": [
+   "orange",
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "powdery",
+   "fuzzy"
+  ],
+  "places": [
+   "top",
+   "seal",
+   "whole"
+  ],
+  "species": [
+   "chestnut",
+   "blue-oyster"
+  ],
+  "aka": "ORANGE BREAD MOULD",
+  "spot": [
+   {
+    "v": "Fast cobweb-like filaments that darken and climb the bag toward the headspace, then turn crisp and orange and burst into powdery orange puffs of spores.",
+    "s": [
+     "F14-0036",
+     "F14-0136"
+    ]
+   },
+   {
+    "v": "Grows about 3-5 mm per hour. In a sealed 5-10 lb (2.3-4.5 kg) bag it can be knocked on Friday and ruined by Monday.",
+    "s": [
+     "F14-0034",
+     "F14-0035",
+     "F14-0039"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Ripening chestnut blocks turn golden-mustard. New staff warned about Neurospora often mistake this for it.",
+    "s": [
+     "F14-0043",
+     "F14-0044",
+     "F14-0101"
+    ],
+    "hz": "chestnut-mustard"
+   },
+   {
+    "v": "Fast orange chicken-of-the-woods mycelium has been mistaken for it. It can also be mistaken for cobweb mould.",
+    "s": [
+     "F14-0045",
+     "F14-0036"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Exposure AFTER the cook. Its spores are among the first killed by steam, so a properly cooked bag is not the source.",
+    "s": [
+     "F14-0046",
+     "F14-0047"
+    ]
+   },
+   {
+    "v": "Bad bag seals are the classic entry: one spore through a pin leak can sporulate and spread over a whole block production. Also torn bags, wet filter patches, and infected bags kept near blocks cooling for next-day inoculation.",
+    "s": [
+     "F14-0049",
+     "F14-0050",
+     "F14-0052"
+    ]
+   },
+   {
+    "v": "More common in warm weather and warm, poorly regulated incubation. Loosely 'takes off above about 18 °C (65 °F)', a passing remark and not a measured limit.",
+    "s": [
+     "F14-0048",
+     "F14-9101"
+    ],
+    "f": "ctx"
+   },
+   {
+    "v": "Contaminated bags left in a building, bags opened or composted near it, and compost heaps near air intakes spread spores. Cases: a warehouse covered by Monday; a compost mound by the fruit-room ducts; blocks carried past an open window.",
+    "s": [
+     "F14-0051",
+     "F14-0056",
+     "F14-0231",
+     "F14-0232",
+     "F14-0243"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Remove infected bags from incubation at once. Do not try to salvage them. Bag and bin them sealed. Never cut them open or compost them near the farm.",
+    "s": [
+     "F14-0054",
+     "F14-0055",
+     "F11-0300"
+    ]
+   },
+   {
+    "v": "Make prompt removal a written procedure. Spray sporicide treats the symptom only; fix the process that lets it in.",
+    "s": [
+     "F14-0056",
+     "F14-9102"
+    ]
+   },
+   {
+    "v": "Kill temperature: steam handles it easily. Rough figure about 66 °C (150 °F); a second account says about 60 °C (140 °F), unconfirmed.",
+    "s": [
+     "F14-0046",
+     "F14-9103"
+    ],
+    "f": "ctx"
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Fix seals and the cool-down path. Move blocks hot into a filtered positive-pressure room. Keep compost far from air intakes.",
+    "s": [
+     "F14-0136",
+     "F14-0057",
+     "F14-0230"
+    ]
+   },
+   {
+    "v": "Track contamination by season, check airflow and pressure, change pre-filters, clean ducts, and recheck after any building change.",
+    "s": [
+     "F14-0058"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "Any species can get it. It is a seal and air problem, not a species one. Caution: it can persist for a year or more once it is in a farm.",
+    "s": [
+     "F14-0053",
+     "F14-8001",
+     "F14-8002"
+    ]
+   }
+  ],
+  "w": [
+   "neurospora 0:08:53",
+   "contamination-1 0:14:39",
+   "neurospora 0:09:56",
+   "massospora 0:10:31",
+   "neurospora 0:10:00",
+   "neurospora 0:10:59",
+   "neurospora 0:25:24",
+   "neurospora 0:46:01",
+   "neurospora 0:18:16",
+   "chestnut-mushrooms 0:11:23"
+  ]
+ },
+ {
+  "id": "pin-mould",
+  "name": "PIN MOULD",
+  "kind": "mould",
+  "stages": [
+   "cook",
+   "block"
+  ],
+  "colours": [
+   "white",
+   "yellow",
+   "green"
+  ],
+  "smells": [],
+  "textures": [
+   "fuzzy",
+   "powdery"
+  ],
+  "places": [
+   "whole",
+   "seal"
+  ],
+  "species": [],
+  "aka": "PIN MOULDS AND OTHER BREAD MOULDS",
+  "spot": [
+   {
+    "v": "The familiar fuzz on old bread and fruit. Some form yellow-green powdery colonies. Grows extremely fast and likes oxygen.",
+    "s": [
+     "F14-0061",
+     "F14-0063"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "Early black oyster blocks grew white fuzz at the cut that formed amber droplets and became the caps. That is normal pinning, not mould.",
+    "s": [
+     "F14-0064",
+     "F14-0112"
+    ],
+    "hz": "black-oyster-cobweb"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Undercooking, a dirty cool-down or bad seals, made worse by excess airflow. Case: small 2-3 lb (0.9-1.4 kg) grow kits with a too-porous filter patch and undercooked substrate; both fixed, never seen again.",
+    "s": [
+     "F14-0062",
+     "F14-0138",
+     "F14-0242"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Pin moulds, Neurospora, Trichoderma and Aspergillus are easy to kill with heat. That is why ultra-pasteurization works. Lengthen the cook and tighten the patch.",
+    "s": [
+     "F14-0060",
+     "F14-0138"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Cook long enough with a logged core temperature, use a tighter patch, cool in clean filtered air, and check seals.",
+    "s": [
+     "F14-0138",
+     "F14-0173"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "No species named in the sources.",
+    "s": [
+     "F14-0062"
+    ],
+    "f": "nodata"
+   }
+  ],
+  "w": [
+   "contamination-1 0:13:33",
+   "contamination-1 0:12:33",
+   "contamination-1 0:14:39",
+   "contamination-1 0:13:20",
+   "contamination-1 0:16:00",
+   "shimofuri-hiratake 0:23:18"
+  ]
+ },
+ {
+  "id": "rainbow",
+  "name": "RAINBOW MOULDS",
+  "kind": "mould",
+  "stages": [
+   "cook",
+   "block"
+  ],
+  "colours": [
+   "multi",
+   "green",
+   "grey",
+   "white",
+   "black",
+   "orange"
+  ],
+  "smells": [],
+  "textures": [
+   "fuzzy"
+  ],
+  "places": [
+   "whole",
+   "patches"
+  ],
+  "species": [],
+  "aka": "MANY COLOURS AT ONCE",
+  "spot": [
+   {
+    "v": "Green, grey, pin mould, white and even bacteria across a lot, a few days after knocking.",
+    "s": [
+     "F14-0093",
+     "F14-0094"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "One organism in every bag from one spawn bag is a spawn problem, not rainbow. Recurring single colours over months point to filtration, not the cook.",
+    "s": [
+     "F14-0117",
+     "F14-0095"
+    ]
+   }
+  ],
+  "cause": [
+   {
+    "v": "Air, 'nine or ten times out of ten', not a bad cook. Spores get into bags as they cool, even bags that seem sealed, and outrun the spawn.",
+    "s": [
+     "F14-0093",
+     "F14-0114",
+     "F14-0177"
+    ]
+   },
+   {
+    "v": "Or steaming too light to kill organisms living in the wood. Pull the cook logger record before changing anything.",
+    "s": [
+     "F14-0094",
+     "F14-0129"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Run the sealed-bag test: seal extra bags before the cook, cook and cool them with the batch, incubate unopened. If they grow, the cool-down air is dirty.",
+    "s": [
+     "F14-0128"
+    ]
+   },
+   {
+    "v": "Plate-test or particle-count in front of the filter. Check the filter's bottom edge for breaks.",
+    "s": [
+     "F14-0130",
+     "F14-0140"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Move blocks hot (93 °C / 200 °F or more) in racks straight into a positive-pressure HEPA room. Keep recirculating AC out of the lab and cool-down room.",
+    "s": [
+     "F14-0183",
+     "F14-0194",
+     "F14-0259"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "All species. Lion's mane shows systemic faults first.",
+    "s": [
+     "F14-0124"
+    ]
+   }
+  ],
+  "w": [
+   "contamination-2 0:07:26",
+   "contamination-1 0:19:55",
+   "dirty-lab 0:25:44"
+  ]
+ },
+ {
+  "id": "hypocrealean",
+  "name": "MYCOGONE-TYPE CRUSTY MOULDS",
+  "kind": "mould",
+  "stages": [
+   "block",
+   "fruit"
+  ],
+  "colours": [
+   "white"
+  ],
+  "smells": [],
+  "textures": [
+   "hard"
+  ],
+  "places": [
+   "patches"
+  ],
+  "species": [],
+  "aka": "HYPOCREALEAN CONTAMINANTS",
+  "spot": [
+   {
+    "v": "Some ascomycete contaminants grow in globular, crusty forms that resemble stroma. Older growers called stroma 'Mycogone', but Mycogone is a genus of real contaminants.",
+    "s": [
+     "F15-0135"
+    ]
+   }
+  ],
+  "look": [
+   {
+    "v": "True stroma is the crop's own tissue and does not spread through the air. Compare before you treat.",
+    "s": [
+     "F15-0133"
+    ],
+    "hz": "stroma"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Not worked out in the sources. Hypocrealean contaminants caused regional outbreaks in the past (France is named).",
+    "s": [
+     "F15-0135"
+    ],
+    "f": "nodata"
+   }
+  ],
+  "treat": [
+   {
+    "v": "No guidance in the sources.",
+    "s": [
+     "F15-0135"
+    ],
+    "f": "nodata"
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Treat as any mould: process, cool-down air, seals. No specific guidance in the sources.",
+    "s": [
+     "F14-0113"
+    ],
+    "f": "nodata"
+   }
+  ],
+  "risk": [
+   {
+    "v": "No species named.",
+    "s": [
+     "F15-0135"
+    ],
+    "f": "nodata"
+   }
+  ],
+  "w": [
+   "stroma 0:01:03",
+   "insane-in-the-incubation 1:02:11",
+   "stroma 0:03:05",
+   "stroma 0:25:49",
+   "stroma 0:02:03",
+   "stroma 0:09:18",
+   "stroma 0:08:16",
+   "bacterial-blotch 0:44:18"
+  ]
+ },
+ {
+  "id": "other-moulds",
+  "name": "OTHER NAMED MOULDS",
+  "kind": "mould",
+  "stages": [
+   "block",
+   "fruit"
+  ],
+  "colours": [
+   "grey",
+   "black",
+   "green"
+  ],
+  "smells": [],
+  "textures": [
+   "fuzzy"
+  ],
+  "places": [
+   "patches"
+  ],
+  "species": [],
+  "aka": "ASPERGILLUS, COBWEB MOULD, PENICILLIUM, WET BUBBLE",
+  "spot": [
+   {
+    "v": "Aspergillus is named as pervasive and easy to kill with heat. Cobweb mould, wet bubble and Penicillium get only passing mentions. The sources give no way to tell them apart by eye.",
+    "s": [
+     "F14-0060"
+    ],
+    "f": "nodata"
+   }
+  ],
+  "look": [
+   {
+    "v": "Neurospora is mistaken for cobweb mould, and fast orange chicken-of-the-woods mycelium for Neurospora.",
+    "s": [
+     "F14-0036",
+     "F14-0045"
+    ],
+    "hz": "neurospora"
+   }
+  ],
+  "cause": [
+   {
+    "v": "Handle as a rainbow-mould pattern: air at cool-down or in the lab, or an undercooked substrate.",
+    "s": [
+     "F14-0114",
+     "F14-0139"
+    ]
+   }
+  ],
+  "treat": [
+   {
+    "v": "Remove the bag, and map the pattern before changing anything.",
+    "s": [
+     "F14-0054",
+     "F14-0113"
+    ]
+   }
+  ],
+  "prevent": [
+   {
+    "v": "Same prevention as pin mould and rainbow moulds.",
+    "s": [
+     "F14-0060",
+     "F14-0259"
+    ]
+   }
+  ],
+  "risk": [
+   {
+    "v": "No species named.",
+    "s": [
+     "F14-0060"
+    ],
+    "f": "nodata"
+   }
+  ],
+  "w": [
+   "contamination-1 0:13:33",
+   "contamination-1 0:12:33",
+   "contamination-1 0:14:39",
+   "contamination-1 0:13:20",
+   "contamination-1 0:16:00",
+   "shimofuri-hiratake 0:23:18",
+   "contamination-2 0:07:26",
+   "contamination-1 0:19:55",
+   "dirty-lab 0:25:44"
+  ]
+ }
+]

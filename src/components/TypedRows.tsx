@@ -17,6 +17,8 @@ export interface Row {
   flag?: Flag
   why?: Why | null
   head?: boolean
+  /** A button that opens something related, shown beside WHY?. */
+  link?: { label: string; onClick: () => void } | null
 }
 
 interface Props {
@@ -115,6 +117,11 @@ export function TypedRows({ rows, instant, onDone }: Props) {
               {valShown}
               {typing && <span className="cursor" aria-hidden />}
               {complete && r.flag && r.flag !== 'nodata' && <span className={`tag tag-${r.flag}`}>{TAG[r.flag]}</span>}
+              {complete && r.link && (
+                <button className="why link" onClick={() => (sound.chirp(), r.link!.onClick())}>
+                  {r.link.label}
+                </button>
+              )}
               {complete && r.why && (
                 <button className="why" aria-expanded={open === r.id} onClick={() => (sound.chirp(), setOpen(open === r.id ? null : r.id))}>
                   WHY?
