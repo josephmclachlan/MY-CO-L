@@ -63,7 +63,7 @@ export function Wireframe({ size = 200, drawMs = 1600, instant }: { size?: numbe
     const camera = new OrthographicCamera(-1.2, 1.2, 1.2, -1.2, 0.1, 10)
     camera.position.set(0, 0, 4)
     const group = new Group()
-    group.rotation.x = 0.3 // tilt so the parallels read as ellipses
+    group.rotation.x = 0.5 // tilt so the parallels read as ellipses
     scene.add(group)
     const pos = globeSegments()
     const geo = new BufferGeometry()
@@ -113,17 +113,15 @@ export function Wireframe({ size = 200, drawMs = 1600, instant }: { size?: numbe
       <div ref={host} className="logo-globe" />
       <svg className="wire logo-svg" viewBox="0 0 260 200" aria-hidden="true">
         {/* band across the globe, masked so the globe lines stop at its edges */}
-        <rect className="logo-band" x="14" y="58" width="232" height="34" pathLength={1} />
-        {/* mushroom emblem: gilled cap, stem, and hyphae into the band */}
+        <rect className="logo-band" x="14" y="52" width="232" height="46" pathLength={1} />
+        {/* heavy double rules above and below the band */}
+        <path pathLength={1} d="M14 52 H246 M14 98 H246" />
+        {/* mushroom emblem: gilled cap rising from the band */}
         <g>
-          <path className="logo-cap" pathLength={1} d="M104 58 C104 22 156 22 156 58 Z" />
-          <path pathLength={1} d="M114 58 C112 44 120 32 130 29 M130 58 V29 M146 58 C148 44 140 32 130 29" />
-          
+          <path className="logo-cap" pathLength={1} d="M104 52 C104 18 156 18 156 52 Z" />
+          <path pathLength={1} d="M114 52 C112 38 120 26 130 23 M130 52 V23 M146 52 C148 38 140 26 130 23" />
         </g>
-        <g className="nodes">
-          <circle cx="130" cy="27" r="3" />
-        </g>
-        <text className="logo-corp" x="130" y="80" textAnchor="middle">BLACK FLAG FUNGI CORP</text>
+        <text className="logo-corp" x="130" y="79" textAnchor="middle">BLACK FLAG FUNGI CORP</text>
         <text className="logo-word" x="130" y="172" textAnchor="middle">MY/CO/L</text>
         <text className="logo-tag" x="130" y="193" textAnchor="middle">THE LATTICE HOLDS</text>
       </svg>
