@@ -76,8 +76,9 @@ export const MEGA_COOK: [number, number] = [12, 15] // AVERY cooker clip 0:46-1:
 /** How long a run is expected to take, for the "start now" peak check. Minutes. */
 export function expectedMinutes(kind: CookKind, heaterW: number): { comeUp: number; hold: number } {
   if (kind === 'steam_box') {
-    // FAB REV D sizing: about 4 h to core temperature at 9 kW; scaled by power for the 6.5 kW option (GUESS - REVIEW).
-    const comeUp = Math.round((4 * 60 * 9000) / Math.max(1000, heaterW))
+    // FAB REV D run table: coldest bag to 200 F in about 7 h at 9 kW (the 4 h in the older sizing notes is superseded);
+    // scaled by power for the 6.5 kW option (GUESS - REVIEW).
+    const comeUp = Math.round((7 * 60 * 9000) / Math.max(1000, heaterW))
     return { comeUp, hold: CONFIRMED_HOLD_MIN }
   }
   if (kind === 'megachef') return { comeUp: 11, hold: 14 }
@@ -102,7 +103,7 @@ export const UNITS: CookUnit[] = [
 /** Probe positions on the steam box (FAB REV D: PT100 for box air, needle in the coldest bag). */
 export const ZONES: { id: string; label: string; judged: boolean }[] = [
   { id: 'AIR', label: 'BOX AIR (PT100)', judged: false },
-  { id: 'CORE', label: 'CORE: COLDEST BAG, BOTTOM SHELF, DOOR SIDE', judged: true },
+  { id: 'CORE', label: 'CORE: COLDEST BAG, BOTTOM SHELF, CENTRE', judged: true },
   { id: 'TOP', label: 'CORE: TOP SHELF', judged: true },
   { id: 'MID', label: 'CORE: MIDDLE SHELF', judged: true },
   { id: 'BOTTOM', label: 'CORE: BOTTOM SHELF, BACK', judged: true },
@@ -192,7 +193,7 @@ export const TARGETS: Target[] = [
   { id: 'ramps', what: 'RAMPS 140-180, 180-200 AND 200-PEAK', want: 'FASTEST HERE WINS', source: "SHEET: 'INEFFICIENCIES / DAMAGE ACCUMULATION'" },
   { id: 'f', what: 'F VALUE AT 97 C / 206 F', want: '6-8 H IDEAL', source: 'SHEET: F = 97C/206F, 6-8 IDEAL. THE Z VALUE (10 C) IS NOT ON THE SHEET.', guess: true },
   { id: 'judged', what: 'WHICH PROBE JUDGES THE RUN', want: 'THE SLOWEST BAG CORE. BOX AIR IS NOT JUDGED', source: 'FAB REV D: START THE HOLD WHEN THE COLDEST BAG PASSES 93 C. WHICH ZONE NAMES COUNT AS CORES IS MY GUESS.', guess: true },
-  { id: 'comeup', what: 'COME-UP TO CORE TEMPERATURE, 9 KW', want: 'ABOUT 4 H', source: 'FAB REV D SIZING NOTES (9 KW, INSULATED BOX). INFORMATION ONLY.' },
+  { id: 'comeup', what: 'COME-UP TO CORE TEMPERATURE, 9 KW', want: 'ABOUT 7 H (ABOUT 16 H ON ONE 4.5 KW ELEMENT)', source: 'FAB REV D RUN TABLE (130 BAGS, INSULATED BOX). THE OLDER SIZING NOTES SAID 4 H; REV D SUPERSEDES THEM. INFORMATION ONLY.' },
   { id: 'x75', what: '75X GRAIN HOLD AT PRESSURE', want: '1 H 45 MIN AT 17 PSI', source: 'AVERY Q&A, STOPCOCK MODEL. THE LOG COUNTS MINUTES AT 15 PSI OR MORE (GAUGE WOBBLE) - MY GUESS.', guess: true },
   { id: 'x75-agar', what: '75X AGAR / OTHER HOLD AT PRESSURE', want: '35 MIN AT 15 PSI', source: 'NO AGAR FIGURE IN JOSEPH\'S FILES. USED THE TEXTBOOK MINIMUM FOR JARS AND GRAIN.', guess: true },
   { id: 'x75-time', what: '75X HEAT-UP AND COOL-DOWN', want: 'ABOUT 1 H AND 1-1.5 H', source: 'AVERY WORKFLOW ASSUMPTION, NOT MEASURED. YOUR FIRST LOGGED RUN REPLACES IT.' },

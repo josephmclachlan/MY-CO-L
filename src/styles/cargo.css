@@ -62,3 +62,5 @@
   .cg-reorder { font-size: 0.8em; }
 }
 .cg-inv-row span:last-child { white-space: nowrap; }
+.cg-field.cg-mix { flex-wrap: wrap; }
+.cg-field.cg-mix > span.tiny { flex-basis: 100%; }

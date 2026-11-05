@@ -9,7 +9,7 @@ import { RefText } from '../manual/ManualLinks'
 import { HazardPick } from '../components/HazardPick'
 import { hazardName, type LotLoss } from '../lib/hazard'
 import { SPECIES } from '../data/species'
-import { allot } from '../lib/runplan'
+import { weekSplit } from '../data/cropplan'
 import { WEEKLY_BAGS } from '../data/species'
 import {
   KIND_LABEL,
@@ -780,7 +780,7 @@ function LineageTab({ d, x, set, say, onLabel }: { d: XData; x: XenoState; set: 
   if (!strain || !root)
     return (
       <div className="xn-sec">
-        <div className="dim">PICK A STRAIN AT RIGHT TO SEE ITS LINE.</div>
+        <div className="dim">PICK A STRAIN IN THE LIST TO SEE ITS LINE.</div>
         <div className="xn-picker">
           {d.strains.map((s) => (
             <button key={s.id} type="button" className="btn" onClick={() => set({ strain: s.id })}>{s.code}</button>
@@ -852,9 +852,9 @@ function PlannerTab({ d, set }: { d: XData; set: SetXeno }) {
     }
   }
   const knock = prefs.knock && prefs.knock >= todayIso() ? prefs.knock : nextKnockDay(todayIso())
-  const planSpecies = SPECIES.filter((s) => (s.plan?.share ?? 0) > 0)
-  const split = new Map(allot(WEEKLY_BAGS, planSpecies).map((a) => [a.sp.id, a.bags]))
-  const keys = [...new Set([...planSpecies.map((s) => s.id), ...d.strains.filter((s) => s.active).map((s) => s.species_key)])]
+  const week = weekSplit(knock)
+  const split = new Map(week.map((x) => [x.key, x.bags]))
+  const keys = [...new Set([...week.map((x) => x.key), ...d.strains.filter((s) => s.active).map((s) => s.species_key)])]
   const today = todayIso()
 
   const rows = keys.map((key) => {
@@ -882,7 +882,7 @@ function PlannerTab({ d, set }: { d: XData; set: SetXeno }) {
         <button type="button" className="btn" onClick={() => save({ blocks: {}, strain: {}, knock: null })}>RESET TO SEQUENCE PLAN</button>
       </div>
       <div className="dim tiny">
-        STARTS FROM THE SEQUENCE WEEKLY PLAN: {WEEKLY_BAGS} BAGS ON THE CROP-PLAN SPLIT (GOLDEN AND PHOENIX SHARE ONE SLOT). CHANGE ANY BLOCK COUNT BELOW. WORKS BACK AT 20 BLOCKS PER G2 (<RefText text={RATIO_SRC.blocksPerG2} />), 12 G2 PER MASTER, NEVER FEWER THAN 6 (<RefText text={RATIO_SRC.g2PerG1} />), 12 MASTERS PER PLATE (<RefText text={RATIO_SRC.g1PerPlate} />), MASTER GROWS ABOUT 2 WEEKS (<RefText text={RATIO_SRC.g1Days} />), G2 HOLDS 2 WEEKS COLD (<RefText text={RATIO_SRC.g2Hold} />). PLATE LEAD TIMES (OYSTERS 8 D, LION'S MANE AND CORAL TOOTH 15 D) ARE FROM THE 100-BAG FARM SCHEDULE. A DATE IN WARNING COLOUR HAS ALREADY PASSED: THAT STEP NEEDED TO BE DONE ALREADY, SO THE KNOCK RELIES ON STOCK ON THE SHELF.
+        STARTS FROM THE SEQUENCE WEEKLY PLAN: {WEEKLY_BAGS} BAGS ON THIS KNOCK'S CROP-PLAN SPLIT (THE SECONDARY SLOT IS THE SPECIES YOU PICK IN PRODUCTION SEQUENCE). CHANGE ANY BLOCK COUNT BELOW. WORKS BACK AT 20 BLOCKS PER G2 (<RefText text={RATIO_SRC.blocksPerG2} />), 12 G2 PER MASTER, NEVER FEWER THAN 6 (<RefText text={RATIO_SRC.g2PerG1} />), 12 MASTERS PER PLATE (<RefText text={RATIO_SRC.g1PerPlate} />), MASTER GROWS ABOUT 2 WEEKS (<RefText text={RATIO_SRC.g1Days} />), G2 HOLDS 2 WEEKS COLD (<RefText text={RATIO_SRC.g2Hold} />). PLATE LEAD TIMES (OYSTERS 8 D, LION'S MANE AND CORAL TOOTH 15 D) ARE FROM THE 100-BAG FARM SCHEDULE. A DATE IN WARNING COLOUR HAS ALREADY PASSED: THAT STEP NEEDED TO BE DONE ALREADY, SO THE KNOCK RELIES ON STOCK ON THE SHELF.
       </div>
       {rows.map((r) => {
         const p = r.plan
