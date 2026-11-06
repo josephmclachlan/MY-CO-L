@@ -6,6 +6,7 @@
 
 export const ES: Record<string, string> = {
   'Show or hide the other four function keys, F5 to F8.': 'Mostrar u ocultar las otras cuatro teclas de función, F5 a F8.',
+  'Hide this message.': 'Ocultar este mensaje.',
   'USER GUIDE': 'GUÍA DE USO',
   'HOW TO USE EVERY SCREEN': 'CÓMO USAR CADA PANTALLA',
   'TIP MODE ON': 'MODO AYUDA ACTIVADO',
@@ -428,6 +429,7 @@ export const ES: Record<string, string> = {
   '{n} FOUND': '{n} ENCONTRADOS',
   '{n} GRADED {g}': '{n} CON CATEGORÍA {g}',
   '{n} LOTS // {kg} KG TO SAVE.': '{n} LOTES // {kg} KG POR GUARDAR.',
+  '1 LOT NEEDS ACTION': '1 LOTE NECESITA ATENCIÓN',
   '{n} LOTS NEED ACTION': '{n} LOTES NECESITAN ATENCIÓN',
   '{n} MARKED OWED': '{n} MARCADOS POR COBRAR',
   '{n} MARKED PAID {d}': '{n} MARCADOS PAGADOS {d}',

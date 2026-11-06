@@ -365,7 +365,7 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
         <span>{uncounted} NOT COUNTED</span>
         {money && (
           <span>
-            TODAY ₡
+            EXCHANGE RATE TODAY ₡
             <input className="cg-fx" aria-label="Colones per US dollar" inputMode="decimal" defaultValue={prefs.fx} key={prefs.fx} onBlur={(e) => { const v = num(e.target.value); if (v && v > 0) setPrefs({ fx: v }) }} />
             = US$1
           </span>

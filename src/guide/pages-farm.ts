@@ -175,7 +175,7 @@ export const FARM: GSection[] = [
       },
       {
         h: 'GOOD TO KNOW',
-        text: ['All times use the farm clock (Costa Rica, UTC-6). The clock in the status line is your device\'s own clock, so on a device set to another zone they can differ.', 'A cut over 30 days cannot be closed with the button: use EDIT.', 'Limits and intervals are GUESSES until you check them. See the GUESSES tab.'],
+        text: ['All times use the farm clock (Costa Rica, UTC-6), the same clock shown in the status line.', 'A cut over 30 days cannot be closed with the button: use EDIT.', 'Limits and intervals are GUESSES until you check them. See the GUESSES tab.'],
       },
     ],
   },

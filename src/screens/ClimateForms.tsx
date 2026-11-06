@@ -98,9 +98,9 @@ export function LogTab({ d, say, place: start }: { d: SensorData; say: Say; plac
           <DateTimeField label="WHEN (FARM CLOCK)" day={when.day} time={when.time} onChange={(day, time) => setWhen({ day, time })} />
         </div>
         <div className="ck-fields ck-quick">
-          <label className="ck-field"><span>TEMPERATURE C</span><input inputMode="decimal" value={temp} placeholder="E.G. 16.2" onChange={(e) => setTemp(e.target.value)} /><em>BAND {band('temp')}</em></label>
-          <label className="ck-field"><span>HUMIDITY %</span><input inputMode="decimal" value={rh} placeholder="E.G. 86" onChange={(e) => setRh(e.target.value)} /><em>BAND {band('rh')}</em></label>
-          <label className="ck-field"><span>CO2 PPM</span><input inputMode="numeric" value={co2} placeholder="E.G. 800" onChange={(e) => setCo2(e.target.value)} /><em>BAND {band('co2')}</em></label>
+          <label className="ck-field"><span>TEMPERATURE C</span><input inputMode="decimal" value={temp} placeholder="E.G. 16.2" onChange={(e) => setTemp(e.target.value)} /><em>{PLACE_LABEL[place]} BAND {band('temp')}</em></label>
+          <label className="ck-field"><span>HUMIDITY %</span><input inputMode="decimal" value={rh} placeholder="E.G. 86" onChange={(e) => setRh(e.target.value)} /><em>{PLACE_LABEL[place]} BAND {band('rh')}</em></label>
+          <label className="ck-field"><span>CO2 PPM</span><input inputMode="numeric" value={co2} placeholder="E.G. 800" onChange={(e) => setCo2(e.target.value)} /><em>{PLACE_LABEL[place]} BAND {band('co2')}</em></label>
         </div>
         <div className="ck-fields">
           <label className="ck-field"><span>NOTE (OPTIONAL)</span><input value={note} placeholder="E.G. DOOR WAS OPEN" onChange={(e) => setNote(e.target.value)} /></label>

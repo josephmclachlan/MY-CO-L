@@ -21,7 +21,12 @@ interface Shown {
   el: HTMLElement
   text: string | null
   sticky: boolean
+  /** Where the mouse rested when a hover tip opened. */
+  at?: { x: number; y: number }
 }
+
+/** A record row in a list or table: its tip goes above it, so the rows below stay readable. */
+const isRow = (el: HTMLElement) => el.matches('tr, li, [role=row]')
 
 /** What the control is called: its explicit key, aria-label, field caption, or its own text. */
 function labelOf(el: HTMLElement): string {
@@ -104,24 +109,66 @@ export function TipLayer({ screen, onGuide }: Props) {
   }, [])
 
   useEffect(() => {
+    const mouse = { x: 0, y: 0 }
+    // A control you just clicked doesn't pop its tip over the result: no hover tip on it until the mouse leaves it.
+    let pressed: HTMLElement | null = null
+    const onDown = (e: PointerEvent) => {
+      if (tipModeOn()) return
+      pressed = tipTarget(e.target)?.el ?? null
+      if (shownRef.current && !shownRef.current.sticky) hide()
+      else if (timer.current) hide()
+    }
     const onOver = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse' || tipModeOn()) return
       const hit = tipTarget(e.target)
-      if (!hit || !hit.text) return hide()
+      if (pressed && hit?.el !== pressed) pressed = null
+      if (!hit || !hit.text || hit.el === pressed) return hide()
       if (shownRef.current?.el === hit.el) return
       hide()
-      later(() => setShown({ el: hit.el, text: hit.text, sticky: false }), HOVER_MS)
+      later(() => setShown({ el: hit.el, text: hit.text, sticky: false, at: { ...mouse } }), HOVER_MS)
+    }
+    // A hover tip is for a resting mouse: moving on along a row or down a list hides it, and it comes back when the mouse rests again.
+    const onMove = (e: PointerEvent) => {
+      mouse.x = e.clientX
+      mouse.y = e.clientY
+      if (e.pointerType !== 'mouse' || tipModeOn()) return
+      const cur = shownRef.current
+      if (!cur || cur.sticky || !cur.at) {
+        if (!cur && timer.current) {
+          // Still waiting to show: restart the wait while the mouse keeps moving.
+          const hit = tipTarget(e.target)
+          if (hit?.text && hit.el !== pressed) later(() => setShown({ el: hit.el, text: hit.text, sticky: false, at: { ...mouse } }), HOVER_MS)
+        }
+        return
+      }
+      if (Math.hypot(e.clientX - cur.at.x, e.clientY - cur.at.y) > 12) {
+        const hit = tipTarget(e.target)
+        hide()
+        if (hit?.text && hit.el !== pressed) later(() => setShown({ el: hit.el, text: hit.text, sticky: false, at: { ...mouse } }), HOVER_MS)
+      }
     }
     const onOut = (e: PointerEvent) => {
       if (e.pointerType === 'mouse' && !shownRef.current?.sticky) hide()
     }
+    // Touch-only phones get tips from ? TIPS only: typing a command on the phone keyboard moves focus too, and a tip would pop up over the page.
+    const touchOnly = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    // Keyboard tips follow the keys that move focus (Tab, arrows, [ ]), not the jumps the app makes after a typed command.
+    let navAt = 0
+    const NAV_KEYS = new Set(['Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', '[', ']', 'Home', 'End', 'PageUp', 'PageDown'])
+    const onNavKey = (e: KeyboardEvent) => {
+      if (NAV_KEYS.has(e.key)) navAt = Date.now()
+    }
     const onFocus = (e: FocusEvent) => {
-      if (shownRef.current?.sticky) return
+      if (shownRef.current?.sticky || touchOnly) return
       const hit = tipTarget(e.target)
       if (!hit || !hit.text) return hide()
       if (!hit.el.matches(':focus-visible')) return hide() // not the focus a mouse click gives
       hide()
-      later(() => setShown({ el: hit.el, text: hit.text, sticky: false }), FOCUS_MS)
+      const at = Date.now()
+      // Checked when the tip is due: the key handler that moved focus may run after this focus event.
+      later(() => {
+        if (navAt >= at - 600 && document.activeElement === hit.el) setShown({ el: hit.el, text: hit.text, sticky: false })
+      }, FOCUS_MS)
     }
     const onBlur = () => {
       if (!shownRef.current?.sticky) hide()
@@ -157,19 +204,25 @@ export function TipLayer({ screen, onGuide }: Props) {
       if (shownRef.current && !(e.target instanceof Element && e.target.closest('[data-tip-ui]'))) hide()
     }
     document.addEventListener('pointerover', onOver)
+    document.addEventListener('pointerdown', onDown, true)
+    document.addEventListener('pointermove', onMove, { passive: true })
     document.addEventListener('pointerout', onOut)
     document.addEventListener('focusin', onFocus)
     document.addEventListener('focusout', onBlur)
     window.addEventListener('keydown', onKey, true)
+    window.addEventListener('keydown', onNavKey, true)
     for (const ev of SWALLOW) document.addEventListener(ev, swallow, true)
     window.addEventListener('scroll', away, true)
     window.addEventListener('resize', away)
     return () => {
       document.removeEventListener('pointerover', onOver)
+      document.removeEventListener('pointerdown', onDown, true)
+      document.removeEventListener('pointermove', onMove)
       document.removeEventListener('pointerout', onOut)
       document.removeEventListener('focusin', onFocus)
       document.removeEventListener('focusout', onBlur)
       window.removeEventListener('keydown', onKey, true)
+      window.removeEventListener('keydown', onNavKey, true)
       for (const ev of SWALLOW) document.removeEventListener(ev, swallow, true)
       window.removeEventListener('scroll', away, true)
       window.removeEventListener('resize', away)
@@ -188,9 +241,14 @@ export function TipLayer({ screen, onGuide }: Props) {
     const r = shown.el.getBoundingClientRect()
     const b = bubble.current.getBoundingClientRect()
     const m = 8
-    let top = r.bottom + 8
-    if (top + b.height > window.innerHeight - m) top = Math.max(m, r.top - b.height - 8)
-    const left = Math.min(Math.max(m, r.left + r.width / 2 - b.width / 2), Math.max(m, window.innerWidth - b.width - m))
+    const above = r.top - b.height - 8
+    const below = r.bottom + 8
+    // Rows: above the row (the next rows stay readable), else below. Other controls: below, else above.
+    let top = isRow(shown.el) && above >= m ? above : below
+    if (top + b.height > window.innerHeight - m) top = Math.max(m, above)
+    // A hover tip on a wide row sits by the mouse, not the middle of the row.
+    const cx = shown.at && r.width > 240 ? shown.at.x : r.left + r.width / 2
+    const left = Math.min(Math.max(m, cx - b.width / 2), Math.max(m, window.innerWidth - b.width - m))
     setPos({ left, top })
     shown.el.setAttribute('aria-describedby', 'tip-bubble')
   }, [shown])

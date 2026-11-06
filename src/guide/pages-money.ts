@@ -308,7 +308,7 @@ export const MORE: GSection[] = [
       },
       {
         h: 'I CANNOT OPEN A SCREEN',
-        text: ['The sentence on the hint line says why. A staff login cannot open money screens, history, data or the textbook. Ask the owner.'],
+        text: ['The answer bar above the prompt says why. A staff login cannot open money screens, history, data or the textbook. Ask the owner.'],
       },
       {
         h: 'THE SCREEN IS HARD TO READ',

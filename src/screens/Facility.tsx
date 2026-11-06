@@ -97,7 +97,6 @@ export function Facility({ x, set, say, onGo }: { x: FacState; set: SetFac; say:
           {FAC_TABS.map((t) => <option key={t} value={t}>{t}</option>)}
         </Select>
       </label>
-      <div className="dim tiny mn-swipe">WIDE TABLES SLIDE SIDEWAYS: SWIPE THEM LEFT FOR MORE COLUMNS.</div>
       {x.tab === 'STATUS' && <StatusTab d={d} lines={d.lines} reminders={d.reminders} set={set} onGo={onGo} say={say} />}
       {x.tab === 'POWER CUTS' && <PowerTab d={d} say={say} />}
       {x.tab === 'WATER' && <WaterTab d={d} say={say} />}
