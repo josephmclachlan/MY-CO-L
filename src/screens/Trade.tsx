@@ -16,6 +16,8 @@ import { Money, Tag } from './Ledger'
 import { salePrice } from '../lib/rates'
 import { useFx, useFxSync } from '../store/useFx'
 import { useRates } from '../store/useRates'
+import { holdFor, nextReceiptNo, owed, PAYMENT_RULE, payStatus, paidDay } from '../lib/money'
+import { todayIso } from '../lib/xeno'
 
 // TRADE: sales. Quick entry on a phone, totals and charts by channel and product, margin against LEDGER.
 
@@ -127,6 +129,7 @@ function SaleForm({ sales, rate, say, cost, lotCodes, onOpenPrices }: { sales: S
   const [amount, setAmount] = useState('') // blank = kg x price
   const [lots, setLots] = useState('')
   const [notes, setNotes] = useState('')
+  const [unpaid, setUnpaid] = useState(false)
   const rt = useRates()
   const def = salePrice(sp, form, rt)
   const k = num(kg)
@@ -139,6 +142,8 @@ function SaleForm({ sales, rate, say, cost, lotCodes, onOpenPrices }: { sales: S
   const c = cost(sp)
   const mg = form === 'fresh' && c.perKg !== null && k && amt ? amt - c.perKg * k : null
   const names = useMemo(() => buyers(sales).map((b) => b.name), [sales])
+  const ow = useMemo(() => owed(sales, todayIso()), [sales])
+  const hold = holdFor(ow, buyer)
 
   const fillFromBuyer = (name: string) => {
     const last = lastSaleTo(sales, name)
@@ -153,10 +158,27 @@ function SaleForm({ sales, rate, say, cost, lotCodes, onOpenPrices }: { sales: S
   const save = async () => {
     if (k === null || k <= 0) return say('TYPE THE KG SOLD.', true)
     if (amt === null || amt < 0) return say('TYPE THE ₡ AMOUNT (NO DEFAULT PRICE FOR THIS PRODUCT).', true)
-    const row = newSale({ sold_on: day, buyer: buyer.trim() || null, channel, species_key: sp, form, grade, kg: k, amount_crc: amt, lot_codes: codes.length ? codes : null, notes: notes.trim() || null })
+    if (unpaid && !buyer.trim()) return say('TYPE THE BUYER: AN UNPAID SALE NEEDS A NAME TO CHASE.', true)
+    const row = newSale({
+      sold_on: day,
+      buyer: buyer.trim() || null,
+      channel,
+      species_key: sp,
+      form,
+      grade,
+      kg: k,
+      amount_crc: amt,
+      lot_codes: codes.length ? codes : null,
+      notes: notes.trim() || null,
+      pay_status: unpaid ? 'owed' : 'paid',
+      paid_on: unpaid ? null : day,
+      receipt_no: nextReceiptNo(sales, day),
+    })
     try {
-      await store.put('sales', row)
-      say(`SALE SAVED // ${k} KG ${speciesName(sp)} // ${fmtCrc(amt)}${row.buyer ? ` // ${row.buyer.toUpperCase()}` : ''}`)
+      const msg = `SALE SAVED ${row.receipt_no} // ${k} KG ${speciesName(sp)} // ${fmtCrc(amt)}${row.buyer ? ` // ${row.buyer.toUpperCase()}` : ''}${unpaid ? ' // OWED' : ''}`
+      await store.action(msg, () => store.put('sales', row))
+      say(msg, unpaid)
+      setUnpaid(false)
       setKg('')
       setAmount('')
       setLots('')
@@ -177,6 +199,11 @@ function SaleForm({ sales, rate, say, cost, lotCodes, onOpenPrices }: { sales: S
             <input list="tr-buyers" value={buyer} placeholder="NAME (OPTIONAL)" onChange={(e) => setBuyer(e.target.value)} onBlur={(e) => fillFromBuyer(e.target.value)} />
           </label>
         </div>
+        {hold && (
+          <div className="lg-warn" data-testid="buyer-hold">
+            {hold.buyer.toUpperCase()} IS ON HOLD: OWES {fmtCrc(hold.crc)} SINCE {hold.oldest} ({hold.n} SALE{hold.n === 1 ? '' : 'S'}). {PAYMENT_RULE} TAKE THE OLD MONEY BEFORE THIS DELIVERY.
+          </div>
+        )}
         <datalist id="tr-buyers">{names.map((n) => <option key={n} value={n} />)}</datalist>
         <div className="ck-field"><span>CHANNEL <Guess /></span><Buttons value={channel} options={CHANNELS} onPick={setChannel} /></div>
         <label className="ck-field">
@@ -203,7 +230,7 @@ function SaleForm({ sales, rate, say, cost, lotCodes, onOpenPrices }: { sales: S
           </label>
         </div>
         <label className="ck-field">
-          <span>LOT CODES (E.G. B1020 L1022)</span>
+          <span>LOT CODES (E.G. B1020 L1022) // NEEDED FOR TRACE AND RECALL</span>
           <input list="tr-lots" value={lots} onChange={(e) => setLots(e.target.value)} />
           {odd.length > 0 && <em className="lg-warn-text">NOT A LOGGED LOT: {odd.join(', ')}. SAVED ANYWAY.</em>}
         </label>
@@ -214,6 +241,14 @@ function SaleForm({ sales, rate, say, cost, lotCodes, onOpenPrices }: { sales: S
             MARGIN {fmtCrc(mg)} ({((mg / amt) * 100).toFixed(0)}%) AT LEDGER COST {fmtCrc(c.perKg as number)}/KG <Tag b={c.basis} />
           </div>
         )}
+        <div className="ck-field">
+          <span>PAYMENT</span>
+          <div className="lg-btns">
+            <button type="button" className={`btn ${!unpaid ? 'on' : ''}`} aria-pressed={!unpaid} onClick={() => setUnpaid(false)}>PAID ON DELIVERY</button>
+            <button type="button" className={`btn ${unpaid ? 'on' : ''}`} aria-pressed={unpaid} onClick={() => setUnpaid(true)}>NOT PAID YET</button>
+          </div>
+          {unpaid && <em className="lg-warn-text">BREAKS THE CASH ON DELIVERY RULE. THE SALE SHOWS IN MONEY OWED AND THE BUYER GOES ON HOLD UNTIL PAID.</em>}
+        </div>
         <button type="button" className="btn on lg-save" onClick={() => void save()}>SAVE SALE</button>
       </div>
     </div>
@@ -377,7 +412,7 @@ function Log({ sales, rate, say }: { sales: Sale[]; rate: Rate; say: Say }) {
       {sales.length === 0 ? <div className="dim">NO SALES YET.</div> : (
         <div className="ck-scroll">
           <table className="lg-table">
-            <thead><tr><th>DAY</th><th>BUYER</th><th>CHANNEL</th><th>PRODUCT</th><th>GRADE</th><th>KG</th><th>₡</th><th>₡/KG</th><th>LOTS</th><th /></tr></thead>
+            <thead><tr><th>DAY</th><th>BUYER</th><th>CHANNEL</th><th>PRODUCT</th><th>GRADE</th><th>KG</th><th>₡</th><th>₡/KG</th><th>PAID</th><th>LOTS</th><th /></tr></thead>
             <tbody>
               {sales.slice(0, 200).map((s) => (
                 <tr key={s.id}>
@@ -389,6 +424,7 @@ function Log({ sales, rate, say }: { sales: Sale[]; rate: Rate; say: Say }) {
                   <td>{Number(s.kg).toFixed(2)}</td>
                   <td>{fmtCrc(Number(s.amount_crc))} <small className="dim">{fmtUsd(Number(s.amount_crc), rate(s.sold_on))}</small></td>
                   <td>{Number(s.kg) > 0 ? fmtCrc(Number(s.amount_crc) / Number(s.kg)) : '--'}</td>
+                  <td>{payStatus(s) === 'paid' ? paidDay(s) : payStatus(s) === 'owed' ? <span className="lg-warn-text">OWED</span> : 'WRITTEN OFF'}</td>
                   <td>{(s.lot_codes ?? []).join(' ') || '--'}</td>
                   <td><Confirm label="DELETE" onYes={() => void store.del('sales', s.id).then(() => say('SALE DELETED'), (e: Error) => say(e.message.toUpperCase(), true))} /></td>
                 </tr>

@@ -94,6 +94,9 @@ export const TABLE_NAMES: Record<string, [string, string]> = {
   photos: ['PHOTO', 'PHOTOS'],
   standing_orders: ['STANDING ORDER', 'STANDING ORDERS'],
   order_weeks: ['ORDER WEEK CHANGE', 'ORDER WEEK CHANGES'],
+  cash_moves: ['MONEY ENTRY', 'MONEY ENTRIES'],
+  budget_lines: ['BUDGET FIGURE', 'BUDGET FIGURES'],
+  waste_log: ['WASTE ENTRY', 'WASTE ENTRIES'],
   sensor_readings: ['SENSOR READING', 'SENSOR READINGS'],
 }
 
@@ -112,6 +115,9 @@ export const TABLE_SCREEN: Record<string, string> = {
   photos: 'MISSION CONTROL',
   standing_orders: 'STANDING ORDERS',
   order_weeks: 'STANDING ORDERS',
+  cash_moves: 'MONEY',
+  budget_lines: 'MONEY',
+  waste_log: 'MONEY',
   hazard_logs: 'HAZARD INDEX',
   cook_runs: 'PROPULSION',
   cook_readings: 'PROPULSION',
@@ -174,6 +180,10 @@ export function showValue(v: unknown, max = 80): string {
 export function rowName(table: string, r: Row | null | undefined): string {
   if (!r) return ''
   if (table === 'fx_rates' && typeof r.day === 'string') return r.day
+  if (table === 'budget_lines') return `BUDGET ${String(r.month ?? '')} ${String(r.line ?? '').toUpperCase()}`
+  if (table === 'cash_moves') return `${String(r.day ?? '')} ${String(r.line ?? '').toUpperCase()}`
+  if (table === 'waste_log') return `WASTE ${String(r.logged_on ?? '')}`
+  if (table === 'sales' && typeof r.receipt_no === 'string' && r.receipt_no) return `${r.receipt_no} ${String(r.buyer ?? '').toUpperCase()}`.trim()
   const pick = ['code', 'lot_code', 'label', 'name', 'buyer', 'unit_label', 'run_ref', 'checked_on', 'started_on', 'harvested_on', 'sold_on', 'moved_at']
   for (const k of pick) {
     const v = r[k]

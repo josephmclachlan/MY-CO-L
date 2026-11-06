@@ -22,6 +22,7 @@ export const BACKUP_TABLES = [
   'grain_runs', 'block_lots', 'contaminants', 'lot_losses', 'hazard_logs', 'harvests', 'sales', 'sale_lots',
   'items', 'item_prices', 'stock_moves', 'energy_bills', 'labour_entries', 'reference_entries', 'app_settings', 'fx_rates',
   'bank_tests', 'viability_checks', 'strain_trials', 'flush_log', 'photos', 'standing_orders', 'order_weeks',
+  'cash_moves', 'budget_lines', 'waste_log',
   'edit_log',
 ] as const
 
@@ -271,7 +272,8 @@ export class Store {
 
   private journal(table: string, list: { before: Row | null; after: Row | null }[], bg?: BackgroundWrite) {
     if (table === EDIT_LOG || !list.length) return
-    const changes: Change[] = list.filter((c) => c.before !== null || c.after !== null).map((c) => ({ table, ...c }))
+    // A write that changed nothing (same values saved again) is not a step: UNDO must never pop an invisible change.
+    const changes: Change[] = list.filter((c) => (c.before !== null || c.after !== null) && !(c.before && c.after && !diffRow(c.before, c.after).length)).map((c) => ({ table, ...c }))
     if (!changes.length) return
     if (bg) {
       // The app writing on its own (a fetched exchange rate): logged, never mixed into the user's UNDO.

@@ -17,6 +17,12 @@ export interface Sale extends Row {
   notes: string | null
   /** Set when the sale was ticked off a standing order on the pick list (G5). */
   order_id?: string | null
+  /** Money (G6). Missing = paid on the sale day: every buyer pays cash on delivery. */
+  pay_status?: 'paid' | 'owed' | 'written_off' | null
+  /** Day the cash came in (paid), or the day it was written off. */
+  paid_on?: string | null
+  /** Receipt number, given once: R2611-001. */
+  receipt_no?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -31,6 +37,9 @@ export function newSale(p: Partial<Sale> & Pick<Sale, 'sold_on' | 'channel' | 'k
     grade: null,
     lot_codes: null,
     notes: null,
+    pay_status: 'paid',
+    paid_on: p.sold_on,
+    receipt_no: null,
     created_at: now,
     updated_at: now,
     ...p,

@@ -80,4 +80,5 @@ export const MODULES: ModuleDef[] = [
   { key: 'HISTORY', num: 13, name: 'HISTORY', what: 'EDITS, UNDO AND SYNC', build: 13 },
   { key: 'YIELD', num: 14, name: 'PRODUCTION RECORDS', what: 'BE%, SCORECARD, TRIALS', build: 14 },
   { key: 'ORDERS', num: 15, name: 'STANDING ORDERS', what: 'BUYERS, FORECAST, PICK LIST', build: 15 },
+  { key: 'MONEY', num: 16, name: 'MONEY', what: 'OWED, PROFIT, CASH FLOW, TRENDS', build: 16 },
 ]
