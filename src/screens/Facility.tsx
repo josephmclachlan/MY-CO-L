@@ -37,7 +37,7 @@ export interface FacState {
 export const FAC_START: FacState = { tab: 'STATUS', check: null }
 type SetFac = (p: Partial<FacState>) => void
 
-export type GoScreen = 'FACILITY' | 'MONEY' | 'MISSION' | 'XENO' | 'CARGO' | 'TRADE'
+export type GoScreen = 'FACILITY' | 'MONEY' | 'MISSION' | 'XENO' | 'CARGO' | 'TRADE' | 'ATMOS'
 
 export const FACILITY_GUESSES = [
   'Times are the farm clock (Costa Rica, UTC-6, no daylight saving). A day or month is always the farm\'s day or month, whatever the phone clock says.',

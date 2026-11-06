@@ -105,6 +105,8 @@ export const TABLE_NAMES: Record<string, [string, string]> = {
   checklist_runs: ['CHECKLIST SIGN-OFF', 'CHECKLIST SIGN-OFFS'],
   reminders: ['REMINDER', 'REMINDERS'],
   sensor_readings: ['SENSOR READING', 'SENSOR READINGS'],
+  sensors: ['SENSOR', 'SENSORS'],
+  ac_log: ['AC CHECK', 'AC CHECKS'],
 }
 
 /** Which screen each table is edited on, so the HISTORY filter can say it in the farm's words. */
@@ -126,6 +128,9 @@ export const TABLE_SCREEN: Record<string, string> = {
   budget_lines: 'MONEY',
   waste_log: 'MONEY',
   power_cuts: 'FACILITY LOGS',
+  sensors: 'ATMOSPHERICS',
+  sensor_readings: 'ATMOSPHERICS',
+  ac_log: 'ATMOSPHERICS',
   water_tests: 'FACILITY LOGS',
   maint_items: 'FACILITY LOGS',
   maint_log: 'FACILITY LOGS',
@@ -204,6 +209,8 @@ export function rowName(table: string, r: Row | null | undefined): string {
   if (table === 'clean_log') return `CLEAN ${String(r.room_id ?? '').toUpperCase()} ${String(r.cleaned_on ?? '')}`
   if (table === 'checklist_runs') return `${String(r.template ?? '').toUpperCase()} ${String(r.done_on ?? '')}`
   if (table === 'reminders') return String(r.text ?? '').slice(0, 40)
+  if (table === 'sensor_readings') return `${String(r.place ?? '').toUpperCase()} ${Number.isFinite(Date.parse(String(r.taken_at))) ? new Date(Date.parse(String(r.taken_at)) - 6 * 3600000).toISOString().slice(0, 16).replace('T', ' ') : ''}`
+  if (table === 'ac_log') return `${String(r.unit ?? '').toUpperCase()} ${Number.isFinite(Date.parse(String(r.logged_at))) ? new Date(Date.parse(String(r.logged_at)) - 6 * 3600000).toISOString().slice(0, 16).replace('T', ' ') : ''}`
   if (table === 'sales' && typeof r.receipt_no === 'string' && r.receipt_no) return `${r.receipt_no} ${String(r.buyer ?? '').toUpperCase()}`.trim()
   const pick = ['code', 'lot_code', 'label', 'name', 'buyer', 'unit_label', 'run_ref', 'checked_on', 'started_on', 'harvested_on', 'sold_on', 'moved_at']
   for (const k of pick) {

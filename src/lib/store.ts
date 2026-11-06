@@ -16,7 +16,7 @@ import { autoLabel, diffRow, same, SUMMARY_OVER, type EditEntry, type EditOp, ty
 export type Row = { id: string } & Record<string, unknown>
 
 /** Tables the backup file carries, in an order that satisfies foreign keys.
- *  sensor_readings is left out on purpose: it grows without limit. */
+ *  sensor_readings is left out on purpose: it grows without limit (CLIMATE > GRAPHS exports it as CSV). */
 export const BACKUP_TABLES = [
   'species', 'strains', 'cultures', 'rooms', 'circuits', 'equipment', 'cook_runs', 'cook_readings',
   'grain_runs', 'block_lots', 'contaminants', 'lot_losses', 'hazard_logs', 'harvests', 'sales', 'sale_lots',
@@ -24,6 +24,7 @@ export const BACKUP_TABLES = [
   'bank_tests', 'viability_checks', 'strain_trials', 'flush_log', 'photos', 'standing_orders', 'order_weeks',
   'cash_moves', 'budget_lines', 'waste_log',
   'power_cuts', 'water_tests', 'maint_items', 'maint_log', 'clean_log', 'checklist_runs', 'reminders',
+  'sensors', 'ac_log',
   'edit_log',
 ] as const
 
@@ -216,7 +217,8 @@ export class Store {
     if (!list.length) return
     const before = this.data.get(table) ?? []
     const gone = new Set(list)
-    const base = new Map<string, Row | null>(list.map((id) => [id, before.find((r) => r.id === id) ?? null]))
+    const byId = new Map(before.map((r) => [r.id, r]))
+    const base = new Map<string, Row | null>(list.map((id) => [id, byId.get(id) ?? null]))
     this.data.set(table, before.filter((r) => !gone.has(r.id)))
     this.bump()
     try {
@@ -279,7 +281,7 @@ export class Store {
     if (bg) {
       // The app writing on its own (a fetched exchange rate): logged, never mixed into the user's UNDO.
       const a = newAction(bg.label, null, 'system', false)
-      a.changes.push(...changes)
+      for (const c of changes) a.changes.push(c)
       void this.writeLog(a, changes, 'APP')
       return
     }
@@ -289,13 +291,13 @@ export class Store {
       if (this.lastAuto && now - this.lastAuto.t < Store.GROUP_MS) a = this.lastAuto.a
       else a = newAction('', this.screen, 'edit', true)
       this.lastAuto = { a, t: now }
-      a.changes.push(...changes)
+      for (const c of changes) a.changes.push(c)
       a.label = autoLabel(a.changes.map(changeOp))
       this.pushUndo(a)
       void this.writeLog(a, changes)
       return
     }
-    a.changes.push(...changes)
+    for (const c of changes) a.changes.push(c)
     this.pushUndo(a)
   }
 
@@ -398,7 +400,11 @@ export class Store {
     if (!changes.length) return
     const rows: EditEntry[] = []
     const byTable = new Map<string, Change[]>()
-    for (const c of changes) byTable.set(c.table, [...(byTable.get(c.table) ?? []), c])
+    for (const c of changes) {
+      const l = byTable.get(c.table)
+      if (l) l.push(c)
+      else byTable.set(c.table, [c])
+    }
     for (const [table, list] of byTable) {
       if (list.length > SUMMARY_OVER) {
         rows.push(entry(a, who, table, '*', 'update', [{ f: 'records', old: null, new: list.length }], null))

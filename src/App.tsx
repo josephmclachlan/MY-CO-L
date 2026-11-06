@@ -27,6 +27,7 @@ import { Yield, YieldIndex, YIELD_START, YIELD_TABS, type YieldState } from './s
 import { Orders, OrdersIndex, ORDERS_START, ORDERS_TABS, type OrdersState } from './screens/Orders'
 import { Money, MoneyIndex, MONEY_START, MONEY_TABS, type MoneyState } from './screens/Money'
 import { Facility, FacilityIndex, FAC_START, FAC_TABS, ReminderWatcher, type FacState, type GoScreen } from './screens/Facility'
+import { Climate, ClimateIndex, AT_START, AT_TABS, type AtState } from './screens/Climate'
 import { History, HistoryIndex, HISTORY_START, HistoryNavContext, SyncLamp, UndoButton, undoneText, type HistoryState } from './screens/History'
 import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
@@ -65,6 +66,7 @@ const YIELD_IDX = MODULES.findIndex((m) => m.key === 'YIELD')
 const ORDERS_IDX = MODULES.findIndex((m) => m.key === 'ORDERS')
 const MONEY_IDX = MODULES.findIndex((m) => m.key === 'MONEY')
 const FACILITY_IDX = MODULES.findIndex((m) => m.key === 'FACILITY')
+const ATMOS_IDX = MODULES.findIndex((m) => m.key === 'ATMOS')
 
 /** Everything needed to put the terminal back on a screen: Back restores one of these. */
 interface Snap {
@@ -85,6 +87,7 @@ interface Snap {
   ord: OrdersState
   money: MoneyState
   fac: FacState
+  atm: AtState
 }
 const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
@@ -135,6 +138,8 @@ export default function App() {
   const setMoney = useCallback((p: Partial<MoneyState>) => setMoneyState((c) => ({ ...c, ...p })), [])
   const [fac, setFacState] = useState<FacState>(FAC_START)
   const setFac = useCallback((p: Partial<FacState>) => setFacState((c) => ({ ...c, ...p })), [])
+  const [atm, setAtmState] = useState<AtState>(AT_START)
+  const setAtm = useCallback((p: Partial<AtState>) => setAtmState((c) => ({ ...c, ...p })), [])
   const store = useStore()
   const strains = useTable<Strain>('strains')
   useFxSync() // today's colones per dollar, once a day when online
@@ -142,7 +147,7 @@ export default function App() {
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac }
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac, atm }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -188,6 +193,7 @@ export default function App() {
     setOrdState(s.ord)
     setMoneyState(s.money)
     setFacState(s.fac)
+    setAtmState(s.atm)
     power.setSelectedRoom(s.room)
     setReply(null)
     setSweep((n) => n + 1)
@@ -301,6 +307,14 @@ export default function App() {
     if (!here) go({ name: 'module', idx: FACILITY_IDX }, false)
     else sound.chirp()
   }
+  const openAtmos = (p: Partial<AtState>) => {
+    const here = view.name === 'module' && view.idx === ATMOS_IDX
+    if (!here) pushHist()
+    setAtm(p)
+    setSelected(ATMOS_IDX)
+    if (!here) go({ name: 'module', idx: ATMOS_IDX }, false)
+    else sound.chirp()
+  }
   const openModuleKey = (key: string) => {
     const idx = MODULES.findIndex((m) => m.key === key)
     if (idx < 0) return
@@ -309,6 +323,7 @@ export default function App() {
   }
   const goScreen = (screen: GoScreen, tab?: string) => {
     if (screen === 'FACILITY') return openFacility({ tab: (FAC_TABS.find((t) => t === tab) ?? 'STATUS') })
+    if (screen === 'ATMOS') return openAtmos({ tab: (AT_TABS.find((t) => t === tab) ?? 'NOW') })
     if (screen === 'MONEY') return openMoney({ tab: (MONEY_TABS.find((t) => t === tab) ?? 'OWED') })
     return openModuleKey(screen === 'XENO' ? 'XENO' : screen)
   }
@@ -598,6 +613,16 @@ export default function App() {
       setFac({ tab: fTab })
       return sound.chirp()
     }
+    // Climate sensors and alarms.
+    if (['ATMOS', 'ATMOSPHERICS', 'CLIMATE', 'SENSOR', 'SENSORS', 'TEMPS', 'TEMPERATURE', 'HUMIDITY'].includes(cmd)) return openAtmos({ tab: 'NOW' })
+    if (['ALARMS', 'CLIMATEALARMS'].includes(cmd)) return openAtmos({ tab: 'ALARMS' })
+    if (['GRAPH', 'GRAPHS', 'CHART'].includes(cmd)) return openAtmos({ tab: 'GRAPHS' })
+    if (['READING', 'LOGREADING', 'TEMP'].includes(cmd)) return openAtmos({ tab: 'LOG READING' })
+    if (['CSV', 'IMPORT', 'IMPORTCSV', 'GOVEE'].includes(cmd)) return openAtmos({ tab: 'IMPORT CSV' })
+    if (['AC', 'ACS', 'ACUNITS', 'LENNOX', 'AIRCON'].includes(cmd)) return openAtmos({ tab: 'AC UNITS' })
+    if (['SETPOINT', 'SETPOINTS', 'BANDS'].includes(cmd)) return openAtmos({ tab: 'SET POINTS' })
+    if (['FEED', 'FEEDS'].includes(cmd)) return openAtmos({ tab: 'FEEDS' })
+    if (['MOCK', 'MOCKTEST'].includes(cmd)) return openAtmos({ tab: 'MOCK TEST' })
     // Power and rooms.
     const openVitals = () => {
       setSelected(VITALS_IDX)
@@ -915,6 +940,7 @@ export default function App() {
       else if (view.idx === YIELD_IDX) content = <Yield x={yld} set={setYld} say={say} />
       else if (view.idx === ORDERS_IDX) content = <Orders x={ord} set={setOrd} say={say} />
       else if (view.idx === FACILITY_IDX) content = <Facility x={fac} set={setFac} say={say} onGo={goScreen} />
+      else if (view.idx === ATMOS_IDX) content = <Climate x={atm} set={setAtm} say={say} />
       else if (view.idx === MONEY_IDX) content = <Money x={money} set={setMoney} say={say} onOpenTrade={() => openTrade({ tab: 'SALE' })} onOpenLedger={() => openLedger({ sel: 'bills' })} />
       else if (view.idx === HISTORY_IDX) content = <History x={hist} set={setHist} say={say} />
       else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} onOpenPrices={() => openLedger({ sel: 'settings' })} onOpenOrders={() => openOrders({ tab: 'ORDERS' })} />
@@ -956,6 +982,8 @@ export default function App() {
     hints.module = 'CASH ON DELIVERY // US$ AT EACH RECORD\'S OWN DAY // TYPE OWED, PNL, CASH, TRENDS, WASTE, TRACE OR WHATIF // F2 MENU'
   if (view.name === 'module' && view.idx === FACILITY_IDX)
     hints.module = 'PRESS POWER WENT OUT THE MOMENT THE GRID FAILS // TYPE POWERCUT, WATER, CHECKLIST, MAINT, CLEANING OR REMINDERS // TIMES ARE THE FARM CLOCK // F2 MENU'
+  if (view.name === 'module' && view.idx === ATMOS_IDX)
+    hints.module = 'TAP A ROOM FOR ITS GRAPH // TYPE ALARMS, GRAPH, READING, CSV, AC, SETPOINTS, FEEDS OR MOCK // TIMES ARE THE FARM CLOCK // F2 MENU'
   if (view.name === 'module' && view.idx === HISTORY_IDX)
     hints.module = 'TAP A CHANGE TO SEE THAT RECORD // UNDO OR CTRL+Z REVERSES THE LAST CHANGE // TYPE SYNC FOR SAVING STATUS // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
@@ -1021,6 +1049,8 @@ export default function App() {
                             ? <MoneyIndex x={money} set={setMoney} />
                           : view.name === 'module' && view.idx === FACILITY_IDX
                             ? <FacilityIndex x={fac} set={setFac} />
+                          : view.name === 'module' && view.idx === ATMOS_IDX
+                            ? <ClimateIndex x={atm} set={setAtm} />
                           : moduleIndex
             }
             keys={keys}
@@ -1034,7 +1064,7 @@ export default function App() {
             onBack={histLen > 0 ? goBack : undefined}
             lamp={<SyncLamp onOpen={() => openHistory({ tab: 'SYNC' })} />}
             undo={<UndoButton say={say} />}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX) ? ' view-ledger' : ''}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX || view.idx === ATMOS_IDX) ? ' view-ledger' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>

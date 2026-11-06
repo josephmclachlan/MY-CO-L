@@ -32,6 +32,8 @@ import type { BlockLot, Culture, GrainRun, Strain } from '../lib/xeno'
 import type { LotLoss } from '../lib/hazard'
 import type { Harvest } from '../lib/ledger'
 import type { BankTest, ViabilityCheck } from '../lib/bank'
+import { useSensors } from './useSensors'
+import { climateLine } from '../lib/sensors'
 
 /** The time now, refreshed every `ms` while a screen is looking (a cut that is still going counts up). */
 export function useNow(ms = 30000): number {
@@ -113,7 +115,22 @@ export function useReminders() {
       now: f.now,
     })
   }, [f.today, f.settings, f.board, f.waterDue, f.cleanDue, f.checkDue, f.custom, f.summary.open, f.now, lots, losses, harvests, cultures, grain, strains, checks, tests, sales, practice, cargo.rows])
+  // Climate alarms from ATMOSPHERICS (the power cut is already the first reminder).
+  const sens = useSensors()
+  const all = useMemo(() => {
+    const climate = sens.alarms
+      .filter((a) => !a.acked && a.kind !== 'POWER')
+      .map((a) => ({ key: `climate:${a.key}`, kind: 'CLIMATE' as const, warn: true, due: null, text: a.text, go: { screen: 'ATMOS' as const, tab: 'ALARMS' } }))
+    if (!climate.length) return reminders
+    const p = reminders.filter((r) => r.kind === 'POWER')
+    return [...p, ...climate, ...reminders.filter((r) => r.kind !== 'POWER')]
+  }, [reminders, sens.alarms])
   const owedTotal = useMemo(() => owed(sales, f.today).total, [sales, f.today])
-  const lines = useMemo(() => statusLines({ now: f.now, today: f.today, cuts: f.cuts, reminders, water: f.waterDue, maint: f.board, owedCrc: owedTotal }), [f.now, f.today, f.cuts, reminders, f.waterDue, f.board, owedTotal])
-  return { ...f, reminders, lines }
+  const withData = sens.board.filter((p) => p.last !== null).length
+  const lines = useMemo(() => {
+    const ls = statusLines({ now: f.now, today: f.today, cuts: f.cuts, reminders: all, water: f.waterDue, maint: f.board, owedCrc: owedTotal })
+    if (!sens.readings.length && !sens.sensors.length && !sens.ac.length) return ls
+    return [ls[0], climateLine(sens.alarms.filter((a) => a.kind !== 'POWER'), withData), ...ls.slice(1)]
+  }, [f.now, f.today, f.cuts, all, f.waterDue, f.board, owedTotal, sens.alarms, sens.readings.length, sens.sensors.length, sens.ac.length, withData])
+  return { ...f, reminders: all, lines }
 }
