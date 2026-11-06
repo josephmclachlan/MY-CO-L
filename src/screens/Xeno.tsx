@@ -12,9 +12,15 @@ import { hazardName, type LotLoss } from '../lib/hazard'
 import { SPECIES } from '../data/species'
 import { weekSplit } from '../data/cropplan'
 import { WEEKLY_BAGS } from '../data/species'
+import { BankTab, PracticeFields, ContamPanel } from './XenoBank'
+import { usePractice } from '../store/usePractice'
+import type { Harvest } from '../lib/ledger'
+import { bankAge, bankStatus, fit75x, isHeld, spareBlocks, type BankTest, type ViabilityCheck } from '../lib/bank'
 import {
   KIND_LABEL,
   LOT_LETTER,
+  MAKE_KINDS,
+  MASTER_KINDS,
   RATIO,
   RATIO_SRC,
   STORAGE_KINDS,
@@ -63,15 +69,15 @@ import {
   setLotStatus,
 } from '../lib/xenoActions'
 
-export const XENO_TABS = ['STRAINS', 'STOCK', 'LINEAGE', 'PLANNER', 'LABELS'] as const
+export const XENO_TABS = ['STRAINS', 'BANK', 'STOCK', 'LINEAGE', 'PLANNER', 'LABELS'] as const
 export type XenoTab = (typeof XENO_TABS)[number]
 export interface XenoState {
   tab: XenoTab
   strain: string | null
   node: string | null
 }
-type SetXeno = (p: Partial<XenoState>) => void
-type Say = (text: string, warn?: boolean) => void
+export type SetXeno = (p: Partial<XenoState>) => void
+export type Say = (text: string, warn?: boolean) => void
 
 // ---------- data ----------
 
@@ -81,14 +87,23 @@ function useXenoData() {
   const runs = useTable<GrainRun>('grain_runs')
   const lots = useTable<BlockLot>('block_lots')
   const lotLoss = useTable<LotLoss>('lot_losses')
+  const tests = useTable<BankTest>('bank_tests')
+  const checks = useTable<ViabilityCheck>('viability_checks')
+  const harvests = useTable<Harvest>('harvests')
+  const practice = usePractice()
   const sorted = useMemo(() => [...strains].sort((a, b) => a.code.localeCompare(b.code)), [strains])
-  return { strains: sorted, cultures, runs, lots, lotLoss }
+  return { strains: sorted, cultures, runs, lots, lotLoss, tests, checks, harvests, practice }
 }
-type XData = ReturnType<typeof useXenoData>
+export type XData = ReturnType<typeof useXenoData>
 
-const spName = (key: string) => speciesOf(key)?.name ?? key.toUpperCase()
+/** Age or due state of any culture: bank tubes follow the bank rules (t08 Our farm), the rest the textbook limits. */
+export function ageOf(c: Culture, d: XData): AgeCheck {
+  return c.kind === 'slant' || c.kind === 'water' ? bankAge(c, d.cultures, d.checks, d.tests, d.practice) : cultureAge(c)
+}
 
-function useRun(say: Say) {
+export const spName = (key: string) => speciesOf(key)?.name ?? key.toUpperCase()
+
+export function useRun(say: Say) {
   const { sound } = useApp()
   const store = useStore()
   return async (fn: () => Promise<unknown>, ok: string) => {
@@ -105,7 +120,7 @@ function useRun(say: Say) {
 }
 
 /** A button that asks twice before doing something that cannot be undone. */
-function Confirm({ label, onYes, disabled }: { label: string; onYes: () => void; disabled?: boolean }) {
+export function Confirm({ label, onYes, disabled }: { label: string; onYes: () => void; disabled?: boolean }) {
   const [sure, setSure] = useState(false)
   return (
     <button type="button" className={`btn danger ${sure ? 'on' : ''}`} disabled={disabled} onClick={() => (sure ? (setSure(false), onYes()) : setSure(true))} onBlur={() => setSure(false)}>
@@ -115,7 +130,7 @@ function Confirm({ label, onYes, disabled }: { label: string; onYes: () => void;
 }
 
 /** A text field that saves when you leave it or press Enter. */
-function Field({ label, value, onSave, wide, placeholder }: { label: string; value: string; onSave: (v: string) => void; wide?: boolean; placeholder?: string }) {
+export function Field({ label, value, onSave, wide, placeholder }: { label: string; value: string; onSave: (v: string) => void; wide?: boolean; placeholder?: string }) {
   const [draft, setDraft] = useState(value)
   const [seen, setSeen] = useState(value)
   if (value !== seen) {
@@ -131,7 +146,7 @@ function Field({ label, value, onSave, wide, placeholder }: { label: string; val
   )
 }
 
-const AGE_TONE: Record<AgeCheck['state'], string> = { ok: '', warn: 'warn', over: 'warn', none: 'dim' }
+export const AGE_TONE: Record<AgeCheck['state'], string> = { ok: '', warn: 'warn', over: 'warn', none: 'dim' }
 
 // ---------- glyphs (own line art) ----------
 
@@ -166,7 +181,7 @@ function Glyph({ kind }: { kind: string }) {
   }
 }
 
-function MiniGlyph({ kind }: { kind: string }) {
+export function MiniGlyph({ kind }: { kind: string }) {
   return (
     <svg className="xg-mini" viewBox="-12 -12 24 24" aria-hidden>
       <g className="xg-glyph">
@@ -216,6 +231,8 @@ function StrainsTab({ d, x, set, say, onOpenSpecies }: { d: XData; x: XenoState;
   const [code, setCode] = useState('')
   const [name, setName] = useState('')
   const [source, setSource] = useState(DEFAULT_SOURCE)
+  const [arrived, setArrived] = useState<'none' | CultureKind>('plate')
+  const [justAdded, setJustAdded] = useState<string | null>(null)
   const suggested = nextStrainCode(sp, d.strains)
   const sel = d.strains.find((s) => s.id === x.strain) ?? null
   const demo = d.strains.some((s) => s.code === DEMO_CODE)
@@ -224,10 +241,16 @@ function StrainsTab({ d, x, set, say, onOpenSpecies }: { d: XData; x: XenoState;
     const c = (code.trim() || suggested).toUpperCase()
     if (d.strains.some((s) => s.code.toUpperCase() === c)) return say(`${c} IS ALREADY ON FILE.`, true)
     const row = newStrain({ species_key: sp, code: c, name, source })
-    void run(() => store.put('strains', row), `STRAIN ${c} REGISTERED`).then((ok) => {
+    const label = arrived === 'none' ? `STRAIN ${c} REGISTERED` : `STRAIN ${c} REGISTERED WITH ITS MASTER (${KIND_LABEL[arrived]}, P0)`
+    void run(async () => {
+      await store.put('strains', row)
+      // The culture as received is the master, P0 (t08-proc-our-intake step 1).
+      if (arrived !== 'none') await addCultures(store, { strain: row, parent: null, kind: arrived, count: 1, p_level: 0, location: 'CULTURE FRIDGE', existing: d.cultures })
+    }, label).then((ok) => {
       if (!ok) return
       setCode('')
       setName('')
+      setJustAdded(row.id)
       set({ strain: row.id })
     })
   }
@@ -268,6 +291,22 @@ function StrainsTab({ d, x, set, say, onOpenSpecies }: { d: XData; x: XenoState;
             </span>
           </div>
           <StrainMeters s={sel} d={d} />
+          {(() => {
+            const b = bankStatus(sel, d.cultures, d.checks, d.tests, d.practice)
+            return (
+              <div className="xb-strip">
+                <span className="tiny">
+                  BANK: {b.slants + b.offsiteSlants} SLANT{b.slants + b.offsiteSlants === 1 ? '' : 'S'} // {b.water + b.offsiteWater} WATER TUBE{b.water + b.offsiteWater === 1 ? '' : 'S'} // {b.offsiteSlants + b.offsiteWater} OFF SITE
+                </span>
+                {b.warnings.map((w) => (
+                  <span key={w} className="warn tiny">! {w}</span>
+                ))}
+                <button type="button" className={`btn ${justAdded === sel.id ? 'on' : ''}`} onClick={() => set({ tab: 'BANK' })}>
+                  {justAdded === sel.id ? 'NEXT: BANK THIS STRAIN' : 'OPEN CULTURE BANK'}
+                </button>
+              </div>
+            )
+          })()}
           <div className="cg-fields">
             <Field label="CODE" value={sel.code} onSave={(v) => v && void run(() => store.put('strains', { ...sel, code: v.toUpperCase() }), 'CODE SAVED')} />
             <Field label="NAME" value={sel.name ?? ''} placeholder="NOT SET" onSave={(v) => void run(() => store.put('strains', { ...sel, name: v || null }), 'NAME SAVED')} />
@@ -307,8 +346,15 @@ function StrainsTab({ d, x, set, say, onOpenSpecies }: { d: XData; x: XenoState;
         <input aria-label="Strain code" placeholder={suggested} value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} style={{ width: '7em' }} />
         <input aria-label="Strain name" placeholder="NAME" value={name} onChange={(e) => setName(e.target.value)} />
         <input aria-label="Source" placeholder="SOURCE" value={source} onChange={(e) => setSource(e.target.value)} />
+        <Select aria-label="Arrived as (the master, P0)" value={arrived} onChange={(e) => setArrived(e.target.value as 'none' | CultureKind)}>
+          {MASTER_KINDS.map((k) => (
+            <option key={k} value={k}>{`ARRIVED AS ${KIND_LABEL[k]}`}</option>
+          ))}
+          <option value="none">NOT ARRIVED YET</option>
+        </Select>
         <button type="button" className="btn" onClick={add}>REGISTER</button>
       </div>
+      <div className="dim tiny">THE CULTURE AS IT ARRIVES IS THE MASTER, P0. IT IS LOGGED WITH THE STRAIN, THEN BANK IT FROM ONE P1 PLATE (TEXTBOOK <RefText text="t08" />, OUR FARM).</div>
       <div className="cg-btns" style={{ marginTop: 8 }}>
         {!demo && <button type="button" className="btn" onClick={() => void run(() => loadDemo(store, d.strains), 'EXAMPLE STRAIN DEMO-01 LOADED')}>LOAD EXAMPLE</button>}
         {demo && <Confirm label="REMOVE EXAMPLE" onYes={() => void run(() => removeDemo(store, d.strains, d.cultures, d.runs, d.lots), 'EXAMPLE REMOVED').then(() => set({ strain: null, node: null }))} />}
@@ -333,7 +379,7 @@ function warnings(d: XData): Warning[] {
     if (!isActiveCulture(c)) continue
     const s = byId.get(c.strain_id)
     if (!s) continue
-    const a = cultureAge(c)
+    const a = ageOf(c, d)
     if (a.state === 'warn' || a.state === 'over') out.push({ key: `c:${c.id}`, strain: s, what: c.label ?? `${pLabel(c.p_level)} ${KIND_LABEL[c.kind]}`, age: a })
   }
   for (const g of d.runs) {
@@ -357,7 +403,7 @@ function AddMaster({ strain, d, say }: { strain: Strain; d: XData; say: Say }) {
     <div className="cg-add xn-add">
       <span className="dim tiny">ADD A MASTER OR A BOUGHT CULTURE:</span>
       <Select aria-label="Kind" value={kind} onChange={(e) => (setKind(e.target.value as CultureKind), setP(e.target.value === 'plate' ? '1' : '0'))}>
-        {(['cryo', 'slant', 'water', 'plate', 'liquid', 'spore_print'] as CultureKind[]).map((k) => (
+        {MASTER_KINDS.map((k) => (
           <option key={k} value={k}>{KIND_LABEL[k]}</option>
         ))}
       </Select>
@@ -404,8 +450,22 @@ function StockTab({ d, x, set, say }: { d: XData; x: XenoState; set: SetXeno; sa
           ))}
         </div>
       )}
+      {(() => {
+        const bw = d.strains.filter((s) => s.active).flatMap((s) => bankStatus(s, d.cultures, d.checks, d.tests, d.practice).warnings.map((w) => ({ s, w })))
+        return bw.length ? (
+          <div className="xn-warns">
+            {bw.map(({ s, w }) => (
+              <button key={s.id + w} type="button" className="xn-warn" onClick={() => set({ tab: 'BANK', strain: s.id })}>
+                <span>{s.code} BANK</span>
+                <span>{w}</span>
+              </button>
+            ))}
+          </div>
+        ) : null
+      })()}
+      <ContamPanel d={d} />
       <div className="dim tiny">
-        LIMITS: PLATES 3 MONTHS (<RefText text="F03-0268" />), SLANTS 6-8 MONTHS (<RefText text="F04-0070" />), WATER TUBES CHECK 6-12 MONTHS (<RefText text="F04-0236" />), CRYOVIALS TEST AT 18-24 MONTHS (<RefText text="F04-0061" />), COLD G1 ABOUT A MONTH (<RefText text="F04-0088" />), COLD G2 2 WEEKS, 3 AT MOST, LION'S MANE AND COMB TOOTH 2 (<RefText text="F04-0089 F04-0090 F04-0091" />). LC IN THE FRIDGE: NO LIMIT IN SOURCES (<RefText text="F04-0096" />).
+        LIMITS: PLATES 3 MONTHS (<RefText text="F03-0268" />), BANK SLANTS REPLACED AT 6 MONTHS, WATER TUBES CHECKED AT 6-12 MONTHS, ANY TUBE OVER 2 YEARS TESTED BEFORE USE (TEXTBOOK <RefText text="t08" />, OUR FARM), COLD G1 ABOUT A MONTH (<RefText text="F04-0088" />), COLD G2 2 WEEKS, 3 AT MOST, LION'S MANE AND COMB TOOTH 2 (<RefText text="F04-0089 F04-0090 F04-0091" />). LC IN THE FRIDGE: NO LIMIT IN SOURCES (<RefText text="F04-0096" />).
       </div>
 
       <div className="section-title rr-sec">{sel ? `${sel.code} // CULTURE STOCK` : 'CULTURE STOCK // ACTIVE STRAINS'}</div>
@@ -436,12 +496,12 @@ function StockTab({ d, x, set, say }: { d: XData; x: XenoState; set: SetXeno; sa
               .filter((c) => c.strain_id === sel.id && isActiveCulture(c))
               .sort((a, b) => (a.p_level ?? 0) - (b.p_level ?? 0) || a.made_on.localeCompare(b.made_on))
               .map((c) => {
-                const a = cultureAge(c)
+                const a = ageOf(c, d)
                 return (
                   <button key={c.id} type="button" className="xn-item" onClick={() => open(`c:${c.id}`, sel.id)}>
                     <MiniGlyph kind={c.kind} />
                     <span>{c.label}</span>
-                    <span className="dim">{c.status === 'cold_storage' ? 'COLD' : 'CLEAN'}{c.location ? ` // ${c.location}` : ''}</span>
+                    <span className="dim">{c.status === 'cold_storage' ? 'COLD' : 'CLEAN'}{c.location ? ` // ${c.location}` : ''}{isHeld(c, d.cultures, d.tests) ? ' // HELD FOR T/E' : ''}</span>
                     <span className={AGE_TONE[a.state]}>{a.text}</span>
                   </button>
                 )
@@ -539,7 +599,7 @@ function Tree({ root, d, strain, sel, onPick }: { root: TreeNode; d: XData; stra
   )
 }
 
-function Num({ label, value, set, w = '3.6em' }: { label: string; value: string; set: (v: string) => void; w?: string }) {
+export function Num({ label, value, set, w = '3.6em' }: { label: string; value: string; set: (v: string) => void; w?: string }) {
   return (
     <label className="xn-num">
       <span>{label}</span>
@@ -592,9 +652,11 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
   if (type === 'c') {
     const c = d.cultures.find((x) => x.id === id)
     if (!c) return <div className="dim">RECORD NOT FOUND ON THIS DEVICE.</div>
-    const a = cultureAge(c)
+    const a = ageOf(c, d)
+    const held = isHeld(c, d.cultures, d.tests)
     const live = isActiveCulture(c)
     const nextP = childP(c, kind)
+    const tube = c.kind === 'slant' || c.kind === 'water'
     const kids = d.cultures.some((x) => x.parent_culture_id === c.id) || d.runs.some((g) => g.parent_culture_id === c.id)
     return (
       <div className="cg-panel">
@@ -604,14 +666,26 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
             {a.limit.rule} <RefText text={a.limit.src} />
           </div>
         )}
+        {held && (
+          <div className="warn tiny xb-held">
+            HELD FOR A T/E TEST: THIS IS DISH E. DO NOT OPEN, SUBCULTURE OR USE IT UNTIL DISH T'S TEST BLOCKS PASS (TEXTBOOK <RefText text="t08" />, OUR FARM).{' '}
+            <button type="button" className="btn" onClick={() => set({ tab: 'BANK', strain: strain.id })}>RECORD THE RESULT IN BANK</button>
+          </div>
+        )}
+        {tube && live && (
+          <div className="tiny">
+            BANK TUBE{c.offsite ? ' // OFF-SITE COPY' : ''}.{' '}
+            <button type="button" className="btn" onClick={() => set({ tab: 'BANK', strain: strain.id })}>CHECK, TEST OR MOVE IT IN BANK</button>
+          </div>
+        )}
         {(c.p_level ?? 0) >= 4 && kind === 'plate' && <div className="warn tiny">A TRANSFER FROM HERE IS P{(c.p_level ?? 0) + 1}. THE SAFER HABIT IS A FRESH PLATE FROM STORAGE (<RefText text="F03-0025 F03-0264" />).</div>}
-        {live && (
+        {live && !held && (
           <div className="cg-actions">
             <div className="cg-act">
               <div className="cg-act-t">TRANSFER // MAKE A COPY</div>
               <span className="xn-inline">
                 <Select aria-label="Make" value={kind} onChange={(e) => setKind(e.target.value as CultureKind)}>
-                  {(['plate', 'slant', 'liquid', 'water', 'cryo'] as CultureKind[]).map((x) => (
+                  {MAKE_KINDS.map((x) => (
                     <option key={x} value={x}>{KIND_LABEL[x]}</option>
                   ))}
                 </Select>
@@ -620,7 +694,7 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
               <button type="button" className="btn" onClick={() => void run(() => addCultures(store, { strain, parent: c, kind, count: Number(n) || 1, existing: d.cultures }), `${n} ${KIND_LABEL[kind]} ${pLabel(nextP)} LOGGED`)}>
                 LOG {KIND_LABEL[kind]} ({pLabel(nextP)})
               </button>
-              {STORAGE_KINDS.includes(kind) && <span className="dim tiny">KEEP SLANTS AND WATER TUBES OF EACH STRAIN (<RefText text="F04-0073" />). 3-5 SLANTS PER CULTURE.</span>}
+              {STORAGE_KINDS.includes(kind) && <span className="dim tiny">KEEP SLANTS AND WATER TUBES OF EACH STRAIN (<RefText text="F04-0073" />). FOR A WHOLE BANK BATCH FROM ONE PLATE, USE THE BANK TAB.</span>}
             </div>
             <div className="cg-act">
               <div className="cg-act-t">GRAIN</div>
@@ -799,7 +873,7 @@ function LineageTab({ d, x, set, say, onLabel }: { d: XData; x: XenoState; set: 
       <div className="xn-legend tiny dim">
         {[
           ['strain', 'STRAIN'],
-          ['cryo', 'CRYO'],
+          ...(d.cultures.some((c) => c.kind === 'cryo' && c.strain_id === strain.id) ? [['cryo', 'CRYO (OLD RECORD)']] : []),
           ['slant', 'SLANT'],
           ['water', 'WATER'],
           ['plate', 'PLATE'],
@@ -842,7 +916,7 @@ function loadPlan(): PlanPrefs {
 
 const ROUTE_TEXT = {
   none: 'NOTHING TO MAKE',
-  weekly: 'MASTER(S) EVERY WEEK',
+  weekly: 'OWN MASTER LINE EVERY WEEK',
   fortnight: 'ONE MASTER EVERY 2 WEEKS, HALF THE G2 HELD COLD ONE WEEK',
   direct: 'AGAR-DIRECT 6 LB BAGS, 4 CUTS EACH (TOO FEW FOR A MASTER)',
 }
@@ -867,12 +941,15 @@ function PlannerTab({ d, set }: { d: XData; set: SetXeno }) {
     const blocks = prefs.blocks[key] ?? split.get(key) ?? 0
     const options = d.strains.filter((s) => s.species_key === key && s.active)
     const strain = options.find((s) => s.id === prefs.strain[key]) ?? options[0] ?? null
-    const plan = planChain(key, blocks, knock)
+    const plan = planChain(key, blocks, knock, d.practice.smallLineRoute)
     const stock = strain ? strainStock(strain.id, key, d.cultures, d.runs, d.lots) : { plates: 0, g1: 0, g2: 0 }
-    const sf = strain ? shortfall(plan, stock) : { level: plan.route === 'none' ? ('ok' as const) : ('short' as const), next: plan.route === 'none' ? 'NO BLOCKS PLANNED' : 'NO STRAIN ON FILE FOR THIS SPECIES' }
+    const sf = strain ? shortfall(plan, stock) : { level: plan.route === 'none' ? ('ok' as const) : ('short' as const), next: plan.route === 'none' ? 'NO BLOCKS PLANNED' : 'NO STRAIN ON FILE FOR THIS SPECIES: REGISTER ONE UNDER STRAINS' }
     return { key, blocks, options, strain, plan, stock, sf }
   })
   const tot = rows.reduce((a, r) => ({ blocks: a.blocks + r.plan.blocks, g2: a.g2 + r.plan.g2, g1: a.g1 + r.plan.g1, plates: a.plates + r.plan.plates }), { blocks: 0, g2: 0, g1: 0, plates: 0 })
+  // Steady week on the grain day: this plan's G2 plus its masters plus spares (t09-our-75x).
+  const fit = fit75x(rows.map((r) => ({ key: r.key, blocks: r.plan.blocks, spare: 0, g2: r.plan.g2, g1: r.plan.route === 'fortnight' ? 0.5 : r.plan.g1 })), d.practice)
+  const spares = rows.reduce((n, r) => n + spareBlocks(r.plan.blocks, d.practice.spareBlockPct), 0)
   const late = (day: string | null) => (day && day < today ? 'warn' : '')
 
   return (
@@ -883,12 +960,19 @@ function PlannerTab({ d, set }: { d: XData; set: SetXeno }) {
           <PickInput type="date" value={knock} onChange={(e) => save({ ...prefs, knock: e.target.value || null })} />
         </label>
         <span className="tiny">
-          {tot.blocks} BLOCKS // {tot.g2} G2 // {tot.g1} G1 // {tot.plates} PLATES
+          {tot.blocks} BLOCKS ({spares} SPARE) // {tot.g2} G2 // {tot.g1} G1{d.practice.spareMasters ? ` + ${d.practice.spareMasters} SPARE` : ''} // {tot.plates} PLATES
         </span>
         <button type="button" className="btn" onClick={() => save({ blocks: {}, strain: {}, knock: null })}>RESET TO SEQUENCE PLAN</button>
       </div>
+      <div className={`xb-fit tiny ${fit.fits ? '' : 'warn'}`}>
+        75X ON GRAIN DAY: {Math.ceil(fit.bags)} BAGS ({Math.ceil(fit.g2)} G2 + {Math.ceil(fit.masters)} MASTERS{fit.spares ? ` + ${fit.spares} SPARE` : ''}) // ROOM FOR {fit.capacity} ({d.practice.runsPerGrainDay} RUNS OF {d.practice.bagsPer75xRun}) // {fit.fits ? (Math.ceil(fit.bags) === fit.capacity ? 'FITS, NO SPARE SLOT' : 'FITS') : 'DOES NOT FIT: ADD A RUN OR CUT BAGS'} (TEXTBOOK <RefText text="t09" />, OUR FARM)
+      </div>
+      <div className="xb-gloss tiny">
+        <b>WORDS:</b> 75X = THE ALL AMERICAN 75X PRESSURE STERILIZER (AUTOCLAVE) FOR GRAIN. MASTER (G1) = A 4 LB GRAIN BAG GROWN FROM A PLATE; G2 = 6 LB SPAWN BAGS MADE FROM A MASTER; KNOCK = INOCULATING THE BLOCKS (TUESDAY).
+      </div>
+      <PracticeFields keys={['smallLineRoute', 'spareMasters', 'spareBlockPct', 'bagsPer75xRun', 'runsPerGrainDay']} title="SPAWN PLAN RULES" />
       <div className="dim tiny">
-        STARTS FROM THE SEQUENCE WEEKLY PLAN: {WEEKLY_BAGS} BAGS ON THIS KNOCK'S CROP-PLAN SPLIT (THE SECONDARY SLOT IS THE SPECIES YOU PICK IN PRODUCTION SEQUENCE). CHANGE ANY BLOCK COUNT BELOW. WORKS BACK AT 20 BLOCKS PER G2 (<RefText text={RATIO_SRC.blocksPerG2} />), 12 G2 PER MASTER, NEVER FEWER THAN 6 (<RefText text={RATIO_SRC.g2PerG1} />), 12 MASTERS PER PLATE (<RefText text={RATIO_SRC.g1PerPlate} />), MASTER GROWS ABOUT 2 WEEKS (<RefText text={RATIO_SRC.g1Days} />), G2 HOLDS 2 WEEKS COLD (<RefText text={RATIO_SRC.g2Hold} />). PLATE LEAD TIMES (OYSTERS 8 D, LION'S MANE AND CORAL TOOTH 15 D) ARE FROM THE 100-BAG FARM SCHEDULE. A DATE IN WARNING COLOUR HAS ALREADY PASSED: THAT STEP NEEDED TO BE DONE ALREADY, SO THE KNOCK RELIES ON STOCK ON THE SHELF.
+        FARM RULE (TEXTBOOK <RefText text="t09" />, OUR FARM): EVERY SPECIES GETS ITS OWN MASTER AND G2 LINE EACH WEEK, EVEN WITH FEWER THAN 6 G2 PER MASTER; NEVER MORE THAN 24. STARTS FROM THE SEQUENCE WEEKLY PLAN: {WEEKLY_BAGS} BAGS ON THIS KNOCK'S CROP-PLAN SPLIT (THE SECONDARY SLOT IS THE SPECIES YOU PICK IN PRODUCTION SEQUENCE). CHANGE ANY BLOCK COUNT BELOW. WORKS BACK AT 20 BLOCKS PER G2 (<RefText text={RATIO_SRC.blocksPerG2} />), 12 G2 PER MASTER, NEVER FEWER THAN 6 (<RefText text={RATIO_SRC.g2PerG1} />), 12 MASTERS PER PLATE (<RefText text={RATIO_SRC.g1PerPlate} />), MASTER GROWS ABOUT 2 WEEKS (<RefText text={RATIO_SRC.g1Days} />), G2 HOLDS 2 WEEKS COLD (<RefText text={RATIO_SRC.g2Hold} />). PLATE LEAD TIMES (OYSTERS 8 D, LION'S MANE AND CORAL TOOTH 15 D) ARE FROM THE 100-BAG FARM SCHEDULE. A DATE IN WARNING COLOUR HAS ALREADY PASSED: THAT STEP NEEDED TO BE DONE ALREADY, SO THE KNOCK RELIES ON STOCK ON THE SHELF.
       </div>
       {rows.map((r) => {
         const p = r.plan
@@ -927,7 +1011,11 @@ function PlannerTab({ d, set }: { d: XData; set: SetXeno }) {
                 <MiniGlyph kind="lot" /> {p.blocks} BLOCKS
               </span>
             </div>
-            <div className="tiny">{ROUTE_TEXT[p.route]}</div>
+            <div className="tiny">
+              {ROUTE_TEXT[p.route]}
+              {p.route === 'weekly' && p.g1 > 0 && p.g2Made / p.g1 < RATIO.minG2PerG1 ? ` // ${p.g2Made} G2 FROM 1 MASTER: BELOW THE USUAL 6, ALLOWED HERE; WATCH G2 AGES` : ''}
+              {p.blocks > 0 && d.practice.spareBlockPct > 0 ? ` // ${spareBlocks(p.blocks, d.practice.spareBlockPct)} OF THE ${p.blocks} BLOCKS ARE SPARES` : ''}
+            </div>
             {p.route !== 'none' && (
               <div className="xn-dates tiny">
                 <span className={late(p.plateBy)}>TRANSFER PLATES BY {p.plateBy}{p.plateAssumed ? ' (LEAD ASSUMED)' : ''}</span>
@@ -1130,6 +1218,7 @@ export function Xeno({ x, set, say, onOpenSpecies }: { x: XenoState; set: SetXen
         ))}
       </nav>
       {x.tab === 'STRAINS' && <StrainsTab d={d} x={x} set={set} say={say} onOpenSpecies={onOpenSpecies} />}
+      {x.tab === 'BANK' && <BankTab d={d} x={x} set={set} say={say} />}
       {x.tab === 'STOCK' && <StockTab d={d} x={x} set={set} say={say} />}
       {x.tab === 'LINEAGE' && <LineageTab d={d} x={x} set={set} say={say} onLabel={onLabel} />}
       {x.tab === 'PLANNER' && <PlannerTab d={d} set={set} />}

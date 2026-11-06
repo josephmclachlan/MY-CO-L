@@ -37,6 +37,10 @@ export interface Culture extends Row {
   location: string | null
   label: string | null
   notes: string | null
+  /** Culture bank (G3): tubes made together from one plate share a batch id. */
+  bank_batch?: string | null
+  /** Culture bank (G3): this tube is the off-site copy. */
+  offsite?: boolean | null
   created_at?: string
   updated_at?: string
 }
@@ -101,7 +105,11 @@ export const KIND_SHORT: Record<CultureKind, string> = {
   spore_print: 'SP',
   other: 'OT',
 }
-export const STORAGE_KINDS: CultureKind[] = ['cryo', 'slant', 'water']
+/** Long-term storage on this farm: slants and water tubes only. No cryo freezer (Joseph, 6 Nov 2026). */
+export const STORAGE_KINDS: CultureKind[] = ['slant', 'water']
+/** Kinds offered when adding or making a culture. Cryovials are hidden (old records still show). */
+export const MAKE_KINDS: CultureKind[] = ['plate', 'slant', 'water', 'liquid']
+export const MASTER_KINDS: CultureKind[] = ['slant', 'water', 'plate', 'liquid', 'spore_print']
 
 // ---------- dates ----------
 
@@ -468,8 +476,13 @@ export interface ChainPlan {
   plateBy: string
 }
 
-/** Work back from blocks on a knock day to G2 bags, G1 masters and plates, with dates. */
-export function planChain(speciesKey: string, blocks: number, knock: string): ChainPlan {
+/**
+ * Work back from blocks on a knock day to G2 bags, G1 masters and plates, with dates.
+ * `small` = what to do for fewer than 6 G2 a week. Farm rule (Joseph, 6 Nov 2026, t09 Our farm):
+ * 'weekly' = still one master per species every week; fewer than 6 G2 per master is fine, never more than 24.
+ * 'fortnight' and 'direct' are the older planner routes, kept as options.
+ */
+export function planChain(speciesKey: string, blocks: number, knock: string, small: 'weekly' | 'fortnight' | 'direct' = 'weekly'): ChainPlan {
   const b = Math.max(0, Math.floor(blocks))
   const g2 = Math.ceil(b / RATIO.blocksPerG2)
   const gd = G2_DAYS[speciesKey] ?? { d: 21, src: '', assumed: true }
@@ -482,7 +495,12 @@ export function planChain(speciesKey: string, blocks: number, knock: string): Ch
     route = 'weekly'
     g1 = Math.ceil(g2 / RATIO.g2PerG1)
     plates = Math.ceil(g1 / RATIO.g1PerPlate)
-  } else if (g2 > 0 && g2 * 2 >= RATIO.minG2PerG1) {
+  } else if (g2 > 0 && small === 'weekly') {
+    // One master line per species, every week, even for 1-5 G2 bags (t09 Our farm).
+    route = 'weekly'
+    g1 = 1
+    plates = 1
+  } else if (g2 > 0 && small === 'fortnight' && g2 * 2 >= RATIO.minG2PerG1) {
     // One master every second week makes two knocks' worth; the second half waits cold for one week (F04-0089).
     route = 'fortnight'
     g1 = 1

@@ -30,6 +30,7 @@ import {
   type LotLoss,
 } from '../lib/hazard'
 import { useTable } from '../store/StoreContext'
+import { ContamLive } from './XenoBank'
 import type { BlockLot } from '../lib/xeno'
 
 export const HAZARD_TABS = ['SPOT', 'LOOK-ALIKES', 'CAUSE', 'TREAT', 'PREVENT', 'SPECIES', 'LOSSES', 'SOURCES'] as const
@@ -255,6 +256,7 @@ function Overview({ set, counts }: { set: SetHazard; counts: Map<string, { event
           </ul>
         </>
       )}
+      <ContamLive />
     </div>
   )
 }

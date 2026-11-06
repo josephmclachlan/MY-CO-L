@@ -115,3 +115,68 @@
 .xeno, .xn-sec, .xn-plan, .cg-panel { min-width: 0; }
 .xeno select, .xeno input { max-width: 100%; }
 .xn-plan-h .xn-num { min-width: 0; max-width: 100%; }
+
+/* ---------- culture bank (G3) ---------- */
+.xb-strip { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; margin: 6px 0; }
+.xb-steps { display: grid; gap: 2px; }
+.xb-step { display: grid; grid-template-columns: 2.6em minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 3px 0; border-bottom: 1px dotted var(--fg-faint); }
+.xb-step.done { color: var(--fg-dim); }
+.xb-step-do { justify-self: end; }
+.xb-tick { font-family: inherit; }
+.xb-form { border: 1px solid var(--fg-faint); padding: 8px; margin: 4px 0; }
+.xb-form .xn-inline { flex-wrap: wrap; }
+.xb-batch { display: grid; gap: 2px; margin-top: 6px; }
+.xb-tube { border-bottom: 1px dotted var(--fg-faint); padding: 4px 0 6px; display: grid; gap: 4px; }
+.xb-tube.over { box-shadow: inset 3px 0 0 var(--hazard); padding-left: 6px; }
+.xb-tube.warn { box-shadow: inset 3px 0 0 var(--fg); padding-left: 6px; }
+.xb-tube-row { display: grid; grid-template-columns: 22px minmax(12em, 1.4fr) minmax(6em, 0.7fr) minmax(9em, 1fr) minmax(8em, 1fr) auto; gap: 8px; align-items: center; width: 100%; text-align: left; font: inherit; color: var(--fg); background: transparent; border: 0; padding: 4px; min-height: 36px; cursor: pointer; }
+.xb-tube-row:hover, .xb-tube-row:focus-visible { background: var(--bg-hi); outline: none; }
+.xb-more { justify-self: end; color: var(--fg-dim); }
+.xb-form .xn-num { min-width: 6.5em; }
+.xb-label { overflow-wrap: anywhere; }
+.xb-off { color: var(--fg); letter-spacing: 0.06em; }
+.xb-test { border: 1px solid var(--fg-dim); padding: 6px 8px; display: grid; gap: 4px; margin-top: 4px; }
+.xb-test.fail { border-color: var(--hazard); }
+.xb-test.pending { border-style: dashed; }
+.xb-test-h { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+.xb-log { display: grid; font-size: 0.9em; }
+.xb-log-row { display: grid; grid-template-columns: 7em minmax(10em, 1.3fr) 3.5em minmax(8em, 1.2fr) minmax(6em, 1fr); gap: 8px; padding: 3px 0; border-bottom: 1px dotted var(--fg-faint); }
+.xb-log-h { color: var(--fg-dim); font-size: 0.85em; letter-spacing: 0.08em; }
+.xb-stages, .xb-check { display: grid; grid-template-columns: repeat(auto-fit, minmax(11em, 1fr)); gap: 8px; }
+.xb-stage { display: grid; gap: 2px; border: 1px solid var(--fg-faint); padding: 6px 8px; }
+.xb-stage.warn { border-color: var(--hazard); color: var(--hazard); text-shadow: none; }
+.xb-big { font-size: 1.4em; }
+.xb-practice { display: grid; gap: 6px; justify-items: start; margin-top: 4px; }
+.xb-practice .cg-fields { width: 100%; }
+.xb-pf-in { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.xb-pf-in input { width: 5em; }
+.xb-fit { padding: 4px 0; }
+.xb-held { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.xb-row { grid-template-columns: 7.5em minmax(9em, 1fr) minmax(8em, 1fr) auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 700px) {
+  .xb-tube-row { grid-template-columns: 22px minmax(0, 1fr) auto; }
+  .xb-tube-row > span:nth-child(n + 3) { grid-column: 2; }
+  .xb-tube-row > .xb-more { grid-column: 3; grid-row: 1; }
+  .xb-log-row { grid-template-columns: 6.5em minmax(0, 1fr); }
+  .xb-log-row > span:nth-child(n + 3) { grid-column: 2; }
+  .xb-log-h > span:nth-child(n + 3) { display: none; }
+  .xb-row { grid-template-columns: minmax(7em, auto) minmax(0, 1fr); }
+  .xb-row .xn-code { white-space: nowrap; }
+  .xb-row > span:nth-child(n + 3) { grid-column: 2; }
+  .xb-step { grid-template-columns: 2.6em minmax(0, 1fr); }
+  .xb-step-do { grid-column: 2; justify-self: start; }
+}
+.xb-practice .cg-fields { grid-template-columns: repeat(auto-fit, minmax(17em, 1fr)); }
+.xb-practice .cg-field { min-width: 0; }
+.xb-practice .cg-field > * { max-width: 100%; min-width: 0; }
+/* Six tabs: wrap to two lines on phones instead of hiding LABELS off the edge. */
+@media (max-width: 700px) {
+  .xeno .spec-tabs { flex-wrap: wrap; overflow-x: visible; }
+  .xeno .spec-tabs button { flex: 1 0 auto; margin-bottom: -1px; }
+}
+
+.xb-gloss { border-left: 3px solid var(--fg-dim); padding: 4px 8px; color: var(--fg); }
+.xb-gloss b { font-weight: normal; letter-spacing: 0.1em; }
+.xb-form .xn-inline { gap: 8px 16px; }
+.xb-more { color: var(--fg); border: 1px solid var(--fg-dim); padding: 1px 6px; font-size: 0.8em; letter-spacing: 0.08em; }

@@ -69,8 +69,23 @@ describe('age limits from t07-t09', () => {
 })
 
 describe('expansion planner', () => {
-  it('52 blue oyster blocks: 3 G2 a week, one master every 2 weeks', () => {
+  it('farm rule: 52 blue oyster blocks = 3 G2 from one master every week (t09 Our farm)', () => {
     const p = planChain('blue-oyster', 52, '2026-11-10')
+    expect(p.g2).toBe(3)
+    expect(p.route).toBe('weekly')
+    expect(p.g1).toBe(1)
+    expect(p.g2Made).toBe(3)
+    expect(p.plates).toBe(1)
+    expect(p.g1By).toBe('2026-10-15')
+  })
+  it('farm rule: the 130-bag week is 3/3/1/1 G2 and 4 masters', () => {
+    const w = [['blue-oyster', 52], ['lions-mane', 46], ['comb-tooth', 16], ['golden-oyster', 16]] as const
+    const ps = w.map(([k, b]) => planChain(k, b, '2026-11-10'))
+    expect(ps.map((p) => p.g2)).toEqual([3, 3, 1, 1])
+    expect(ps.map((p) => p.g1)).toEqual([1, 1, 1, 1])
+  })
+  it('option: 52 blue oyster blocks, one master every 2 weeks', () => {
+    const p = planChain('blue-oyster', 52, '2026-11-10', 'fortnight')
     expect(p.g2).toBe(3)
     expect(p.route).toBe('fortnight')
     expect(p.g2Made).toBe(6)
@@ -85,15 +100,17 @@ describe('expansion planner', () => {
     expect(p.g1).toBe(1)
     expect(p.plates).toBe(1)
   })
-  it('never plans fewer than 6 G2 per master', () => {
-    for (const b of [1, 20, 60, 100, 121, 200, 400, 1000]) {
-      const p = planChain('blue-oyster', b, '2026-11-10')
+  it('never plans more than 24 G2 per master; the fortnight option never fewer than 6', () => {
+    for (const b of [1, 20, 60, 100, 121, 200, 400, 1000, 5000]) {
+      const w = planChain('blue-oyster', b, '2026-11-10')
+      if (w.g1) expect(w.g2Made / w.g1).toBeLessThanOrEqual(24)
+      const p = planChain('blue-oyster', b, '2026-11-10', 'fortnight')
       if (p.g1) expect(p.g2Made / p.g1).toBeGreaterThanOrEqual(6)
       if (p.g1) expect(p.g2Made / p.g1).toBeLessThanOrEqual(24)
     }
   })
-  it('small batches go agar-direct', () => {
-    const p = planChain('comb-tooth', 16, '2026-11-10')
+  it('option: small batches go agar-direct', () => {
+    const p = planChain('comb-tooth', 16, '2026-11-10', 'direct')
     expect(p.route).toBe('direct')
     expect(p.g1).toBe(0)
     expect(p.plates).toBe(1)

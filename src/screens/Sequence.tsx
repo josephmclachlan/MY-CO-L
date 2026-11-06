@@ -11,6 +11,7 @@ import { useCargo } from '../store/useCargo'
 import { runLines } from '../lib/stockplan'
 import { bookRun } from '../lib/cargoActions'
 import { fmtQty, nextRunRef, onHandMap } from '../lib/cargo'
+import { usePractice } from '../store/usePractice'
 
 // Cart capacity from the steam-box design (rev D): 130 x 10 lb bags per cart.
 const CART_BAGS = 130
@@ -119,6 +120,7 @@ function Bar({ label, p, state, keep }: { label: string; p: number; state: 'wait
 export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
   const { sound } = useApp()
   const cargo = useCargo()
+  const practice = usePractice()
   const [booked, setBooked] = useState<{ ref: string; n: number; missing: string[]; warn?: boolean } | null>(null)
   const [bags, setBags] = useState(WEEKLY_BAGS)
   const plan = usePlan()
@@ -319,7 +321,7 @@ export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
 
       <div className="section-title" style={{ marginTop: 10 }}>STOCK USED // {bags} BAGS</div>
       {(() => {
-        const lines = runLines(bags, { form: cargo.prefs.form, soyShare: cargo.prefs.soyShare })
+        const lines = runLines(bags, { form: cargo.prefs.form, soyShare: cargo.prefs.soyShare, split: result.filter((a) => a.bags > 0).map((a) => ({ key: a.sp.id, bags: a.bags })), spareMasters: practice.spareMasters })
         const hand = onHandMap(cargo.moves)
         const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
         const already = cargo.moves.some((m) => m.run_ref?.startsWith(`RUN-${today}`) && m.notes?.startsWith(`${bags} BAGS`))

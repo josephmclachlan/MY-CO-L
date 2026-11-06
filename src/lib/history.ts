@@ -82,6 +82,8 @@ export const TABLE_NAMES: Record<string, [string, string]> = {
   reference_entries: ['REFERENCE', 'REFERENCES'],
   app_settings: ['SETTING', 'SETTINGS'],
   fx_rates: ['EXCHANGE RATE', 'EXCHANGE RATES'],
+  bank_tests: ['T/E TEST', 'T/E TESTS'],
+  viability_checks: ['TUBE CHECK', 'TUBE CHECKS'],
   sensor_readings: ['SENSOR READING', 'SENSOR READINGS'],
 }
 
@@ -90,6 +92,8 @@ export const TABLE_SCREEN: Record<string, string> = {
   strains: 'XENOGENETICS',
   cultures: 'XENOGENETICS',
   grain_runs: 'XENOGENETICS',
+  bank_tests: 'XENOGENETICS',
+  viability_checks: 'XENOGENETICS',
   block_lots: 'MISSION CONTROL',
   harvests: 'MISSION CONTROL',
   lot_losses: 'MISSION CONTROL',
@@ -155,7 +159,7 @@ export function showValue(v: unknown, max = 80): string {
 export function rowName(table: string, r: Row | null | undefined): string {
   if (!r) return ''
   if (table === 'fx_rates' && typeof r.day === 'string') return r.day
-  const pick = ['code', 'lot_code', 'label', 'name', 'buyer', 'unit_label', 'run_ref', 'harvested_on', 'sold_on', 'moved_at']
+  const pick = ['code', 'lot_code', 'label', 'name', 'buyer', 'unit_label', 'run_ref', 'checked_on', 'started_on', 'harvested_on', 'sold_on', 'moved_at']
   for (const k of pick) {
     const v = r[k]
     if (typeof v === 'string' && v.trim()) return k === 'moved_at' ? v.slice(0, 10) : v.toUpperCase()
