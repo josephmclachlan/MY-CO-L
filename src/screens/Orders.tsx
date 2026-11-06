@@ -45,6 +45,8 @@ import {
   type SpeciesWeek,
   type StandingOrder,
 } from '../lib/orders'
+import { holdFor, owed } from '../lib/money'
+import type { Sale } from '../lib/trade'
 import { changeTerms, createOrder, deleteOrder, deliverAll, deliverLine, endOrder, restartOrder, setNote, setWeekKg } from '../lib/ordersActions'
 
 // STANDING ORDERS: what each buyer takes every week, the 1-3 week harvest forecast from the lots in the rooms,
@@ -760,9 +762,10 @@ function PackLine({ l, sales, say, now }: { l: OrderLine; sales: OrdersData['sal
       </div>
     )
   }
+  const hold = holdFor(owed(sales as Sale[], now), o.buyer)
   return (
     <div className="od-pack">
-      <span className="od-who">{o.buyer.toUpperCase()}{o.confirmed ? '' : ' ?'}{l.deliveryOn < now && <em className="od-tag over"> OVERDUE</em>}</span>
+      <span className="od-who">{o.buyer.toUpperCase()}{o.confirmed ? '' : ' ?'}{l.deliveryOn < now && <em className="od-tag over"> OVERDUE</em>}{hold && <em className="od-tag over" title={`Owes ₡${Math.round(hold.crc).toLocaleString('en-US')} since ${hold.oldest}. Cash on delivery: no delivery until paid.`}> ON HOLD: OWES {fmtCrc(hold.crc)}</em>}</span>
       <span>{sp(o.species_key)}{o.form === 'dried' ? ' DRIED' : ''}</span>
       <span>{round2(l.kg)} KG @ {fmtCrc(Number(o.price_crc_per_kg))}</span>
       <span>{fmtCrc(l.crc)}</span>

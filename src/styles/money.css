@@ -1,0 +1,51 @@
+/* MONEY (build G6). Reuses the cook/ledger boxes, records tables and order marks. */
+.mn-spark { width: 120px; height: 30px; display: block; overflow: visible; }
+.mn-spark .spark, .mn-chart .spark { fill: none; stroke: var(--fg); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 0 2px var(--glow)); }
+.mn-spark .trend { stroke: var(--fg-dim); stroke-width: 1; stroke-dasharray: 3 3; }
+.mn-spark .ax, .mn-chart .ax { stroke: var(--fg-faint); stroke-width: 1; }
+.mn-spark .pt, .mn-chart .pt { fill: var(--fg); filter: drop-shadow(0 0 3px var(--glow)); }
+.mn-chart .pt.plan { fill: var(--bg); stroke: var(--fg); stroke-width: 1.2; }
+.mn-chart .pt.low { fill: var(--hazard); filter: none; }
+.mn-chart .floor { stroke: var(--hazard); stroke-width: 1; stroke-dasharray: 5 4; }
+.mn-chart .lb { fill: var(--fg-dim); font-size: 9px; font-family: 'Share Tech Mono', monospace; }
+.mn-spark-cell { padding-top: 1px !important; padding-bottom: 1px !important; }
+.mn-trend-total { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.mn-trend-total .mn-spark { width: 100%; max-width: 520px; height: 60px; }
+.mn-down { color: var(--hazard); text-shadow: none; }
+.mn-pair { display: grid; gap: 2px; width: 8em; }
+.mn-pair i { display: block; height: 4px; }
+.mn-pair i.in { background: var(--fg); box-shadow: 0 0 3px var(--glow); }
+.mn-pair i.out { background: repeating-linear-gradient(90deg, var(--fg-dim) 0 3px, transparent 3px 5px); }
+.mn-pnl .mn-head td { color: var(--fg-dim); letter-spacing: 0.14em; border-bottom-color: var(--fg-dim); }
+.mn-pnl td:first-child { white-space: normal; min-width: 12em; }
+.mn-lines td { background: color-mix(in srgb, var(--fg) 5%, transparent); white-space: normal !important; }
+.mn-linegrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16em, 1fr)); gap: 2px 14px; }
+.mn-linegrid > div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px dotted var(--fg-faint); min-width: 0; }
+.mn-linegrid span { color: var(--fg-dim); overflow-wrap: anywhere; }
+.mn-budget { display: grid; grid-template-columns: repeat(auto-fit, minmax(17em, 1fr)); gap: 8px 14px; }
+.mn-brow { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.mn-brow input { flex: 1 1 auto; min-width: 0; width: 100%; box-sizing: border-box; }
+.mn-brow .btn { flex: 0 0 auto; }
+.mn-act { display: flex; gap: 4px; }
+.mn-cell { width: 5.5em; min-width: 0; box-sizing: border-box; }
+.mn-chain { display: grid; gap: 3px; border-top: 1px dashed var(--fg-faint); padding-top: 6px; min-width: 0; }
+.mn-step { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); gap: 8px; align-items: baseline; }
+.mn-k { color: var(--bg); background: var(--fg-dim); text-align: center; letter-spacing: 0.1em; font-size: 0.8em; padding: 0 4px; text-shadow: none; }
+.mn-v { overflow-wrap: anywhere; min-width: 0; }
+.mn-receipt { min-height: 16em; }
+@media (max-width: 700px) {
+  .mn-step { grid-template-columns: 5.2em minmax(0, 1fr); }
+  .mn-budget { grid-template-columns: minmax(0, 1fr); }
+  .mn-pnl td:first-child { min-width: 9em; }
+  .mn-spark { width: 88px; }
+  .mn-act { flex-direction: column; }
+}
+/* Warning colour on a selected (bright) row would vanish: use the row's dark text instead. */
+.mn tr.sel .lg-warn-text, .mn tr.sel .mn-down, .mn tr.sel small { color: var(--bg) !important; }
+.mn-swipe { display: none; }
+.mn-danger { margin-top: 4px; align-items: center; border-top: 1px dashed var(--fg-faint); padding-top: 6px; }
+@media (max-width: 700px) {
+  .mn-swipe { display: block; }
+  .mn-linegrid { grid-template-columns: minmax(0, 1fr); position: sticky; left: 0; max-width: calc(100vw - 112px); }
+  .mn-linegrid b { white-space: nowrap; }
+}

@@ -25,6 +25,7 @@ import { Trade, TradeIndex, TRADE_START, TRADE_TABS, type TradeState } from './s
 import { Mission, MissionIndex, MISSION_START, type MissionState } from './screens/Mission'
 import { Yield, YieldIndex, YIELD_START, YIELD_TABS, type YieldState } from './screens/Yield'
 import { Orders, OrdersIndex, ORDERS_START, ORDERS_TABS, type OrdersState } from './screens/Orders'
+import { Money, MoneyIndex, MONEY_START, MONEY_TABS, type MoneyState } from './screens/Money'
 import { History, HistoryIndex, HISTORY_START, HistoryNavContext, SyncLamp, UndoButton, undoneText, type HistoryState } from './screens/History'
 import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
@@ -61,6 +62,7 @@ const MISSION_IDX = MODULES.findIndex((m) => m.key === 'MISSION')
 const HISTORY_IDX = MODULES.findIndex((m) => m.key === 'HISTORY')
 const YIELD_IDX = MODULES.findIndex((m) => m.key === 'YIELD')
 const ORDERS_IDX = MODULES.findIndex((m) => m.key === 'ORDERS')
+const MONEY_IDX = MODULES.findIndex((m) => m.key === 'MONEY')
 
 /** Everything needed to put the terminal back on a screen: Back restores one of these. */
 interface Snap {
@@ -79,6 +81,7 @@ interface Snap {
   hist: HistoryState
   yld: YieldState
   ord: OrdersState
+  money: MoneyState
 }
 const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
@@ -125,6 +128,8 @@ export default function App() {
   const setYld = useCallback((p: Partial<YieldState>) => setYldState((c) => ({ ...c, ...p })), [])
   const [ord, setOrdState] = useState<OrdersState>(ORDERS_START)
   const setOrd = useCallback((p: Partial<OrdersState>) => setOrdState((c) => ({ ...c, ...p })), [])
+  const [money, setMoneyState] = useState<MoneyState>(MONEY_START)
+  const setMoney = useCallback((p: Partial<MoneyState>) => setMoneyState((c) => ({ ...c, ...p })), [])
   const store = useStore()
   const strains = useTable<Strain>('strains')
   useFxSync() // today's colones per dollar, once a day when online
@@ -132,7 +137,7 @@ export default function App() {
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord }
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -176,6 +181,7 @@ export default function App() {
     setHistState(s.hist)
     setYldState(s.yld)
     setOrdState(s.ord)
+    setMoneyState(s.money)
     power.setSelectedRoom(s.room)
     setReply(null)
     setSweep((n) => n + 1)
@@ -271,6 +277,14 @@ export default function App() {
     setOrd(p)
     setSelected(ORDERS_IDX)
     if (!here) go({ name: 'module', idx: ORDERS_IDX }, false)
+    else sound.chirp()
+  }
+  const openMoney = (p: Partial<MoneyState>) => {
+    const here = view.name === 'module' && view.idx === MONEY_IDX
+    if (!here) pushHist()
+    setMoney(p)
+    setSelected(MONEY_IDX)
+    if (!here) go({ name: 'module', idx: MONEY_IDX }, false)
     else sound.chirp()
   }
   const openHistory = (p: Partial<HistoryState>) => {
@@ -528,6 +542,22 @@ export default function App() {
     const oTab = ORDERS_TABS.find((t) => t === cmd)
     if (oTab && view.name === 'module' && view.idx === ORDERS_IDX) {
       setOrd({ tab: oTab })
+      return sound.chirp()
+    }
+    // Money: OWED, RECEIPT, SPEND, PNL, CASHFLOW, BUDGET, TRENDS, WASTE, TRACE, RECALL, WHATIF.
+    if (['MONEY', 'OWED', 'OWES', 'UNPAID', 'DEBT'].includes(cmd)) return openMoney({ tab: 'OWED' })
+    if (['RECEIPT', 'RECEIPTS', 'INVOICE', 'INVOICES'].includes(cmd)) return openMoney({ tab: 'RECEIPTS' })
+    if (['SPEND', 'SPENT', 'SPENDING', 'EXPENSE', 'EXPENSES'].includes(cmd)) return openMoney({ tab: 'SPEND' })
+    if (['PNL', 'P&L', 'PL', 'PROFIT', 'LOSS'].includes(cmd)) return openMoney({ tab: 'PNL' })
+    if (['CASH', 'CASHFLOW', 'FLOW'].includes(cmd)) return openMoney({ tab: 'CASH' })
+    if (['BUDGET'].includes(cmd)) return openMoney({ tab: 'BUDGET' })
+    if (['TRENDS', 'TREND'].includes(cmd)) return openMoney({ tab: 'TRENDS' })
+    if (['WASTE', 'SURPLUS', 'DRIED', 'DONATED'].includes(cmd)) return openMoney({ tab: 'WASTE' })
+    if (['TRACE', 'RECALL'].includes(cmd)) return openMoney({ tab: 'TRACE' })
+    if (['WHATIF', 'WHAT-IF', 'BREAKEVEN', 'BREAK-EVEN'].includes(cmd)) return openMoney({ tab: 'WHATIF' })
+    const mTab = MONEY_TABS.find((t) => t === cmd)
+    if (mTab && view.name === 'module' && view.idx === MONEY_IDX) {
+      setMoney({ tab: mTab })
       return sound.chirp()
     }
     // Power and rooms.
@@ -845,6 +875,7 @@ export default function App() {
       else if (view.idx === MISSION_IDX) content = <Mission x={mission} set={setMission} say={say} openRecord={(key, strainId) => openXeno({ tab: 'LINEAGE', strain: strainId, node: key })} onOpenOrders={(tab) => openOrders({ tab })} />
       else if (view.idx === YIELD_IDX) content = <Yield x={yld} set={setYld} say={say} />
       else if (view.idx === ORDERS_IDX) content = <Orders x={ord} set={setOrd} say={say} />
+      else if (view.idx === MONEY_IDX) content = <Money x={money} set={setMoney} say={say} onOpenTrade={() => openTrade({ tab: 'SALE' })} onOpenLedger={() => openLedger({ sel: 'bills' })} />
       else if (view.idx === HISTORY_IDX) content = <History x={hist} set={setHist} say={say} />
       else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} onOpenPrices={() => openLedger({ sel: 'settings' })} onOpenOrders={() => openOrders({ tab: 'ORDERS' })} />
       else if (view.idx === MANUAL_IDX) content = <Manual loc={manualLoc} onOpen={openManual} />
@@ -881,6 +912,8 @@ export default function App() {
     hints.module = 'FLUSH LOG: BE% PER LOT AND FLUSH // SCORECARD: BY STRAIN, COOK, ROOM, WEEK, WORKER // TYPE TRIAL OR FADING // F2 MENU'
   if (view.name === 'module' && view.idx === ORDERS_IDX)
     hints.module = 'EVERY BUYER PAYS CASH ON DELIVERY // PICK LIST COMPARES ORDERS WITH THE FORECAST // TYPE FORECAST, PACK OR WHATSAPP // F2 MENU'
+  if (view.name === 'module' && view.idx === MONEY_IDX)
+    hints.module = 'CASH ON DELIVERY // US$ AT EACH RECORD\'S OWN DAY // TYPE OWED, PNL, CASH, TRENDS, WASTE, TRACE OR WHATIF // F2 MENU'
   if (view.name === 'module' && view.idx === HISTORY_IDX)
     hints.module = 'TAP A CHANGE TO SEE THAT RECORD // UNDO OR CTRL+Z REVERSES THE LAST CHANGE // TYPE SYNC FOR SAVING STATUS // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
@@ -941,6 +974,8 @@ export default function App() {
                             ? <YieldIndex x={yld} set={setYld} />
                           : view.name === 'module' && view.idx === ORDERS_IDX
                             ? <OrdersIndex x={ord} set={setOrd} />
+                          : view.name === 'module' && view.idx === MONEY_IDX
+                            ? <MoneyIndex x={money} set={setMoney} />
                           : moduleIndex
             }
             keys={keys}
@@ -954,7 +989,7 @@ export default function App() {
             onBack={histLen > 0 ? goBack : undefined}
             lamp={<SyncLamp onOpen={() => openHistory({ tab: 'SYNC' })} />}
             undo={<UndoButton say={say} />}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX) ? ' view-ledger' : ''}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX) ? ' view-ledger' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>
