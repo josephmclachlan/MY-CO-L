@@ -764,6 +764,11 @@ li[tabindex]:focus-visible,
 tr[tabindex]:focus-visible {
   outline: 1px solid var(--fg);
   outline-offset: 0;
+}
+/* Only an unselected row gets the dim fill; a selected row keeps its bright bar. */
+.index-list li:not(.sel):not(.cur):focus-visible,
+li[tabindex]:not(.sel):not(.cur):not([aria-selected="true"]):focus-visible,
+tr[tabindex]:not(.sel):focus-visible {
   background: var(--bg-hi);
 }
 .menu-item:focus-visible { outline: none; border-color: var(--fg); }
@@ -774,6 +779,10 @@ html.kbd :focus:not(.prompt input):not([data-kbd-zone]) {
   outline: 2px solid var(--fg) !important;
   outline-offset: 2px !important;
   box-shadow: 0 0 calc(10px * var(--glow-k, 1)) var(--glow) !important;
+}
+/* A focused item that is not the selected one gets a faint fill; a selected row
+   keeps its solid bright bar (Joseph, 6 Nov 2026: the fill washed the bar out). */
+html.kbd :focus:not(.sel):not(.cur):not(.on):not(.active):not([aria-selected="true"]):not(.prompt input):not([data-kbd-zone]) {
   background-image: linear-gradient(var(--fg-faint), var(--fg-faint));
 }
 html.kbd [data-kbd-zone]:focus {
