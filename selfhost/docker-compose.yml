@@ -94,6 +94,7 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./app:/srv/app:ro
+      - ./manual:/srv/manual:ro
       - ./data/caddy:/data
 
   ollama:

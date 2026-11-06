@@ -7,7 +7,7 @@
 
 import { SPECIES } from '../data/species'
 import { ROOMS } from '../data/rooms'
-import { daysBetween, parseDay, isoDay, type BlockLot, type Strain } from './xeno'
+import { addDays, daysBetween, parseDay, isoDay, type BlockLot, type Strain } from './xeno'
 import type { Row } from './store'
 import type { Harvest } from './ledger'
 import type { LotLoss } from './hazard'
@@ -531,4 +531,73 @@ export function flushTest(recs: LotRecord[], species: string, minAddPct = 15, mi
     }
   }
   return { species, finished: done.length, open, rows, suggest }
+}
+
+// ---------- Catawba-style weekly sheets (Joseph 6 Nov 2026: mirror Catawba's tracking) ----------
+// Catawba keeps two weekly records: a harvest side table (pounds picked per variety per week, with averages) and an
+// inoculation chart (blocks knocked per variety per week, with expected production). These are the same, in kg.
+
+/** The last `n` ISO weeks ending with the week of `today`, oldest first, as [week id, Monday]. */
+export function lastWeeks(today: string, n: number): { week: string; monday: string }[] {
+  const out: { week: string; monday: string }[] = []
+  const mon = weekStart(today)
+  for (let i = n - 1; i >= 0; i--) {
+    const m = addDays(mon, -7 * i)
+    out.push({ week: isoWeek(m), monday: m })
+  }
+  return out
+}
+
+export interface WeekSheetRow {
+  species: string
+  /** One figure per week, oldest first (kg for the harvest sheet, blocks for the knock chart). */
+  byWeek: number[]
+  total: number
+  /** Average of the last 4 weeks shown (Catawba's "Averages" column), counting empty weeks as 0. */
+  avg4: number
+  /** Knock chart only: expected kg from these blocks (Catawba's "Production" column), at the per-block figure used. */
+  expectedKg?: number
+}
+export interface WeekSheet {
+  weeks: { week: string; monday: string }[]
+  rows: WeekSheetRow[]
+  /** Column totals, one per week. */
+  totals: number[]
+}
+
+function sheet(weeks: { week: string; monday: string }[], items: { species: string; week: string; v: number }[]): WeekSheet {
+  const idx = new Map(weeks.map((w, i) => [w.week, i]))
+  const by = new Map<string, number[]>()
+  for (const it of items) {
+    const i = idx.get(it.week)
+    if (i === undefined) continue
+    if (!by.has(it.species)) by.set(it.species, weeks.map(() => 0))
+    by.get(it.species)![i] += it.v
+  }
+  const rows = [...by.entries()].map(([species, byWeek]) => {
+    const last4 = byWeek.slice(-4)
+    return { species, byWeek, total: byWeek.reduce((a, b) => a + b, 0), avg4: last4.reduce((a, b) => a + b, 0) / (last4.length || 1) }
+  })
+  rows.sort((a, b) => b.total - a.total || a.species.localeCompare(b.species))
+  return { weeks, rows, totals: weeks.map((_, i) => rows.reduce((n, r) => n + r.byWeek[i], 0)) }
+}
+
+/** Kilos picked per species for each calendar week (the harvest day's week, as Catawba's side table). */
+export function weeklyHarvest(harvests: Harvest[], lots: BlockLot[], today: string, n = 8): WeekSheet {
+  const sp = new Map(lots.map((l) => [l.id, l.species_key]))
+  const items = harvests
+    .filter((h) => sp.has(h.block_lot_id) && Number(h.kg) > 0)
+    .map((h) => ({ species: sp.get(h.block_lot_id)!, week: isoWeek(h.harvested_on), v: Number(h.kg) }))
+  return sheet(lastWeeks(today, n), items)
+}
+
+/** Blocks knocked per species for each knock week, with expected kg at `kgPerBlock` (Catawba's inoculation chart). */
+export function knockChart(lots: BlockLot[], today: string, kgPerBlock: (species: string) => number | null, n = 8): WeekSheet {
+  const items = lots.filter((l) => Number(l.bag_count) > 0).map((l) => ({ species: l.species_key, week: isoWeek(l.knock_date), v: Number(l.bag_count) }))
+  const s = sheet(lastWeeks(today, n), items)
+  for (const r of s.rows) {
+    const k = kgPerBlock(r.species)
+    r.expectedKg = k === null ? undefined : r.total * k
+  }
+  return s
 }

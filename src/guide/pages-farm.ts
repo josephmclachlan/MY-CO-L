@@ -74,6 +74,8 @@ export const FARM: GSection[] = [
         h: 'THE TABS',
         items: [
           ['FLUSH LOG', 'BE% for each lot and flush, with the day the first pins appeared.'],
+          ['WEEKLY HARVEST', 'Kilos picked per species for each week, with the 4-week average. The same shape as Catawba\'s weekly harvest table.'],
+          ['KNOCK CHART', 'Blocks knocked per species for each week and the kilos to expect from them. The same shape as Catawba\'s inoculation chart.'],
           ['FLUSH TEST', 'Every crop starts in test: lots stay open for up to 4 flushes until you mark them spent. This tab shows what each flush gave (kg per block, share of flush 1, days between flushes) and a suggested count. COMMIT 1-4 sets the count for that species; BACK TO TEST undoes it.'],
           ['SCORECARD', 'Results grouped by strain, cook run, room, week or worker. Pick a grouping at the top.'],
           ['STRAIN TRIALS', 'Put two or more strains side by side and see which wins. START TRIAL begins one.'],
@@ -220,7 +222,7 @@ export const FARM: GSection[] = [
         h: 'THE TABS',
         items: [
           ['STRAINS', 'Every strain you hold. REGISTER adds one.'],
-          ['BANK', 'The culture bank: slants and water tubes, due dates, viability checks, T/E tests.'],
+          ['BANK', 'The culture bank: slants and water tubes, due dates, viability checks, T/E tests. FRIDAY CULTURE CHECK lists any strain missing a fresh plate (under 30 days), a slant, a water tube or backup spawn under 6 weeks old.'],
           ['STOCK', 'Cultures and grain runs in stock.'],
           ['LINEAGE', 'A strain\'s family tree. Tap a node to log the next step.'],
           ['PLANNER', 'Works back from the weekly bag run to how many G2, G1 and masters you need.'],

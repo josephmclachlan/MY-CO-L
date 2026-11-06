@@ -11,6 +11,7 @@ import type { Harvest } from './ledger'
 import {
   addDays,
   daysBetween,
+  grainRemaining,
   isActiveCulture,
   todayIso,
   type AgeCheck,
@@ -367,6 +368,48 @@ export function bankStatus(strain: Strain, cultures: Culture[], checks: Viabilit
   if (out.due) out.warnings.push(`${out.due} TUBE${out.due > 1 ? 'S' : ''} DUE OR ON WATCH`)
   if (sl + wt > 0 && out.passed === 0 && out.pendingTests === 0) out.warnings.push('NO T/E TEST ON FILE: TEST BEFORE THE STRAIN FEEDS PRODUCTION')
   return out
+}
+
+// ---------- Friday culture check (Catawba's lab routine, t26: Joseph 6 Nov 2026 asked to mirror Catawba) ----------
+// "Each Friday, every strain in use should have a fresh plate or P2 wedge in the fridge, its slants and water tube
+// banked, and a backup spawn bag less than 6 weeks old." {F24-0040 F24-0041 F24-0042}
+
+export const FRESH_PLATE_DAYS = 30
+export const BACKUP_SPAWN_DAYS = 42
+
+export interface FridayRow {
+  strain: Strain
+  /** Newest clean working plate (P1 or later) made in the last 30 days, if any. */
+  plate: Culture | null
+  slant: boolean
+  water: boolean
+  /** Grain (G1 or G2) under 6 weeks old with bags left, if any. */
+  spawn: GrainRun | null
+  missing: string[]
+}
+
+export function fridayCheck(strains: Strain[], cultures: Culture[], runs: GrainRun[], lots: BlockLot[], checks: ViabilityCheck[], tests: BankTest[], p: Practice = DEFAULT_PRACTICE, now = todayIso()): FridayRow[] {
+  return strains
+    .filter((s) => s.active)
+    .map((strain) => {
+      const plate =
+        cultures
+          .filter((c) => c.strain_id === strain.id && c.kind === 'plate' && isActiveCulture(c) && (c.p_level ?? 1) >= 1 && daysBetween(c.made_on, now) <= FRESH_PLATE_DAYS && c.made_on <= now)
+          .sort((a, b) => b.made_on.localeCompare(a.made_on))[0] ?? null
+      const b = bankStatus(strain, cultures, checks, tests, p, now)
+      const spawn =
+        runs
+          .filter((g) => g.strain_id === strain.id && ['incubating', 'ready', 'cold_storage'].includes(g.status) && daysBetween(g.inoculated_on, now) <= BACKUP_SPAWN_DAYS && grainRemaining(g, runs, lots) > 0)
+          .sort((a, b2) => b2.inoculated_on.localeCompare(a.inoculated_on))[0] ?? null
+      const slant = b.slants + b.offsiteSlants > 0
+      const water = b.water + b.offsiteWater > 0
+      const missing: string[] = []
+      if (!plate) missing.push('FRESH PLATE')
+      if (!slant) missing.push('SLANT')
+      if (!water) missing.push('WATER TUBE')
+      if (!spawn) missing.push('BACKUP SPAWN')
+      return { strain, plate, slant, water, spawn, missing }
+    })
 }
 
 // ---------- contamination by stage (t16 Our farm) ----------

@@ -12,7 +12,7 @@ import { weekSplit } from '../data/cropplan'
 import { GRADES } from '../data/ledger'
 import { HazardPick } from '../components/HazardPick'
 import { hazardName, type LotLoss } from '../lib/hazard'
-import { addDays, RATIO, todayIso, type BlockLot, type Culture, type GrainRun, type Strain } from '../lib/xeno'
+import { addDays, notFuture, RATIO, todayIso, type BlockLot, type Culture, type GrainRun, type Strain } from '../lib/xeno'
 import { lossLot, setLotStatus } from '../lib/xenoActions'
 import { uuid } from '../lib/store'
 import type { Harvest } from '../lib/ledger'
@@ -335,6 +335,7 @@ function HarvestForm({ m, say }: { m: M; say: Say }) {
     if (!initials.trim()) return say(tt('TYPE YOUR INITIALS.'), true)
     if (fl < 1 || fl > 9) return say(tt('FLUSH MUST BE 1 TO 9.'), true)
     try {
+      notFuture(day, 'HARVEST')
       // One UNDO step and one history line, even when the pick also moves the lot to fruiting.
       await store.action(`HARVEST ${row.lot.lot_code}`, async () => {
         if (row.lot.status === 'incubating') await store.put('block_lots', { ...row.lot, status: 'fruiting', to_fruiting_on: row.lot.to_fruiting_on ?? day, room: 'fruiting' })

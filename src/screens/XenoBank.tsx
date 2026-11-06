@@ -11,6 +11,7 @@ import { useStore, useTable } from '../store/StoreContext'
 import { usePractice, usePracticeEditor } from '../store/usePractice'
 import type { LotLoss } from '../lib/hazard'
 import { AGE_TONE, Confirm, MiniGlyph, Num, ageOf, spName, useRun, type Say, type SetXeno, type XData, type XenoState } from './Xeno'
+import { Guess } from './CookParts'
 import { KIND_LABEL, isActiveCulture, pLabel, todayIso, type BlockLot, type Culture, type GrainRun, type Strain } from '../lib/xeno'
 import { setCultureStatus } from '../lib/xenoActions'
 import {
@@ -21,6 +22,9 @@ import {
   STAGE_TEXT,
   bankStatus,
   baselineDays,
+  fridayCheck,
+  FRESH_PLATE_DAYS,
+  BACKUP_SPAWN_DAYS,
   chainSurvival,
   isBankTube,
   isHeld,
@@ -574,6 +578,37 @@ function StrainBank({ strain, d, say, set }: { strain: Strain; d: XData; say: Sa
   )
 }
 
+/** Catawba's Friday check (t26): every strain in use has a fresh plate, slants, a water tube and backup spawn. */
+function FridayCheck({ d }: { d: XData }) {
+  const rows = fridayCheck(d.strains, d.cultures, d.runs, d.lots, d.checks, d.tests, d.practice)
+  if (!rows.length) return null
+  const short = rows.filter((r) => r.missing.length).length
+  return (
+    <div className="ck-box xb-friday">
+      <div className="section-title">FRIDAY CULTURE CHECK // {short ? `${short} STRAIN${short > 1 ? 'S' : ''} SHORT` : 'ALL STRAINS COVERED'}</div>
+      <div className="rc-wrap">
+        <table className="lg-table rc-table">
+          <thead><tr><th>STRAIN</th><th>FRESH PLATE</th><th>SLANT</th><th>WATER</th><th>BACKUP SPAWN</th></tr></thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.strain.id} className={r.missing.length ? 'warn' : ''}>
+                <td>{r.strain.code}</td>
+                <td>{r.plate ? `${pLabel(r.plate.p_level)} ${r.plate.made_on}` : 'MISSING'}</td>
+                <td>{r.slant ? 'YES' : 'MISSING'}</td>
+                <td>{r.water ? 'YES' : 'MISSING'}</td>
+                <td>{r.spawn ? `${r.spawn.generation} ${r.spawn.inoculated_on}` : 'MISSING'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="dim tiny">
+        CATAWBA'S FRIDAY RULE: EVERY STRAIN IN USE HAS A FRESH PLATE (UNDER {FRESH_PLATE_DAYS} DAYS), SLANTS AND A WATER TUBE BANKED, AND A BACKUP SPAWN BAG UNDER {BACKUP_SPAWN_DAYS / 7} WEEKS OLD (THEY KEEP 2-5 BAGS OF LION'S MANE OR BLUE OYSTER). THE {FRESH_PLATE_DAYS}-DAY PLATE LIMIT IS A GUESS. <Guess />
+      </div>
+    </div>
+  )
+}
+
 export function BankTab({ d, x, set, say }: { d: XData; x: XenoState; set: SetXeno; say: Say }) {
   const sel = d.strains.find((s) => s.id === x.strain) ?? null
   return (
@@ -601,6 +636,7 @@ export function BankTab({ d, x, set, say }: { d: XData; x: XenoState; set: SetXe
         {!d.strains.length && <div className="dim">NO STRAINS ON FILE. REGISTER ONE UNDER STRAINS FIRST.</div>}
       </div>
       {sel ? <StrainBank key={sel.id} strain={sel} d={d} say={say} set={set} /> : d.strains.length > 0 && <div className="dim tiny">PICK A STRAIN TO BANK, CHECK OR TEST ITS TUBES.</div>}
+      <FridayCheck d={d} />
       <PracticeFields keys={['bankSlants', 'bankWater', 'slantReplaceDays', 'waterCheckDays', 'waterOverDays', 'suspectDays', 'slowerPct', 'yieldDropPct']} title="BANK RULES" say={say} />
     </div>
   )

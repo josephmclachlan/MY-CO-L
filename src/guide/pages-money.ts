@@ -14,7 +14,7 @@ export const MONEY: GSection[] = [
         items: [
           ['OVERVIEW + PLAN WEEK', 'Cost of goods: what one block and one kilogram cost, split into parts, and the cost of the planned week.'],
           ['ICE BILLS', 'Type in each electricity bill. The app checks the bill against the ICE tariff.'],
-          ['LABOUR HOURS', 'Log hours worked. They count toward cost when labour is switched on.'],
+          ['LABOUR + TASK HOURS', 'Log hours against a standard task (MIX + BAG, STEAM RUN, KNOCK, HARVEST, PACK and so on). Pick the task and who, then START TIMER and STOP + SAVE when done, or type the hours. HOURS PER TASK shows hours each week, share of all hours, and a rate where there is an output: blocks an hour for knocking, kg an hour for picking and packing. Labour is off in costs by default; the hours are for tracking.'],
           ['PRICES + COSTS', 'Every price and cost the app uses: sale price per kg, electricity tariff, labour rate, wear. Blank means the built-in number.'],
         ],
       },

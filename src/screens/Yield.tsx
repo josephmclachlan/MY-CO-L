@@ -9,17 +9,18 @@ import { Confirm, Guess } from './CookParts'
 import { SPECIES } from '../data/species'
 import { speciesName } from '../store/useLedger'
 import { todayIso } from '../lib/xeno'
-import { BLOCK_DRY_LB, DIMENSIONS, daysFmt, flushTest, kgFmt, pctFmt, pickerTotals, scorecard, speciesLabel, trialArms, trialVerdict, type Dimension, type LotRecord, type StrainTrial } from '../lib/records'
+import { BLOCK_DRY_LB, DIMENSIONS, daysFmt, flushTest, knockChart, weeklyHarvest, kgFmt, pctFmt, pickerTotals, scorecard, speciesLabel, trialArms, trialVerdict, type Dimension, type LotRecord, type StrainTrial } from '../lib/records'
 import { closeTrial, createTrial, bulkLots, logPins } from '../lib/recordsActions'
 import { usePracticeEditor } from '../store/usePractice'
 import { TEST_FLUSH_MAX } from '../lib/bank'
+import { expectFor } from '../lib/mission'
 
 // PRODUCTION RECORDS: the flush log with BE% per lot and per flush, the strain scorecard (with the fading-strain
 // warning), and side-by-side strain trials.
 
-export type YieldTab = 'FLUSHES' | 'FLUSHTEST' | 'SCORECARD' | 'TRIALS' | 'GUESSES'
-export const YIELD_TABS: YieldTab[] = ['FLUSHES', 'FLUSHTEST', 'SCORECARD', 'TRIALS', 'GUESSES']
-const TAB_LABEL: Record<YieldTab, string> = { FLUSHES: 'FLUSH LOG', FLUSHTEST: 'FLUSH TEST', SCORECARD: 'SCORECARD', TRIALS: 'STRAIN TRIALS', GUESSES: 'GUESSES' }
+export type YieldTab = 'FLUSHES' | 'FLUSHTEST' | 'WEEKLY' | 'KNOCKS' | 'SCORECARD' | 'TRIALS' | 'GUESSES'
+export const YIELD_TABS: YieldTab[] = ['FLUSHES', 'FLUSHTEST', 'WEEKLY', 'KNOCKS', 'SCORECARD', 'TRIALS', 'GUESSES']
+const TAB_LABEL: Record<YieldTab, string> = { FLUSHES: 'FLUSH LOG', FLUSHTEST: 'FLUSH TEST', WEEKLY: 'WEEKLY HARVEST', KNOCKS: 'KNOCK CHART', SCORECARD: 'SCORECARD', TRIALS: 'STRAIN TRIALS', GUESSES: 'GUESSES' }
 export interface YieldState {
   tab: YieldTab
   lot: string | null
@@ -91,6 +92,8 @@ export function Yield({ x, set, say }: { x: YieldState; set: SetYield; say: Say 
       </label>
       {x.tab === 'FLUSHES' && <Flushes r={r} x={x} set={set} say={say} />}
       {x.tab === 'FLUSHTEST' && <FlushTestTab r={r} x={x} set={set} say={say} />}
+      {x.tab === 'WEEKLY' && <WeekSheetTab r={r} kind="harvest" />}
+      {x.tab === 'KNOCKS' && <WeekSheetTab r={r} kind="knock" />}
       {x.tab === 'SCORECARD' && <Score r={r} x={x} set={set} />}
       {x.tab === 'TRIALS' && <Trials r={r} x={x} set={set} say={say} />}
       {x.tab === 'GUESSES' && <Guesses />}
@@ -394,6 +397,71 @@ function TrialView({ t, r, say }: { t: StrainTrial; r: Recs; say: Say }) {
       <div className="lg-btns">
         <button type="button" className="btn" onClick={() => void run(() => closeTrial(store, t, t.status === 'running'), t.status === 'running' ? 'TRIAL CLOSED' : 'TRIAL REOPENED')}>{t.status === 'running' ? 'CLOSE TRIAL' : 'REOPEN TRIAL'}</button>
         <HistoryButton table="strain_trials" id={t.id} />
+      </div>
+    </div>
+  )
+}
+
+// ---------- WEEKLY HARVEST + KNOCK CHART (Catawba's two weekly records) ----------
+
+function WeekSheetTab({ r, kind }: { r: Recs; kind: 'harvest' | 'knock' }) {
+  const [n, setN] = useState(8)
+  const today = todayIso()
+  const s = useMemo(
+    () => (kind === 'harvest' ? weeklyHarvest(r.harvests, r.lots, today, n) : knockChart(r.lots, today, (sp) => expectFor(sp).kgPerBlock, n)),
+    [kind, r.harvests, r.lots, today, n],
+  )
+  const unit = kind === 'harvest' ? 'KG' : 'BLOCKS'
+  const fmt = (v: number) => (kind === 'harvest' ? (v ? v.toFixed(1) : '-') : v ? String(v) : '-')
+  return (
+    <div className="lg-stack">
+      <div className="ck-box">
+        <div className="section-title">{kind === 'harvest' ? 'WEEKLY HARVEST // KG PICKED PER SPECIES, BY HARVEST WEEK' : 'KNOCK CHART // BLOCKS KNOCKED PER SPECIES, BY KNOCK WEEK'}</div>
+        <div className="lg-btns">
+          {[4, 8, 13, 26].map((k) => (
+            <button key={k} type="button" className={`btn${n === k ? ' on' : ''}`} onClick={() => setN(k)}>{k} WEEKS</button>
+          ))}
+        </div>
+        {s.rows.length ? (
+          <div className="rc-wrap">
+            <table className="lg-table rc-table">
+              <thead>
+                <tr>
+                  <th>SPECIES</th>
+                  {s.weeks.map((w) => <th key={w.week}>{w.monday.slice(5)}</th>)}
+                  <th>TOTAL</th>
+                  <th>AVG 4 WK</th>
+                  {kind === 'knock' && <th>EXPECT KG</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {s.rows.map((row) => (
+                  <tr key={row.species}>
+                    <td>{speciesLabel(row.species).toUpperCase()}</td>
+                    {row.byWeek.map((v, i) => <td key={i}>{fmt(v)}</td>)}
+                    <td>{fmt(row.total)}</td>
+                    <td>{kind === 'harvest' ? row.avg4.toFixed(1) : row.avg4.toFixed(0)}</td>
+                    {kind === 'knock' && <td>{row.expectedKg === undefined ? '-' : row.expectedKg.toFixed(0)}</td>}
+                  </tr>
+                ))}
+                <tr>
+                  <td>ALL</td>
+                  {s.totals.map((v, i) => <td key={i}>{fmt(v)}</td>)}
+                  <td>{fmt(s.totals.reduce((a, b) => a + b, 0))}</td>
+                  <td>{(s.totals.slice(-4).reduce((a, b) => a + b, 0) / Math.min(4, s.totals.length)).toFixed(kind === 'harvest' ? 1 : 0)}</td>
+                  {kind === 'knock' && <td>{s.rows.reduce((a, b) => a + (b.expectedKg ?? 0), 0).toFixed(0)}</td>}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="dim">NOTHING {kind === 'harvest' ? 'PICKED' : 'KNOCKED'} IN THESE WEEKS YET.</div>
+        )}
+        <div className="dim tiny">
+          {kind === 'harvest'
+            ? `${unit} PER SPECIES FOR EACH WEEK (MONDAY SHOWN), THE SAME SHAPE AS CATAWBA'S WEEKLY HARVEST TABLE. AVG 4 WK COUNTS EMPTY WEEKS AS 0.`
+            : `${unit} PER SPECIES FOR EACH KNOCK WEEK, LIKE CATAWBA'S INOCULATION CHART. EXPECT KG USES THE SAME KG PER BLOCK AS MISSION CONTROL (CATAWBA'S REAL PICKS).`}
+        </div>
       </div>
     </div>
   )

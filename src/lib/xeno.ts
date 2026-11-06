@@ -125,6 +125,11 @@ export function isoDay(d: Date): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 export const todayIso = () => isoDay(new Date())
+/** Refuse a day after today (Catawba's slips: a 2026 pick typed as 2021, 2024 knocks typed as 2026). */
+export function notFuture(day: string, what: string, today = todayIso()): void {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new Error(`PICK THE ${what} DAY.`)
+  if (day > today) throw new Error(`THE ${what} DAY ${day} IS IN THE FUTURE. TODAY IS ${today}.`)
+}
 export function parseDay(s: string): Date {
   const [y, m, d] = s.split('-').map(Number)
   return new Date(y, (m || 1) - 1, d || 1)

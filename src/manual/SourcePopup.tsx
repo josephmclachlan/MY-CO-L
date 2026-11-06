@@ -78,6 +78,7 @@ export function SourcePopup({ refId: first, onClose, onGoPage }: Props) {
         >
           {state.status === 'locked' && <div className="warn">MANUAL LOCKED // LOGIN REQUIRED</div>}
           {state.status === 'loading' && <span className="processing">LOADING MANUAL</span>}
+          {state.status === 'missing' && <div className="warn">{state.why}</div>}
           {data && !found && <div className="warn">{refId} IS NOT IN THE MANUAL. NO SECTION TO SHOW.</div>}
           {found && (
             <>

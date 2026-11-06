@@ -3,6 +3,7 @@
 //   mycol-selfhost/migrations/  the database changes (supabase/migrations)
 //   mycol-selfhost/selfhost/    docker-compose.yml, Caddyfile, mycol.sh, db/, bridge/bridge.mjs
 //   mycol-selfhost/VERSION      date and commit
+// The textbook is never in it: the app fetches it from the box (./mycol.sh manual FILE puts it there).
 // The GitHub workflow .github/workflows/selfhost.yml runs this on every merge and attaches the file to the
 // "selfhost-latest" release, which ./mycol.sh update downloads.
 import { execSync } from 'node:child_process'
@@ -13,7 +14,7 @@ const out = 'dist-selfhost'
 const pkg = `${out}/mycol-selfhost`
 rmSync(out, { recursive: true, force: true })
 
-run(`npx tsc -b && npx vite build --outDir ${pkg}/app --emptyOutDir`, { BASE_PATH: '/', VITE_SUPABASE_URL: 'self', VITE_SUPABASE_KEY: 'self-hosted' })
+run(`npx tsc -b && npx vite build --outDir ${pkg}/app --emptyOutDir`, { BASE_PATH: '/', VITE_SUPABASE_URL: 'self', VITE_SUPABASE_KEY: 'self-hosted', MANUAL: '', MANUAL_FETCH: '1' })
 run('npx vite build --config selfhost/bridge/vite.config.ts')
 
 cpSync('supabase/migrations', `${pkg}/migrations`, { recursive: true })

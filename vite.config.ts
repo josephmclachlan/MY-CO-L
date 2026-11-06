@@ -16,6 +16,10 @@ const preview = process.env.PREVIEW === '1'
 // The public build aliases the data to an empty stub, so the textbook text cannot
 // end up in it. Remove this gate once the Supabase login serves the manual.
 const manual = process.env.MANUAL === '1'
+// MANUAL_FETCH=1 (the farm-box build, scripts/build-selfhost.mjs): the textbook is NOT in the download either.
+// The app fetches it from the box at /manual/manual.json, which Caddy only hands to a logged-in user, after
+// Joseph copies it there with ./mycol.sh manual FILE (his answer A7, 6 Nov 2026).
+const manualFetch = process.env.MANUAL_FETCH === '1'
 const at = (p: string) => fileURLToPath(new URL(p, import.meta.url))
 
 // The contaminant library, the species facts and the cook log's context notes are paraphrased from the textbook, so their sentences follow the manual's rule:
@@ -38,7 +42,7 @@ const hazardText = (): Plugin => ({
 
 export default defineConfig({
   base,
-  define: { __MANUAL__: JSON.stringify(manual) },
+  define: { __MANUAL__: JSON.stringify(manual), __MANUAL_FETCH__: JSON.stringify(manualFetch && !manual) },
   resolve: { alias: { '@manual-data': at(manual ? './src/manual-data/manual.json' : './src/manual/empty.json') } },
   build: preview ? { outDir: 'dist-preview', assetsInlineLimit: 0, rollupOptions: { output: { inlineDynamicImports: true } } } : undefined,
   plugins: [
