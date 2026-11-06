@@ -86,8 +86,8 @@ export function Menu({ selected, setSelected, onOpen, firstShow }: Props) {
           <Wireframe size={190} instant={!firstShow} />
         </div>
         <span className="sign dim">LATTICE NODE 01</span>
-        {listReady && <StatusBoard onOpen={() => onOpen(MODULES.findIndex((m) => m.key === 'FACILITY'))} />}
       </div>
+      {listReady && <StatusBoard onOpen={() => onOpen(MODULES.findIndex((m) => m.key === 'FACILITY'))} />}
     </div>
   )
 }

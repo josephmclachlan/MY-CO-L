@@ -60,16 +60,11 @@ export function MaintTab({ d, say }: { d: FacilityData; say: Say }) {
             </div>
           </>
         ) : (
-          <div className="rc-wrap">
-            <table className="lg-table rc-table fc-maint">
-              <thead><tr><th>JOB</th><th className="hide-sm">ROOM</th><th>STATE</th><th>WHEN</th><th /></tr></thead>
-              <tbody>
-                {d.board.map((m) => (
-                  <MaintRow key={m.item.id} m={m} open={done === m.item.id} onOpen={() => setDone(done === m.item.id ? null : m.item.id)} onEdit={() => startEdit(m.item)} say={say} today={d.today} />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="fc-cards">
+            {d.board.map((m) => (
+              <MaintRow key={m.item.id} m={m} open={done === m.item.id} onOpen={() => setDone(done === m.item.id ? null : m.item.id)} onEdit={() => startEdit(m.item)} say={say} today={d.today} />
+            ))}
+          </ul>
         )}
         <div className="dim tiny">GENERATOR HOURS COME FROM THE POWER CUTS LOG: {genTotal.toFixed(1)} H IN TOTAL. "MARK DONE" STARTS THE CLOCK AGAIN FROM THE DAY YOU PICK. INTERVALS ARE WORKING NUMBERS: FOLLOW THE MAKER'S MANUAL WHERE IT IS STRICTER.</div>
         {d.board.length > 0 && d.board.length < STANDARD_MAINT.length && (
@@ -129,37 +124,35 @@ function MaintRow({ m, open, onOpen, onEdit, say, today }: { m: MaintStatus; ope
   const [who, setWho] = useState(getInitials)
   const [notes, setNotes] = useState('')
   const it = m.item
+  const warn = m.state === 'late' || m.state === 'due'
   return (
-    <>
-      <tr className={m.state === 'late' || m.state === 'due' ? 'od-row over' : ''}>
-        <td>{it.name}{it.make_model ? <small className="dim"> {it.make_model}</small> : null}</td>
-        <td className="hide-sm">{it.room_id ? ROOM_LABEL[it.room_id] ?? it.room_id : '--'}</td>
-        <td className={m.state === 'late' || m.state === 'due' ? 'lg-warn-text' : ''}>{STATE_TEXT[m.state]}</td>
-        <td>{m.text}</td>
-        <td className="mn-act">
-          <button type="button" className={`btn ${open ? 'on' : ''}`} aria-expanded={open} onClick={onOpen}>MARK DONE</button>
-        </td>
-      </tr>
+    <li className={`fc-card ${warn ? 'warn' : ''}`}>
+      <div className="fc-card-head">
+        <span className="fc-card-name">{it.name}</span>
+        <span className={`fc-state ${warn ? 'warn' : ''}`}>{STATE_TEXT[m.state]}</span>
+      </div>
+      <div className="fc-card-sub">{it.room_id ? `${ROOM_LABEL[it.room_id] ?? it.room_id} // ` : ''}{m.text}{it.make_model ? ` // ${it.make_model}` : ''}</div>
+      <div className="lg-btns">
+        <button type="button" className={`btn ${open ? 'on' : ''}`} aria-expanded={open} onClick={onOpen}>{open ? 'CLOSE' : 'MARK DONE'}</button>
+        <button type="button" className="btn" onClick={onEdit}>EDIT</button>
+      </div>
       {open && (
-        <tr className="mn-lines">
-          <td colSpan={5}>
-            <div className="ck-fields ck-quick">
-              <label className="ck-field"><span>DAY DONE</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value)} /></label>
-              <label className="ck-field"><span>DONE BY</span><input value={who} placeholder="INITIALS" onChange={(e) => setWho(e.target.value)} /></label>
-              <label className="ck-field"><span>NOTES</span><input value={notes} onChange={(e) => setNotes(e.target.value)} /></label>
-            </div>
-            <div className="lg-btns">
-              <button type="button" className="btn on" onClick={() => void run(`DONE: ${it.name}`, async () => { setInitials(who); await markMaintDone(store, it.id, day, who, notes, today) }).then((ok) => ok && (onOpen(), setNotes('')))}>SAVE AS DONE</button>
-              <button type="button" className="btn" onClick={onEdit}>EDIT ITEM</button>
-              <HistoryButton table="maint_items" id={it.id} />
-              <Confirm label="REMOVE FROM LIST" onYes={() => void run(`REMOVED: ${it.name}`, () => setMaintActive(store, it.id, false))} />
-            </div>
-            {it.notes && <div className="dim tiny">{it.notes}</div>}
-            {it.serial && <div className="dim tiny">SERIAL {it.serial}{it.installed_on ? ` // INSTALLED ${it.installed_on}` : ''}</div>}
-          </td>
-        </tr>
+        <div className="fc-card-body">
+          <div className="ck-fields ck-quick">
+            <label className="ck-field"><span>DAY DONE</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value)} /></label>
+            <label className="ck-field"><span>DONE BY</span><input value={who} placeholder="INITIALS" onChange={(e) => setWho(e.target.value)} /></label>
+            <label className="ck-field"><span>NOTES</span><input value={notes} onChange={(e) => setNotes(e.target.value)} /></label>
+          </div>
+          <div className="lg-btns">
+            <button type="button" className="btn on" onClick={() => void run(`DONE: ${it.name}`, async () => { setInitials(who); await markMaintDone(store, it.id, day, who, notes, today) }).then((ok) => ok && (onOpen(), setNotes('')))}>SAVE AS DONE</button>
+            <HistoryButton table="maint_items" id={it.id} />
+            <Confirm label="REMOVE FROM LIST" onYes={() => void run(`REMOVED: ${it.name}`, () => setMaintActive(store, it.id, false))} />
+          </div>
+          {it.notes && <div className="dim tiny">{it.notes}</div>}
+          {it.serial && <div className="dim tiny">SERIAL {it.serial}{it.installed_on ? ` // INSTALLED ${it.installed_on}` : ''}</div>}
+        </div>
       )}
-    </>
+    </li>
   )
 }
 

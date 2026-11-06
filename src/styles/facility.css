@@ -23,7 +23,7 @@
 .fc-rem { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .fc-rem li { display: grid; grid-template-columns: 7em minmax(0, 1fr) auto; gap: 8px; align-items: start; border-bottom: 1px dotted var(--fg-faint); padding-bottom: 4px; }
 .fc-rem li.warn .fc-rtext { color: var(--hazard); text-shadow: none; }
-.fc-kind { color: var(--bg); background: var(--fg-dim); text-align: center; letter-spacing: 0.08em; font-size: 0.78em; padding: 0 4px; text-shadow: none; }
+.fc-kind { color: var(--fg); border: 1px solid var(--fg-dim); text-align: center; letter-spacing: 0.08em; font-size: 0.78em; padding: 0 4px; align-self: start; }
 .fc-rtext { overflow-wrap: anywhere; min-width: 0; }
 .fc-ract { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
 .fc-lines { margin: 0; display: grid; gap: 3px; }
@@ -34,7 +34,7 @@
 .fc-lines2 { display: grid; gap: 3px; color: var(--fg-dim); }
 .fc-check { display: flex; gap: 8px; align-items: center; }
 .fc-board { margin-top: 10px; display: grid; gap: 6px; min-width: 0; max-width: 24em; width: 100%; }
-.fc-board .fc-lines > div { grid-template-columns: 8.5em minmax(0, 1fr); }
+.fc-board .fc-lines > div { grid-template-columns: 11em minmax(0, 1fr); }
 .v-cuts { display: grid; gap: 6px; margin-top: 10px; min-width: 0; }
 .fc tr.od-row.over .lg-warn-text { color: var(--hazard); }
 .fc tr.sel .lg-warn-text { color: var(--bg) !important; }
@@ -44,6 +44,26 @@
   .fc-rem li { grid-template-columns: minmax(0, 1fr); }
   .fc-ract { justify-content: flex-start; }
   .fc-lines > div { grid-template-columns: 8.5em minmax(0, 1fr); }
+  .fc-board .fc-lines > div { grid-template-columns: 9.5em minmax(0, 1fr); }
   .fc-board { max-width: none; }
   .fc-spark { width: 90px; }
+}
+
+/* Cards for the upkeep list: a table with an open form inside it does not fit a phone. */
+.fc-cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.fc-card { border: 1px solid var(--fg-faint); padding: 6px 8px; display: grid; gap: 4px; min-width: 0; }
+.fc-card.warn { border-color: var(--hazard); }
+.fc-card-head { display: flex; gap: 8px; justify-content: space-between; align-items: baseline; flex-wrap: wrap; }
+.fc-card-name { overflow-wrap: anywhere; min-width: 0; flex: 1 1 14em; }
+.fc-state { letter-spacing: 0.08em; font-size: 0.85em; color: var(--fg-dim); }
+.fc-state.warn { color: var(--hazard); text-shadow: none; }
+.fc-card-sub { color: var(--fg-dim); overflow-wrap: anywhere; min-width: 0; }
+.fc-card-body { display: grid; gap: 6px; border-top: 1px dashed var(--fg-faint); padding-top: 6px; min-width: 0; }
+/* Menu: the status board sits under the logo on a computer and under the module list on a phone. */
+.menu-grid > div:first-child { grid-row: 1 / span 2; }
+.menu-grid > .menu-wire { grid-column: 2; grid-row: 1; }
+.menu-grid > .fc-board { grid-column: 2; grid-row: 2; }
+@media (max-width: 700px) {
+  .menu-grid > div:first-child, .menu-grid > .menu-wire, .menu-grid > .fc-board { grid-column: 1; grid-row: auto; }
+  .menu-grid > .fc-board { order: 1; }
 }

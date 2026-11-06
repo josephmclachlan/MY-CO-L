@@ -1014,7 +1014,7 @@ export function statusLines(i: { now: number; today: string; cuts: PowerCut[]; r
   const lines: BoardLine[] = []
   if (o.open) lines.push({ label: 'POWER', value: `OUT FOR ${fmtMin(cutStats(o.open, i.now).gridMin)}`, warn: true })
   else lines.push({ label: 'POWER', value: o.last ? `GRID UP // LAST CUT ${stamp(Date.parse(o.last.up_at as string))}` : 'GRID UP // NO CUT LOGGED', warn: false })
-  lines.push({ label: `NO GRID ${monthLabel(o.thisMonth.month)}`, value: fmtHours(o.thisMonth.gridMin), warn: false })
+  lines.push({ label: 'NO GRID THIS MONTH', value: `${fmtHours(o.thisMonth.gridMin)} // ${o.thisMonth.cuts} CUT${o.thisMonth.cuts === 1 ? '' : 'S'}`, warn: false })
   const warned = i.reminders.filter((r) => r.warn).length
   lines.push({ label: 'REMINDERS', value: i.reminders.length ? `${i.reminders.length}${warned ? ` // ${warned} URGENT` : ''}` : 'NONE', warn: warned > 0 })
   const late = i.maint.filter((m) => m.state === 'late' || m.state === 'due').length

@@ -88,8 +88,8 @@ export function PowerTab({ d, say }: { d: FacilityData; say: Say }) {
         ) : (
           <>
             <div className="lg-big fc-live">
-              <div><span>{monthLabel(tm.month)} NO GRID</span><b>{fmtHours(tm.gridMin)}</b></div>
-              <div><span>{monthLabel(tm.month)} CUTS</span><b>{tm.cuts}</b></div>
+              <div><span>THIS MONTH NO GRID</span><b>{fmtHours(tm.gridMin)}</b></div>
+              <div><span>THIS MONTH CUTS</span><b>{tm.cuts}</b></div>
               <div><span>LAST 12 MONTHS NO GRID</span><b>{fmtHours(y.gridMin)}</b></div>
               <div><span>LAST 12 MONTHS FULLY DARK</span><b>{fmtHours(y.darkMin)}</b></div>
             </div>
