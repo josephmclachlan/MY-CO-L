@@ -29,6 +29,8 @@ import { Money, MoneyIndex, MONEY_START, MONEY_TABS, type MoneyState } from './s
 import { Facility, FacilityIndex, FAC_START, FAC_TABS, ReminderWatcher, type FacState, type GoScreen } from './screens/Facility'
 import { Climate, ClimateIndex, AT_START, AT_TABS, type AtState } from './screens/Climate'
 import { Search, SearchIndex, SEARCH_START, type SearchState } from './screens/Search'
+import { Ask, AskIndex, ASK_START, type AskState } from './screens/Ask'
+import type { Go } from './lib/search'
 import { Data, DataIndex, DATA_START, type DataState } from './screens/Data'
 import { Staff, StaffIndex } from './screens/Staff'
 import { GlovePad } from './components/GlovePad'
@@ -80,6 +82,10 @@ const ATMOS_IDX = MODULES.findIndex((m) => m.key === 'ATMOS')
 const SEARCH_IDX = MODULES.findIndex((m) => m.key === 'SEARCH')
 const DATA_IDX = MODULES.findIndex((m) => m.key === 'DATA')
 const STAFF_IDX = MODULES.findIndex((m) => m.key === 'STAFF')
+const ASK_IDX = MODULES.findIndex((m) => m.key === 'ASK')
+
+/** Words that start a question or a command for the farm assistant (ASK), when more words follow. */
+const ASK_WORDS = new Set(['ASK', 'HOW', 'WHAT', 'WHATS', "WHAT'S", 'WHO', 'WHOS', "WHO'S", 'WHICH', 'WHEN', 'IS', 'ARE', 'WAS', 'DID', 'DO', 'DOES', 'HAS', 'HAVE', 'ANY', 'TELL', 'SHOW', 'OPEN', 'LIST', 'GIVE', 'LOG', 'ADD', 'RECORD', 'PICKED', 'HARVESTED', 'RECEIVED', 'USED', 'MARK', 'MOVE', 'SET', 'POWER', 'GENERATOR', 'GRID', 'CUANTOS', 'CUANTAS', 'CUANTO', 'QUIEN', 'QUE', 'CUAL'])
 
 /** Everything needed to put the terminal back on a screen: Back restores one of these. */
 interface Snap {
@@ -103,6 +109,7 @@ interface Snap {
   atm: AtState
   srch: SearchState
   dat: DataState
+  askS: AskState
 }
 const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
@@ -159,6 +166,8 @@ export default function App() {
   const setSrch = useCallback((p: Partial<SearchState>) => setSrchState((c) => ({ ...c, ...p })), [])
   const [dat, setDatState] = useState<DataState>(DATA_START)
   const setDat = useCallback((p: Partial<DataState>) => setDatState((c) => ({ ...c, ...p })), [])
+  const [askS, setAskState] = useState<AskState>(ASK_START)
+  const setAsk = useCallback((p: Partial<AskState> | ((c: AskState) => Partial<AskState>)) => setAskState((c) => ({ ...c, ...(typeof p === 'function' ? p(c) : p) })), [])
   const { t, tf, lang } = useT()
   const roleInfo = useRole()
   const roleRef = useRef(roleInfo)
@@ -173,7 +182,7 @@ export default function App() {
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac, atm, srch, dat }
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac, atm, srch, dat, askS }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -227,6 +236,7 @@ export default function App() {
     setAtmState(s.atm)
     setSrchState(s.srch)
     setDatState(s.dat)
+    setAskState({ ...s.askS, queued: null })
     power.setSelectedRoom(s.room)
     setReply(null)
     setSweep((n) => n + 1)
@@ -364,6 +374,13 @@ export default function App() {
     if (!here) go({ name: 'module', idx: DATA_IDX }, false)
     else sound.chirp()
   }
+  const openAsk = (p: Partial<AskState>) => {
+    const here = view.name === 'module' && view.idx === ASK_IDX
+    if (!here) pushHist()
+    setAsk(p)
+    setSelected(ASK_IDX)
+    if (!here) go({ name: 'module', idx: ASK_IDX }, false)
+  }
   const openModuleKey = (key: string) => {
     const idx = MODULES.findIndex((m) => m.key === key)
     if (idx < 0) return
@@ -377,8 +394,9 @@ export default function App() {
     return openModuleKey(screen === 'XENO' ? 'XENO' : screen)
   }
   /** Open the record a search hit points at. */
-  const openHit = (h: SearchDoc) => {
-    const g = h.go
+  const openHit = (h: SearchDoc) => openGo(h.go)
+  /** Open a screen a search hit or an assistant answer points at. */
+  const openGo = (g: Go) => {
     if (g.screen === 'XENO') return openXeno({ strain: g.strain ?? null, node: g.node ?? null, tab: (g.node || g.strain ? 'LINEAGE' : xeno.tab) as XenoState['tab'] })
     if (g.screen === 'SPECIMEN' && g.id) return openSpecies(g.id)
     if (g.screen === 'HAZARD') return openHazard({ id: g.id ?? null, tab: 'SPOT' })
@@ -567,6 +585,12 @@ export default function App() {
     // Search: FIND blue oyster, /B1020, or just type a code or a name.
     if (raw.trim().startsWith('/') && raw.trim().length > 1) return openSearch({ tab: 'FIND', q: raw.trim().slice(1).trim().toUpperCase(), kinds: [] })
     if (['FIND', 'LOOKUP', 'WHERE'].includes(cmd)) return openSearch({ tab: 'FIND', q: arg, kinds: [] })
+    // Farm assistant: ASK <anything>, a question, or a plain-words command (LOG 4.2 KG FROM B1020).
+    // On the ASK screen, YES / NO answer the save waiting for CONFIRM.
+    const onAsk = view.name === 'module' && view.idx === ASK_IDX
+    const word0 = cmd0.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[?¿]/g, '')
+    if (roleInfo.canOpen('ASK') && ((cmd === 'ASK' && arg) || (rest.length > 0 && ASK_WORDS.has(word0)) || (raw.trim().endsWith('?') && raw.trim().length > 2) || (onAsk && /^(Y|YES|N|NO|OK|SI|CONFIRM|CANCEL)$/.test(cmd0))))
+      return openAsk({ tab: 'ASK', queued: cmd === 'ASK' ? raw.trim().replace(/^ask\s+/i, '') : raw.trim() })
     if (['BULKEDIT', 'CHANGEMANY', 'MANY', 'STOCKTAKE'].includes(cmd)) return openSearch({ tab: 'BULK', ...(cmd === 'STOCKTAKE' ? { bulk: 'stock' as const, bq: '' } : {}) })
     // Data: BACKUP, EXPORT, RESTORE.
     if (['BACKUP', 'ZIP', 'SAVEDATA'].includes(cmd)) return openData({ tab: 'BACKUP' })
@@ -1041,6 +1065,7 @@ export default function App() {
       else if (view.idx === SEARCH_IDX) content = <Search x={srch} set={setSrch} say={say} onOpen={openHit} />
       else if (view.idx === DATA_IDX) content = <Data x={dat} set={setDat} say={say} />
       else if (view.idx === STAFF_IDX) content = <Staff say={say} />
+      else if (view.idx === ASK_IDX) content = <Ask x={askS} set={setAsk} say={say} onGo={openGo} />
       else if (view.idx === HISTORY_IDX) content = <History x={hist} set={setHist} say={say} />
       else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} onOpenPrices={() => openLedger({ sel: 'settings' })} onOpenOrders={() => openOrders({ tab: 'ORDERS' })} />
       else if (view.idx === MANUAL_IDX) content = <Manual loc={manualLoc} onOpen={openManual} />
@@ -1089,6 +1114,8 @@ export default function App() {
     hints.module = 'SAVE EVERYTHING (ZIP) OFTEN // RESTORE SHOWS WHAT WOULD CHANGE BEFORE IT DOES // TYPE BACKUP, EXPORT OR RESTORE // F2 MENU'
   if (view.name === 'module' && view.idx === STAFF_IDX)
     hints.module = 'OWNER SEES EVERYTHING // STAFF LOGS THE WORK AND SEES NO MONEY // THE OWNER PIN UNLOCKS A LOCKED DEVICE // F2 MENU'
+  if (view.name === 'module' && view.idx === ASK_IDX)
+    hints.module = 'TYPE A QUESTION OR A COMMAND IN PLAIN WORDS // SAVES WAIT FOR CONFIRM, UNDO REVERSES THEM // ON ANY SCREEN TYPE ASK OR END WITH ? // F2 MENU'
   if (view.name === 'module' && view.idx === HISTORY_IDX)
     hints.module = 'TAP A CHANGE TO SEE THAT RECORD // UNDO OR CTRL+Z REVERSES THE LAST CHANGE // TYPE SYNC FOR SAVING STATUS // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
@@ -1163,6 +1190,8 @@ export default function App() {
                             ? <DataIndex x={dat} set={setDat} />
                           : view.name === 'module' && view.idx === STAFF_IDX
                             ? <StaffIndex />
+                          : view.name === 'module' && view.idx === ASK_IDX
+                            ? <AskIndex x={askS} set={setAsk} />
                           : moduleIndex
             }
             keys={keys}
@@ -1177,7 +1206,7 @@ export default function App() {
             lamp={<SyncLamp onOpen={() => openHistory({ tab: 'SYNC' })} />}
             glove={settings.glove ? <button type="button" className="gl-badge" title={t('Glove mode is on. Tap to switch it off.')} onClick={() => update((x) => ({ ...x, glove: false }))}>{t('GLOVE')} {'\u2715'}</button> : undefined}
             undo={<UndoButton say={say} />}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX || view.idx === ATMOS_IDX || view.idx === SEARCH_IDX || view.idx === DATA_IDX || view.idx === STAFF_IDX) ? ' view-ledger' : ''}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX || view.idx === ATMOS_IDX || view.idx === SEARCH_IDX || view.idx === DATA_IDX || view.idx === STAFF_IDX || view.idx === ASK_IDX) ? ' view-ledger' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>

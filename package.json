@@ -11,7 +11,7 @@
     "typecheck": "tsc -b",
     "build:preview": "node scripts/build-preview.mjs",
     "test": "vitest run",
-    "test:stress": "STRESS_SEEDS=200 vitest run src/lib/stress.test.ts && STRESS_SEEDS=40 vitest run src/lib/bank.test.ts && STRESS_SEEDS=12 STRESS_STEPS=2500 vitest run src/lib/records.stress.test.ts && STRESS_SEEDS=30 STRESS_STEPS=2000 vitest run src/lib/orders.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=1200 vitest run src/lib/money.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=1200 vitest run src/lib/facility.stress.test.ts && STRESS_SEEDS=10 STRESS_STEPS=500 vitest run src/lib/sensors.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=600 vitest run src/lib/shell.stress.test.ts"
+    "test:stress": "STRESS_SEEDS=200 vitest run src/lib/stress.test.ts && STRESS_SEEDS=40 vitest run src/lib/bank.test.ts && STRESS_SEEDS=12 STRESS_STEPS=2500 vitest run src/lib/records.stress.test.ts && STRESS_SEEDS=30 STRESS_STEPS=2000 vitest run src/lib/orders.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=1200 vitest run src/lib/money.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=1200 vitest run src/lib/facility.stress.test.ts && STRESS_SEEDS=10 STRESS_STEPS=500 vitest run src/lib/sensors.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=600 vitest run src/lib/shell.stress.test.ts && STRESS_SEEDS=10 vitest run src/lib/assistant/assistant.stress.test.ts"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.2.6",

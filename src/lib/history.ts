@@ -8,7 +8,7 @@ import type { Row } from './store'
 
 export type EditOp = 'create' | 'update' | 'delete'
 /** Why the write happened: a normal edit, an UNDO, a RESTORE from history, an import, or the app itself (starter list). */
-export type EditVia = 'edit' | 'undo' | 'restore' | 'import' | 'system'
+export type EditVia = 'edit' | 'undo' | 'restore' | 'import' | 'system' | 'assistant'
 
 export interface FieldChange {
   f: string

@@ -69,7 +69,7 @@ the address, so this is for testing until launch, before your MycoWizards refere
    and cold-storage dates. Then `0004_hazard_links.sql` (loss logging against the HAZARD INDEX) and
    `0005_cook_log.sql` (the PROPULSION cook log columns), then `0006_ledger_trade.sql` (sales species, lot codes and
    the DELIVERY channel), then `0007_app_settings.sql` (the PRICES + COSTS screen), then `0008_fx_rates.sql` (exchange rate by day),
-   then `0009_edit_log.sql` (the HISTORY screen's edit history). Files `0010` to `0016` follow the same way (culture bank, production records, standing orders, money, facility logs, climate sensors, staff logins). Run each file once, in number order.
+   then `0009_edit_log.sql` (the HISTORY screen's edit history). Files `0010` to `0017` follow the same way (culture bank, production records, standing orders, money, facility logs, climate sensors, staff logins, farm assistant). Run each file once, in number order.
 7. **Copy the two public values.** **Project Settings** (gear icon) > **API Keys** (or **Data API**):
    - the **Project URL** (looks like `https://abcd1234.supabase.co`)
    - the **publishable** key (or, on older screens, the **anon public** key).
