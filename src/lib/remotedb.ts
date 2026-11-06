@@ -17,6 +17,27 @@ function check(res: { error: { message: string } | null; status?: number }) {
   throw new Error(res.error.message)
 }
 
+type Err = { message: string; code?: string } | null
+const isDuplicate = (e: Err) => e?.code === '23505'
+
+/** History lines are only ever added. A plain insert needs no read or change right (an upsert does), so a STAFF login can
+ *  write its own history lines without being able to read or rewrite anyone's (migration 0016). A line that arrives twice
+ *  because the first answer was lost is already there: that is not an error. */
+export async function addHistory(sb: Pick<SupabaseClient, 'from'>, rows: Row[]): Promise<void> {
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    const chunk = rows.slice(i, i + CHUNK)
+    const res = await sb.from('edit_log').insert(chunk)
+    if (!isDuplicate(res.error)) {
+      check(res)
+      continue
+    }
+    for (const r of chunk) {
+      const one = await sb.from('edit_log').insert(r)
+      if (!isDuplicate(one.error)) check(one)
+    }
+  }
+}
+
 export class SupabaseApi implements RemoteApi {
   constructor(private sb: SupabaseClient) {}
   async load(table: string): Promise<Row[]> {
@@ -40,6 +61,7 @@ export class SupabaseApi implements RemoteApi {
     return out
   }
   async upsert(table: string, rows: Row[]): Promise<void> {
+    if (table === 'edit_log') return addHistory(this.sb, rows)
     for (let i = 0; i < rows.length; i += CHUNK) check(await this.sb.from(table).upsert(rows.slice(i, i + CHUNK), { onConflict: 'id' }))
   }
   async remove(table: string, ids: string[]): Promise<void> {

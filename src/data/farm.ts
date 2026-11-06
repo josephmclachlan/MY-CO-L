@@ -83,4 +83,7 @@ export const MODULES: ModuleDef[] = [
   { key: 'MONEY', num: 16, name: 'MONEY', what: 'OWED, PROFIT, CASH FLOW, TRENDS', build: 16 },
   { key: 'FACILITY', num: 17, name: 'FACILITY LOGS', what: 'POWER CUTS, WATER, UPKEEP', build: 17 },
   { key: 'ATMOS', num: 18, name: 'ATMOSPHERICS', what: 'CLIMATE SENSORS AND ALARMS', build: 18 },
+  { key: 'SEARCH', num: 19, name: 'SEARCH', what: 'FIND ANY RECORD, CHANGE MANY', build: 19 },
+  { key: 'DATA', num: 20, name: 'DATA', what: 'EXPORT, BACKUP, RESTORE', build: 20 },
+  { key: 'STAFF', num: 21, name: 'STAFF', what: 'ROLES AND ACCESS', build: 21 },
 ]

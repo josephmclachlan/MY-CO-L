@@ -43,6 +43,10 @@ export interface SoundSettings {
 export interface Settings {
   look: LookSettings
   sound: SoundSettings
+  /** Screen language for this device. */
+  lang: 'EN' | 'ES'
+  /** Glove mode: big buttons and the number pad. */
+  glove: boolean
   bootSeen: boolean // after the first full boot, the boot can be skipped
   fullBoot: boolean // always play the whole boot sequence
 }
@@ -77,6 +81,8 @@ export const DEFAULTS: Settings = {
     ambienceOn: false,
     glitchOn: true,
   },
+  lang: 'EN',
+  glove: false,
   bootSeen: false,
   fullBoot: false,
 }
@@ -91,6 +97,8 @@ export function loadSettings(): Settings {
     return {
       ...DEFAULTS,
       ...saved,
+      lang: saved.lang === 'ES' ? 'ES' : 'EN',
+      glove: saved.glove === true,
       look: { ...DEFAULTS.look, ...(saved.look ?? {}) },
       sound: { ...DEFAULTS.sound, ...(saved.sound ?? {}) },
     }

@@ -1,7 +1,9 @@
-import { createContext, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { loadPrefs, savePrefs, type CargoPrefs } from '../lib/cargo'
 import { seedStarter } from '../lib/cargoActions'
 import { useApp } from '../settings/AppContext'
+import { useRole } from '../settings/RoleContext'
+import { STAFF_DENIED_TABLES, staffHideRow, type Role } from '../lib/roles'
 import { supabase } from '../lib/supabase'
 import { Store, MemoryBackend, type Backend, type Row } from '../lib/store'
 import { LocalBackend } from '../lib/localdb'
@@ -42,11 +44,17 @@ async function makeBackend(userId: string | null): Promise<Backend> {
 /** The name written in the edit history: the login email when linked, else the operator name set on this device. */
 const whoFor = (email: string | null) => (email ? email.toUpperCase() : getOperator())
 
+/** STAFF reads the money tables as empty and cannot write them (the database refuses them too: migration 0016). */
+const limitFor = (st: Store, role: Role) => (role === 'staff' ? st.setAccess(STAFF_DENIED_TABLES, staffHideRow) : st.setAccess([]))
+
 /** Gives every screen the same Store. Local mode until Supabase is linked and the owner is signed in. */
 export function StoreProvider({ children }: { children: ReactNode }) {
   const { session } = useApp()
   const userId = session?.user.id ?? null
   const email = session?.user.email ?? null
+  const { role } = useRole()
+  const roleRef = useRef(role)
+  roleRef.current = role
   const [store, setStore] = useState<Store | null>(null)
 
   useEffect(() => {
@@ -55,6 +63,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (!live) return
       const st = new Store(b)
       st.who = whoFor(email)
+      limitFor(st, roleRef.current)
       setStore(st)
       void st.action('STARTER LIST', () => seedStarter(st, false), { undoable: false, via: 'system' })
     })
@@ -62,6 +71,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       live = false
     }
   }, [userId])
+  // Locking or unlocking this device (or another login) changes what the same data copy may show.
+  useEffect(() => {
+    if (store) limitFor(store, role)
+  }, [role, store])
   // Only the newest data copy may send the offline queue.
   useEffect(() => () => (store?.backend as { stop?: () => void } | undefined)?.stop?.(), [store])
 

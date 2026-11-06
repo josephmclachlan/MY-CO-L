@@ -69,7 +69,7 @@ the address, so this is for testing until launch, before your MycoWizards refere
    and cold-storage dates. Then `0004_hazard_links.sql` (loss logging against the HAZARD INDEX) and
    `0005_cook_log.sql` (the PROPULSION cook log columns), then `0006_ledger_trade.sql` (sales species, lot codes and
    the DELIVERY channel), then `0007_app_settings.sql` (the PRICES + COSTS screen), then `0008_fx_rates.sql` (exchange rate by day),
-   then `0009_edit_log.sql` (the HISTORY screen's edit history). Run each file once, in number order.
+   then `0009_edit_log.sql` (the HISTORY screen's edit history). Files `0010` to `0016` follow the same way (culture bank, production records, standing orders, money, facility logs, climate sensors, staff logins). Run each file once, in number order.
 7. **Copy the two public values.** **Project Settings** (gear icon) > **API Keys** (or **Data API**):
    - the **Project URL** (looks like `https://abcd1234.supabase.co`)
    - the **publishable** key (or, on older screens, the **anon public** key).
@@ -80,6 +80,12 @@ the address, so this is for testing until launch, before your MycoWizards refere
    - Name `VITE_SUPABASE_KEY`, value: the publishable (or anon) key
 9. Re-run **Actions** > **Deploy to GitHub Pages** > **Run workflow**. The app now shows **DB LOCKED**.
    Press **F8 LOGIN** and sign in with the email and passcode from step 6.
+
+**Staff logins (optional, file `0016_staff_role.sql`).** Until you run it only your login can use the database. It adds a second kind of login, STAFF, that can log the farm work (lots, harvests, cooks, losses, stock moves, facility logs, climate readings) but can **not** read or write sales, prices, power bills, labour pay, standing orders, cash, budget, exchange rates or the edit history. To make one: **Authentication** > **Users** > **Add user** (tick **Auto Confirm User**), then in **SQL Editor** run
+`insert into public.staff_members (user_id) select id from auth.users where email = 'worker@example.com';`
+(the STAFF screen in the app has a copy button for this). To remove access, delete that row from `staff_members`. Never put the same person in both `allowed_users` and `staff_members`: the owner list wins. If a later migration adds a table, run `select public.staff_apply();` afterwards so staff can reach it. The app also hides the money screens for a STAFF login, but the database is what actually refuses.
+
+Without Supabase, STAFF works as a lock on one device: STAFF screen > set an owner PIN > **LOCK THIS DEVICE TO STAFF**. That is a convenience, not security (the data still sits in that browser).
 
 **Moving your local CARGO data across.** If you used the app in local mode first: before linking, open CARGO and press
 **EXPORT BACKUP** on the device that holds your counts. After linking and logging in, open CARGO and press

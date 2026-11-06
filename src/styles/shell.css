@@ -1,0 +1,86 @@
+/* G9: SEARCH, DATA, STAFF screens and glove mode. Reuses the cook / ledger boxes. */
+
+/* ---------- search ---------- */
+.sr .sr-input, .dt .sr-input, .st .sr-input { width: 100%; box-sizing: border-box; text-transform: uppercase; letter-spacing: 0.06em; }
+.sr-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; min-width: 0; }
+.sr-list li { min-width: 0; }
+.sr-hit {
+  font: inherit; color: var(--fg); background: transparent; border: 1px solid var(--fg-faint); padding: 5px 8px; width: 100%; text-align: left; cursor: pointer;
+  display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 0 10px; align-items: baseline; min-width: 0; text-shadow: inherit;
+}
+.sr-ticks .sr-hit { grid-template-columns: 2.6em minmax(0, 1fr); }
+.sr-hit:hover, .sr-hit:focus-visible { background: var(--fg); color: var(--bg); text-shadow: none; outline: none; }
+.sr-hit:hover .sr-kind, .sr-hit:focus-visible .sr-kind, .sr-hit:hover .sr-sub, .sr-hit:focus-visible .sr-sub { color: var(--bg); }
+.sr-hit.on { border: 1px solid var(--fg); background: color-mix(in srgb, var(--fg) 14%, transparent); }
+.sr-kind { color: var(--fg-dim); font-size: 0.74em; letter-spacing: 0.1em; overflow-wrap: anywhere; }
+.sr-title { overflow-wrap: anywhere; min-width: 0; }
+.sr-sub { grid-column: 2; color: var(--fg-dim); font-size: 0.84em; overflow-wrap: anywhere; min-width: 0; }
+.sr-box { color: var(--fg-dim); letter-spacing: 0; }
+.sr-ticks .sr-title, .sr-ticks .sr-sub { grid-column: 2; }
+.sr-ticks .sr-box { grid-row: 1 / span 2; }
+@media (max-width: 700px) {
+  .sr-hit { grid-template-columns: minmax(0, 1fr); gap: 1px; }
+  .sr-sub, .sr-ticks .sr-title, .sr-ticks .sr-sub { grid-column: 1; }
+  .sr-ticks .sr-hit { grid-template-columns: 2.6em minmax(0, 1fr); }
+  .sr-ticks .sr-title, .sr-ticks .sr-sub { grid-column: 2; }
+}
+
+/* ---------- data ---------- */
+.dt-file { width: 100%; box-sizing: border-box; }
+
+/* ---------- staff ---------- */
+.st-sql { margin: 0; padding: 6px 8px; border: 1px dashed var(--fg-dim); font: inherit; font-size: 0.8em; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--fg-dim); }
+.st-roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(14em, 1fr)); gap: 10px; }
+.st-roles b { font-weight: normal; letter-spacing: 0.1em; }
+.st-roles > div { border: 1px solid var(--fg-faint); padding: 6px 8px; display: grid; gap: 3px; align-content: start; min-width: 0; overflow-wrap: anywhere; }
+
+/* ---------- glove mode ---------- */
+.gl-badge { font: inherit; color: var(--bg); background: var(--fg); border: 0; padding: 0 8px; letter-spacing: 0.1em; cursor: pointer; line-height: 1.5; text-shadow: none; }
+.glove .btn, .glove .ui-select-btn, .glove .sr-hit { min-height: 52px; font-size: 1.1em; padding-top: 6px; padding-bottom: 6px; }
+/* The title bar and status line keep their size (they already take a lot of a phone screen); only the touch height grows. */
+.glove .undo-btn, .glove .back-btn, .glove .gl-badge { min-height: 46px; }
+.glove .fkey { min-height: 58px; }
+.glove .fkey .flabel { font-size: 0.74em; }
+.glove .fkey .fnum { font-size: 0.82em; }
+.glove .lg-btns { gap: 12px; }
+.glove .ck-box, .glove .lg-stack { gap: 10px; }
+.glove .cook input, .glove .cook textarea { min-height: 54px; font-size: 1.2em; padding: 8px 10px; }
+.glove .menu-item { min-height: 54px; align-items: center; }
+.glove .index-list li { min-height: 50px; display: flex; align-items: center; }
+.glove .lg-table td, .glove .lg-table th { padding: 8px 8px; }
+.glove .rc-input input { min-height: 52px; min-width: 4.5em; }
+.glove .ui-select-opt, .glove .ui-pick-grid button { min-height: 50px; }
+.glove .statusline { font-size: 1.05em; }
+
+.gl-pad {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 80; display: grid; gap: 8px; padding: 10px 12px 12px;
+  background: var(--bg); border-top: 2px solid var(--fg); box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
+  max-width: 720px; margin: 0 auto;
+}
+.gl-pad-head { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; min-width: 0; }
+.gl-pad-label { color: var(--fg-dim); font-size: 0.85em; letter-spacing: 0.08em; overflow: hidden; text-overflow: clip; white-space: nowrap; min-width: 0; flex: 1 1 auto; }
+.gl-pad-val { font-size: 2em; letter-spacing: 0.08em; min-height: 1.2em; min-width: 3em; text-align: right; flex: 0 0 auto; max-width: 70%; overflow: hidden; }
+.gl-pad-val.empty { color: var(--fg-dim); }
+.gl-pad-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.gl-key {
+  font: inherit; font-size: 1.7em; color: var(--fg); background: transparent; border: 1px solid var(--fg-dim); min-height: 62px; cursor: pointer; text-shadow: inherit; padding: 0;
+  touch-action: manipulation; user-select: none; -webkit-user-select: none;
+}
+.gl-key:active, .gl-key:focus-visible { background: var(--fg); color: var(--bg); text-shadow: none; outline: none; }
+.gl-key.fn { font-size: 1em; letter-spacing: 0.04em; overflow: hidden; }
+.gl-key.go { background: var(--fg); color: var(--bg); text-shadow: none; }
+.gl-key:disabled { opacity: 0.3; }
+body.gl-open .main-panel { padding-bottom: var(--gl-pad, 330px); }
+@media (max-height: 560px) and (orientation: landscape) {
+  .gl-pad { max-width: none; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); align-items: center; }
+  .gl-key { min-height: 44px; font-size: 1.3em; }
+}
+
+/* main menu: backup reminder under the list */
+.menu-nag { font: inherit; font-size: 0.82em; letter-spacing: 0.06em; background: transparent; border: 1px dashed var(--hazard); color: var(--hazard); text-shadow: none; padding: 4px 8px; margin-top: 8px; cursor: pointer; text-align: left; max-width: 100%; overflow-wrap: anywhere; }
+.menu-nag:hover, .menu-nag:focus-visible { background: var(--hazard); color: #000; outline: none; }
+
+/* Spanish words are longer: a function-key label may shrink or be cut, never run into the next key. */
+.fkey { min-width: 0; }
+.fkey .flabel { max-width: 100%; overflow: hidden; text-overflow: clip; }
+html[lang='es'] .fkey .flabel { font-size: 0.56em; }

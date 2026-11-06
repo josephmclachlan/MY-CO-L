@@ -3,6 +3,7 @@ import { HistoryButton } from './History'
 import { PickInput } from '../components/PickInput'
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
+import { useRole } from '../settings/RoleContext'
 import { useStore, useTable } from '../store/StoreContext'
 import { usePower } from '../power/PowerContext'
 import {
@@ -276,6 +277,7 @@ export function Propulsion({
 // ---------- overview and starting a run ----------
 
 function Overview({ d, set, say, onOpenVitals, onPrint }: { d: ReturnType<typeof useCook>; set: SetCook; say: Say; onOpenVitals: () => void; onPrint: () => void }) {
+  const { money } = useRole()
   const { sound } = useApp()
   const { state } = usePower()
   const heater: HeaterOption = state.heater
@@ -322,7 +324,7 @@ function Overview({ d, set, say, onOpenVitals, onPrint }: { d: ReturnType<typeof
         <span>RUNS <b>{d.runs.length}</b></span>
         <span>CLOSED <b>{done.length}</b></span>
         <span>PASSED <b>{passed}</b></span>
-        <span>THIS MONTH <b>{mRuns.length}</b> RUNS, <b>{kwhText(mKwh)}</b>, <b>{crc(mKwh * rates().ice.energyCrcPerKwh)}</b></span>
+        <span>THIS MONTH <b>{mRuns.length}</b> RUNS, <b>{kwhText(mKwh)}</b>{money && <>, <b>{crc(mKwh * rates().ice.energyCrcPerKwh)}</b></>}</span>
       </div>
 
       <div className="ck-box">
@@ -401,6 +403,7 @@ function Overview({ d, set, say, onOpenVitals, onPrint }: { d: ReturnType<typeof
 // ---------- targets and sources ----------
 
 function Targets() {
+  const { money } = useRole()
   return (
     <div className="ck-targets">
       <div className="section-title">TARGETS AND SOURCES</div>
@@ -427,7 +430,7 @@ function Targets() {
           {c.v !== '' && <div className="tiny dim">{c.source}</div>}
         </div>
       ))}
-      <div className="tiny dim ck-rate">{rateNote()}</div>
+      {money && <div className="tiny dim ck-rate">{rateNote()}</div>}
     </div>
   )
 }
@@ -435,6 +438,7 @@ function Targets() {
 // ---------- RUN tab ----------
 
 function RunTab({ run, info, say, set, onOpenHazard, onOpenXeno, onOpenVitals, onOpenSequence }: { run: CookRun; info: RunInfo; say: Say; set: SetCook; onOpenHazard: () => void; onOpenXeno: () => void; onOpenVitals: () => void; onOpenSequence: () => void }) {
+  const { money } = useRole()
   const { sound } = useApp()
   const store = useStore()
   const { an, en } = info
@@ -526,8 +530,8 @@ function RunTab({ run, info, say, set, onOpenHazard, onOpenXeno, onOpenVitals, o
         <div className="section-title">ENERGY</div>
         <div className="ck-kv">
           <span>ENERGY</span><b>{kwhText(en.kwh)} {en.basis ? `(${en.basis})` : ''}</b>
-          <span>COST AT ₡{rates().ice.energyCrcPerKwh}/KWH</span><b>{crc(en.cost)} <span className="dim">{en.costTax !== null && `(${crc(en.costTax)} WITH ${Math.round((rates().ice.tax - 1) * 100)}% TAXES)`}</span></b>
-          {run.bag_count && en.kwh !== null ? (<><span>PER BAG</span><b>{(en.kwh / run.bag_count).toFixed(2)} KWH // {crc((en.cost ?? 0) / run.bag_count)}</b></>) : null}
+          {money && <><span>COST AT ₡{rates().ice.energyCrcPerKwh}/KWH</span><b>{crc(en.cost)} <span className="dim">{en.costTax !== null && `(${crc(en.costTax)} WITH ${Math.round((rates().ice.tax - 1) * 100)}% TAXES)`}</span></b></>}
+          {run.bag_count && en.kwh !== null ? (<><span>PER BAG</span><b>{(en.kwh / run.bag_count).toFixed(2)} KWH{money && <> // {crc((en.cost ?? 0) / run.bag_count)}</>}</b></>) : null}
           {en.watts > 0 && (<><span>FULL POWER</span><b>{en.watts.toLocaleString('en-US')} W {isSteam && <button type="button" className="ck-link" onClick={onOpenVitals}>({HEATER_OPTIONS[run.heater_option ?? '2x4500'].short} FROM VITALS)</button>}</b></>)}
         </div>
         {en.basis === 'ESTIMATE' && (
@@ -544,7 +548,7 @@ function RunTab({ run, info, say, set, onOpenHazard, onOpenXeno, onOpenVitals, o
         ) : (
           en.profile.length > 0 && <div className="tiny">CLEAR OF THE ICE PEAK WINDOWS ({ICE_PEAKS.map((w) => `${w.from}-${w.to}`).join(', ')}).</div>
         )}
-        <div className="tiny dim">{rateNote()} THE RUN'S HEATER LOAD ALSO RAISES THE MONTH'S DEMAND ABOVE 8 KW, WHICH IS BILLED ON TOP.</div>
+        <div className="tiny dim">{money && rateNote()} THE RUN'S HEATER LOAD ALSO RAISES THE MONTH'S DEMAND ABOVE 8 KW, WHICH IS BILLED ON TOP.</div>
       </section>
 
       <Outcome run={run} onOpenHazard={onOpenHazard} onOpenXeno={onOpenXeno} say={say} guard={guard} purpose={purpose} />

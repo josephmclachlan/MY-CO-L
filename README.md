@@ -70,6 +70,23 @@ Modules 1 and 4-9 show "NOT YET INSTALLED" until their build threads land.
 - Typed commands: `LEDGER`, `COST`, `BILLS`, `LABOUR`, `PRICES`, `TRADE`, `SALE`, `TOTALS`, `BUYERS`.
 - Best guesses show GUESS - REVIEW on screen and are listed under SWITCHES + GUESSES (LEDGER) and GUESSES (TRADE).
 
+## What's in the search, export, staff and Spanish build (modules 19 to 21)
+
+- **SEARCH (19):** type a code, a name or any words (accents and capitals do not matter) and open any record or screen:
+  lots, harvests, strains, cultures, grain runs, cook runs, stock items, facility logs, sensors, species, hazards and (owner
+  only) sales, orders, money entries, power bills and labour. At the `>` prompt anything that is not a command is searched too;
+  an exact code (`B1020`, `BO-01`) opens straight away. **CHANGE MANY AT ONCE** ticks many records and applies one change
+  (status, place, grade, paid/owed/written off, delete) or a **STOCK TAKE** (one count move per item that differs). Each is one UNDO step.
+- **DATA (20, owner only):** **SAVE EVERYTHING (ZIP)** (a restorable `backup.json`, one CSV per table, a README), a single-table CSV,
+  and **RESTORE** that shows what would change before it does (merge, or exact copy with a safety backup first). A reminder
+  shows when the last backup is over 7 days old. Typed: `BACKUP`, `EXPORT`, `RESTORE`.
+- **STAFF (21):** two roles. STAFF logs the work and sees no money (screens, search results, prices, history); the database
+  refuses it too (migration `0016`). Linked mode takes the role from the login (`app_metadata`), local mode from an owner PIN that
+  locks the device. See `docs/SETUP.md`.
+- **Glove mode** (`GLOVE`, TUNE): bigger buttons and a number pad for gloved hands. **Spanish** (`SPANISH` / `ENGLISH`, TUNE):
+  the frame, menu, help, the new screens, LOG HARVEST and HARVEST SESSION; the other screens stay English for now.
+  The Spanish was written by Claude and needs a native reader (`src/lib/es.ts`; a test fails if a string has no entry).
+
 ## Setting it up
 
 Step-by-step, no git commands needed: **[docs/SETUP.md](docs/SETUP.md)**.

@@ -24,6 +24,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     saveSettings(settings)
     sound.apply(settings.sound)
+    // Glove mode and language are classes/attributes on the page itself, so every screen and pop-up follows.
+    document.documentElement.classList.toggle('glove', settings.glove)
+    document.documentElement.lang = settings.lang === 'ES' ? 'es' : 'en'
   }, [settings, sound])
 
   // Safety net: if sound is ever still locked (a reload, a skipped boot, a

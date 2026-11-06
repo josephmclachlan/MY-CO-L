@@ -28,6 +28,16 @@ import { Orders, OrdersIndex, ORDERS_START, ORDERS_TABS, type OrdersState } from
 import { Money, MoneyIndex, MONEY_START, MONEY_TABS, type MoneyState } from './screens/Money'
 import { Facility, FacilityIndex, FAC_START, FAC_TABS, ReminderWatcher, type FacState, type GoScreen } from './screens/Facility'
 import { Climate, ClimateIndex, AT_START, AT_TABS, type AtState } from './screens/Climate'
+import { Search, SearchIndex, SEARCH_START, type SearchState } from './screens/Search'
+import { Data, DataIndex, DATA_START, type DataState } from './screens/Data'
+import { Staff, StaffIndex } from './screens/Staff'
+import { GlovePad } from './components/GlovePad'
+import { useT } from './settings/useT'
+import { useRole } from './settings/RoleContext'
+import { ES_COMMANDS, LANG_NAME, tr, trf } from './lib/i18n'
+import { backupNag } from './lib/dataExport'
+import { search as runSearch, type Doc as SearchDoc } from './lib/search'
+import { useSearchIndex } from './store/useSearchIndex'
 import { History, HistoryIndex, HISTORY_START, HistoryNavContext, SyncLamp, UndoButton, undoneText, type HistoryState } from './screens/History'
 import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
@@ -67,6 +77,9 @@ const ORDERS_IDX = MODULES.findIndex((m) => m.key === 'ORDERS')
 const MONEY_IDX = MODULES.findIndex((m) => m.key === 'MONEY')
 const FACILITY_IDX = MODULES.findIndex((m) => m.key === 'FACILITY')
 const ATMOS_IDX = MODULES.findIndex((m) => m.key === 'ATMOS')
+const SEARCH_IDX = MODULES.findIndex((m) => m.key === 'SEARCH')
+const DATA_IDX = MODULES.findIndex((m) => m.key === 'DATA')
+const STAFF_IDX = MODULES.findIndex((m) => m.key === 'STAFF')
 
 /** Everything needed to put the terminal back on a screen: Back restores one of these. */
 interface Snap {
@@ -88,6 +101,8 @@ interface Snap {
   money: MoneyState
   fac: FacState
   atm: AtState
+  srch: SearchState
+  dat: DataState
 }
 const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
@@ -140,6 +155,17 @@ export default function App() {
   const setFac = useCallback((p: Partial<FacState>) => setFacState((c) => ({ ...c, ...p })), [])
   const [atm, setAtmState] = useState<AtState>(AT_START)
   const setAtm = useCallback((p: Partial<AtState>) => setAtmState((c) => ({ ...c, ...p })), [])
+  const [srch, setSrchState] = useState<SearchState>(SEARCH_START)
+  const setSrch = useCallback((p: Partial<SearchState>) => setSrchState((c) => ({ ...c, ...p })), [])
+  const [dat, setDatState] = useState<DataState>(DATA_START)
+  const setDat = useCallback((p: Partial<DataState>) => setDatState((c) => ({ ...c, ...p })), [])
+  const { t, tf, lang } = useT()
+  const roleInfo = useRole()
+  const roleRef = useRef(roleInfo)
+  roleRef.current = roleInfo
+  const langRef = useRef(lang)
+  langRef.current = lang
+  const searchIndex = useSearchIndex()
   const store = useStore()
   const strains = useTable<Strain>('strains')
   useFxSync() // today's colones per dollar, once a day when online
@@ -147,7 +173,7 @@ export default function App() {
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac, atm }
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac, atm, srch, dat }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -163,6 +189,11 @@ export default function App() {
 
   const go = useCallback(
     (v: View, record = true) => {
+      // A role that may not open this screen stays where it is, with a plain sentence.
+      if (v.name === 'module' && !roleRef.current.canOpen(MODULES[v.idx].key)) {
+        setReply({ text: trf(langRef.current, 'STAFF CANNOT OPEN {name}. ASK THE OWNER.', { name: tr(langRef.current, MODULES[v.idx].name) }), warn: true, id: Date.now() })
+        return
+      }
       if (record && !sameSpot(snapRef.current, v)) pushHist()
       setView(v)
       setSweep((n) => n + 1)
@@ -194,6 +225,8 @@ export default function App() {
     setMoneyState(s.money)
     setFacState(s.fac)
     setAtmState(s.atm)
+    setSrchState(s.srch)
+    setDatState(s.dat)
     power.setSelectedRoom(s.room)
     setReply(null)
     setSweep((n) => n + 1)
@@ -315,6 +348,22 @@ export default function App() {
     if (!here) go({ name: 'module', idx: ATMOS_IDX }, false)
     else sound.chirp()
   }
+  const openSearch = (p: Partial<SearchState>) => {
+    const here = view.name === 'module' && view.idx === SEARCH_IDX
+    if (!here) pushHist()
+    setSrch(p)
+    setSelected(SEARCH_IDX)
+    if (!here) go({ name: 'module', idx: SEARCH_IDX }, false)
+    else sound.chirp()
+  }
+  const openData = (p: Partial<DataState>) => {
+    const here = view.name === 'module' && view.idx === DATA_IDX
+    if (!here) pushHist()
+    setDat(p)
+    setSelected(DATA_IDX)
+    if (!here) go({ name: 'module', idx: DATA_IDX }, false)
+    else sound.chirp()
+  }
   const openModuleKey = (key: string) => {
     const idx = MODULES.findIndex((m) => m.key === key)
     if (idx < 0) return
@@ -326,6 +375,20 @@ export default function App() {
     if (screen === 'ATMOS') return openAtmos({ tab: (AT_TABS.find((t) => t === tab) ?? 'NOW') })
     if (screen === 'MONEY') return openMoney({ tab: (MONEY_TABS.find((t) => t === tab) ?? 'OWED') })
     return openModuleKey(screen === 'XENO' ? 'XENO' : screen)
+  }
+  /** Open the record a search hit points at. */
+  const openHit = (h: SearchDoc) => {
+    const g = h.go
+    if (g.screen === 'XENO') return openXeno({ strain: g.strain ?? null, node: g.node ?? null, tab: (g.node || g.strain ? 'LINEAGE' : xeno.tab) as XenoState['tab'] })
+    if (g.screen === 'SPECIMEN' && g.id) return openSpecies(g.id)
+    if (g.screen === 'HAZARD') return openHazard({ id: g.id ?? null, tab: 'SPOT' })
+    if (g.screen === 'PROPULSION') return openCook({ sel: g.id ?? null, tab: 'RUN' })
+    if (g.screen === 'MISSION') return openMission({ tab: (g.tab as MissionState['tab']) ?? 'BOARD' })
+    if (g.screen === 'YIELD') return openYield({ tab: (YIELD_TABS.find((x) => x === g.tab) ?? 'FLUSHES') })
+    if (g.screen === 'TRADE') return openTrade({ tab: (TRADE_TABS.find((x) => x === g.tab) ?? 'SALE') })
+    if (g.screen === 'ORDERS') return openOrders({ tab: (ORDERS_TABS.find((x) => x === g.tab) ?? 'ORDERS') })
+    if (g.screen === 'LEDGER') return openLedger({ sel: 'overview' })
+    return goScreen(g.screen as GoScreen, g.tab)
   }
   const openHistory = (p: Partial<HistoryState>) => {
     const here = view.name === 'module' && view.idx === HISTORY_IDX
@@ -413,22 +476,22 @@ export default function App() {
     const next = THEMES[(i + 1) % THEMES.length]
     update((s) => ({ ...s, look: { ...s.look, theme: next } }))
     sound.chirp()
-    say(`THEME ${next}`)
+    say(`${t('THEME')} ${next}`)
   }
   const toggleSound = () => {
     const on = !settings.sound.enabled
     update((s) => ({ ...s, sound: { ...s.sound, enabled: on } }))
-    say(on ? 'SOUND ON' : 'SOUND MUTED')
+    say(t(on ? 'SOUND ON' : 'SOUND MUTED'))
   }
   const toggleClean = () => {
     const on = !settings.look.clean
     update((s) => ({ ...s, look: { ...s.look, clean: on } }))
-    say(on ? 'CLEAN MODE ON' : 'CLEAN MODE OFF')
+    say(t(on ? 'CLEAN MODE ON' : 'CLEAN MODE OFF'))
   }
   const logout = async () => {
-    if (!supabase) return say('DATABASE NOT LINKED. LOCAL MODE.', true)
+    if (!supabase) return say(t('DATABASE NOT LINKED. LOCAL MODE.'), true)
     await supabase.auth.signOut()
-    say('LOGGED OUT')
+    say(t('LOGGED OUT'))
   }
 
   const onKey = (f: number) => {
@@ -491,7 +554,9 @@ export default function App() {
   // ---------- commands ----------
 
   const onCommand = (raw: string) => {
-    const [cmd, ...rest] = raw.trim().toUpperCase().split(/\s+/)
+    const [cmd0, ...rest] = raw.trim().toUpperCase().split(/\s+/)
+    // Spanish words mean their English command (AYUDA = HELP, BUSCAR = FIND). Accents never matter.
+    const cmd = ES_COMMANDS[cmd0.normalize('NFD').replace(/[\u0300-\u036f]/g, '')] ?? cmd0
     const arg = rest.join(' ')
     const num = Number(cmd)
     const byNum = Number.isInteger(num) ? MODULES.findIndex((m) => m.num === num) : -1
@@ -499,6 +564,26 @@ export default function App() {
       setSelected(byNum)
       return go({ name: 'module', idx: byNum })
     }
+    // Search: FIND blue oyster, /B1020, or just type a code or a name.
+    if (raw.trim().startsWith('/') && raw.trim().length > 1) return openSearch({ tab: 'FIND', q: raw.trim().slice(1).trim().toUpperCase(), kinds: [] })
+    if (['FIND', 'LOOKUP', 'WHERE'].includes(cmd)) return openSearch({ tab: 'FIND', q: arg, kinds: [] })
+    if (['BULKEDIT', 'CHANGEMANY', 'MANY', 'STOCKTAKE'].includes(cmd)) return openSearch({ tab: 'BULK', ...(cmd === 'STOCKTAKE' ? { bulk: 'stock' as const, bq: '' } : {}) })
+    // Data: BACKUP, EXPORT, RESTORE.
+    if (['BACKUP', 'ZIP', 'SAVEDATA'].includes(cmd)) return openData({ tab: 'BACKUP' })
+    if (cmd === 'EXPORT') return openData({ tab: 'EXPORT' })
+    if (cmd === 'RESTORE') return openData({ tab: 'RESTORE' })
+    // Glove mode and language.
+    if (['GLOVE', 'GLOVES'].includes(cmd)) {
+      const on = arg === 'ON' ? true : arg === 'OFF' ? false : !settings.glove
+      update((x) => ({ ...x, glove: on }))
+      return say(tr(lang, on ? 'GLOVE MODE ON: BIG BUTTONS AND THE NUMBER PAD' : 'GLOVE MODE OFF'))
+    }
+    if (['SPANISH', 'ES', 'ENGLISH', 'EN', 'LANG', 'LANGUAGE'].includes(cmd)) {
+      const next = cmd === 'SPANISH' || cmd === 'ES' || arg.startsWith('ES') || arg.startsWith('SPAN') ? 'ES' : cmd === 'ENGLISH' || cmd === 'EN' || arg.startsWith('EN') ? 'EN' : lang === 'ES' ? 'EN' : 'ES'
+      update((x) => ({ ...x, lang: next }))
+      return say(`${next === 'ES' ? 'IDIOMA' : 'LANGUAGE'} ${LANG_NAME[next]}`)
+    }
+    if (['ROLE', 'WHOAMI'].includes(cmd)) return say(tf('YOU ARE {r} ({s})', { r: roleInfo.role === 'owner' ? t('OWNER') : t('STAFF'), s: roleInfo.source === 'login' ? t('FROM THE LOGIN') : t('FROM THE LOCK ON THIS DEVICE') }))
     // Undo, edit history and sync.
     if (cmd === 'UNDO') return undoNow()
     if (['HISTORY', 'EDITS', 'CHANGES', 'LOG'].includes(cmd)) return openHistory({ tab: 'EDITS' })
@@ -676,7 +761,7 @@ export default function App() {
         if (!(view.name === 'module' && view.idx === CARGO_IDX)) go({ name: 'module', idx: CARGO_IDX })
         return
       case 'BACK':
-        if (!history.current.length) return say('NOTHING TO GO BACK TO.', true)
+        if (!history.current.length) return say(t('NOTHING TO GO BACK TO.'), true)
         return goBack()
       case 'MENU':
       case 'CORE':
@@ -725,8 +810,14 @@ export default function App() {
         return void logout()
       case 'ALARM':
         return toggleAlarm()
-      default:
-        return say(`UNKNOWN COMMAND ${cmd}. TYPE HELP.`, true)
+      default: {
+        // Not a command: look it up. One exact code opens straight away; anything else lists what was found.
+        const q = raw.trim()
+        const r = runSearch(searchIndex.docs, q, { limit: 3 })
+        if (r.total === 0) return say(tf('UNKNOWN COMMAND {c}. NOTHING FOUND WITH THAT NAME EITHER. TYPE HELP.', { c: cmd0 }), true)
+        if (r.hits[0].score >= 1000 && (r.total === 1 || r.hits[1].score < 1000)) return openHit(r.hits[0])
+        return openSearch({ tab: 'FIND', q: q.toUpperCase(), kinds: [] })
+      }
     }
   }
 
@@ -770,14 +861,14 @@ export default function App() {
   }
 
   const keys: FKey[] = [
-    { f: 1, label: 'HELP', active: view.name === 'help' },
-    { f: 2, label: 'MENU', active: view.name === 'menu' },
-    { f: 3, label: 'TUNE', active: view.name === 'tune' },
-    { f: 4, label: settings.sound.enabled ? 'MUTE' : 'SOUND' },
-    { f: 5, label: 'THEME' },
-    { f: 6, label: settings.look.clean ? 'GLASS' : 'CLEAN' },
-    { f: 7, label: 'BOOT' },
-    { f: 8, label: session ? 'LOGOUT' : 'LOGIN', active: view.name === 'login' },
+    { f: 1, label: t('HELP'), active: view.name === 'help' },
+    { f: 2, label: t('MENU'), active: view.name === 'menu' },
+    { f: 3, label: t('TUNE'), active: view.name === 'tune' },
+    { f: 4, label: t(settings.sound.enabled ? 'MUTE' : 'SOUND') },
+    { f: 5, label: t('THEME') },
+    { f: 6, label: t(settings.look.clean ? 'GLASS' : 'CLEAN') },
+    { f: 7, label: t('BOOT') },
+    { f: 8, label: t(session ? 'LOGOUT' : 'LOGIN'), active: view.name === 'login' },
   ]
 
   const hints: Record<View['name'], string> = {
@@ -791,13 +882,13 @@ export default function App() {
 
   const moduleIndex = (
     <>
-      <div className="section-title">INDEX</div>
+      <div className="section-title">{t('INDEX')}</div>
       <ul className="index-list">
         <li tabIndex={0} onClick={() => go({ name: 'menu' })}>
-          <span>00 CORE</span>
-          <span className="k">ONLINE</span>
+          <span>00 {t('CORE')}</span>
+          <span className="k">{t('ONLINE')}</span>
         </li>
-        {MODULES.map((m, i) => (
+        {MODULES.map((m, i) => roleInfo.canOpen(m.key) && (
           <li tabIndex={0} key={m.key} className={view.name === 'module' && view.idx === i ? 'sel' : ''} onClick={() => (setSelected(i), go({ name: 'module', idx: i }))}>
             <span>
               {String(m.num).padStart(2, '0')} {m.key}
@@ -810,21 +901,22 @@ export default function App() {
   )
   const tuneIndex = (
     <>
-      <div className="section-title">SECTIONS</div>
+      <div className="section-title">{t('SECTIONS')}</div>
       <ul className="index-list">
         {[
           ['LOOK', 'tune-look'],
           ['SOUND', 'tune-sound'],
+          ['LANGUAGE AND GLOVES', 'tune-device'],
         ].map(([label, id]) => (
           <li tabIndex={0} key={id} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}>
-            <span>{label}</span>
+            <span>{t(label)}</span>
           </li>
         ))}
       </ul>
     </>
   )
 
-  let title = TITLES[view.name]
+  let title = t(TITLES[view.name])
   let content: React.ReactNode
   switch (view.name) {
     case 'menu':
@@ -853,13 +945,17 @@ export default function App() {
               `OFFLINE CACHE ... ${'serviceWorker' in navigator && navigator.serviceWorker.controller ? 'ACTIVE' : 'NOT YET ACTIVE'}`,
               `THEME ........... ${settings.look.clean ? 'CLEAN' : settings.look.theme}`,
               `SOUND ........... ${settings.sound.enabled ? settings.sound.mode : 'MUTED'}`,
+              `LANGUAGE ........ ${LANG_NAME[lang]}`,
+              `GLOVE MODE ...... ${settings.glove ? 'ON' : 'OFF'}`,
+              `ROLE ............ ${roleInfo.role.toUpperCase()} (${roleInfo.source === 'login' ? 'LOGIN' : 'THIS DEVICE'})`,
+              `LAST BACKUP ..... ${backupNag().text.replace(/^LAST BACKUP /, '')}`,
             ]}
           />
         </div>
       )
       break
     case 'module':
-      title = MODULES[view.idx].name
+      title = t(MODULES[view.idx].name)
       if (view.idx === VITALS_IDX)
         content = (
           <Vitals
@@ -936,12 +1032,15 @@ export default function App() {
             }}
           />
         )
-      else if (view.idx === MISSION_IDX) content = <Mission x={mission} set={setMission} say={say} openRecord={(key, strainId) => openXeno({ tab: 'LINEAGE', strain: strainId, node: key })} onOpenOrders={(tab) => openOrders({ tab })} />
+      else if (view.idx === MISSION_IDX) content = <Mission x={mission} set={setMission} say={say} openRecord={(key, strainId) => openXeno({ tab: 'LINEAGE', strain: strainId, node: key })} onOpenOrders={roleInfo.canOpen('ORDERS') ? (tab) => openOrders({ tab }) : undefined} />
       else if (view.idx === YIELD_IDX) content = <Yield x={yld} set={setYld} say={say} />
       else if (view.idx === ORDERS_IDX) content = <Orders x={ord} set={setOrd} say={say} />
       else if (view.idx === FACILITY_IDX) content = <Facility x={fac} set={setFac} say={say} onGo={goScreen} />
       else if (view.idx === ATMOS_IDX) content = <Climate x={atm} set={setAtm} say={say} />
       else if (view.idx === MONEY_IDX) content = <Money x={money} set={setMoney} say={say} onOpenTrade={() => openTrade({ tab: 'SALE' })} onOpenLedger={() => openLedger({ sel: 'bills' })} />
+      else if (view.idx === SEARCH_IDX) content = <Search x={srch} set={setSrch} say={say} onOpen={openHit} />
+      else if (view.idx === DATA_IDX) content = <Data x={dat} set={setDat} say={say} />
+      else if (view.idx === STAFF_IDX) content = <Staff say={say} />
       else if (view.idx === HISTORY_IDX) content = <History x={hist} set={setHist} say={say} />
       else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} onOpenPrices={() => openLedger({ sel: 'settings' })} onOpenOrders={() => openOrders({ tab: 'ORDERS' })} />
       else if (view.idx === MANUAL_IDX) content = <Manual loc={manualLoc} onOpen={openManual} />
@@ -984,6 +1083,12 @@ export default function App() {
     hints.module = 'PRESS POWER WENT OUT THE MOMENT THE GRID FAILS // TYPE POWERCUT, WATER, CHECKLIST, MAINT, CLEANING OR REMINDERS // TIMES ARE THE FARM CLOCK // F2 MENU'
   if (view.name === 'module' && view.idx === ATMOS_IDX)
     hints.module = 'TAP A ROOM FOR ITS GRAPH // TYPE ALARMS, GRAPH, READING, CSV, AC, SETPOINTS, FEEDS OR MOCK // TIMES ARE THE FARM CLOCK // F2 MENU'
+  if (view.name === 'module' && view.idx === SEARCH_IDX)
+    hints.module = 'TYPE A CODE OR NAME AND TAP A RESULT TO OPEN IT // CHANGE MANY: TICK RECORDS, THEN APPLY ONE CHANGE // AT THE > PROMPT TYPE FIND OR JUST A CODE // F2 MENU'
+  if (view.name === 'module' && view.idx === DATA_IDX)
+    hints.module = 'SAVE EVERYTHING (ZIP) OFTEN // RESTORE SHOWS WHAT WOULD CHANGE BEFORE IT DOES // TYPE BACKUP, EXPORT OR RESTORE // F2 MENU'
+  if (view.name === 'module' && view.idx === STAFF_IDX)
+    hints.module = 'OWNER SEES EVERYTHING // STAFF LOGS THE WORK AND SEES NO MONEY // THE OWNER PIN UNLOCKS A LOCKED DEVICE // F2 MENU'
   if (view.name === 'module' && view.idx === HISTORY_IDX)
     hints.module = 'TAP A CHANGE TO SEE THAT RECORD // UNDO OR CTRL+Z REVERSES THE LAST CHANGE // TYPE SYNC FOR SAVING STATUS // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
@@ -992,7 +1097,7 @@ export default function App() {
   const hint = reply ? (
     <TypeText key={reply.id} className={reply.warn ? 'warn' : ''} lines={[reply.text]} />
   ) : (
-    hints[view.name]
+    t(hints[view.name])
   )
 
   return (
@@ -1000,6 +1105,7 @@ export default function App() {
     <HistoryNavContext.Provider value={openRecordHistory}>
     <Crt alert={alert}>
       <ReminderWatcher />
+      <GlovePad />
       {stage === 'login' ? (
         <div className="shell" style={{ gridTemplateRows: 'auto minmax(0,1fr)' }}>
           <header className="titlebar">
@@ -1051,6 +1157,12 @@ export default function App() {
                             ? <FacilityIndex x={fac} set={setFac} />
                           : view.name === 'module' && view.idx === ATMOS_IDX
                             ? <ClimateIndex x={atm} set={setAtm} />
+                          : view.name === 'module' && view.idx === SEARCH_IDX
+                            ? <SearchIndex x={srch} set={setSrch} />
+                          : view.name === 'module' && view.idx === DATA_IDX
+                            ? <DataIndex x={dat} set={setDat} />
+                          : view.name === 'module' && view.idx === STAFF_IDX
+                            ? <StaffIndex />
                           : moduleIndex
             }
             keys={keys}
@@ -1063,8 +1175,9 @@ export default function App() {
             focusToken={focusToken}
             onBack={histLen > 0 ? goBack : undefined}
             lamp={<SyncLamp onOpen={() => openHistory({ tab: 'SYNC' })} />}
+            glove={settings.glove ? <button type="button" className="gl-badge" title={t('Glove mode is on. Tap to switch it off.')} onClick={() => update((x) => ({ ...x, glove: false }))}>{t('GLOVE')} {'\u2715'}</button> : undefined}
             undo={<UndoButton say={say} />}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX || view.idx === ATMOS_IDX) ? ' view-ledger' : ''}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX || view.idx === ATMOS_IDX || view.idx === SEARCH_IDX || view.idx === DATA_IDX || view.idx === STAFF_IDX) ? ' view-ledger' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>

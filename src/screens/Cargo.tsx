@@ -3,6 +3,7 @@ import { HistoryButton } from './History'
 import { useRef, useState, type ReactNode } from 'react'
 import { useFx, useFxSync } from '../store/useFx'
 import { useApp } from '../settings/AppContext'
+import { useRole } from '../settings/RoleContext'
 import { useStoreStatus } from '../store/StoreContext'
 import { useCargo, type CargoRow } from '../store/useCargo'
 import { RefText } from '../manual/ManualLinks'
@@ -89,6 +90,7 @@ function Money({ crc, fx, day }: { crc: number; fx: number; day?: string }) {
 function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onClose: () => void; say: (t: string, warn?: boolean) => void }) {
   const { store, prices, prefs } = useCargo()
   const { sound } = useApp()
+  const { money } = useRole() // staff never see a price
   const { item } = r
   const [qty, setQty] = useState('')
   const [useQty, setUseQty] = useState('')
@@ -170,17 +172,19 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
         <div className="cg-act">
           <div className="cg-act-t">RECEIVE DELIVERY</div>
           <input aria-label="Quantity received" inputMode="decimal" placeholder={`QTY (${item.unit})`} value={qty} onChange={(e) => setQty(e.target.value)} />
-          <span className="cg-price">
-            <input aria-label="Price per unit" inputMode="decimal" placeholder={`PRICE PER ${item.unit.toUpperCase()}`} value={price} onChange={(e) => setPrice(e.target.value)} />
-            <Select aria-label="Currency" value={cur} onChange={(e) => setCur(e.target.value as 'CRC' | 'USD')}>
-              <option value="CRC">₡</option>
-              <option value="USD">US$</option>
-            </Select>
-          </span>
+          {money && (
+            <span className="cg-price">
+              <input aria-label="Price per unit" inputMode="decimal" placeholder={`PRICE PER ${item.unit.toUpperCase()}`} value={price} onChange={(e) => setPrice(e.target.value)} />
+              <Select aria-label="Currency" value={cur} onChange={(e) => setCur(e.target.value as 'CRC' | 'USD')}>
+                <option value="CRC">₡</option>
+                <option value="USD">US$</option>
+              </Select>
+            </span>
+          )}
           <input aria-label="Supplier for this delivery" placeholder={item.supplier ? `SUPPLIER (${item.supplier})` : 'SUPPLIER'} value={supplier} onChange={(e) => setSupplier(e.target.value)} />
           <span className="cg-btns">
             <button type="button" className="btn" onClick={doReceive}>BOOK DELIVERY</button>
-            <button type="button" className="btn" onClick={doPrice} title="Log a price without a delivery">PRICE ONLY</button>
+            {money && <button type="button" className="btn" onClick={doPrice} title="Log a price without a delivery">PRICE ONLY</button>}
           </span>
         </div>
         <div className="cg-act">
@@ -220,6 +224,8 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
         <Field label="NOTES" value={item.notes ?? ''} wide placeholder="NONE" onSave={(v) => void patch({ notes: v || null })} />
       </div>
 
+      {money && (
+        <>
       <div className="section-title rr-sec">PRICE HISTORY // PER {item.unit.toUpperCase()}</div>
       {hist.length === 0 ? (
         <div className="dim tiny">NO PRICES YET. ENTER A PRICE WITH A DELIVERY, OR USE PRICE ONLY.</div>
@@ -241,6 +247,8 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
             })}
           </tbody>
         </table>
+      )}
+        </>
       )}
 
       <div className="section-title rr-sec">MOVES</div>
@@ -274,6 +282,7 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
 export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
   const { sound } = useApp()
   const { store, rows, moves, plan, prefs, setPrefs } = useCargo()
+  const { money } = useRole()
   const { status, kind, note, error } = useStoreStatus()
   const [openId, setOpenId] = useState<string | null>(null)
   const [msg, setMsg] = useState<{ t: string; warn?: boolean; id: number } | null>(null)
@@ -354,19 +363,21 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
         <span>{rows.length} ITEMS</span>
         <span className={low.length ? 'warn' : ''}>{low.length} TO REORDER</span>
         <span>{uncounted} NOT COUNTED</span>
-        <span>
-          TODAY ₡
-          <input className="cg-fx" aria-label="Colones per US dollar" inputMode="decimal" defaultValue={prefs.fx} key={prefs.fx} onBlur={(e) => { const v = num(e.target.value); if (v && v > 0) setPrefs({ fx: v }) }} />
-          = US$1
-        </span>
+        {money && (
+          <span>
+            TODAY ₡
+            <input className="cg-fx" aria-label="Colones per US dollar" inputMode="decimal" defaultValue={prefs.fx} key={prefs.fx} onBlur={(e) => { const v = num(e.target.value); if (v && v > 0) setPrefs({ fx: v }) }} />
+            = US$1
+          </span>
+        )}
       </div>
       {(note || error || status === 'stale') && <div className="warn tiny">{error ?? note}</div>}
       {kind === 'local' && <div className="dim tiny">LOCAL MODE: THESE COUNTS LIVE IN THIS BROWSER ONLY. EXPORT A BACKUP OFTEN. THE PHONE AND THE LAPTOP DO NOT SHARE THEM UNTIL SUPABASE IS LINKED.</div>}
 
       <div className="cg-tools">
         <button type="button" className="btn" onClick={() => (sound.chirp(), setShowAdd((s) => !s))}>ADD ITEM</button>
-        <button type="button" className="btn" onClick={exportFile}>EXPORT BACKUP</button>
-        <button type="button" className="btn" onClick={() => file.current?.click()}>IMPORT BACKUP</button>
+        {money && <button type="button" className="btn" onClick={exportFile}>EXPORT BACKUP</button>}
+        {money && <button type="button" className="btn" onClick={() => file.current?.click()}>IMPORT BACKUP</button>}
         <button type="button" className="btn" onClick={() => void guard(async () => { const n = await seedStarter(store, true); return n ? `ADDED ${n} STARTER ITEMS` : 'ALL STARTER ITEMS ARE ALREADY HERE' })}>RESTORE STARTER LIST</button>
         <input ref={file} type="file" accept="application/json,.json" hidden onChange={(e) => { importFile(e.target.files?.[0]); e.target.value = '' }} />
       </div>
@@ -391,7 +402,7 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
         </div>
       ) : (
         <table className="pl-table cg-reorder">
-          <thead><tr><th>ITEM</th><th>ON HAND</th><th>REORDER AT</th><th>WEEKS</th><th>LEAD</th><th>SUPPLIER</th><th>LAST PRICE</th></tr></thead>
+          <thead><tr><th>ITEM</th><th>ON HAND</th><th>REORDER AT</th><th>WEEKS</th><th>LEAD</th><th>SUPPLIER</th>{money && <th>LAST PRICE</th>}</tr></thead>
           <tbody>
             {low.map((r) => (
               <tr tabIndex={0} key={r.item.id} className="warn" onClick={() => (setOpenId(r.item.id), document.getElementById(`cg-${r.item.id}`)?.scrollIntoView({ block: 'center', behavior: 'smooth' }))}>
@@ -401,7 +412,7 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
                 <td>{fmtWeeks(r.weeks)}</td>
                 <td>{r.item.lead_time_days === null ? '--' : `${r.item.lead_time_days} D`}</td>
                 <td>{r.item.supplier ?? '--'}</td>
-                <td>{r.last ? <Money crc={r.last.price_crc} fx={prefs.fx} day={r.last.priced_on} /> : '--'}</td>
+                {money && <td>{r.last ? <Money crc={r.last.price_crc} fx={prefs.fx} day={r.last.priced_on} /> : '--'}</td>}
               </tr>
             ))}
           </tbody>
