@@ -440,3 +440,20 @@ describe('rules alone', () => {
     expect(await askRules('flibber the jibber', ctxOf(await farmStore()))).toBeNull()
   })
 })
+
+describe('farm box address (/llm, G13)', () => {
+  it('accepts a same-address path on an https page and calls it as a path', async () => {
+    expect(addressProblem({ ...DEFAULT_ENGINE, kind: 'ollama', url: '/llm' }, 'https:')).toBeNull()
+    expect(normEngine({ kind: 'ollama', url: '/llm/' }).url).toBe('/llm')
+    const sent: unknown[] = []
+    const f: Fetcher = async (url) => {
+      sent.push(url)
+      return { ok: true, status: 200, json: async () => ({ message: { role: 'assistant', content: 'OUT_OF_SCOPE' } }) }
+    }
+    await chat({ ...DEFAULT_ENGINE, kind: 'ollama', url: '/llm' }, [{ role: 'user', content: 'hi' }], [], f)
+    expect(sent[0]).toBe('/llm/api/chat')
+  })
+  it('still refuses a // address that only looks like a path', () => {
+    expect(addressProblem({ ...DEFAULT_ENGINE, kind: 'ollama', url: '//192.168.1.20:11434' }, 'https:')).not.toBeNull()
+  })
+})

@@ -61,9 +61,10 @@ The rule brain needs no model and runs everywhere.
    TEST CONNECTION, RUN TEST QUESTIONS.
 
 **Phones and other computers:** a page opened over `https://` is not allowed to call a plain `http://` address on
-another computer, and a phone cannot reach `localhost`. So the model works today from a browser on the same
-computer that runs it. G13 fixes this for phones by serving the app and the model from the farm PC under one
-address (a reverse proxy such as Caddy, with the model behind a path like `/llm`, reached over Tailscale).
+another computer, and a phone cannot reach `localhost`. The farm box (docs/SELF-HOST.md) fixes this: it serves the
+app and the model under one https address, with the model at the path `/llm`. On a phone, open the app from the
+box's address and set ASK > ENGINE > ADDRESS to `/llm`. The public GitHub Pages copy can use the box too, with the
+box's full address plus `/llm` (for example `https://farm-box.tail1234.ts.net/llm`); the box allows that one origin.
 
 ## Safety rules built in
 

@@ -66,6 +66,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // The main script is about 2.1 MB once a database address is set (Supabase or the farm box), just over
+        // Workbox's 2 MiB default, which would leave it out of the offline copy (and fails the build).
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
     }),
   ],

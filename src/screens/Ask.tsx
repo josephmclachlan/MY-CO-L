@@ -363,7 +363,7 @@ function EngineTab() {
           <li>{t('IN A TERMINAL: ollama pull qwen2.5:3b')}</li>
           <li>{t('LET THIS PAGE TALK TO IT: SET THE SETTING OLLAMA_ORIGINS TO THE ADDRESS YOU OPEN THE APP FROM (E.G. https://josephmclachlan.github.io), THEN RESTART OLLAMA.')}</li>
           <li>{t('HERE: ENGINE OLLAMA, ADDRESS http://localhost:11434, MODEL qwen2.5:3b, SAVE, TEST CONNECTION, RUN THE TEST QUESTIONS.')}</li>
-          <li>{t('PHONES: A PHONE CANNOT REACH localhost. THE SELF-HOST PLAN (G13) SERVES THE APP AND THE MODEL FROM THE FARM PC TOGETHER SO PHONES CAN USE IT.')}</li>
+          <li>{t('PHONES: A PHONE CANNOT REACH localhost. OPEN THE APP FROM THE FARM BOX\'S https ADDRESS AND SET THE ADDRESS HERE TO /llm: THE BOX SERVES THE MODEL UNDER THE APP\'S OWN ADDRESS (SEE docs/SELF-HOST.md).')}</li>
         </ol>
       </Box>
       <Box title={t('WHICH MODEL')}>
