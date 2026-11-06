@@ -69,7 +69,7 @@ export function TradeIndex({ x, set }: { x: TradeState; set: SetTrade }) {
   )
 }
 
-export function Trade({ x, set, say, onOpenLedger, onOpenPrices }: { x: TradeState; set: SetTrade; say: Say; onOpenLedger: () => void; onOpenPrices: () => void }) {
+export function Trade({ x, set, say, onOpenLedger, onOpenPrices, onOpenOrders }: { x: TradeState; set: SetTrade; say: Say; onOpenLedger: () => void; onOpenPrices: () => void; onOpenOrders?: () => void }) {
   const { sound } = useApp()
   const sales = useSales()
   const [cp] = useCargoPrefs()
@@ -87,7 +87,7 @@ export function Trade({ x, set, say, onOpenLedger, onOpenPrices }: { x: TradeSta
       </label>
       {x.tab === 'SALE' && <SaleForm sales={sales} fx={cp.fx} rate={fxd.rate} say={say} cost={cost} lotCodes={d.lots.map((l) => l.lot_code)} onOpenPrices={onOpenPrices} />}
       {x.tab === 'TOTALS' && <Totals sales={sales} fx={cp.fx} rate={fxd.rate} cost={cost} noPrices={d.plan.all.parts.consumables.basis === 'NONE'} onOpenLedger={onOpenLedger} />}
-      {x.tab === 'BUYERS' && <Buyers sales={sales} fx={cp.fx} rate={fxd.rate} />}
+      {x.tab === 'BUYERS' && <Buyers sales={sales} fx={cp.fx} rate={fxd.rate} onOpenOrders={onOpenOrders} />}
       {x.tab === 'LOG' && <Log sales={sales} rate={fxd.rate} say={say} />}
       {x.tab === 'GUESSES' && (
         <div className="ck-box">
@@ -338,11 +338,12 @@ function Totals({ sales, fx, rate, cost, noPrices, onOpenLedger }: { sales: Sale
 
 // ---------- buyers and the log ----------
 
-function Buyers({ sales, fx, rate }: { sales: Sale[]; fx: number; rate: Rate }) {
+function Buyers({ sales, fx, rate, onOpenOrders }: { sales: Sale[]; fx: number; rate: Rate; onOpenOrders?: () => void }) {
   const list = buyers(sales, rate)
   return (
     <div className="ck-box">
       <div className="section-title">BUYERS</div>
+      {onOpenOrders && <div className="dim tiny">BUYERS WHO TAKE THE SAME EVERY WEEK? <button type="button" className="ck-link" onClick={onOpenOrders}>OPEN STANDING ORDERS</button> (CASH ON DELIVERY).</div>}
       {list.length === 0 ? <div className="dim">NO NAMED BUYERS YET. TYPE A BUYER ON A SALE AND THEY APPEAR HERE.</div> : (
         <div className="ck-scroll">
           <table className="lg-table">

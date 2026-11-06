@@ -21,7 +21,7 @@ export const BACKUP_TABLES = [
   'species', 'strains', 'cultures', 'rooms', 'circuits', 'equipment', 'cook_runs', 'cook_readings',
   'grain_runs', 'block_lots', 'contaminants', 'lot_losses', 'hazard_logs', 'harvests', 'sales', 'sale_lots',
   'items', 'item_prices', 'stock_moves', 'energy_bills', 'labour_entries', 'reference_entries', 'app_settings', 'fx_rates',
-  'bank_tests', 'viability_checks', 'strain_trials', 'flush_log', 'photos',
+  'bank_tests', 'viability_checks', 'strain_trials', 'flush_log', 'photos', 'standing_orders', 'order_weeks',
   'edit_log',
 ] as const
 

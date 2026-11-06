@@ -25,6 +25,8 @@ import { SplitForm } from './MissionBulk'
 import { ROOM_CHOICES, roomName } from '../lib/records'
 import { setLotPlace } from '../lib/recordsActions'
 import { useRecords } from '../store/useRecords'
+import { useOrders } from '../store/useOrders'
+import { EPS } from '../lib/orders'
 
 // MISSION CONTROL: every active block lot on one board, the harvest log and the TODAY list.
 
@@ -113,7 +115,7 @@ export function MissionIndex({ x, set }: { x: MissionState; set: SetMission }) {
   )
 }
 
-export function Mission({ x, set, say, openRecord }: { x: MissionState; set: SetMission; say: Say; openRecord: (key: string, strainId: string | null) => void }) {
+export function Mission({ x, set, say, openRecord, onOpenOrders }: { x: MissionState; set: SetMission; say: Say; openRecord: (key: string, strainId: string | null) => void; onOpenOrders?: (tab: 'ORDERS' | 'FORECAST' | 'PICK') => void }) {
   const { sound } = useApp()
   const m = useMission()
   return (
@@ -125,7 +127,7 @@ export function Mission({ x, set, say, openRecord }: { x: MissionState; set: Set
         </Select>
       </label>
       {x.tab === 'BOARD' && <Board m={m} say={say} />}
-      {x.tab === 'TODAY' && <Today m={m} />}
+      {x.tab === 'TODAY' && <Today m={m} onOpenOrders={onOpenOrders} />}
       {x.tab === 'HARVEST' && <HarvestForm m={m} say={say} />}
       {x.tab === 'NEWLOT' && <NewLot m={m} say={say} done={() => set({ tab: 'BOARD' })} />}
       {x.tab === 'BULK' && <Bulk m={m} mode={x.bulk} setMode={(b) => set({ bulk: b })} say={say} />}
@@ -246,8 +248,12 @@ function LotMore({ l, m, say }: { l: BlockLot; m: M; say: Say }) {
   )
 }
 
-function Today({ m }: { m: M }) {
+function Today({ m, onOpenOrders }: { m: M; onOpenOrders?: (tab: 'ORDERS' | 'FORECAST' | 'PICK') => void }) {
   const rec = useRecords()
+  const ord = useOrders(null)
+  const nextOrd = useOrders(ord.nextWeek)
+  const shorts = [ord, nextOrd].flatMap((o) => o.plan.filter((p) => p.status === 'SHORT').map((p) => `${speciesName(p.species).toUpperCase()} WEEK OF ${o.week}: ORDERS ${p.ordersKg.toFixed(1)} KG, FORECAST ${p.supplyKg.toFixed(1)} KG, SHORT ${p.shortKg.toFixed(1)} KG`))
+  const overCap = ord.dep.rows.filter((r) => r.level === 'over')
   const fading = rec.fading.filter((f) => f.fading)
   const groups: { kind: 'MOVE' | 'HARVEST' | 'CULTURE' | 'REORDER'; title: string; empty: string }[] = [
     { kind: 'MOVE', title: 'LOTS TO MOVE TO FRUITING', empty: 'NONE DUE' },
@@ -272,6 +278,23 @@ function Today({ m }: { m: M }) {
           </div>
         )
       })}
+      <div className="ck-box" data-testid="today-orders">
+        <div className="section-title">STANDING ORDERS // {shorts.length + overCap.length}</div>
+        {shorts.length + overCap.length ? (
+          <ul className="ck-guesses">
+            {shorts.map((t) => <li key={t} className="lg-warn-text">SHORT: {t}</li>)}
+            {overCap.map((r) => <li key={r.buyer} className="lg-warn-text">{r.buyer.toUpperCase()} IS {r.sharePct.toFixed(0)}% OF THIS WEEK&apos;S ORDERS (CAP {ord.practice.buyerCapPct}%)</li>)}
+          </ul>
+        ) : (
+          <div className="dim">{ord.lines.some((l) => l.kg > EPS) ? 'ORDERS COVERED FOR THIS WEEK AND NEXT' : 'NO STANDING ORDERS THIS WEEK'}</div>
+        )}
+        {onOpenOrders && (
+          <div className="lg-btns">
+            <button type="button" className="btn" onClick={() => onOpenOrders('PICK')}>OPEN PICK + PACK LIST</button>
+            <button type="button" className="btn" onClick={() => onOpenOrders('FORECAST')}>OPEN HARVEST FORECAST</button>
+          </div>
+        )}
+      </div>
       <div className="ck-box">
         <div className="section-title">FADING STRAINS (PRODUCTION RECORDS) // {fading.length}</div>
         {fading.length ? (

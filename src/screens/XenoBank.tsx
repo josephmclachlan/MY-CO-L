@@ -52,6 +52,7 @@ const FIELD_TEXT: Record<keyof Practice, { label: string; unit?: string; months?
   suspectDays: { label: 'TUBE SUSPECT AFTER', unit: 'MONTHS', months: true },
   slowerPct: { label: 'WATCH IF SLOWER THAN BASELINE BY', unit: '%' },
   yieldDropPct: { label: 'SLIPPING IF YIELD DROPS BY', unit: '%' },
+  buyerCapPct: { label: 'ONE BUYER CAP, SHARE OF WEEKLY ORDERS', unit: '%' },
 }
 
 const ROUTES = [

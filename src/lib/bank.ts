@@ -51,6 +51,8 @@ export interface Practice {
   slowerPct: number
   /** Monthly strain check: a yield drop this big against the strain's history is slipping, % (GUESS). */
   yieldDropPct: number
+  /** One buyer's share of a week's standing orders (by value) above which the order list marks them, % (Joseph 6 Nov 2026: 30%, unconfirmed). */
+  buyerCapPct: number
 }
 
 export const PRACTICE_ID = 'practice'
@@ -70,6 +72,7 @@ export const DEFAULT_PRACTICE: Practice = {
   suspectDays: 730,
   slowerPct: 25,
   yieldDropPct: 15,
+  buyerCapPct: 30,
 }
 
 /** Which defaults are guesses waiting on Joseph (shown on screen and in the PR). */
@@ -81,6 +84,7 @@ export const PRACTICE_GUESS: Partial<Record<keyof Practice, string>> = {
   bankWater: 'TEXTBOOK SAYS 3-5. 4 PICKED.',
   slowerPct: 'GUESS: THE TEXTBOOK SAYS "CLEARLY SLOWER" WITHOUT A NUMBER.',
   yieldDropPct: 'GUESS: NO SOURCE GIVES A NUMBER FOR A SLIPPING STRAIN.',
+  buyerCapPct: 'JOSEPH SAID 30% BUT MARKED IT UNCONFIRMED. THE TEXTBOOK SAYS ONLY "ONE-BUYER CAP".',
 }
 
 const num = (v: unknown, d: number, lo: number, hi: number) => {
@@ -109,6 +113,7 @@ export function mergePractice(v: unknown): Practice {
     suspectDays: Math.round(num(o.suspectDays, d.suspectDays, 180, 3650)),
     slowerPct: num(o.slowerPct, d.slowerPct, 1, 200),
     yieldDropPct: num(o.yieldDropPct, d.yieldDropPct, 1, 90),
+    buyerCapPct: num(o.buyerCapPct, d.buyerCapPct, 5, 100),
   }
 }
 
