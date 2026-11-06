@@ -352,6 +352,7 @@ export const TIPS: Record<string, string> = {
   'DOWNLOAD PHONE CALENDAR FILE': 'Download the reminders as a calendar file for your phone.',
   'ALERTS BLOCKED IN THE BROWSER': 'The browser is blocking notifications. Allow them in the browser settings.',
   'LAB CLEAN-DOWN': 'Clean the lab.',
+  'FRUITING ROOM FULL CLEAN': 'The weekly top-to-bottom clean of the fruiting room.',
   'DEEP CLEAN': 'Deep clean the walls, shelves and under things.',
   'MOP FLOOR': 'Mop the floor.',
   SANITISE: 'Sanitise.',

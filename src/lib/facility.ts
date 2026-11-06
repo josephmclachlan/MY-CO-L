@@ -85,7 +85,7 @@ export interface Limit {
 }
 export type PointLimits = Partial<Record<WaterField, Limit>>
 
-/** GUESS - REVIEW: working limits per sampling point. Joseph tunes them on the WATER screen. */
+/** NOT IN YOUR FILES: STARTING POINT. Only the tank chlorine (150-250 ppm) is from the sources {F15-0087}; set the rest from the first real tests on the WATER screen. */
 export const DEFAULT_LIMITS: Record<WaterPoint, PointLimits> = {
   raw: { ph: { min: 6.0, max: 8.5 }, tds: { max: 500 }, hardness: { max: 150 } },
   filtered: { ph: { min: 6.0, max: 8.5 }, tds: { max: 500 }, hardness: { max: 150 }, cl: { max: 0.5 } },
@@ -122,11 +122,16 @@ export interface FacilitySettings {
   phoneAlerts: boolean
 }
 
-/** GUESS - REVIEW: cleaning cadence and the other working numbers. */
+/**
+ * Cleaning cadence: checked against the knowledge base and approved by Joseph 6 Nov 2026 (facility-guesses-check.md).
+ * Lab 2 d + weekly full clean {F02-0226}; packing 2 d (it feeds the lab HEPA and the fruiting supply) {F02-0161};
+ * incubation 7 d rack wipe-down {F09-8004}; fruiting daily spot clean and floor, full clean weekly {F02-0229, F12-8006};
+ * boiling room 7 d. Water test intervals are NOT in Joseph's files: starting points.
+ */
 export const DEFAULT_FACILITY: FacilitySettings = {
   waterEvery: { raw: 30, filtered: 14, ro: 7, tank: 7, mix: 30 },
   limits: {},
-  cleanEvery: { lab: 2, packing: 3, incubation: 14, fruiting: 7, boiling: 7 },
+  cleanEvery: { lab: 2, packing: 2, incubation: 7, fruiting: 1, boiling: 7 },
   checkEvery: Object.fromEntries(CHECKLISTS.map((c) => [c.key, c.every ?? 0])),
   routineOn: true,
   leadDays: 2,
@@ -641,25 +646,33 @@ export interface StdMaint {
   hours: number | null
   note: string
 }
-/** GUESS - REVIEW: a starting schedule for the farm's equipment. Intervals are working numbers, not the maker's. */
+/**
+ * The farm's equipment schedule, checked against the knowledge base and approved by Joseph 6 Nov 2026
+ * (facility-guesses-check.md). Jobs with no source keep a working number and say so in their note.
+ */
 export const STANDARD_MAINT: StdMaint[] = [
-  { name: 'HEPA PRE-FILTERS WASH OR CHANGE', category: 'air', room: 'lab', days: 30, hours: null, note: 'Pre-filters protect the HEPA. Change when grey.' },
-  { name: 'HEPA PRESSURE + FILTER CHECK', category: 'air', room: 'lab', days: 90, hours: null, note: 'Read the pressure drop; replace the HEPA when it is past the maker limit.' },
-  { name: 'MINI-SPLIT FILTERS WASH', category: 'air', room: null, days: 30, hours: null, note: 'All Lennox units. Humid air loads filters fast.' },
-  { name: 'MINI-SPLIT COILS + DRAIN LINES', category: 'air', room: null, days: 180, hours: null, note: 'Clear drain lines: algae blocks them in humid rooms.' },
-  { name: 'COLD ROOM + FRIDGE COILS CLEAN', category: 'cold', room: 'outside', days: 90, hours: null, note: 'Fogel cold rooms (outside under the roof, by the fruiting door) and reach-in fridges.' },
-  { name: 'CO2 METERS CALIBRATE', category: 'air', room: null, days: 180, hours: null, note: 'All CO2Meter units against fresh outdoor air or a reference.' },
-  { name: 'STEAM GENERATOR DESCALE', category: 'steam', room: 'boiling', days: 60, hours: null, note: 'Sooner if the water test shows hard water.' },
+  { name: 'HEPA PRE-FILTERS CHECK', category: 'air', room: 'lab', days: 7, hours: null, note: 'Check weekly, change when grey. They pull from the packing plenum, a dirty space; clogged pre-filters kill positive pressure {F02-0161, F02-0162, F02-0165}.' },
+  { name: 'HEPA PRESSURE + FILTER CHECK', category: 'air', room: 'lab', days: 90, hours: null, note: 'Read the pressure drop; replace the HEPA when it is past the maker limit. Interval not in your files (working number).' },
+  { name: 'MINI-SPLIT FILTERS WASH (PACKING)', category: 'air', room: 'packing', days: 14, hours: null, note: 'Packing feeds the fruit room and the lab HEPA, so its filters load fast {F10-8010}.' },
+  { name: 'MINI-SPLIT FILTERS WASH (INCUBATION)', category: 'air', room: 'incubation', days: 30, hours: null, note: 'Humid air loads filters fast.' },
+  { name: 'MINI-SPLIT DRAIN LINES CHECK', category: 'air', room: null, days: 30, hours: null, note: 'Algae blocks drain lines in humid rooms.' },
+  { name: 'MINI-SPLIT COILS CLEAN', category: 'air', room: null, days: 180, hours: null, note: 'Spores clog coils {F10-0047}. Gold-fin coating helps against corrosion, not spores.' },
+  { name: 'COLD ROOM + FRIDGE COILS CLEAN', category: 'cold', room: 'outside', days: 90, hours: null, note: 'Fogel cold rooms (outside under the roof, by the fruiting door) and reach-in fridges. Dust and salt air reach outdoor coils faster: shorten if they look dirty.' },
+  { name: 'CO2 METERS CALIBRATE', category: 'air', room: null, days: 180, hours: null, note: 'All CO2Meter units against fresh outdoor air or a reference. Interval not in your files (working number).' },
+  { name: 'STEAM GENERATOR DESCALE', category: 'steam', room: 'boiling', days: 60, hours: null, note: 'Sooner if the water test shows hard water. Blow down after every steam run (cook checklist) {F08-0301}.' },
   { name: 'STEAM BOX DOOR SEAL CHECK', category: 'steam', room: 'boiling', days: 90, hours: null, note: 'Look for cracks, flat spots, steam leaks at the corners.' },
   { name: '75X GASKET + SAFETY VALVE CHECK', category: 'steam', room: 'lab', days: 90, hours: null, note: 'Follow the maker manual for the pressure valve.' },
-  { name: 'HUMIDIFIER CLEAN + TANK DRAIN', category: 'water', room: 'fruiting', days: 14, hours: null, note: 'Drain and scrub the tank; check the transducer.' },
-  { name: 'WATER FILTER CARTRIDGES CHANGE', category: 'water', room: null, days: 90, hours: null, note: 'Particle and carbon cartridges.' },
-  { name: 'SOFTENER SALT CHECK', category: 'water', room: null, days: 30, hours: null, note: 'Top up before it runs low.' },
-  { name: 'UV LAMP REPLACE', category: 'water', room: null, days: 365, hours: null, note: 'Lamps lose strength before they go dark.' },
+  { name: 'HUMIDIFIER CLEAN + TANK DRAIN', category: 'water', room: 'fruiting', days: 3, hours: null, note: 'Dump and clean the reservoir every 3 days; untreated foggers are the usual cause of blotch {F12-0101, F10-0149}.' },
+  { name: 'WATER FILTER CARTRIDGES CHANGE', category: 'water', room: null, days: 90, hours: null, note: 'Particle and carbon cartridges, if they feed the farm (water treatment runs on house power). Interval not in your files.' },
+  { name: 'SOFTENER SALT CHECK', category: 'water', room: null, days: 30, hours: null, note: 'Only if you have a softener (needed only for hard water) {F15-0076}.' },
+  { name: 'UV LAMP REPLACE', category: 'water', room: null, days: 365, hours: null, note: 'Only if you have one. Lamps lose strength before they go dark {F15-0080}.' },
   { name: 'GENERATOR TEST RUN UNDER LOAD', category: 'power', room: 'outside', days: 30, hours: null, note: 'Run 20-30 minutes with the emergency list on. Log it as a TEST RUN in POWER CUTS.' },
-  { name: 'GENERATOR OIL CHANGE', category: 'power', room: 'outside', days: 365, hours: 100, note: 'First change after the first 20 hours (break-in), then every 100 hours or each year. Counts hours from the POWER CUTS log.' },
+  { name: 'GENERATOR OIL CHANGE', category: 'power', room: 'outside', days: 365, hours: 100, note: 'First change after the first 20 hours (break-in), then every 100 hours or each year (check the DuroMax manual). Counts hours from the POWER CUTS log.' },
   { name: 'ALUMINIUM FEEDER LUGS RE-TORQUE', category: 'power', room: null, days: 180, hours: null, note: 'Qualified electrician. Re-torque after the first 2-3 months, then twice a year.' },
   { name: 'FIRE EXTINGUISHERS CHECK', category: 'safety', room: null, days: 30, hours: null, note: 'Gauge in the green, pin in place, not blocked.' },
+  { name: 'INLINE EXHAUST FANS REPLACE', category: 'air', room: 'fruiting', days: 180, hours: null, note: 'Wet-exhaust inline fans wear out; replace twice a year. Look at them daily on the walk-round {F10-0091, F10-8036}.' },
+  { name: 'STICKY TRAPS CHANGE', category: 'safety', room: null, days: 14, hours: null, note: 'About 8 per room; also keep gaps taped and screens on openings (Catawba) {F24-0058}.' },
+  { name: 'AGAR PLATE AIR CHECK', category: 'safety', room: null, days: 180, hours: null, note: 'Open plates at doorways, vents and corners to see what is in the air {F10-0217}.' },
 ]
 
 export interface MaintStatus {
