@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { HistoryButton } from './History'
 import { PickInput } from '../components/PickInput'
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
@@ -439,7 +440,7 @@ function RunTab({ run, info, say, set, onOpenHazard, onOpenXeno, onOpenVitals, o
   const { an, en } = info
   const guard = async (fn: () => Promise<void>, ok: string) => {
     try {
-      await fn()
+      await store.action(ok, fn)
       sound.confirm()
       say(ok)
     } catch (e) {
@@ -583,6 +584,7 @@ function RunTab({ run, info, say, set, onOpenHazard, onOpenXeno, onOpenVitals, o
           {!run.ended_at ? <button type="button" className="btn" onClick={finish}>CLOSE THE RUN</button> : <button type="button" className="btn" onClick={() => void save({ ended_at: null }, 'RUN REOPENED')}>REOPEN</button>}
           <button type="button" className="btn" onClick={() => set({ tab: 'READINGS' })}>ADD READINGS</button>
           <Confirm label="DELETE THIS RUN" onYes={() => void guard(async () => { await removeRun(store, run.id); set({ sel: null }) }, 'RUN DELETED')} />
+          <HistoryButton table="cook_runs" id={run.id} />
         </div>
       </section>
     </div>

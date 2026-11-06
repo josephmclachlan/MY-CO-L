@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { HistoryButton } from './History'
 import { PickInput } from '../components/PickInput'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
@@ -89,9 +90,10 @@ const spName = (key: string) => speciesOf(key)?.name ?? key.toUpperCase()
 
 function useRun(say: Say) {
   const { sound } = useApp()
+  const store = useStore()
   return async (fn: () => Promise<unknown>, ok: string) => {
     try {
-      await fn()
+      await store.action(ok, fn)
       sound.confirm()
       say(ok)
       return true
@@ -289,6 +291,7 @@ function StrainsTab({ d, x, set, say, onOpenSpecies }: { d: XData; x: XenoState;
               disabled={d.cultures.some((c) => c.strain_id === sel.id) || d.runs.some((g) => g.strain_id === sel.id)}
               onYes={() => void run(() => store.del('strains', sel.id), `${sel.code} DELETED`).then(() => set({ strain: null }))}
             />
+            <HistoryButton table="strains" id={sel.id} />
             {(d.cultures.some((c) => c.strain_id === sel.id) || d.runs.some((g) => g.strain_id === sel.id)) && <span className="dim tiny">HAS CULTURES: RETIRE IT INSTEAD</span>}
           </div>
         </div>
@@ -648,6 +651,7 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
           )}
           {c.status !== 'discarded' && <button type="button" className="btn" onClick={() => void run(() => setCultureStatus(store, c, 'discarded'), 'DISCARDED')}>DISCARD</button>}
           <Confirm label="DELETE RECORD" disabled={kids} onYes={() => void run(() => store.del('cultures', c.id), 'RECORD DELETED').then(() => set({ node: null }))} />
+          <HistoryButton table="cultures" id={c.id} />
         </div>
         <div className="cg-fields">
           <Field label="LOCATION" value={c.location ?? ''} placeholder="NOT SET" onSave={(v) => void run(() => store.put('cultures', { ...c, location: v || null }), 'LOCATION SAVED')} />
@@ -721,6 +725,7 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
           {live && <button type="button" className="btn" onClick={() => void run(() => setGrainStatus(store, g, 'used_up'), 'MARKED USED UP')}>USED UP</button>}
           {live && <button type="button" className="btn" onClick={() => void run(() => setGrainStatus(store, g, 'discarded'), 'DISCARDED')}>DISCARD</button>}
           <Confirm label="DELETE RECORD" disabled={kids} onYes={() => void run(() => store.del('grain_runs', g.id), 'RECORD DELETED').then(() => set({ node: null }))} />
+          <HistoryButton table="grain_runs" id={g.id} />
         </div>
         <div className="cg-add xn-add">
           <span className="dim tiny">CONTAMINATION: BAGS LOST IN TOTAL</span>
@@ -752,6 +757,7 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
         ))}
         <button type="button" className={`btn hazard ${l.status === 'lost' ? 'on' : ''}`} onClick={() => void run(() => setLotStatus(store, l, 'lost'), 'LOT MARKED LOST')}>LOST</button>
         <Confirm label="DELETE LOT" onYes={() => void run(() => store.del('block_lots', l.id), 'LOT DELETED').then(() => set({ node: null }))} />
+        <HistoryButton table="block_lots" id={l.id} />
       </div>
       <div className="cg-add xn-add">
         <span className="dim tiny">CONTAMINATION: BLOCKS LOST ({lotBagsLost(d.lotLoss, l.id)} OF {l.bag_count} LOGGED)</span>

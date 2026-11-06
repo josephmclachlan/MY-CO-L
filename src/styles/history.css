@@ -1,0 +1,76 @@
+/* HISTORY screen, the save/sync lamp (title bar) and the UNDO button (status line). */
+
+.tb-left { flex: 1 1 auto; min-width: 0; }
+.tb-lamp { flex: 0 0 auto; display: flex; align-items: center; }
+.sync-lamp {
+  font: inherit; font-size: 0.92em; letter-spacing: 0.1em; color: var(--bg); background: none;
+  border: 1px solid var(--bg); padding: 0 7px; cursor: pointer; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 6px; line-height: 1.5;
+}
+.sync-lamp i { width: 7px; height: 7px; border-radius: 50%; background: var(--bg); display: inline-block; flex: 0 0 auto; }
+.sync-lamp.wait i { background: none; border: 1px solid var(--bg); animation: blink 1s steps(1) infinite; }
+.sync-lamp.warn { background: var(--hazard); color: #000; border-color: #000; }
+.sync-lamp.warn i { background: #000; }
+.sync-lamp:hover, .sync-lamp:focus-visible { outline: 2px solid var(--bg); outline-offset: 1px; }
+/* The same lamp drawn on the dark screen (HISTORY > SAVING + SYNC). */
+.hist-lamp-row { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.hist-lamp-row .sync-lamp { color: var(--fg); border-color: var(--fg); cursor: default; }
+.hist-lamp-row .sync-lamp i { background: var(--fg); }
+.hist-lamp-row .sync-lamp.wait i { background: none; border-color: var(--fg); }
+.hist-lamp-row .sync-lamp.warn { color: #000; }
+.hist-lamp-row .sync-lamp.warn i { background: #000; }
+
+.undo-btn {
+  font: inherit; color: var(--fg); background: transparent; border: 1px solid var(--fg-dim);
+  padding: 0 8px; cursor: pointer; letter-spacing: 0.08em; white-space: nowrap; line-height: 1.5;
+}
+.undo-btn:hover, .undo-btn:focus-visible { background: var(--fg); color: var(--bg); text-shadow: none; }
+.statusline { align-items: center; }
+
+.hist-label { font-weight: normal; letter-spacing: 0.08em; overflow-wrap: anywhere; }
+.hist-head { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
+.hist-head .hist-label { padding: 0 6px; background: var(--fg); color: var(--bg); text-shadow: none; }
+.hist-act.via-undo .hist-head .hist-label, .hist-entry.via-undo .hist-head .hist-label { background: none; color: var(--fg); border: 1px dashed var(--fg); }
+.hist-list { display: grid; gap: 10px; }
+.hist-act { border-left: 2px solid var(--fg-dim); padding-left: 8px; display: grid; gap: 3px; min-width: 0; }
+.hist-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.hist-row { padding: 2px 4px; overflow-wrap: anywhere; font-size: 0.92em; }
+.hist-row.link { cursor: pointer; }
+.hist-row.link:hover, .hist-row.link:focus-visible { background: var(--fg); color: var(--bg); text-shadow: none; outline: none; }
+.hist-row.link:hover .hist-sum, .hist-row.link:focus-visible .hist-sum, .hist-row.link:hover .hist-op, .hist-row.link:focus-visible .hist-op { color: var(--bg); }
+.hist-op { color: var(--fg-dim); letter-spacing: 0.08em; }
+.hist-sum { color: var(--fg-dim); }
+.hist-table td { white-space: normal; overflow-wrap: anywhere; min-width: 5em; }
+.hist-undo { margin: 0; padding-left: 1.6em; display: grid; gap: 6px; }
+.hist-undo li { overflow-wrap: anywhere; }
+.hist-undo .btn { margin-left: 10px; }
+.hist-who input { text-transform: uppercase; }
+
+@media (max-width: 700px) {
+  .undo-what { display: none; }
+  .sync-lamp { padding: 0 5px; gap: 4px; }
+}
+.hist-table td, .hist-sum, .hist-row, .hist-undo li { text-transform: uppercase; }
+
+/* Phones: the title bar is too narrow for the screen name and the lamp, so the lamp sits in the status line. */
+.sl-lamp { display: none; }
+.sl-lamp .sync-lamp { color: var(--fg); border-color: var(--fg); }
+.sl-lamp .sync-lamp i { background: var(--fg); }
+.sl-lamp .sync-lamp.wait i { background: none; border-color: var(--fg); }
+.sl-lamp .sync-lamp.warn { color: #000; border-color: var(--hazard); }
+.sl-lamp .sync-lamp.warn i { background: #000; }
+@media (max-width: 700px) {
+  .tb-lamp { display: none; }
+  .sl-lamp { display: inline-flex; }
+}
+@media (max-width: 420px) {
+  /* PRODUCTION SEQUENCE was cut after BACK on a 390 px phone. */
+  .titlebar { letter-spacing: 0.06em; }
+  .titlebar .back-btn { margin-right: 6px; padding: 0 6px; }
+}
+.hist-who b { font-weight: normal; color: var(--fg); }
+.hist-who-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.hist-who-row input { flex: 1 1 12em; min-width: 0; }
+.hist-who em { font-style: normal; color: var(--fg-dim); font-size: 0.75em; }
+/* Desktop: the UNDO button must be easy to spot. */
+.undo-btn { border-color: var(--fg); color: var(--fg); box-shadow: 0 0 calc(6px * var(--glow-k, 1)) var(--glow); }
