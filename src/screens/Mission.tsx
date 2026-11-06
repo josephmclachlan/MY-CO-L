@@ -111,7 +111,7 @@ export function MissionIndex({ x, set }: { x: MissionState; set: SetMission }) {
       <div className="lg-mini">
         <div>{tf('{n} ACTIVE LOTS', { n: m.rows.length })}</div>
         <div>{tf('{n} BLOCKS', { n: m.rows.reduce((n, r) => n + r.blocks, 0) })}</div>
-        <div className={due ? 'lg-warn-text' : ''}>{tf('{n} LOTS NEED ACTION', { n: due })}</div>
+        <div className={due ? 'lg-warn-text' : ''}>{due === 1 ? tt('1 LOT NEEDS ACTION') : tf('{n} LOTS NEED ACTION', { n: due })}</div>
       </div>
     </>
   )

@@ -429,6 +429,7 @@ export const ES: Record<string, string> = {
   '{n} FOUND': '{n} ENCONTRADOS',
   '{n} GRADED {g}': '{n} CON CATEGORÍA {g}',
   '{n} LOTS // {kg} KG TO SAVE.': '{n} LOTES // {kg} KG POR GUARDAR.',
+  '1 LOT NEEDS ACTION': '1 LOTE NECESITA ATENCIÓN',
   '{n} LOTS NEED ACTION': '{n} LOTES NECESITAN ATENCIÓN',
   '{n} MARKED OWED': '{n} MARCADOS POR COBRAR',
   '{n} MARKED PAID {d}': '{n} MARCADOS PAGADOS {d}',

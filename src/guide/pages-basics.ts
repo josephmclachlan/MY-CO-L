@@ -51,7 +51,7 @@ export const BASICS: GSection[] = [
         h: 'FROM TOP TO BOTTOM',
         items: [
           ['TITLE BAR', 'The dark bar at the top. It shows the screen name. The < BACK button at the left goes back one step. On a phone the little saving lamp sits in the status line instead.'],
-          ['STATUS LINE', 'The small grey line under it: the device clock, DB LINKED or LOCAL MODE, NET OK or NET DOWN, the sound and look in use, the saving lamp, the ? TIPS button, the UNDO button (it shows up after your first saved change), and GLOVE when glove mode is on.'],
+          ['STATUS LINE', 'The small grey line under it: the farm clock (Costa Rica time, the same clock every log uses), DB LINKED or LOCAL MODE, NET OK or NET DOWN, the sound and look in use, the saving lamp, the ? TIPS button, the UNDO button (it shows up after your first saved change), and GLOVE when glove mode is on.'],
           ['INDEX (LEFT)', 'The menu column on the left of a desktop screen. It lists the tabs or records for the screen you are on. On a phone it is hidden: pick the tab from the SHOW list (or the strip of tabs) at the top of the page instead.'],
           ['MAIN PANEL', 'The big box with the work in it. It scrolls by itself.'],
           ['ANSWER BAR', 'A boxed line just above the prompt that appears after you save something, undo, or type a command. It says what happened. It is red when something went wrong and stays until you close it with X; other answers fade after about 12 seconds.'],

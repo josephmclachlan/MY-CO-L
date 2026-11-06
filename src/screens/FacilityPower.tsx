@@ -130,7 +130,7 @@ export function PowerTab({ d, say }: { d: FacilityData; say: Say }) {
           </table>
         </div>
         <div className="dim tiny">
-          NO GRID = HOURS ICE POWER WAS OUT. ON GEN = THOSE HOURS THE GENERATOR WAS RUNNING. FULLY DARK = NO GRID AND NO GENERATOR. A CUT THAT CROSSES MIDNIGHT AT THE MONTH END IS SPLIT BETWEEN THE TWO MONTHS. LONGEST CUT IN 12 MONTHS: {fmtMin(y.longestMin)}.
+          NO GRID = HOURS THE ICE GRID (MAINS POWER) WAS OUT. ON GEN = THOSE HOURS THE GENERATOR WAS RUNNING. FULLY DARK = NO GRID AND NO GENERATOR. A CUT THAT CROSSES MIDNIGHT AT THE MONTH END IS SPLIT BETWEEN THE TWO MONTHS. LONGEST CUT IN 12 MONTHS: {fmtMin(y.longestMin)}.
         </div>
         <div className="lg-btns">
           <button type="button" className="btn" onClick={() => void copyText(outageReport(d.cuts, d.now, 12)).then((ok) => say(ok ? 'REPORT COPIED. PASTE IT INTO WHATSAPP OR AN EMAIL TO ICE.' : 'COULD NOT COPY. SELECT THE TABLE AND COPY IT BY HAND.', !ok))}>COPY 12-MONTH REPORT</button>

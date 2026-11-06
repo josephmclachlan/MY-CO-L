@@ -3,6 +3,7 @@ import { useApp } from '../settings/AppContext'
 import { useT } from '../settings/useT'
 import { STATION } from '../data/farm'
 import { dbLinked } from '../lib/supabase'
+import { farmDay, farmTime } from '../lib/facility'
 
 export interface FKey {
   f: number
@@ -55,8 +56,9 @@ function useClock() {
     const t = window.setInterval(() => setNow(new Date()), 15000)
     return () => window.clearInterval(t)
   }, [])
-  const p = (n: number) => String(n).padStart(2, '0')
-  return `${now.getFullYear()}.${p(now.getMonth() + 1)}.${p(now.getDate())} ${p(now.getHours())}:${p(now.getMinutes())}`
+  // The farm clock (Costa Rica), the same clock every log uses, whatever time zone the device is set to.
+  const ms = now.getTime()
+  return `${farmDay(ms).replace(/-/g, '.')} ${farmTime(ms)}`
 }
 
 /** The frame every screen shares: title bar, status line, index column, prompt, hint line and F-key bar. */

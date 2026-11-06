@@ -127,7 +127,7 @@ export function UndoButton({ say }: { say: Say }) {
     )
   return (
     <button type="button" className="undo-btn" onClick={go} title={`Undo the last change: ${last.label}${last.screen ? ` (${last.screen})` : ''}. Keys: Ctrl+Z, or type UNDO.`}>
-      <span aria-hidden>{'↶'} </span>UNDO<span className="undo-what"> {last.label.length > 34 ? `${last.label.slice(0, 32)}..` : last.label}</span>
+      <span aria-hidden>{'↶'} </span>UNDO<span className="undo-what">: {last.label.length > 34 ? `${last.label.slice(0, 32)}..` : last.label}</span>
     </button>
   )
 }
