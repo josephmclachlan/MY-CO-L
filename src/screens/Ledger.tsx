@@ -7,6 +7,8 @@ import { speciesName, useLedger, type LedgerData } from '../store/useLedger'
 import { useRatesEditor } from '../store/useRates'
 import { estimateMid, iceBill, rates } from '../lib/rates'
 import { Prices } from './Prices'
+import { useFx } from '../store/useFx'
+import { monthEnd } from '../lib/fx'
 import { ICE } from '../data/ledger'
 import { PART_KEYS, PART_LABEL, addDays, type Basis, type Cost, type EnergyBill, type LabourEntry, type WeekCost } from '../lib/ledger'
 import { fmtCrc, fmtUsd, today } from '../lib/cargo'
@@ -106,7 +108,7 @@ export function Ledger({ x, set, say, onOpenTrade, onOpenCargo }: { x: LedgerSta
 
 // ---------- cost cards ----------
 
-function CostCard({ c, fx, title }: { c: Cost; fx: number; title?: string }) {
+function CostCard({ c, title }: { c: Cost; fx?: number; title?: string }) {
   const max = Math.max(1, ...PART_KEYS.map((k) => c.parts[k].crc))
   return (
     <div className="ck-box lg-card">
@@ -120,15 +122,15 @@ function CostCard({ c, fx, title }: { c: Cost; fx: number; title?: string }) {
       <div className="lg-big">
         <div>
           <span>PER BLOCK</span>
-          <Money crc={c.perBlock} fx={fx} />
+          <Money crc={c.perBlock} fx={c.fx} />
         </div>
         <div>
           <span>PER KG</span>
-          <Money crc={c.perKg} fx={fx} />
+          <Money crc={c.perKg} fx={c.fx} />
         </div>
         <div>
           <span>TOTAL</span>
-          <Money crc={c.total} fx={fx} />
+          <Money crc={c.total} fx={c.fx} />
         </div>
       </div>
       <div className="lg-parts">
@@ -185,12 +187,14 @@ function Week({ w, fx }: { w: WeekCost; fx: number }) {
 }
 
 function Overview({ d, fx, set, onOpenTrade, onOpenCargo }: { d: LedgerData; fx: number; set: SetLedger; onOpenTrade: () => void; onOpenCargo: () => void }) {
+  const fxNow = useFx().today
   const { ledger, plan } = d
   const noPrices = plan.all.parts.consumables.basis === 'NONE'
   return (
     <div className="lg-stack">
       <div className="ck-box">
-        <div className="section-title">COST OF GOODS // ₡ FIRST, US$ AT ₡{fx}</div>
+        <div className="section-title">COST OF GOODS // ₡ FIRST, US$ AT EACH DAY'S RATE</div>
+        <div className="dim tiny">US$ USES THE RATE ON EACH LOT'S KNOCK DAY, SO OLD WEEKS KEEP THEIR OLD RATE. TODAY ₡{fxNow.rate} ({fxNow.source === 'FALLBACK' ? 'NO DAILY RATE YET: THE FIGURE ON PRICES + COSTS' : fxNow.source === 'MANUAL' ? 'TYPED' : `FETCHED ${fxNow.day}`}).</div>
         <div className="dim tiny">
           EACH PART SAYS WHERE IT CAME FROM. NO TAG = LOGGED DATA. <span className="lg-tag estimate">ESTIMATE</span> = FROM THE PLAN OR THE ELECTRICAL PACKAGE. <span className="lg-tag mixed">MIXED</span> = SOME OF EACH. <span className="lg-tag none">NO DATA</span> = NOTHING TO COUNT YET.
         </div>
@@ -252,6 +256,7 @@ function Overview({ d, fx, set, onOpenTrade, onOpenCargo }: { d: LedgerData; fx:
 // ---------- ICE bills ----------
 
 function Bills({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
+  const fxd = useFx()
   const store = useStore()
   const [month, setMonth] = useState(today().slice(0, 7))
   const [kwh, setKwh] = useState('')
@@ -317,7 +322,7 @@ function Bills({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
                       <td>{Number(b.kwh).toLocaleString('en-US')}</td>
                       <td>{b.billed_kw ?? '--'}</td>
                       <td>{fmtCrc(Number(b.total_crc))}</td>
-                      <td>{fmtUsd(Number(b.total_crc), fx)}</td>
+                      <td title={`AT ₡${fxd.rate(monthEnd(b.month))} PER US$ (${monthEnd(b.month)})`}>{fmtUsd(Number(b.total_crc), fxd.rate(monthEnd(b.month)))}</td>
                       <td>{fmtCrc(t)} ({((Number(b.total_crc) / t - 1) * 100).toFixed(0)}%)</td>
                       <td><Confirm label="DELETE" onYes={() => void store.del('energy_bills', b.id).then(() => say('BILL DELETED'), (e: Error) => say(e.message.toUpperCase(), true))} /></td>
                     </tr>
@@ -334,7 +339,8 @@ function Bills({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
 
 // ---------- labour ----------
 
-function Labour({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
+function Labour({ d, say }: { d: LedgerData; fx: number; say: Say }) {
+  const fxd = useFx()
   const store = useStore()
   const [rt, saveRt] = useRatesEditor()
   const p = { rate: rt.labourRate, labourOn: rt.labourOn }
@@ -402,7 +408,7 @@ function Labour({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
                     <td>{e.hours}</td>
                     <td>{(e.task ?? '').toUpperCase()}</td>
                     <td>{d.lots.find((l) => l.id === e.block_lot_id)?.lot_code ?? '--'}</td>
-                    <td>{p.rate ? <>{fmtCrc(e.hours * p.rate)} <small>{fmtUsd(e.hours * p.rate, fx)}</small></> : '--'}</td>
+                    <td>{p.rate ? <>{fmtCrc(e.hours * p.rate)} <small>{fmtUsd(e.hours * p.rate, fxd.rate(e.worked_on))}</small></> : '--'}</td>
                     <td><Confirm label="DELETE" onYes={() => void store.del('labour_entries', e.id).then(() => say('HOURS DELETED'), (er: Error) => say(er.message.toUpperCase(), true))} /></td>
                   </tr>
                 ))}

@@ -45,21 +45,27 @@ export function parseLots(text: string): string[] {
 /** A lot code looks like a species letter and a knock MMDD (B1020). */
 export const lotLooksRight = (code: string) => /^[A-Z]\d{4}$/.test(code)
 
+/** Colones per dollar on a day. Each sale converts at its own day's rate. */
+export type Rate = (day: string) => number
+const flat: Rate = () => 510
+
 export interface Total {
   key: string
   kg: number
   crc: number
+  usd: number // each sale at its own day's rate
   n: number
   perKg: number | null
 }
 
-function totals(list: Sale[], key: (s: Sale) => string): Total[] {
+function totals(list: Sale[], key: (s: Sale) => string, rate: Rate = flat): Total[] {
   const m = new Map<string, Total>()
   for (const s of list) {
     const k = key(s)
-    const t = m.get(k) ?? { key: k, kg: 0, crc: 0, n: 0, perKg: null }
+    const t = m.get(k) ?? { key: k, kg: 0, crc: 0, usd: 0, n: 0, perKg: null }
     t.kg += Number(s.kg)
     t.crc += Number(s.amount_crc)
+    t.usd += Number(s.amount_crc) / rate(s.sold_on)
     t.n++
     m.set(k, t)
   }
@@ -68,9 +74,11 @@ function totals(list: Sale[], key: (s: Sale) => string): Total[] {
 }
 
 export const productKey = (s: Sale) => `${s.species_key ?? 'unknown'}|${s.form}`
-export const byChannel = (list: Sale[]) => totals(list, (s) => s.channel)
-export const byProduct = (list: Sale[]) => totals(list, productKey)
-export const bySpecies = (list: Sale[]) => totals(list, (s) => s.species_key ?? 'unknown')
+export const byChannel = (list: Sale[], rate?: Rate) => totals(list, (s) => s.channel, rate)
+export const byProduct = (list: Sale[], rate?: Rate) => totals(list, productKey, rate)
+export const bySpecies = (list: Sale[], rate?: Rate) => totals(list, (s) => s.species_key ?? 'unknown', rate)
+/** Dollars for a list of sales, each at its own day's rate. */
+export const usdOf = (list: Sale[], rate: Rate) => list.reduce((n, s) => n + Number(s.amount_crc) / rate(s.sold_on), 0)
 
 export interface Buyer {
   name: string
@@ -78,21 +86,23 @@ export interface Buyer {
   n: number
   kg: number
   crc: number
+  usd: number
   last: string
   first: string
 }
 
 /** One row per buyer (names matched ignoring case and spaces), the channel they used last. */
-export function buyers(list: Sale[]): Buyer[] {
+export function buyers(list: Sale[], rate: Rate = flat): Buyer[] {
   const m = new Map<string, Buyer>()
   for (const s of [...list].sort((a, b) => a.sold_on.localeCompare(b.sold_on))) {
     const name = (s.buyer ?? '').trim()
     if (!name) continue
     const k = name.toUpperCase().replace(/\s+/g, ' ')
-    const b = m.get(k) ?? { name, channel: s.channel, n: 0, kg: 0, crc: 0, last: s.sold_on, first: s.sold_on }
+    const b = m.get(k) ?? { name, channel: s.channel, n: 0, kg: 0, crc: 0, usd: 0, last: s.sold_on, first: s.sold_on }
     b.n++
     b.kg += Number(s.kg)
     b.crc += Number(s.amount_crc)
+    b.usd += Number(s.amount_crc) / rate(s.sold_on)
     b.last = s.sold_on
     b.channel = s.channel
     b.name = name
@@ -118,13 +128,16 @@ export interface Margin {
   cost: number
   margin: number
   pct: number | null
+  /** The same three in US$, each sale at its own day's rate. */
+  usd: { revenue: number; cost: number; margin: number }
 }
 
 /** Margin of a set of sales when each kilo cost `costPerKg` (fresh only: dried kilos carry the drying loss, so they are left out). */
-export function margin(list: Sale[], costPerKg: (key: string) => number | null): { m: Margin; uncosted: number } {
+export function margin(list: Sale[], costPerKg: (key: string) => number | null, rate: Rate = flat): { m: Margin; uncosted: number } {
   let revenue = 0
   let cost = 0
   let uncosted = 0
+  const usd = { revenue: 0, cost: 0, margin: 0 }
   for (const s of list) {
     const c = s.species_key && s.form === 'fresh' ? costPerKg(s.species_key) : null
     if (c === null) {
@@ -133,9 +146,13 @@ export function margin(list: Sale[], costPerKg: (key: string) => number | null):
     }
     revenue += Number(s.amount_crc)
     cost += c * Number(s.kg)
+    const fx = rate(s.sold_on)
+    usd.revenue += Number(s.amount_crc) / fx
+    usd.cost += (c * Number(s.kg)) / fx
   }
+  usd.margin = usd.revenue - usd.cost
   const mg = revenue - cost
-  return { m: { revenue, cost, margin: mg, pct: revenue > 0 ? (mg / revenue) * 100 : null }, uncosted }
+  return { m: { revenue, cost, margin: mg, pct: revenue > 0 ? (mg / revenue) * 100 : null, usd }, uncosted }
 }
 
 /** Sales in a date range, inclusive. */

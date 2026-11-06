@@ -5,7 +5,8 @@ import { useApp } from '../settings/AppContext'
 import { supabase } from '../lib/supabase'
 import { Store, MemoryBackend, type Backend, type Row } from '../lib/store'
 import { LocalBackend } from '../lib/localdb'
-import { saveRates, useRates } from './useRates'
+import { useFx } from './useFx'
+import { setManualRate } from '../lib/fx'
 import { RemoteBackend } from '../lib/remotedb'
 
 const Ctx = createContext<Store | null>(null)
@@ -78,15 +79,15 @@ export function useCargoPrefs(): [CargoPrefs, (p: Partial<CargoPrefs>) => void] 
     (fn) => (prefListeners.add(fn), () => void prefListeners.delete(fn)),
     () => prefs,
   )
-  // The exchange rate is shared with PRICES + COSTS (saved in app_settings); the rest stays on the device.
+  // The exchange rate is today's rate from the daily record (fx_rates); typing one here sets today's rate.
   const store = useStore()
-  const r = useRates()
+  const fx = useFx()
   const set = (patch: Partial<CargoPrefs>) => {
-    if (patch.fx !== undefined && patch.fx > 0 && patch.fx !== r.fx) void saveRates(store, r, { fx: patch.fx }).catch(() => undefined)
+    if (patch.fx !== undefined && patch.fx > 0 && patch.fx !== fx.today.rate) void setManualRate(store, fx.todayDay, patch.fx).catch(() => undefined)
     prefs = { ...prefs, ...patch }
     savePrefs(prefs)
     for (const l of prefListeners) l()
   }
-  const merged = useMemo(() => (p.fx === r.fx ? p : { ...p, fx: r.fx }), [p, r.fx])
+  const merged = useMemo(() => (p.fx === fx.today.rate ? p : { ...p, fx: fx.today.rate }), [p, fx.today.rate])
   return [merged, set]
 }

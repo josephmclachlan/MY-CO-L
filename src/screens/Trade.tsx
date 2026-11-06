@@ -6,11 +6,15 @@ import { useCargoPrefs, useStore, useTable } from '../store/StoreContext'
 import { speciesName, useLedger } from '../store/useLedger'
 import { CHANNELS, FORMS, GRADES, SALE_SPECIES, TRADE_GUESSES, type Channel, type Form } from '../data/ledger'
 import { addDays, costPerKg, weekOf, type Basis } from '../lib/ledger'
-import { between, buyers, byChannel, byProduct, lastSaleTo, lotLooksRight, margin, newSale, parseLots, weekly, type Sale, type Total } from '../lib/trade'
+import { between, buyers, byChannel, byProduct, lastSaleTo, lotLooksRight, margin, newSale, parseLots, usdOf, weekly, type Rate, type Sale, type Total } from '../lib/trade'
+
+/** The ₡ per US$ that turns `crc` into `usd`, for showing an already-converted total. */
+const eff = (crc: number, usd: number, fallback: number) => (crc > 0 && usd > 0 ? crc / usd : fallback)
 import { fmtCrc, fmtUsd, today } from '../lib/cargo'
 import { Confirm, Guess } from './CookParts'
 import { Money, Tag } from './Ledger'
 import { salePrice } from '../lib/rates'
+import { useFx, useFxSync } from '../store/useFx'
 import { useRates } from '../store/useRates'
 
 // TRADE: sales. Quick entry on a phone, totals and charts by channel and product, margin against LEDGER.
@@ -71,6 +75,8 @@ export function Trade({ x, set, say, onOpenLedger, onOpenPrices }: { x: TradeSta
   const [cp] = useCargoPrefs()
   const d = useLedger()
   const cost = (k: string) => costPerKg(d.ledger, k, d.plan)
+  const fxd = useFx()
+  useFxSync(sales.map((s) => s.sold_on))
   return (
     <div className="cook ledger">
       <label className="ck-picker">
@@ -79,10 +85,10 @@ export function Trade({ x, set, say, onOpenLedger, onOpenPrices }: { x: TradeSta
           {TRADE_TABS.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
         </Select>
       </label>
-      {x.tab === 'SALE' && <SaleForm sales={sales} fx={cp.fx} say={say} cost={cost} lotCodes={d.lots.map((l) => l.lot_code)} onOpenPrices={onOpenPrices} />}
-      {x.tab === 'TOTALS' && <Totals sales={sales} fx={cp.fx} cost={cost} noPrices={d.plan.all.parts.consumables.basis === 'NONE'} onOpenLedger={onOpenLedger} />}
-      {x.tab === 'BUYERS' && <Buyers sales={sales} fx={cp.fx} />}
-      {x.tab === 'LOG' && <Log sales={sales} fx={cp.fx} say={say} />}
+      {x.tab === 'SALE' && <SaleForm sales={sales} fx={cp.fx} rate={fxd.rate} say={say} cost={cost} lotCodes={d.lots.map((l) => l.lot_code)} onOpenPrices={onOpenPrices} />}
+      {x.tab === 'TOTALS' && <Totals sales={sales} fx={cp.fx} rate={fxd.rate} cost={cost} noPrices={d.plan.all.parts.consumables.basis === 'NONE'} onOpenLedger={onOpenLedger} />}
+      {x.tab === 'BUYERS' && <Buyers sales={sales} fx={cp.fx} rate={fxd.rate} />}
+      {x.tab === 'LOG' && <Log sales={sales} rate={fxd.rate} say={say} />}
       {x.tab === 'GUESSES' && (
         <div className="ck-box">
           <div className="section-title">BEST GUESSES WAITING FOR JOSEPH <Guess /></div>
@@ -108,7 +114,7 @@ function Buttons<T extends string>({ value, options, onPick }: { value: T; optio
   )
 }
 
-function SaleForm({ sales, fx, say, cost, lotCodes, onOpenPrices }: { sales: Sale[]; fx: number; say: Say; onOpenPrices: () => void; cost: (k: string) => { perKg: number | null; basis: Basis }; lotCodes: string[] }) {
+function SaleForm({ sales, rate, say, cost, lotCodes, onOpenPrices }: { sales: Sale[]; fx: number; rate: Rate; say: Say; onOpenPrices: () => void; cost: (k: string) => { perKg: number | null; basis: Basis }; lotCodes: string[] }) {
   const store = useStore()
   const [day, setDay] = useState(today())
   const [buyer, setBuyer] = useState('')
@@ -193,7 +199,7 @@ function SaleForm({ sales, fx, say, cost, lotCodes, onOpenPrices }: { sales: Sal
           <label className="ck-field">
             <span>₡ AMOUNT</span>
             <input inputMode="decimal" value={amount} placeholder={auto !== null ? String(auto) : ''} onChange={(e) => setAmount(e.target.value)} />
-            {amt !== null && <em>{fmtUsd(amt, fx)}{!amount && auto !== null ? ' // KG X PRICE' : ''}</em>}
+            {amt !== null && <em>{fmtUsd(amt, rate(day))} AT ₡{rate(day)}{!amount && auto !== null ? ' // KG X PRICE' : ''}</em>}
           </label>
         </div>
         <label className="ck-field">
@@ -232,6 +238,7 @@ function periodFrom(p: Period): string | null {
 }
 
 function Bars({ rows, label, fx }: { rows: Total[]; label: (k: string) => string; fx: number }) {
+  // US$ per row is the sum of each sale at its own day's rate.
   const max = Math.max(1, ...rows.map((r) => r.crc))
   if (!rows.length) return <div className="dim">NO SALES IN THIS PERIOD.</div>
   return (
@@ -241,7 +248,7 @@ function Bars({ rows, label, fx }: { rows: Total[]; label: (k: string) => string
           <span className="lg-pl">{label(r.key)}</span>
           <span className="lg-bar"><i style={{ width: `${(r.crc / max) * 100}%` }} /></span>
           <span className="lg-pv">
-            {fmtCrc(r.crc)} <small>{fmtUsd(r.crc, fx)} // {r.kg.toFixed(1)} KG{r.perKg !== null ? ` // ${fmtCrc(r.perKg)}/KG` : ''}</small>
+            {fmtCrc(r.crc)} <small>{fmtUsd(r.crc, eff(r.crc, r.usd, fx))} // {r.kg.toFixed(1)} KG{r.perKg !== null ? ` // ${fmtCrc(r.perKg)}/KG` : ''}</small>
           </span>
         </div>
       ))}
@@ -277,12 +284,13 @@ function WeekChart({ sales }: { sales: Sale[] }) {
   )
 }
 
-function Totals({ sales, fx, cost, noPrices, onOpenLedger }: { sales: Sale[]; fx: number; cost: (k: string) => { perKg: number | null; basis: Basis }; noPrices: boolean; onOpenLedger: () => void }) {
+function Totals({ sales, fx, rate, cost, noPrices, onOpenLedger }: { sales: Sale[]; fx: number; rate: Rate; cost: (k: string) => { perKg: number | null; basis: Basis }; noPrices: boolean; onOpenLedger: () => void }) {
   const [p, setP] = useState<Period>('4WK')
   const list = between(sales, periodFrom(p), null)
   const kg = list.reduce((n, s) => n + Number(s.kg), 0)
   const crc = list.reduce((n, s) => n + Number(s.amount_crc), 0)
-  const { m, uncosted } = margin(list, (k) => cost(k).perKg)
+  const { m, uncosted } = margin(list, (k) => cost(k).perKg, rate)
+  const usd = usdOf(list, rate)
   const bases = [...new Set(list.filter((s) => s.form === 'fresh' && s.species_key).map((s) => cost(s.species_key as string).basis))]
   const anyEstimate = bases.some((b) => b !== 'ACTUAL')
   return (
@@ -293,8 +301,8 @@ function Totals({ sales, fx, cost, noPrices, onOpenLedger }: { sales: Sale[]; fx
         <div className="lg-big">
           <div><span>SALES</span><b>{list.length}</b></div>
           <div><span>KG</span><b>{kg.toFixed(1)}</b></div>
-          <div><span>REVENUE</span><Money crc={crc} fx={fx} /></div>
-          <div><span>AVERAGE</span><Money crc={kg > 0 ? crc / kg : null} fx={fx} /></div>
+          <div><span>REVENUE</span><Money crc={crc} fx={eff(crc, usd, fx)} /></div>
+          <div><span>AVERAGE</span><Money crc={kg > 0 ? crc / kg : null} fx={eff(crc, usd, fx)} /></div>
         </div>
       </div>
       <div className="ck-box">
@@ -302,9 +310,9 @@ function Totals({ sales, fx, cost, noPrices, onOpenLedger }: { sales: Sale[]; fx
         {anyEstimate && <div className="dim tiny"><span className="lg-tag estimate">ESTIMATE</span> SOME OF THE COST PER KG IS FROM THE PLAN, NOT LOGGED DATA.</div>}
         {noPrices && <div className="lg-warn">CARGO HAS NO PRICES YET, SO THE COST LEAVES OUT SUBSTRATE, GRAIN AND BAGS. THE MARGIN IS TOO HIGH UNTIL YOU ADD THEM.</div>}
         <div className="lg-big">
-          <div><span>COSTED REVENUE</span><Money crc={m.revenue} fx={fx} /></div>
-          <div><span>COST OF THOSE KG</span><Money crc={m.cost} fx={fx} /></div>
-          <div><span>MARGIN</span><Money crc={m.margin} fx={fx} /></div>
+          <div><span>COSTED REVENUE</span><Money crc={m.revenue} fx={eff(m.revenue, m.usd.revenue, fx)} /></div>
+          <div><span>COST OF THOSE KG</span><Money crc={m.cost} fx={eff(m.cost, m.usd.cost, fx)} /></div>
+          <div><span>MARGIN</span><Money crc={m.margin} fx={eff(Math.abs(m.margin), Math.abs(m.usd.margin), fx)} /></div>
           <div><span>MARGIN %</span><b>{m.pct === null ? '--' : `${m.pct.toFixed(0)}%`}</b></div>
         </div>
         <div className="dim tiny">
@@ -314,11 +322,11 @@ function Totals({ sales, fx, cost, noPrices, onOpenLedger }: { sales: Sale[]; fx
       </div>
       <div className="ck-box">
         <div className="section-title">BY CHANNEL</div>
-        <Bars rows={byChannel(list)} label={chLabel} fx={fx} />
+        <Bars rows={byChannel(list, rate)} label={chLabel} fx={fx} />
       </div>
       <div className="ck-box">
         <div className="section-title">BY PRODUCT</div>
-        <Bars rows={byProduct(list)} label={productLabel} fx={fx} />
+        <Bars rows={byProduct(list, rate)} label={productLabel} fx={fx} />
       </div>
       <div className="ck-box">
         <div className="section-title">₡ PER WEEK // LAST 12 WEEKS</div>
@@ -330,8 +338,8 @@ function Totals({ sales, fx, cost, noPrices, onOpenLedger }: { sales: Sale[]; fx
 
 // ---------- buyers and the log ----------
 
-function Buyers({ sales, fx }: { sales: Sale[]; fx: number }) {
-  const list = buyers(sales)
+function Buyers({ sales, fx, rate }: { sales: Sale[]; fx: number; rate: Rate }) {
+  const list = buyers(sales, rate)
   return (
     <div className="ck-box">
       <div className="section-title">BUYERS</div>
@@ -347,7 +355,7 @@ function Buyers({ sales, fx }: { sales: Sale[]; fx: number }) {
                   <td>{b.n}</td>
                   <td>{b.kg.toFixed(1)}</td>
                   <td>{fmtCrc(b.crc)}</td>
-                  <td>{fmtUsd(b.crc, fx)}</td>
+                  <td>{fmtUsd(b.crc, eff(b.crc, b.usd, fx))}</td>
                   <td>{b.first}</td>
                   <td>{b.last}</td>
                 </tr>
@@ -360,7 +368,7 @@ function Buyers({ sales, fx }: { sales: Sale[]; fx: number }) {
   )
 }
 
-function Log({ sales, fx, say }: { sales: Sale[]; fx: number; say: Say }) {
+function Log({ sales, rate, say }: { sales: Sale[]; rate: Rate; say: Say }) {
   const store = useStore()
   return (
     <div className="ck-box">
@@ -378,7 +386,7 @@ function Log({ sales, fx, say }: { sales: Sale[]; fx: number; say: Say }) {
                   <td>{speciesName(s.species_key ?? 'unknown')} {s.form.toUpperCase()}</td>
                   <td>{s.grade ?? '--'}</td>
                   <td>{Number(s.kg).toFixed(2)}</td>
-                  <td title={fmtUsd(Number(s.amount_crc), fx)}>{fmtCrc(Number(s.amount_crc))}</td>
+                  <td>{fmtCrc(Number(s.amount_crc))} <small className="dim">{fmtUsd(Number(s.amount_crc), rate(s.sold_on))}</small></td>
                   <td>{Number(s.kg) > 0 ? fmtCrc(Number(s.amount_crc) / Number(s.kg)) : '--'}</td>
                   <td>{(s.lot_codes ?? []).join(' ') || '--'}</td>
                   <td><Confirm label="DELETE" onYes={() => void store.del('sales', s.id).then(() => say('SALE DELETED'), (e: Error) => say(e.message.toUpperCase(), true))} /></td>

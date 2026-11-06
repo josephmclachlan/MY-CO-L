@@ -18,7 +18,7 @@ export type Row = { id: string } & Record<string, unknown>
 export const BACKUP_TABLES = [
   'species', 'strains', 'cultures', 'rooms', 'circuits', 'equipment', 'cook_runs', 'cook_readings',
   'grain_runs', 'block_lots', 'contaminants', 'lot_losses', 'hazard_logs', 'harvests', 'sales', 'sale_lots',
-  'items', 'item_prices', 'stock_moves', 'energy_bills', 'labour_entries', 'reference_entries', 'app_settings',
+  'items', 'item_prices', 'stock_moves', 'energy_bills', 'labour_entries', 'reference_entries', 'app_settings', 'fx_rates',
 ] as const
 
 /** Delete order is the reverse, so children go before parents. */

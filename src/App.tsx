@@ -27,6 +27,7 @@ import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
 import { useStoreStatus, useTable } from './store/StoreContext'
 import { useRates } from './store/useRates'
+import { useFxSync } from './store/useFx'
 import { SPECIES } from './data/species'
 import { usePower } from './power/PowerContext'
 import { allCircuits, type RoomId } from './data/power'
@@ -109,6 +110,7 @@ export default function App() {
   const [mission, setMissionState] = useState<MissionState>(MISSION_START)
   const setMission = useCallback((p: Partial<MissionState>) => setMissionState((c) => ({ ...c, ...p })), [])
   const strains = useTable<Strain>('strains')
+  useFxSync() // today's colones per dollar, once a day when online
   useRates() // keeps the prices and costs from PRICES + COSTS live for every screen's maths
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])

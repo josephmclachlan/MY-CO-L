@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import { useRates } from './useRates'
+import { useFx, useFxSync } from './useFx'
+import { monthEnd } from '../lib/fx'
 import { usePlan } from '../data/cropplan'
 import { useTable } from './StoreContext'
 import { SPECIES } from '../data/species'
@@ -42,10 +44,13 @@ export function useLedger(): LedgerData {
   const rt = useRates()
   const rot = usePlan()
   const p: LedgerPrefs = useMemo(() => ({ labourOn: rt.labourOn, rate: rt.labourRate, wearOn: rt.wearOn, wearPerBlock: rt.wearPerBlock }), [rt])
+  const fx = useFx()
+  // Each lot's US$ uses its knock day's rate, each bill its month's last day, each hour its day.
+  useFxSync([...lots.map((l) => l.knock_date), ...bills.map((b) => monthEnd(b.month)), ...labour.map((e) => e.worked_on)].filter(Boolean))
   const ledger = useMemo(
-    () => buildLedger({ lots, losses, harvests, items, prices, moves, cooks, bills, labour, prefs: p }, speciesName),
-    [lots, losses, harvests, items, prices, moves, cooks, bills, labour, p, rt, rot],
+    () => buildLedger({ lots, losses, harvests, items, prices, moves, cooks, bills, labour, prefs: p }, speciesName, fx.rate),
+    [lots, losses, harvests, items, prices, moves, cooks, bills, labour, p, rt, rot, fx.rows],
   )
-  const plan = useMemo(() => planWeek({ items, prices, prefs: p }, nextTuesday(), speciesName), [items, prices, p, rt, rot])
+  const plan = useMemo(() => planWeek({ items, prices, prefs: p }, nextTuesday(), speciesName, () => fx.today.rate), [items, prices, p, rt, rot, fx.today.rate])
   return { ledger, plan, bills, labour, lots, harvests, prefs: p }
 }

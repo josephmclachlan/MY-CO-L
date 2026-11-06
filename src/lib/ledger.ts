@@ -85,6 +85,10 @@ export interface Cost {
   kgBasis: Basis
   perKg: number | null
   hours: number
+  /** US$ at each lot's own day (knock date), never today's rate. */
+  usd: number
+  /** Colones per dollar behind `usd` (total / usd): use it to show US$ next to any ₡ of this cost. */
+  fx: number
 }
 
 export interface LotCost extends Cost {
@@ -220,9 +224,10 @@ function share<T>(amount: number, list: T[], w: (x: T) => number): Map<T, number
   return new Map(list.map((x) => [x, sum > 0 ? (amount * w(x)) / sum : 0]))
 }
 
-function finish(c: Omit<Cost, 'total' | 'perBlock' | 'perKg'>): Cost {
+function finish(c: Omit<Cost, 'total' | 'perBlock' | 'perKg' | 'usd' | 'fx'>, usd: (total: number) => number): Cost {
   const total = PART_KEYS.reduce((n, k) => n + c.parts[k].crc, 0)
-  return { ...c, total, perBlock: c.blocks > 0 ? total / c.blocks : null, perKg: c.kg > 0 ? total / c.kg : null }
+  const u = usd(total)
+  return { ...c, total, perBlock: c.blocks > 0 ? total / c.blocks : null, perKg: c.kg > 0 ? total / c.kg : null, usd: u, fx: total > 0 && u > 0 ? total / u : rates().fx }
 }
 
 function sumCosts(key: string, label: string, list: Cost[]): Cost {
@@ -241,12 +246,12 @@ function sumCosts(key: string, label: string, list: Cost[]): Cost {
     kg: list.reduce((n, c) => n + c.kg, 0),
     kgBasis,
     hours: list.reduce((n, c) => n + c.hours, 0),
-  })
+  }, () => list.reduce((n, c) => n + c.usd, 0))
 }
 
 // ---------- the ledger ----------
 
-export function buildLedger(inp: LedgerInput, speciesName: (key: string) => string = (k) => k.toUpperCase()): Ledger {
+export function buildLedger(inp: LedgerInput, speciesName: (key: string) => string = (k) => k.toUpperCase(), fxRate: (day: string) => number = () => rates().fx): Ledger {
   const lots = inp.lots.filter((l) => l.knock_date && Number(l.bag_count) > 0)
   const byWeek = new Map<string, LedgerLot[]>()
   for (const l of lots) {
@@ -402,7 +407,7 @@ export function buildLedger(inp: LedgerInput, speciesName: (key: string) => stri
       kgBasis = 'ESTIMATE'
     }
     return {
-      ...finish({ key: l.id, label: l.lot_code, blocks: Number(l.bag_count), alive: alive(l), parts: parts.get(l.id)!, kg, kgBasis, hours: hours.get(l.id)! }),
+      ...finish({ key: l.id, label: l.lot_code, blocks: Number(l.bag_count), alive: alive(l), parts: parts.get(l.id)!, kg, kgBasis, hours: hours.get(l.id)! }, (t) => t / fxRate(l.knock_date)),
       lot: l,
       partial: got !== undefined && (l.status === 'fruiting' || l.status === 'incubating'),
     }
@@ -421,9 +426,9 @@ export function buildLedger(inp: LedgerInput, speciesName: (key: string) => stri
 }
 
 /** A standard 130-bag week, all estimates: what the cost should look like before any data exists. */
-export function planWeek(inp: Pick<LedgerInput, 'items' | 'prices' | 'prefs'>, knock: string, speciesName?: (k: string) => string): WeekCost {
+export function planWeek(inp: Pick<LedgerInput, 'items' | 'prices' | 'prefs'>, knock: string, speciesName?: (k: string) => string, fxRate?: (day: string) => number): WeekCost {
   const lots: LedgerLot[] = weekSplit(knock).map((s) => ({ id: `plan-${s.key}`, lot_code: 'PLAN', species_key: s.key, bag_count: s.bags, knock_date: knock, status: 'incubating' }))
-  const l = buildLedger({ ...inp, lots, losses: [], harvests: [], moves: [], cooks: [], bills: [], labour: [] }, speciesName)
+  const l = buildLedger({ ...inp, lots, losses: [], harvests: [], moves: [], cooks: [], bills: [], labour: [] }, speciesName, fxRate)
   return l.weeks[0]
 }
 

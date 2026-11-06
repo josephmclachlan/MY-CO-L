@@ -1,5 +1,6 @@
 import { Select } from '../components/Select'
 import { useRef, useState, type ReactNode } from 'react'
+import { useFx, useFxSync } from '../store/useFx'
 import { useApp } from '../settings/AppContext'
 import { useStoreStatus } from '../store/StoreContext'
 import { useCargo, type CargoRow } from '../store/useCargo'
@@ -72,11 +73,15 @@ function Confirm({ label, onYes, disabled }: { label: string; onYes: () => void;
   )
 }
 
-function Money({ crc, fx }: { crc: number; fx: number }) {
+/** ₡ with US$ beside it. With a day, the US$ uses that day's rate (a price keeps the rate of the day it was paid). */
+function Money({ crc, fx, day }: { crc: number; fx: number; day?: string }) {
+  const f = useFx()
+  useFxSync(day ? [day] : [])
+  const rate = day ? f.rate(day) : fx
   return (
-    <>
-      {fmtCrc(crc)} <span className="dim">/ {fmtUsd(crc, fx)}</span>
-    </>
+    <span>
+      {fmtCrc(crc)} <span className="dim">/ {fmtUsd(crc, rate)}</span>
+    </span>
   )
 }
 
@@ -227,7 +232,7 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
               return (
                 <tr key={p.id}>
                   <td>{p.priced_on}</td>
-                  <td><Money crc={p.price_crc} fx={prefs.fx} /></td>
+                  <td><Money crc={p.price_crc} fx={prefs.fx} day={p.priced_on} /></td>
                   <td className={d !== null && d > 0 ? 'warn' : ''}>{d === null ? '--' : `${d > 0 ? '+' : ''}${d.toFixed(0)}%`}</td>
                   <td>{p.supplier ?? '--'}</td>
                 </tr>
@@ -348,7 +353,7 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
         <span className={low.length ? 'warn' : ''}>{low.length} TO REORDER</span>
         <span>{uncounted} NOT COUNTED</span>
         <span>
-          RATE ₡
+          TODAY ₡
           <input className="cg-fx" aria-label="Colones per US dollar" inputMode="decimal" defaultValue={prefs.fx} key={prefs.fx} onBlur={(e) => { const v = num(e.target.value); if (v && v > 0) setPrefs({ fx: v }) }} />
           = US$1
         </span>
@@ -394,7 +399,7 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
                 <td>{fmtWeeks(r.weeks)}</td>
                 <td>{r.item.lead_time_days === null ? '--' : `${r.item.lead_time_days} D`}</td>
                 <td>{r.item.supplier ?? '--'}</td>
-                <td>{r.last ? <Money crc={r.last.price_crc} fx={prefs.fx} /> : '--'}</td>
+                <td>{r.last ? <Money crc={r.last.price_crc} fx={prefs.fx} day={r.last.priced_on} /> : '--'}</td>
               </tr>
             ))}
           </tbody>
