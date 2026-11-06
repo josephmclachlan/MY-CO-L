@@ -3,6 +3,7 @@ import { useApp } from '../settings/AppContext'
 import { usePower } from '../power/PowerContext'
 import { allCircuits, OUTLET_ROOM, type Circuit } from '../data/power'
 import { ROOMS, roomAlarms, roomById, type Room } from '../data/rooms'
+import { RoomClimate } from './Climate'
 import { itemWatts, type Warning } from '../lib/power'
 import { TypeText } from '../components/TypeText'
 import { useCargo } from '../store/useCargo'
@@ -251,22 +252,7 @@ function RoomReadout({ onOpenVitals, onOpenCargo }: { onOpenVitals: () => void; 
         OPEN VITALS
       </button>
 
-      <div className="section-title rr-sec">SENSORS</div>
-      <div className="placeholder">
-        <div className="ph-row">
-          <span>TEMP</span>
-          <span>--.- C</span>
-        </div>
-        <div className="ph-row">
-          <span>RH</span>
-          <span>--%</span>
-        </div>
-        <div className="ph-row">
-          <span>CO2</span>
-          <span>---- PPM</span>
-        </div>
-        <div className="dim tiny">NO SENSORS LINKED. LENNOX AND GOVEE READINGS ARRIVE IN A LATER BUILD.</div>
-      </div>
+      <RoomClimate room={room.id} />
 
       <div className="section-title rr-sec">INVENTORY</div>
       {(() => {

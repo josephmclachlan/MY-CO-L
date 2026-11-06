@@ -1,0 +1,43 @@
+/* ATMOSPHERICS (build G8): climate sensors. Reuses the cook/ledger boxes and the facility cards. */
+.at-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(15.5em, 1fr)); gap: 8px; }
+.at-card { border: 1px solid var(--fg-faint); padding: 6px 8px; display: grid; gap: 4px; min-width: 0; cursor: pointer; align-content: start; }
+.at-card:hover, .at-card:focus-visible { border-color: var(--fg-dim); }
+.at-card.alarm { border: 2px solid var(--hazard); }
+.at-card.alarm .fc-card-sub { color: var(--fg-dim); }
+.at-place { min-width: 16em; }
+.at-card-name { letter-spacing: 0.06em; overflow-wrap: anywhere; min-width: 0; flex: 1 1 8em; }
+.at-vals { margin: 0; display: grid; gap: 3px; }
+.at-vals > div { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 6px; align-items: baseline; }
+.at-vals dt { color: var(--fg-dim); font-size: 0.85em; }
+.at-vals dd { margin: 0; min-width: 0; display: grid; }
+.at-vals dd b { font-weight: normal; font-size: 1.2em; }
+.at-vals dd small { font-size: 0.74em; overflow-wrap: anywhere; }
+.at-pickrow { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.at-pickrow > .ck-field { flex: 0 1 auto; min-width: 0; }
+.at-graph { width: 100%; min-width: 0; overflow: hidden; display: grid; gap: 4px; }
+.at-graph svg { display: block; touch-action: pan-y; }
+.at-empty { min-height: 90px; align-content: center; border: 1px dashed var(--fg-faint); padding: 8px; }
+.at-readout { min-height: 2.6em; font-size: 0.85em; overflow-wrap: anywhere; }
+.at-readout b { font-weight: normal; color: var(--fg); }
+.at-ok { fill: var(--fg); opacity: 0.06; }
+.at-grid { stroke: var(--fg-faint); stroke-width: 1; }
+.at-ylab, .at-xlab, .at-unit { fill: var(--fg-dim); font-size: 11px; font-family: inherit; }
+.at-range { fill: var(--fg); opacity: 0.16; }
+.at-line { fill: none; stroke: var(--fg); stroke-width: 1.8; stroke-linejoin: round; filter: drop-shadow(0 0 2px var(--glow)); }
+.at-lim { stroke: var(--hazard); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.at-cursor { stroke: var(--fg-dim); stroke-width: 1; stroke-dasharray: 2 3; }
+.at-dot { fill: var(--fg); }
+.at-sum { margin-top: 4px; }
+.at-paste { width: 100%; box-sizing: border-box; font: inherit; font-size: 0.85em; background: transparent; color: var(--fg); border: 1px solid var(--fg-dim); padding: 4px 6px; resize: vertical; }
+.at-bands { display: grid; gap: 6px; }
+.at-plan { margin: 4px 0 0; padding-left: 1.6em; display: grid; gap: 4px; }
+.at-plan li { overflow-wrap: anywhere; }
+.at-feed { display: grid; gap: 4px; }
+.at-more summary { cursor: pointer; color: var(--fg-dim); letter-spacing: 0.06em; }
+.at-more summary:focus-visible { outline: 1px solid var(--fg); }
+.at-room { margin-top: 8px; display: grid; gap: 2px; }
+.at-alarms li.dim .fc-rtext { color: var(--fg-dim); }
+@media (max-width: 700px) {
+  .at-cards { grid-template-columns: minmax(0, 1fr); }
+  .at-ylab, .at-xlab, .at-unit { font-size: 10px; }
+}

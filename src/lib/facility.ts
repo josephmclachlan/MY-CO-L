@@ -867,7 +867,7 @@ export function completeCustom(r: Custom, today: string): Partial<Custom> {
   return { due_on: next, done_on: null }
 }
 
-export type ReminderKind = 'POWER' | 'MOVE' | 'HARVEST' | 'PLATES' | 'STORAGE' | 'STOCK' | 'ROUTINE' | 'FILTER' | 'MAINT' | 'CLEAN' | 'WATER' | 'CHECKLIST' | 'MONEY' | 'CUSTOM'
+export type ReminderKind = 'POWER' | 'CLIMATE' | 'MOVE' | 'HARVEST' | 'PLATES' | 'STORAGE' | 'STOCK' | 'ROUTINE' | 'FILTER' | 'MAINT' | 'CLEAN' | 'WATER' | 'CHECKLIST' | 'MONEY' | 'CUSTOM'
 export interface Reminder {
   key: string
   kind: ReminderKind
@@ -876,7 +876,7 @@ export interface Reminder {
   /** The day it is due (null = right now). */
   due: string | null
   /** Where to fix it. */
-  go: { screen: 'FACILITY' | 'MONEY' | 'MISSION' | 'XENO' | 'CARGO' | 'TRADE'; tab?: string } | null
+  go: { screen: 'FACILITY' | 'MONEY' | 'MISSION' | 'XENO' | 'CARGO' | 'TRADE' | 'ATMOS'; tab?: string } | null
 }
 
 /** The farm's week as Joseph runs it. 1 = Monday. */
@@ -910,7 +910,7 @@ export interface ReminderInput {
   now: number
 }
 
-const KIND_ORDER: ReminderKind[] = ['POWER', 'MOVE', 'HARVEST', 'MONEY', 'STOCK', 'PLATES', 'STORAGE', 'FILTER', 'MAINT', 'WATER', 'CLEAN', 'CHECKLIST', 'ROUTINE', 'CUSTOM']
+const KIND_ORDER: ReminderKind[] = ['POWER', 'CLIMATE', 'MOVE', 'HARVEST', 'MONEY', 'STOCK', 'PLATES', 'STORAGE', 'FILTER', 'MAINT', 'WATER', 'CLEAN', 'CHECKLIST', 'ROUTINE', 'CUSTOM']
 const crcShort = (n: number) => `₡${Math.round(n).toLocaleString('en-US')}`
 
 export function buildReminders(i: ReminderInput): Reminder[] {

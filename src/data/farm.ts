@@ -82,4 +82,5 @@ export const MODULES: ModuleDef[] = [
   { key: 'ORDERS', num: 15, name: 'STANDING ORDERS', what: 'BUYERS, FORECAST, PICK LIST', build: 15 },
   { key: 'MONEY', num: 16, name: 'MONEY', what: 'OWED, PROFIT, CASH FLOW, TRENDS', build: 16 },
   { key: 'FACILITY', num: 17, name: 'FACILITY LOGS', what: 'POWER CUTS, WATER, UPKEEP', build: 17 },
+  { key: 'ATMOS', num: 18, name: 'ATMOSPHERICS', what: 'CLIMATE SENSORS AND ALARMS', build: 18 },
 ]
