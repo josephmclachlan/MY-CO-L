@@ -1,9 +1,11 @@
 import { TypeText } from '../components/TypeText'
+import { useT } from '../settings/useT'
 
 export const HELP_LINES = [
   'COMMANDS',
   '  MENU            MAIN MENU',
-  '  1-14 OR NAME    OPEN A MODULE (E.G. 2 OR VITALS)',
+  '  1-21 OR NAME    OPEN A MODULE (E.G. 2 OR VITALS)',
+  '  ANYTHING ELSE   NOT A COMMAND? IT IS SEARCHED: TYPE A CODE (B1020, BO-01) OR A NAME',
   '  TUNE            LOOK AND SOUND SETTINGS',
   '  THEME <NAME>    PHOSPHOR, CRYO, SODIUM, SPORE OR ALERT',
   '  CLEAN           SUNLIGHT MODE ON OR OFF',
@@ -17,6 +19,17 @@ export const HELP_LINES = [
   '  UNDO / CTRL+Z   UNDO THE LAST SAVED CHANGE (ALSO THE UNDO BUTTON UNDER THE TITLE BAR)',
   '  HISTORY         EVERY CHANGE: WHO, WHEN, OLD AND NEW VALUE; PUT OLD VALUES BACK',
   '  SYNC            SAVING STATUS (THE LAMP IN THE TITLE BAR: SAVED HERE, SYNCED, WAITING, CONFLICT)',
+  '',
+  'SEARCH, EXPORT, GLOVES, LANGUAGE AND STAFF',
+  '  FIND <WORDS>    SEARCH EVERY RECORD AND SCREEN (ALSO /WORDS)',
+  '  MANY            CHANGE MANY RECORDS AT ONCE: TICK, THEN ONE CHANGE',
+  '  STOCKTAKE       COUNT MANY STOCK ITEMS AND SAVE ONCE',
+  '  BACKUP / ZIP    SAVE EVERYTHING: A ZIP WITH THE BACKUP FILE AND A SPREADSHEET PER TABLE',
+  '  EXPORT          ONE TABLE AS A CSV SPREADSHEET',
+  '  RESTORE         PUT A BACKUP BACK (YOU SEE WHAT WOULD CHANGE FIRST)',
+  '  GLOVE           BIG BUTTONS AND A NUMBER PAD FOR GLOVED HANDS (ON / OFF)',
+  '  SPANISH/ENGLISH SCREEN LANGUAGE (ALSO ESPANOL, AYUDA, COSECHA, BUSCAR)',
+  '  STAFF           WHO YOU ARE, THE OWNER PIN, WHAT STAFF MAY OPEN',
   '',
   'POWER AND ROOMS',
   '  UTILITY / GEN   SWITCH THE POWER SOURCE (OPENS VITALS)',
@@ -73,10 +86,11 @@ export const HELP_LINES = [
 ]
 
 export function Help() {
+  const { t, lang } = useT()
   return (
     <div>
-      <div className="section-title">HELP</div>
-      <TypeText group={3} lines={HELP_LINES} />
+      <div className="section-title">{t('HELP')}</div>
+      <TypeText key={lang} group={3} lines={HELP_LINES.map((l) => t(l))} />
     </div>
   )
 }

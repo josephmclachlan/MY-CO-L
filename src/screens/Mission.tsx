@@ -3,6 +3,7 @@ import { HistoryButton } from './History'
 import { PickInput } from '../components/PickInput'
 import { useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
+import { useT } from '../settings/useT'
 import { useStore, useTable } from '../store/StoreContext'
 import { useCargo } from '../store/useCargo'
 import { speciesName } from '../store/useLedger'
@@ -91,25 +92,26 @@ function useRun(say: Say) {
 
 export function MissionIndex({ x, set }: { x: MissionState; set: SetMission }) {
   const { sound } = useApp()
+  const { t: tt, tf } = useT()
   const m = useMission()
   const due = m.today.filter((t) => t.kind === 'MOVE' || t.kind === 'HARVEST').length
   return (
     <>
-      <div className="section-title">MISSION CONTROL</div>
+      <div className="section-title">{tt('MISSION CONTROL')}</div>
       <ul className="index-list">
         {MISSION_TABS.map((t) => (
           <li tabIndex={0} key={t} className={x.tab === t ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
-            <span>{TAB_LABEL[t]}</span>
+            <span>{tt(TAB_LABEL[t])}</span>
             {t === 'BOARD' && <span className="k">{m.rows.length}</span>}
             {t === 'TODAY' && <span className="k">{m.today.length}</span>}
           </li>
         ))}
       </ul>
-      <div className="section-title" style={{ marginTop: 10 }}>NOW</div>
+      <div className="section-title" style={{ marginTop: 10 }}>{tt('NOW')}</div>
       <div className="lg-mini">
-        <div>{m.rows.length} ACTIVE LOTS</div>
-        <div>{m.rows.reduce((n, r) => n + r.blocks, 0)} BLOCKS</div>
-        <div className={due ? 'lg-warn-text' : ''}>{due} LOTS NEED ACTION</div>
+        <div>{tf('{n} ACTIVE LOTS', { n: m.rows.length })}</div>
+        <div>{tf('{n} BLOCKS', { n: m.rows.reduce((n, r) => n + r.blocks, 0) })}</div>
+        <div className={due ? 'lg-warn-text' : ''}>{tf('{n} LOTS NEED ACTION', { n: due })}</div>
       </div>
     </>
   )
@@ -117,13 +119,14 @@ export function MissionIndex({ x, set }: { x: MissionState; set: SetMission }) {
 
 export function Mission({ x, set, say, openRecord, onOpenOrders }: { x: MissionState; set: SetMission; say: Say; openRecord: (key: string, strainId: string | null) => void; onOpenOrders?: (tab: 'ORDERS' | 'FORECAST' | 'PICK') => void }) {
   const { sound } = useApp()
+  const { t: tt } = useT()
   const m = useMission()
   return (
     <div className="cook ledger">
       <label className="ck-picker">
-        <span>SHOW</span>
+        <span>{tt('SHOW')}</span>
         <Select value={x.tab} onChange={(e) => (sound.chirp(), set({ tab: e.target.value as MissionTab }))}>
-          {MISSION_TABS.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
+          {MISSION_TABS.map((t) => <option key={t} value={t}>{tt(TAB_LABEL[t])}</option>)}
         </Select>
       </label>
       {x.tab === 'BOARD' && <Board m={m} say={say} />}
@@ -312,6 +315,7 @@ const pctText = (n: number) => `${n.toFixed(1)}%`
 
 function HarvestForm({ m, say }: { m: M; say: Say }) {
   const store = useStore()
+  const { t: tt, tf } = useT()
   const [lotId, setLotId] = useState('')
   const [flush, setFlush] = useState('')
   const [kg, setKg] = useState('')
@@ -326,10 +330,10 @@ function HarvestForm({ m, say }: { m: M; say: Say }) {
 
   const save = async () => {
     const k = num(kg)
-    if (!row) return say('NO ACTIVE LOT. CREATE ONE FIRST.', true)
-    if (k === null || k <= 0) return say('TYPE THE KG PICKED.', true)
-    if (!initials.trim()) return say('TYPE YOUR INITIALS.', true)
-    if (fl < 1 || fl > 9) return say('FLUSH MUST BE 1 TO 9.', true)
+    if (!row) return say(tt('NO ACTIVE LOT. CREATE ONE FIRST.'), true)
+    if (k === null || k <= 0) return say(tt('TYPE THE KG PICKED.'), true)
+    if (!initials.trim()) return say(tt('TYPE YOUR INITIALS.'), true)
+    if (fl < 1 || fl > 9) return say(tt('FLUSH MUST BE 1 TO 9.'), true)
     try {
       if (row.lot.status === 'incubating') await store.put('block_lots', { ...row.lot, status: 'fruiting', to_fruiting_on: row.lot.to_fruiting_on ?? day, room: 'fruiting' })
       await store.put('harvests', { id: uuid(), block_lot_id: row.lot.id, harvested_on: day, flush: Math.floor(fl), kg: k, grade, initials: initials.trim().toUpperCase(), notes: null, created_at: new Date().toISOString() })
@@ -338,11 +342,11 @@ function HarvestForm({ m, say }: { m: M; say: Say }) {
       } catch {
         // blocked storage: asked again next time
       }
-      say(`HARVEST SAVED // ${row.lot.lot_code} FLUSH ${Math.floor(fl)} // ${kg1(k)} KG // GRADE ${grade}${row.lot.status === 'incubating' ? ' // LOT MARKED FRUITING' : ''}`)
+      say(tf('HARVEST SAVED // {lot} FLUSH {fl} // {kg} KG // GRADE {grade}', { lot: row.lot.lot_code, fl: Math.floor(fl), kg: kg1(k), grade }) + (row.lot.status === 'incubating' ? ` // ${tt('LOT MARKED FRUITING')}` : ''))
       setKg('')
       setFlush('')
     } catch (e) {
-      say(e instanceof Error ? e.message.toUpperCase() : 'SAVE FAILED', true)
+      say(e instanceof Error ? e.message.toUpperCase() : tt('SAVE FAILED'), true)
     }
   }
 
@@ -350,54 +354,54 @@ function HarvestForm({ m, say }: { m: M; say: Say }) {
   return (
     <div className="lg-stack lg-sale">
       <div className="ck-box">
-        <div className="section-title">LOG HARVEST</div>
+        <div className="section-title">{tt('LOG HARVEST')}</div>
         {!active.length ? (
-          <div className="dim">NO ACTIVE LOTS. CREATE A BLOCK LOT FIRST.</div>
+          <div className="dim">{tt('NO ACTIVE LOTS. CREATE A BLOCK LOT FIRST.')}</div>
         ) : (
           <>
             <label className="ck-field">
-              <span>LOT</span>
+              <span>{tt('LOT')}</span>
               <Select value={row?.lot.id ?? ''} onChange={(e) => (setLotId(e.target.value), setFlush(''))}>
                 {active.map((r) => <option key={r.lot.id} value={r.lot.id}>{r.lot.lot_code} {speciesName(r.lot.species_key)} // {r.lot.status.toUpperCase()}</option>)}
               </Select>
             </label>
             <div className="ck-fields ck-quick">
-              <label className="ck-field"><span>KG</span><input inputMode="decimal" autoFocus value={kg} placeholder="0.0" onChange={(e) => setKg(e.target.value)} /></label>
-              <label className="ck-field"><span>FLUSH</span><input inputMode="numeric" value={flush} placeholder={String(fl)} onChange={(e) => setFlush(e.target.value)} /></label>
-              <label className="ck-field"><span>INITIALS</span><input value={initials} maxLength={4} onChange={(e) => setInitials(e.target.value.toUpperCase())} /></label>
+              <label className="ck-field"><span>{tt('KG')}</span><input inputMode="decimal" autoFocus value={kg} placeholder="0.0" onChange={(e) => setKg(e.target.value)} /></label>
+              <label className="ck-field"><span>{tt('FLUSH')}</span><input inputMode="numeric" value={flush} placeholder={String(fl)} onChange={(e) => setFlush(e.target.value)} /></label>
+              <label className="ck-field"><span>{tt('INITIALS')}</span><input value={initials} maxLength={4} onChange={(e) => setInitials(e.target.value.toUpperCase())} /></label>
             </div>
             <div className="ck-field">
-              <span>GRADE <Guess /></span>
+              <span>{tt('GRADE')} <Guess /></span>
               <div className="lg-btns">
                 {GRADES.map((g) => <button key={g} type="button" className={`btn ${grade === g ? 'on' : ''}`} onClick={() => setGrade(g)}>{g}</button>)}
               </div>
             </div>
-            <label className="ck-field"><span>DAY</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value || todayIso())} /></label>
+            <label className="ck-field"><span>{tt('DAY')}</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value || todayIso())} /></label>
             {row && (
               <div className="dim">
-                {row.expKg === null ? 'EXPECTED KG: NO DATA' : `EXPECTED ${kg1(row.expKg)} KG ALL FLUSHES // LOGGED ${kg1(row.gotKg)}${after !== null ? ` -> ${kg1(after)} (${Math.round((after / row.expKg) * 100)}%)` : ''}`}
+                {row.expKg === null ? tt('EXPECTED KG: NO DATA') : `${tf('EXPECTED {e} KG ALL FLUSHES // LOGGED {g}', { e: kg1(row.expKg), g: kg1(row.gotKg) })}${after !== null ? ` -> ${kg1(after)} (${Math.round((after / row.expKg) * 100)}%)` : ''}`}
               </div>
             )}
-            <button type="button" className="btn on" onClick={() => void save()}>SAVE HARVEST</button>
+            <button type="button" className="btn on" onClick={() => void save()}>{tt('SAVE HARVEST')}</button>
           </>
         )}
       </div>
       <div className="ck-box">
-        <div className="section-title">RECENT PICKS // LEDGER AND TRADE USE THESE KG</div>
+        <div className="section-title">{tt('RECENT PICKS // LEDGER AND TRADE USE THESE KG')}</div>
         {recent.length ? (
           <table className="lg-table">
-            <thead><tr><th>DAY</th><th>LOT</th><th>FL</th><th>KG</th><th>GR</th><th>BY</th><th /></tr></thead>
+            <thead><tr><th>{tt('DAY')}</th><th>{tt('LOT')}</th><th>FL</th><th>KG</th><th>GR</th><th>{tt('BY')}</th><th /></tr></thead>
             <tbody>
               {recent.map((h) => (
                 <tr key={h.id}>
                   <td>{h.harvested_on}</td><td>{codeOf(h.block_lot_id)}</td><td>{h.flush}</td><td>{kg1(Number(h.kg))}</td><td>{h.grade ?? ''}</td><td>{h.initials ?? ''}</td>
-                  <td><Confirm label="DEL" onYes={() => void store.del('harvests', h.id).then(() => say('PICK DELETED'))} /></td>
+                  <td><Confirm label={tt('DEL')} onYes={() => void store.del('harvests', h.id).then(() => say(tt('PICK DELETED')))} /></td>
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
-          <div className="dim">NOTHING LOGGED YET.</div>
+          <div className="dim">{tt('NOTHING LOGGED YET.')}</div>
         )}
       </div>
     </div>

@@ -22,6 +22,8 @@ import './styles/money.css'
 import './styles/facility.css'
 import './styles/climate.css'
 import { AppProvider } from './settings/AppContext'
+import { RoleProvider } from './settings/RoleContext'
+import './styles/shell.css'
 import { PowerProvider } from './power/PowerContext'
 import { StoreProvider } from './store/StoreContext'
 import App from './App'
@@ -29,11 +31,13 @@ import App from './App'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppProvider>
-      <PowerProvider>
-        <StoreProvider>
-          <App />
-        </StoreProvider>
-      </PowerProvider>
+      <RoleProvider>
+        <PowerProvider>
+          <StoreProvider>
+            <App />
+          </StoreProvider>
+        </PowerProvider>
+      </RoleProvider>
     </AppProvider>
   </StrictMode>,
 )

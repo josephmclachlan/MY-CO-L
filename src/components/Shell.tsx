@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useApp } from '../settings/AppContext'
+import { useT } from '../settings/useT'
 import { STATION } from '../data/farm'
 import { dbLinked } from '../lib/supabase'
 
@@ -27,6 +28,8 @@ interface Props {
   lamp?: ReactNode
   /** UNDO button for the status line. */
   undo?: ReactNode
+  /** Glove mode badge (tap to switch it off). */
+  glove?: ReactNode
 }
 
 function useClock() {
@@ -40,8 +43,9 @@ function useClock() {
 }
 
 /** The frame every screen shares: title bar, status line, index column, prompt, hint line and F-key bar. */
-export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack, lamp, undo }: Props) {
+export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack, lamp, undo, glove }: Props) {
   const { settings, sound, session } = useApp()
+  const { t } = useT()
   const clock = useClock()
   const [cmd, setCmd] = useState('')
   // Phones show F1-F4 and a MORE key; MORE opens F5-F8 underneath.
@@ -68,15 +72,15 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
     if (window.matchMedia('(pointer: fine)').matches) inputRef.current?.focus({ preventScroll: true })
   }, [focusToken])
 
-  const db = !dbLinked ? 'LOCAL MODE' : session ? 'DB LINKED' : 'DB LOCKED'
+  const db = !dbLinked ? t('LOCAL MODE') : session ? t('DB LINKED') : t('DB LOCKED')
 
   return (
     <div className="shell">
       <header className="titlebar" data-kbd-zone="top">
         <span className="tb-left">
           {onBack && (
-            <button type="button" className="back-btn" onClick={onBack} title="Back to where you were (Backspace, Esc or Alt+Left)">
-              &lt; BACK
+            <button type="button" className="back-btn" onClick={onBack} title={t('Back to where you were (Backspace, Esc or Alt+Left)')}>
+              &lt; {t('BACK')}
             </button>
           )}
           <span className="tb-sys">{STATION.system} <span className="tb-sep">//</span> </span>{title}
@@ -89,10 +93,11 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
       <div className="statusline" data-kbd-zone="status">
         <span>{clock}</span>
         <span>{db}</span>
-        <span className={online ? '' : 'warn'}>{online ? 'NET OK' : 'NET DOWN // CACHED'}</span>
-        <span>SND {settings.sound.enabled ? settings.sound.mode : 'MUTED'}</span>
-        <span>{settings.look.clean ? 'CLEAN' : settings.look.theme}</span>
+        <span className={online ? '' : 'warn'}>{t(online ? 'NET OK' : 'NET DOWN // CACHED')}</span>
+        <span>{t('SND')} {t(settings.sound.enabled ? settings.sound.mode : 'MUTED')}</span>
+        <span>{settings.look.clean ? t('CLEAN') : settings.look.theme}</span>
         {lamp && <span className="sl-lamp">{lamp}</span>}
+        {glove}
         {undo}
       </div>
       <div className={`body ${index ? 'has-index' : ''} ${bodyClass ?? ''}`}>
@@ -128,11 +133,11 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
           autoCorrect="off"
           spellCheck={false}
           enterKeyHint="go"
-          aria-label="Command prompt"
+          aria-label={t('Command prompt')}
         />
       </form>
       <div className="hintline">{hint}</div>
-      <nav className={`keybar ${more ? 'more-open' : ''}`} aria-label="Function keys" data-kbd-zone="keys">
+      <nav className={`keybar ${more ? 'more-open' : ''}`} aria-label={t('Function keys')} data-kbd-zone="keys">
         {keys.map((k) => (
           <button
             key={k.f}
@@ -149,7 +154,7 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
         ))}
         <button type="button" className={`fkey fkey-more ${more ? 'active' : ''}`} aria-expanded={more} onClick={() => setMore((m) => !m)}>
           <span className="fnum">F5-F8</span>
-          <span className="flabel">{more ? 'LESS' : 'MORE'}</span>
+          <span className="flabel">{t(more ? 'LESS' : 'MORE')}</span>
         </button>
       </nav>
     </div>

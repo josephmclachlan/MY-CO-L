@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
+import { useT } from '../settings/useT'
 import { useStore } from '../store/StoreContext'
 import { Select } from '../components/Select'
 import { PickInput } from '../components/PickInput'
@@ -66,12 +67,13 @@ function useRun(say: Say) {
 }
 
 export function Bulk({ m, mode, setMode, say }: { m: MLike; mode: BulkMode; setMode: (b: BulkMode) => void; say: Say }) {
+  const { t: tt } = useT()
   return (
     <div className="lg-stack">
       <div className="ck-box">
-        <div className="section-title">BULK ACTIONS // EACH BUTTON IS ONE UNDO</div>
+        <div className="section-title">{tt('BULK ACTIONS // EACH BUTTON IS ONE UNDO')}</div>
         <div className="lg-btns" role="tablist">
-          {BULK_MODES.map((b) => <button key={b} type="button" role="tab" aria-selected={mode === b} className={`btn ${mode === b ? 'on' : ''}`} onClick={() => setMode(b)}>{MODE_LABEL[b]}</button>)}
+          {BULK_MODES.map((b) => <button key={b} type="button" role="tab" aria-selected={mode === b} className={`btn ${mode === b ? 'on' : ''}`} onClick={() => setMode(b)}>{tt(MODE_LABEL[b])}</button>)}
         </div>
       </div>
       {mode === 'HARVEST' && <HarvestSession m={m} say={say} />}
@@ -86,6 +88,7 @@ export function Bulk({ m, mode, setMode, say }: { m: MLike; mode: BulkMode; setM
 
 export function HarvestSession({ m, say, only }: { m: MLike; say: Say; only?: string[] }) {
   const store = useStore()
+  const { t: tt, tf } = useT()
   const run = useRun(say)
   const [day, setDay] = useState(todayIso())
   const [by, setBy] = useState(getInitials)
@@ -103,7 +106,7 @@ export function HarvestSession({ m, say, only }: { m: MLike; say: Say; only?: st
   const save = async () => {
     const ok = await run(
       () => harvestSession(store, { day, initials: by, rows: entries.map((e) => ({ lot: e.r.lot, kg: e.k, flush: Math.floor(e.f), grade })) }),
-      `HARVEST SESSION // ${entries.length} LOTS // ${kg1(total)} KG`,
+      tf('HARVEST SESSION // {n} LOTS // {kg} KG', { n: entries.length, kg: kg1(total) }),
     )
     if (ok) {
       try {
@@ -117,37 +120,37 @@ export function HarvestSession({ m, say, only }: { m: MLike; say: Say; only?: st
   }
   return (
     <div className="ck-box">
-      <div className="section-title">HARVEST SESSION // TYPE THE KG FOR EACH LOT PICKED, THEN SAVE ONCE</div>
-      <div className="dim tiny">FL = WHICH PICKING OF THE LOT (1 = FIRST). GRADE A IS THE NORMAL SALE GRADE. LEAVE A LOT BLANK IF YOU DID NOT PICK IT. THE SAVE BUTTON IS AT THE BOTTOM OF THE LIST.</div>
+      <div className="section-title">{tt('HARVEST SESSION // TYPE THE KG FOR EACH LOT PICKED, THEN SAVE ONCE')}</div>
+      <div className="dim tiny">{tt('FL = WHICH PICKING OF THE LOT (1 = FIRST). GRADE A IS THE NORMAL SALE GRADE. LEAVE A LOT BLANK IF YOU DID NOT PICK IT. THE SAVE BUTTON IS AT THE BOTTOM OF THE LIST.')}</div>
       {!m.rows.length ? (
-        <div className="dim">NO ACTIVE LOTS.</div>
+        <div className="dim">{tt('NO ACTIVE LOTS.')}</div>
       ) : (
         <>
           <div className="ck-fields ck-quick">
-            <label className="ck-field"><span>DAY</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value || todayIso())} /></label>
-            <label className="ck-field"><span>INITIALS</span><input value={by} maxLength={4} onChange={(e) => setBy(e.target.value.toUpperCase())} /></label>
+            <label className="ck-field"><span>{tt('DAY')}</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value || todayIso())} /></label>
+            <label className="ck-field"><span>{tt('INITIALS')}</span><input value={by} maxLength={4} onChange={(e) => setBy(e.target.value.toUpperCase())} /></label>
             {!only && (
               <label className="ck-field">
-                <span>ONLY ROOM</span>
+                <span>{tt('ONLY ROOM')}</span>
                 <Select value={room} onChange={(e) => setRoom(e.target.value)}>
-                  <option value="">ALL ROOMS</option>
+                  <option value="">{tt('ALL ROOMS')}</option>
                   {ROOM_CHOICES.filter((r) => r.id === 'incubation' || r.id === 'fruiting').map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
                 </Select>
               </label>
             )}
           </div>
           <div className="ck-field">
-            <span>GRADE FOR THIS SESSION <Guess /></span>
+            <span>{tt('GRADE FOR THIS SESSION')} <Guess /></span>
             <div className="lg-btns">{GRADES.map((g) => <button key={g} type="button" className={`btn ${grade === g ? 'on' : ''}`} onClick={() => setGrade(g)}>{g}</button>)}</div>
           </div>
           <div className="rc-wrap">
             <table className="lg-table rc-table rc-input">
-              <thead><tr><th>LOT</th><th>NOW</th><th>FL</th><th>KG PICKED</th></tr></thead>
+              <thead><tr><th>{tt('LOT')}</th><th>{tt('NOW')}</th><th>FL</th><th>{tt('KG PICKED')}</th></tr></thead>
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.lot.id}>
                     <td>{r.lot.lot_code}</td>
-                    <td>{r.lot.status === 'fruiting' ? 'FRUIT' : 'INCUB'}</td>
+                    <td>{tt(r.lot.status === 'fruiting' ? 'FRUIT' : 'INCUB')}</td>
                     <td><input aria-label={`Flush for ${r.lot.lot_code}`} inputMode="numeric" value={fl[r.lot.id] ?? ''} placeholder={String(nextFlush(m.harvests, r.lot.id))} onChange={(e) => setFl({ ...fl, [r.lot.id]: e.target.value })} /></td>
                     <td><input aria-label={`Kg for ${r.lot.lot_code}`} inputMode="decimal" value={kg[r.lot.id] ?? ''} placeholder="0.0" onChange={(e) => setKg({ ...kg, [r.lot.id]: e.target.value })} /></td>
                   </tr>
@@ -155,8 +158,8 @@ export function HarvestSession({ m, say, only }: { m: MLike; say: Say; only?: st
               </tbody>
             </table>
           </div>
-          <div className="dim">{entries.length} LOTS // {kg1(total)} KG TO SAVE. A LOT STILL INCUBATING MOVES TO FRUITING ON THE DAY OF ITS FIRST PICK.</div>
-          <button type="button" className="btn on" disabled={!entries.length} onClick={() => void save()}>SAVE SESSION</button>
+          <div className="dim">{tf('{n} LOTS // {kg} KG TO SAVE.', { n: entries.length, kg: kg1(total) })} {tt('A LOT STILL INCUBATING MOVES TO FRUITING ON THE DAY OF ITS FIRST PICK.')}</div>
+          <button type="button" className="btn on" disabled={!entries.length} onClick={() => void save()}>{tt('SAVE SESSION')}</button>
         </>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { useT } from '../settings/useT'
 import { Select } from '../components/Select'
 import { PickInput } from '../components/PickInput'
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
@@ -71,10 +72,11 @@ export function Pick<T extends string>({ label, value, options, onPick, wide }: 
 
 /** A button that asks twice before doing something that cannot be undone. */
 export function Confirm({ label, onYes, disabled }: { label: string; onYes: () => void; disabled?: boolean }) {
+  const { t } = useT()
   const [sure, setSure] = useState(false)
   return (
     <button type="button" className={`btn danger ${sure ? 'on' : ''}`} disabled={disabled} onClick={() => (sure ? (setSure(false), onYes()) : setSure(true))} onBlur={() => setSure(false)}>
-      {sure ? 'SURE? TAP AGAIN' : label}
+      {sure ? t('SURE? TAP AGAIN') : label}
     </button>
   )
 }

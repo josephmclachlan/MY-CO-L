@@ -104,13 +104,34 @@ export class Store {
   /** The screen on show, for the history. */
   screen: string | null = null
 
+  /** Tables this person may not read or write (STAFF and the money tables). They read as empty and refuse writes. */
+  private denied: ReadonlySet<string> = new Set()
+  /** Rows of an allowed table that are still off limits (STAFF and the money settings rows). */
+  private hideRow: ((table: string, r: Row) => boolean) | null = null
+
+  /** Limit what this Store shows and writes. Cached tables are dropped so the next read applies the limit. */
+  setAccess(denied: Iterable<string>, hideRow: ((table: string, r: Row) => boolean) | null = null) {
+    this.denied = new Set(denied)
+    this.hideRow = hideRow
+    this.data.clear()
+    this.bump()
+  }
+  isDenied(table: string) {
+    return this.denied.has(table)
+  }
+  private visible(table: string, rows: Row[]): Row[] {
+    if (this.denied.has(table)) return []
+    const h = this.hideRow
+    return h ? rows.filter((r) => !h(table, r)) : rows
+  }
+
   constructor(backend: Backend) {
     this.backend = backend
     backend.onChange = (table, put, removed) => {
       const have = this.data.get(table)
       if (!have) return
       const m = new Map(have.map((r) => [r.id, r]))
-      for (const r of put) m.set(r.id, { ...(m.get(r.id) ?? {}), ...r })
+      for (const r of this.visible(table, put)) m.set(r.id, { ...(m.get(r.id) ?? {}), ...r })
       for (const id of removed) m.delete(id)
       this.data.set(table, [...m.values()])
       this.bump()
@@ -154,12 +175,16 @@ export class Store {
 
   ensure(table: string): Promise<void> {
     if (this.data.has(table)) return Promise.resolve()
+    if (this.denied.has(table)) {
+      this.data.set(table, [])
+      return Promise.resolve()
+    }
     let p = this.loading.get(table)
     if (!p) {
       p = this.backend
         .load(table)
         .then((rows) => {
-          this.data.set(table, rows)
+          this.data.set(table, this.visible(table, rows))
           this.error = null
         })
         .catch((e) => {
@@ -176,8 +201,9 @@ export class Store {
     return p
   }
 
-  private writable() {
+  private writable(table?: string) {
     if (this.backend.kind === 'locked') throw new Error('DATABASE LOCKED. LOGIN FIRST.')
+    if (table && table !== EDIT_LOG && this.denied.has(table)) throw new Error('STAFF CANNOT CHANGE THAT. ASK THE OWNER.')
   }
 
   /** Insert or update rows by id (fields not given are kept). Updates the screen first, rolls back if the write fails. */
@@ -186,10 +212,11 @@ export class Store {
   }
 
   private async write(table: string, input: Row | Row[], replace: boolean, opts?: BackgroundWrite): Promise<void> {
-    this.writable()
+    this.writable(table)
     await this.ensure(table)
     const rows = Array.isArray(input) ? input : [input]
     if (!rows.length) return
+    if (this.hideRow && rows.some((r) => this.hideRow!(table, r))) throw new Error('STAFF CANNOT CHANGE THAT. ASK THE OWNER.')
     const now = new Date().toISOString()
     const before = this.data.get(table) ?? []
     const byId = new Map(before.map((r) => [r.id, r]))
@@ -211,7 +238,7 @@ export class Store {
   }
 
   async del(table: string, ids: string | string[], opts?: BackgroundWrite): Promise<void> {
-    this.writable()
+    this.writable(table)
     await this.ensure(table)
     const list = Array.isArray(ids) ? ids : [ids]
     if (!list.length) return
@@ -235,7 +262,7 @@ export class Store {
   async refresh(table: string): Promise<void> {
     if (!this.data.has(table)) return this.ensure(table)
     try {
-      this.data.set(table, await this.backend.load(table))
+      this.data.set(table, this.visible(table, await this.backend.load(table)))
       this.error = null
     } catch (e) {
       this.error = e instanceof Error ? e.message : String(e)
@@ -438,6 +465,7 @@ export class Store {
   async exportJson(): Promise<string> {
     const tables: Record<string, Row[]> = {}
     for (const t of BACKUP_TABLES) {
+      if (this.denied.has(t)) continue
       await this.ensure(t)
       const rows = this.data.get(t) ?? []
       if (rows.length) tables[t] = rows
@@ -445,9 +473,8 @@ export class Store {
     return JSON.stringify({ app: 'MY/CO/L', format: BACKUP_FORMAT, exported_at: new Date().toISOString(), mode: this.backend.kind, tables }, null, 1)
   }
 
-  /** Merge a backup file into the store by id. Rows in the file win; rows not in the file are left alone. */
-  async importJson(text: string): Promise<Record<string, number>> {
-    this.writable()
+  /** Read and check a backup file. Nothing is written. Throws a plain sentence when the file is not a MY/CO/L backup. */
+  parseBackup(text: string): Record<string, Row[]> {
     let doc: unknown
     try {
       doc = JSON.parse(text)
@@ -464,12 +491,71 @@ export class Store {
       if (!Array.isArray(rows) || rows.some((r) => !r || typeof r !== 'object' || typeof (r as Row).id !== 'string' || !(r as Row).id))
         throw new Error(`BAD ROWS IN BACKUP TABLE ${t}.`)
     }
+    return tables as Record<string, Row[]>
+  }
+
+  /** What restoring this backup would do, table by table, without doing it. */
+  async previewBackup(text: string, exact = false): Promise<BackupPreview> {
+    const tables = this.parseBackup(text)
+    const out: BackupPreview = { tables: [], add: 0, change: 0, same: 0, remove: 0 }
+    for (const t of BACKUP_TABLES) {
+      const rows = tables[t] ?? []
+      if (t === EDIT_LOG) {
+        await this.ensure(t)
+        const have = new Set(this.rows(t).map((r) => r.id))
+        const add = rows.filter((r) => !have.has(r.id)).length
+        if (rows.length) out.tables.push({ table: t, add, change: 0, same: rows.length - add, remove: 0 })
+        out.add += add
+        out.same += rows.length - add
+        continue
+      }
+      await this.ensure(t)
+      const have = new Map(this.rows(t).map((r) => [r.id, r]))
+      let add = 0
+      let change = 0
+      let same0 = 0
+      for (const r of rows) {
+        const cur = have.get(r.id)
+        if (!cur) add++
+        else if (this.differs(cur, r)) change++
+        else same0++
+      }
+      const inFile = new Set(rows.map((r) => r.id))
+      const remove = exact ? [...have.keys()].filter((id) => !inFile.has(id)).length : 0
+      if (rows.length || remove) out.tables.push({ table: t, add, change, same: same0, remove })
+      out.add += add
+      out.change += change
+      out.same += same0
+      out.remove += remove
+    }
+    return out
+  }
+
+  /** A saved row differs from the file's row when a field the file has holds another value. */
+  private differs(cur: Row, file: Row): boolean {
+    for (const k of Object.keys(file)) {
+      if (k === 'updated_at') continue
+      if (!same(cur[k], file[k])) return true
+    }
+    return false
+  }
+
+  /**
+   * Merge a backup file into the store by id. Rows in the file win; rows not in the file are left alone.
+   * With exact = true the store ends up the same as the file: records the file does not have are removed too
+   * (the history log is never removed). It is ONE undo step either way.
+   */
+  async importJson(text: string, opts: { exact?: boolean } = {}): Promise<Record<string, number>> {
+    this.writable()
+    // A limited view (STAFF) holds only part of the data: restoring from it, or into it, could wipe what it cannot see.
+    if (this.denied.size) throw new Error('STAFF CANNOT CHANGE THAT. ASK THE OWNER.')
+    const tables = this.parseBackup(text)
     const counts: Record<string, number> = {}
-    await this.action('IMPORT BACKUP', async () => {
+    await this.action(opts.exact ? 'RESTORE BACKUP (EXACT COPY)' : 'IMPORT BACKUP', async () => {
       for (const t of BACKUP_TABLES) {
-        const rows = tables[t] as Row[] | undefined
-        if (!rows?.length) continue
+        const rows = tables[t]
         if (t === EDIT_LOG) {
+          if (!rows?.length) continue
           // The old history comes back as it was, not as new edits.
           await this.ensure(t)
           const have = new Set(this.rows(t).map((r) => r.id))
@@ -478,12 +564,35 @@ export class Store {
             this.data.set(t, [...this.rows(t), ...add])
             await this.backend.put(t, add)
           }
-        } else await this.put(t, rows)
-        counts[t] = rows.length
+          counts[t] = rows.length
+          continue
+        }
+        if (rows?.length) {
+          await (opts.exact ? this.write(t, rows, true) : this.put(t, rows))
+          counts[t] = rows.length
+        }
+      }
+      if (opts.exact) {
+        // Children go before parents (reverse of the backup order), so nothing is ever left pointing at a removed parent.
+        for (const t of [...BACKUP_TABLES].reverse()) {
+          if (t === EDIT_LOG) continue
+          await this.ensure(t)
+          const keep = new Set((tables[t] ?? []).map((r) => r.id))
+          const gone = this.rows(t).filter((r) => !keep.has(r.id)).map((r) => r.id)
+          if (gone.length) await this.del(t, gone)
+        }
       }
     }, { via: 'import' })
     return counts
   }
+}
+
+export interface BackupPreview {
+  tables: { table: string; add: number; change: number; same: number; remove: number }[]
+  add: number
+  change: number
+  same: number
+  remove: number
 }
 
 // ---------- action journal ----------

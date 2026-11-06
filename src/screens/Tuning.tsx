@@ -4,6 +4,8 @@ import { THEMES, type LookSettings, type SoundSettings } from '../settings/setti
 import { Meter } from '../components/Meter'
 import { TypeText } from '../components/TypeText'
 import { DataColumns } from '../components/DataColumns'
+import { useT } from '../settings/useT'
+import { LANGS, LANG_NAME } from '../lib/i18n'
 
 type Test =
   | { kind: 'typing' }
@@ -48,6 +50,7 @@ function WarbleTest() {
 export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onReplayBoot: () => void }) {
   const { settings, update, reset, sound } = useApp()
   const { look, sound: snd } = settings
+  const { t: tt } = useT()
   const [test, setTest] = useState<{ t: Test; id: number } | null>(null)
   const run = (t: Test) => setTest({ t, id: Date.now() })
 
@@ -73,7 +76,26 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
 
   return (
     <div className="tune">
-      <div className="section-title">TUNING</div>
+      <div className="section-title">{tt('TUNING')}</div>
+
+      <section className="tune-group" id="tune-device">
+        <div className="section-title">{tt('LANGUAGE AND GLOVES')}</div>
+        <div className="tune-row">
+          <span className="lbl">{tt('LANGUAGE')}</span>
+          {LANGS.map((l) => (
+            <button key={l} type="button" className={`btn ${settings.lang === l ? 'on' : ''}`} aria-pressed={settings.lang === l} onClick={() => (sound.chirp(), update((x) => ({ ...x, lang: l })))}>
+              {LANG_NAME[l]}
+            </button>
+          ))}
+        </div>
+        <div className="tune-row">
+          <span className="lbl">{tt('GLOVE MODE')}</span>
+          <button type="button" className={`btn ${settings.glove ? 'on' : ''}`} aria-pressed={settings.glove} onClick={() => (sound.chirp(), update((x) => ({ ...x, glove: !x.glove })))}>
+            {tt(settings.glove ? 'ON // BIG BUTTONS + NUMBER PAD' : 'OFF')}
+          </button>
+        </div>
+        <div className="dim tiny">{tt('GLOVE MODE MAKES EVERY BUTTON AND BOX BIGGER AND OPENS A NUMBER PAD WHEN YOU TAP A NUMBER BOX. THESE TWO SETTINGS ARE SAVED ON THIS DEVICE ONLY.')}</div>
+      </section>
 
       <section className="tune-group" id="tune-look">
         <div className="section-title">LOOK</div>
