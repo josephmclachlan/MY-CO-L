@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { isTypingKey, pickNext, type Box, type Dir } from '../lib/keynav'
+import { tipModeOn } from '../guide/tipStore'
 
 /**
  * App-wide keyboard control. One listener, so every screen behaves the same:
@@ -333,6 +334,7 @@ export function useKeyNav(opts: { enabled: boolean; onBack: () => boolean }) {
         }
         case 'Escape': {
           if (openPopup) return // the pop-up closes itself
+          if (tipModeOn() || document.getElementById('tip-bubble')) return // an open tip or tip mode takes the Esc (components/Tips.tsx)
           if (field) {
             handled()
             ;(document.querySelector(PROMPT) as HTMLElement | null)?.focus()

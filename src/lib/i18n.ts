@@ -38,6 +38,9 @@ export function normLang(v: unknown): Lang {
 /** Spanish words typed at the > prompt that mean an English command. The screens' own command list stays English. */
 export const ES_COMMANDS: Record<string, string> = {
   AYUDA: 'HELP',
+  GUIA: 'GUIDE',
+  GUÍA: 'GUIDE',
+  CONSEJOS: 'TIPS',
   INICIO: 'MENU',
   MENU: 'MENU',
   MENÚ: 'MENU',

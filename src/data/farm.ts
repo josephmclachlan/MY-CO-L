@@ -87,4 +87,5 @@ export const MODULES: ModuleDef[] = [
   { key: 'DATA', num: 20, name: 'DATA', what: 'EXPORT, BACKUP, RESTORE', build: 20 },
   { key: 'STAFF', num: 21, name: 'STAFF', what: 'ROLES AND ACCESS', build: 21 },
   { key: 'ASK', num: 22, name: 'ASK THE LATTICE', what: 'FARM ASSISTANT: QUESTIONS AND COMMANDS', build: 22 },
+  { key: 'GUIDE', num: 23, name: 'USER GUIDE', what: 'HOW TO USE EVERY SCREEN', build: 23 },
 ]

@@ -257,7 +257,7 @@ export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
       <div className="tiny dim">52 BLUE, 46 LION'S MANE AND 16 COMB TOOTH RUN EVERY WEEK. PICK THE SPECIES FOR THE OTHER {SLOT_BAGS} BAGS. IT FILLS EVERY WEEK UNLESS YOU SET A WEEK BELOW. SAVED ON THIS DEVICE; SPECIMEN FILES, XENOGENETICS, MISSION AND LEDGER FOLLOW IT.</div>
       <div className="pl-pick">
         {SPECIES.filter((s) => !CORE.some((c) => c.key === s.id)).map((s) => (
-          <button key={s.id} disabled={lock} className={plan.slot === s.id ? 'sel' : ''} aria-pressed={plan.slot === s.id} onClick={() => { sound.chirp(); setSlot(s.id); setChosen(weekSplit(knockDay).map((x) => x.key)) }}>
+          <button key={s.id} disabled={lock} data-tip={`Make ${s.name.toLowerCase()} the species for the second slot of the week. Tap again on another to change it.`} className={plan.slot === s.id ? 'sel' : ''} aria-pressed={plan.slot === s.id} onClick={() => { sound.chirp(); setSlot(s.id); setChosen(weekSplit(knockDay).map((x) => x.key)) }}>
             {plan.slot === s.id ? '[X]' : '[ ]'} {s.name}
           </button>
         ))}
@@ -281,7 +281,7 @@ export function Sequence({ onOpenCargo }: { onOpenCargo: () => void }) {
       <div className="section-title" style={{ marginTop: 10 }}>SPECIES IN THIS RUN</div>
       <div className="pl-pick">
         {SPECIES.map((s) => (
-          <button key={s.id} disabled={lock} className={chosen.includes(s.id) ? 'sel' : ''} aria-pressed={chosen.includes(s.id)} onClick={() => toggle(s.id)}>
+          <button key={s.id} disabled={lock} data-tip={`Put ${s.name.toLowerCase()} in this run, or take it out. The allotment below shows each species' share.`} className={chosen.includes(s.id) ? 'sel' : ''} aria-pressed={chosen.includes(s.id)} onClick={() => toggle(s.id)}>
             {chosen.includes(s.id) ? '[X]' : '[ ]'} {s.name}
           </button>
         ))}
