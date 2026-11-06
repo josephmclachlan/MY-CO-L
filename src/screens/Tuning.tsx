@@ -83,14 +83,14 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
 
       <section className="tune-group" id="tune-device">
         <div className="section-title">{tt('LANGUAGE AND GLOVES')}</div>
-        <div className="tune-row">
+        {LANGS.length > 1 && <div className="tune-row">
           <span className="lbl">{tt('LANGUAGE')}</span>
           {LANGS.map((l) => (
             <button key={l} type="button" className={`btn ${settings.lang === l ? 'on' : ''}`} aria-pressed={settings.lang === l} onClick={() => (sound.chirp(), update((x) => ({ ...x, lang: l })))}>
               {LANG_NAME[l]}
             </button>
           ))}
-        </div>
+        </div>}
         <div className="tune-row">
           <span className="lbl">{tt('GLOVE MODE')}</span>
           <button type="button" className={`btn ${settings.glove ? 'on' : ''}`} aria-pressed={settings.glove} onClick={() => (sound.chirp(), update((x) => ({ ...x, glove: !x.glove })))}>

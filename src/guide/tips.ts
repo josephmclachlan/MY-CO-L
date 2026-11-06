@@ -278,6 +278,8 @@ export const TIPS: Record<string, string> = {
   'YOUR NAME FOR THE HISTORY': 'The name written next to your changes in HISTORY.',
   'SHOW ALL 23 RECORDS IN THIS CHANGE': 'List every record this one change touched.',
   'FLUSH LOG': 'Each flush: kilograms, BE% and pin day per lot.',
+  'FLUSH TEST': 'What each flush gives per species, and where you commit a flush count.',
+  'BACK TO TEST': 'Put this species back in test: lots stay open for up to 4 flushes until marked spent.',
   SCORECARD: 'Results grouped by strain, cook, room, week or worker.',
   'STRAIN TRIALS': 'Strains tried side by side.',
   'START TRIAL': 'Begin a side-by-side trial of strains.',
@@ -517,6 +519,7 @@ export const TIPS: Record<string, string> = {
 
 /** Families of controls. Checked after the dictionary. Keys arrive already normalised (capitals, no counts). */
 export const TIP_RULES: [RegExp, string][] = [
+  [/^COMMIT [1-4]$/, 'Set this many flushes for the species. Its lots then finish after that many picks. BACK TO TEST undoes it.'],
   [/^EDIT .+ \/\/ TEMP/, 'Change this room\'s limits for temperature, humidity and CO2. The alarms use them.'],
   [/^(ADDED|ENTERED|CHANGED|UNDID) /, 'A line of the change history. Tap to see that record.'],
   [/^STEP \d+ DONE$/, 'Tick when this step is done.'],

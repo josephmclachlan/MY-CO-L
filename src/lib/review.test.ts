@@ -48,7 +48,7 @@ describe('G12 review: menu order', () => {
 describe('G12 review: alarm bands', () => {
   // ATMOSPHERICS NOW and LOG READING both read bandFor(); LOG READING now names the place next to the band.
   it('gives each place one band, the same on every screen', () => {
-    expect(bandText(bandFor(DEFAULT_SENSOR_SETTINGS, 'lab', 'temp'), 'temp')).toBe(bandText({ lo: 16, hi: 21 }, 'temp'))
-    expect(bandText(bandFor(DEFAULT_SENSOR_SETTINGS, 'fruiting', 'temp'), 'temp')).toBe(bandText({ lo: 13, hi: 19 }, 'temp'))
+    expect(bandText(bandFor(DEFAULT_SENSOR_SETTINGS, 'lab', 'temp'), 'temp')).toBe(bandText({ lo: 13, hi: 20 }, 'temp'))
+    expect(bandText(bandFor(DEFAULT_SENSOR_SETTINGS, 'fruiting', 'temp'), 'temp')).toBe(bandText({ lo: 13, hi: 20 }, 'temp'))
   })
 })

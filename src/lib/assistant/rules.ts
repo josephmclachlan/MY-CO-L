@@ -42,7 +42,7 @@ function codeIn(raw: string, list: string[]): string | null {
   return null
 }
 /** Something shaped like a lot code even if it is not on file: one letter + 4 digits (+ -n). */
-const lotShaped = (raw: string) => /\b([A-Za-z]\d{4}(?:-\d)?)\b/.exec(raw)?.[1]?.toUpperCase() ?? null
+const lotShaped = (raw: string) => /\b([A-Za-z]{1,2}\d{4}(?:-S?\d+)?)\b/.exec(raw)?.[1]?.toUpperCase() ?? null
 const strainShaped = (raw: string) => /\b([A-Za-z]{2}-\d{2})\b/.exec(raw)?.[1]?.toUpperCase() ?? null
 
 function longestName(t: string, names: string[]): string | null {

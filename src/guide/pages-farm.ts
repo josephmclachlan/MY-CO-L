@@ -74,12 +74,13 @@ export const FARM: GSection[] = [
         h: 'THE TABS',
         items: [
           ['FLUSH LOG', 'BE% for each lot and flush, with the day the first pins appeared.'],
+          ['FLUSH TEST', 'Every crop starts in test: lots stay open for up to 4 flushes until you mark them spent. This tab shows what each flush gave (kg per block, share of flush 1, days between flushes) and a suggested count. COMMIT 1-4 sets the count for that species; BACK TO TEST undoes it.'],
           ['SCORECARD', 'Results grouped by strain, cook run, room, week or worker. Pick a grouping at the top.'],
           ['STRAIN TRIALS', 'Put two or more strains side by side and see which wins. START TRIAL begins one.'],
           ['GUESSES', 'The rules the app guessed, for you to check.'],
         ],
       },
-      { h: 'GOOD TO KNOW', text: ['Only complete lots (spent, or all flushes picked) count toward averages. Fading needs at least five finished lots of a strain.'] },
+      { h: 'GOOD TO KNOW', text: ['Only complete lots (spent, or all committed flushes picked; 4 while a crop is in test) count toward averages. Fading needs at least five finished lots of a strain.'] },
     ],
   },
   {

@@ -9,15 +9,17 @@ import { Confirm, Guess } from './CookParts'
 import { SPECIES } from '../data/species'
 import { speciesName } from '../store/useLedger'
 import { todayIso } from '../lib/xeno'
-import { BLOCK_DRY_LB, DIMENSIONS, daysFmt, kgFmt, pctFmt, pickerTotals, scorecard, speciesLabel, trialArms, trialVerdict, type Dimension, type LotRecord, type StrainTrial } from '../lib/records'
+import { BLOCK_DRY_LB, DIMENSIONS, daysFmt, flushTest, kgFmt, pctFmt, pickerTotals, scorecard, speciesLabel, trialArms, trialVerdict, type Dimension, type LotRecord, type StrainTrial } from '../lib/records'
 import { closeTrial, createTrial, bulkLots, logPins } from '../lib/recordsActions'
+import { usePracticeEditor } from '../store/usePractice'
+import { TEST_FLUSH_MAX } from '../lib/bank'
 
 // PRODUCTION RECORDS: the flush log with BE% per lot and per flush, the strain scorecard (with the fading-strain
 // warning), and side-by-side strain trials.
 
-export type YieldTab = 'FLUSHES' | 'SCORECARD' | 'TRIALS' | 'GUESSES'
-export const YIELD_TABS: YieldTab[] = ['FLUSHES', 'SCORECARD', 'TRIALS', 'GUESSES']
-const TAB_LABEL: Record<YieldTab, string> = { FLUSHES: 'FLUSH LOG', SCORECARD: 'SCORECARD', TRIALS: 'STRAIN TRIALS', GUESSES: 'GUESSES' }
+export type YieldTab = 'FLUSHES' | 'FLUSHTEST' | 'SCORECARD' | 'TRIALS' | 'GUESSES'
+export const YIELD_TABS: YieldTab[] = ['FLUSHES', 'FLUSHTEST', 'SCORECARD', 'TRIALS', 'GUESSES']
+const TAB_LABEL: Record<YieldTab, string> = { FLUSHES: 'FLUSH LOG', FLUSHTEST: 'FLUSH TEST', SCORECARD: 'SCORECARD', TRIALS: 'STRAIN TRIALS', GUESSES: 'GUESSES' }
 export interface YieldState {
   tab: YieldTab
   lot: string | null
@@ -88,6 +90,7 @@ export function Yield({ x, set, say }: { x: YieldState; set: SetYield; say: Say 
         </Select>
       </label>
       {x.tab === 'FLUSHES' && <Flushes r={r} x={x} set={set} say={say} />}
+      {x.tab === 'FLUSHTEST' && <FlushTestTab r={r} x={x} set={set} say={say} />}
       {x.tab === 'SCORECARD' && <Score r={r} x={x} set={set} />}
       {x.tab === 'TRIALS' && <Trials r={r} x={x} set={set} say={say} />}
       {x.tab === 'GUESSES' && <Guesses />}
@@ -396,10 +399,97 @@ function TrialView({ t, r, say }: { t: StrainTrial; r: Recs; say: Say }) {
   )
 }
 
+// ---------- FLUSH TEST ----------
+
+function FlushTestTab({ r, x, set, say }: { r: Recs; x: YieldState; set: SetYield; say: Say }) {
+  const { sound } = useApp()
+  const [p, save] = usePracticeEditor()
+  const species = useMemo(() => {
+    const have = new Set(r.recs.map((l) => l.lot.species_key))
+    return SPECIES.filter((s) => have.has(s.id)).map((s) => s.id)
+  }, [r.recs])
+  if (!species.length)
+    return (
+      <div className="ck-box">
+        <div className="section-title">FLUSH TEST</div>
+        <div className="dim">NO BLOCK LOTS YET. EVERY CROP STARTS IN TEST: LOG EVERY FLUSH, MARK THE LOT SPENT WHEN THE BLOCKS STOP, AND THIS PAGE SHOWS WHAT EACH FLUSH ADDS.</div>
+      </div>
+    )
+  const sp = x.species && species.includes(x.species) ? x.species : species[0]
+  const t = flushTest(r.recs, sp)
+  const committed = p.flushPlan[sp]
+  const commit = async (n: number | null) => {
+    const plan = { ...p.flushPlan }
+    if (n === null) delete plan[sp]
+    else plan[sp] = n
+    const label = n === null ? `${speciesLabel(sp).toUpperCase()} BACK IN FLUSH TEST` : `${speciesLabel(sp).toUpperCase()}: ${n} FLUSH${n > 1 ? 'ES' : ''} COMMITTED`
+    try {
+      await save({ flushPlan: plan }, label)
+      sound.confirm()
+      say(label)
+    } catch (e) {
+      say(e instanceof Error ? e.message : String(e), true)
+    }
+  }
+  return (
+    <div className="lg-stack">
+      <div className="ck-box">
+        <div className="section-title">FLUSH TEST // HOW MANY FLUSHES IS EACH CROP WORTH?</div>
+        <div className="lg-btns">
+          {species.map((k) => (
+            <button key={k} type="button" className={`btn${k === sp ? ' on' : ''}`} onClick={() => (sound.chirp(), set({ species: k }))}>
+              {speciesLabel(k).toUpperCase()} {p.flushPlan[k] ? `(${p.flushPlan[k]})` : '(TEST)'}
+            </button>
+          ))}
+        </div>
+        <div className="dim tiny">
+          {committed
+            ? `${speciesLabel(sp).toUpperCase()} IS COMMITTED TO ${committed} FLUSH${committed > 1 ? 'ES' : ''}. A LOT IS FINISHED AFTER THAT MANY.`
+            : `${speciesLabel(sp).toUpperCase()} IS IN TEST. LOTS STAY OPEN FOR UP TO ${TEST_FLUSH_MAX} FLUSHES. MARK A LOT SPENT IN MISSION CONTROL WHEN ITS BLOCKS STOP.`}
+        </div>
+      </div>
+      <div className="ck-box">
+        <div className="section-title">WHAT EACH FLUSH GIVES // {t.finished} FINISHED LOT{t.finished === 1 ? '' : 'S'}{t.open ? `, ${t.open} STILL PICKING` : ''}</div>
+        {t.rows.length ? (
+          <div className="rc-wrap">
+            <table className="lg-table rc-table">
+              <thead><tr><th>FLUSH</th><th>LOTS</th><th>KG/BLK</th><th>VS FLUSH 1</th><th>SHARE</th><th>DAYS AFTER</th></tr></thead>
+              <tbody>
+                {t.rows.map((row) => (
+                  <tr key={row.flush}>
+                    <td>{row.flush}</td>
+                    <td>{row.lots}</td>
+                    <td>{kgFmt(row.kgPerBlock, 2)}</td>
+                    <td>{pctFmt(row.vsFirstPct)}</td>
+                    <td>{pctFmt(row.sharePct)}</td>
+                    <td>{row.gapDays === null ? '-' : Math.round(row.gapDays)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="dim">NO FINISHED LOT YET. KEEP LOGGING EVERY FLUSH, THEN MARK THE LOT SPENT.</div>
+        )}
+        <div className="dim tiny">
+          {t.suggest === null ? 'A SUGGESTION SHOWS ONCE 3 LOTS ARE FINISHED.' : `SUGGESTED: ${t.suggest} FLUSH${t.suggest > 1 ? 'ES' : ''} (EACH ONE STILL GIVES AT LEAST 15% OF FLUSH 1).`} <Guess />
+        </div>
+        <div className="lg-btns">
+          {Array.from({ length: TEST_FLUSH_MAX }, (_, i) => i + 1).map((n) => (
+            <button key={n} type="button" className={`btn${committed === n ? ' on' : ''}`} onClick={() => void commit(n)}>COMMIT {n}</button>
+          ))}
+          {committed !== undefined && <button type="button" className="btn" onClick={() => void commit(null)}>BACK TO TEST</button>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const GUESS_LIST = [
   `Dry substrate per block is ${BLOCK_DRY_LB} lb (your 10 lb block: 4 lb dry, 6 lb water). BE% = fresh kg / dry kg. A lot can carry its own dry weight.`,
   'BE% uses blocks still alive now. Blocks lost after a flush was picked lower the later figures slightly.',
-  'A lot is FINISHED when every flush the species gets is picked (oysters 1, lion\'s mane 2, others 1) or you mark it spent. Only finished lots feed KG/BLK and BE% in the scorecard.',
+  'A lot is FINISHED when you mark it SPENT, or when it has picked every flush: the count you committed in FLUSH TEST, or 4 while the species is still in test. Only finished lots feed KG/BLK and BE% in the scorecard.',
+  'FLUSH TEST suggests the most flushes where each one still gives at least 15% of flush 1\'s kg per block, once 3 lots are finished. The 15% is a guess; you commit the number yourself.',
   'FADING = the newest 3 finished lots of a strain average at least 15% lower BE% than its earlier finished lots (needs 5 finished lots). The 15% is shared with the culture bank slipping rule.',
   'Lost% counts every logged loss on a lot, not only contamination, divided by blocks knocked.',
   'Days to pins counts from the knock day to the day you log pins for flush 1. Pin days are logged by hand on this screen.',

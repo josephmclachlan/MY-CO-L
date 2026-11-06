@@ -53,6 +53,7 @@ const FIELD_TEXT: Record<keyof Practice, { label: string; unit?: string; months?
   slowerPct: { label: 'WATCH IF SLOWER THAN BASELINE BY', unit: '%' },
   yieldDropPct: { label: 'SLIPPING IF YIELD DROPS BY', unit: '%' },
   buyerCapPct: { label: 'ONE BUYER CAP, SHARE OF WEEKLY ORDERS', unit: '%' },
+  flushPlan: { label: 'FLUSHES PER SPECIES (SET IN PRODUCTION RECORDS > FLUSH TEST)' },
 }
 
 const ROUTES = [

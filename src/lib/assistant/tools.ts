@@ -531,7 +531,7 @@ const logHarvest: Tool = {
     species: { type: 'string', desc: 'species, only when no lot code was given' },
     kg: { type: 'number', desc: 'kilograms picked' },
     flush: { type: 'number', desc: 'flush number 1-9 (leave out: the next flush)' },
-    grade: { type: 'string', desc: 'A, B or SECONDS (default A)' },
+    grade: { type: 'string', desc: 'A or SECONDS (default A)' },
     initials: { type: 'string', desc: "picker's initials" },
     day: { type: 'string', desc: 'today, yesterday or yyyy-mm-dd (default today)' },
   },

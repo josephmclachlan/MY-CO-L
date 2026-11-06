@@ -5,13 +5,15 @@
 //  - Days from knock to first harvest and lb per block: Catawba's real picks (species JSON, `cat`).
 //  - Move to fruiting: the species' "Block incubation" days in the textbook; first day of the range
 //    opens the window, last day is late. No range stated = 14 days, tagged GUESS.
-//  - Flushes: oysters 1, lion's mane 2 (Joseph's farm facts). Others: 1, tagged GUESS.
+//  - Flushes: every species is IN TEST (up to TEST_FLUSH_MAX, lot finished when marked SPENT) until you commit a
+//    count in PRODUCTION RECORDS > FLUSH TEST (Joseph 6 Nov 2026).
 
 import { SPECIES } from '../data/species'
 import { addDays, daysBetween, mmdd, todayIso, LOT_LETTER, cultureAge, grainAge, isActiveCulture, type BlockLot, type Culture, type GrainRun, type Strain } from './xeno'
 import type { Harvest } from './ledger'
 import type { LotLoss } from './hazard'
 import { LB_TO_KG } from './runplan'
+import { TEST_FLUSH_MAX } from './bank'
 
 export const MOVE_FALLBACK_DAYS = 14
 
@@ -23,7 +25,16 @@ export interface Expect {
   moveGuess: boolean
   flushes: number
   flushGuess: boolean
+  /** No flush count committed yet: lots stay open for more flushes until marked SPENT. */
+  flushTest: boolean
   src: string
+}
+
+// The committed flush count per species, from PRACTICE (PRODUCTION RECORDS > FLUSH TEST). Kept live like rates().
+let flushPlan: Record<string, number> = {}
+export const liveFlushPlan = () => flushPlan
+export function setLiveFlushPlan(p: Record<string, number>) {
+  flushPlan = p
 }
 
 export function expectFor(speciesKey: string): Expect {
@@ -31,7 +42,8 @@ export function expectFor(speciesKey: string): Expect {
   const inc = sp?.timeline.find((f) => f.k === 'Block incubation' && f.d)
   const open = inc?.d ? inc.d[0] : MOVE_FALLBACK_DAYS
   const late = inc?.d ? inc.d[1] : MOVE_FALLBACK_DAYS
-  const flushes = speciesKey === 'lions-mane' ? 2 : 1
+  const committed = flushPlan[speciesKey]
+  const flushes = committed ?? TEST_FLUSH_MAX
   return {
     firstDays: sp?.cat ? Math.round(sp.cat.d) : null,
     kgPerBlock: sp?.cat ? sp.cat.lb * LB_TO_KG : null,
@@ -39,7 +51,8 @@ export function expectFor(speciesKey: string): Expect {
     moveLate: late,
     moveGuess: !inc?.d,
     flushes,
-    flushGuess: !(speciesKey === 'lions-mane' || /oyster|black-pearl/.test(speciesKey)),
+    flushGuess: false,
+    flushTest: committed === undefined,
     src: sp?.cat ? 'CATAWBA REAL PICKS' : 'NO DATA',
   }
 }

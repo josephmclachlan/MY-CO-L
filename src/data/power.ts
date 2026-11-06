@@ -194,13 +194,13 @@ export const MAIN: Circuit[] = [
 export const SUB: Circuit[] = [
   {
     id: 's1', tag: 'S1', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'FOGEL 3-DOOR COLD ROOM 1', short: 'COLD ROOM 1', note: 'Compressor load. Put a voltage protector on it.',
-    items: [it('fogel1', 'Fogel 3-door cold room 1', 1, 800, 'packing')],
+    name: 'FOGEL 3-DOOR COLD ROOM 1', short: 'COLD ROOM 1', note: 'Compressor load. Put a voltage protector on it. Sits outside under the roof, by the fruiting room door (Joseph, 6 Nov 2026).',
+    items: [it('fogel1', 'Fogel 3-door cold room 1', 1, 800, 'outside', true, false)],
   },
   {
     id: 's2', tag: 'S2', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'FOGEL 3-DOOR COLD ROOM 2', short: 'COLD ROOM 2', note: 'Start 5-10 s after cold room 1.',
-    items: [it('fogel2', 'Fogel 3-door cold room 2', 1, 800, 'packing')],
+    name: 'FOGEL 3-DOOR COLD ROOM 2', short: 'COLD ROOM 2', note: 'Start 5-10 s after cold room 1. Outside under the roof, by the fruiting room door.',
+    items: [it('fogel2', 'Fogel 3-door cold room 2', 1, 800, 'outside', true, false)],
   },
   {
     id: 's3', tag: 'S3', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
@@ -230,7 +230,7 @@ export const SUB: Circuit[] = [
     name: 'TAC XL FOGGER + CHEST FRIDGE', short: 'FOGGER + FRIDGE', note: 'Fogger about 300 W (est), chest fridge 150 W.',
     items: [
       it('tac', 'TAC Misting XL sonic fogger', 1, 300, 'fruiting'),
-      it('chest', 'Square chest fridge (lab fridge)', 1, 150, 'lab'),
+      it('chest', 'Square chest fridge (culture fridge, on the generator list: Joseph 6 Nov 2026)', 1, 150, 'lab'),
     ],
   },
   {

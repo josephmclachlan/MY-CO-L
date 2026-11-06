@@ -167,22 +167,27 @@ export const STRAIN_PREFIX: Record<string, string> = {
   cordyceps: 'CM',
 }
 
-/** Lot code letter (species letter + knock MMDD). B is Catawba's; the rest are a first guess, editable on each lot. */
+/**
+ * Lot code letters (species letters + knock MMDD), Catawba's scheme (Joseph, 6 Nov 2026):
+ * B blue, L lion's mane, CT coral/comb tooth, Y golden (yellow), X Italian = phoenix (P. pulmonarius),
+ * PK pink, BK black pearl, KG king, C chestnut, P pioppino, GF maitake (grifola).
+ * Catawba grows no shiitake, reishi or cordyceps: SH, RS and CM are ours (same as the strain prefixes).
+ */
 export const LOT_LETTER: Record<string, string> = {
   'blue-oyster': 'B',
   'lions-mane': 'L',
-  'comb-tooth': 'C',
-  'golden-oyster': 'G',
-  'phoenix-oyster': 'P',
-  'pink-oyster': 'K',
-  'black-pearl': 'N',
-  'king-oyster': 'E',
-  chestnut: 'A',
-  pioppino: 'O',
-  shiitake: 'S',
-  maitake: 'M',
-  reishi: 'R',
-  cordyceps: 'Y',
+  'comb-tooth': 'CT',
+  'golden-oyster': 'Y',
+  'phoenix-oyster': 'X',
+  'pink-oyster': 'PK',
+  'black-pearl': 'BK',
+  'king-oyster': 'KG',
+  chestnut: 'C',
+  pioppino: 'P',
+  shiitake: 'SH',
+  maitake: 'GF',
+  reishi: 'RS',
+  cordyceps: 'CM',
 }
 
 export const speciesOf = (key: string): Species | undefined => SPECIES.find((s) => s.id === key)

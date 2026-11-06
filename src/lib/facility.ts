@@ -647,7 +647,7 @@ export const STANDARD_MAINT: StdMaint[] = [
   { name: 'HEPA PRESSURE + FILTER CHECK', category: 'air', room: 'lab', days: 90, hours: null, note: 'Read the pressure drop; replace the HEPA when it is past the maker limit.' },
   { name: 'MINI-SPLIT FILTERS WASH', category: 'air', room: null, days: 30, hours: null, note: 'All Lennox units. Humid air loads filters fast.' },
   { name: 'MINI-SPLIT COILS + DRAIN LINES', category: 'air', room: null, days: 180, hours: null, note: 'Clear drain lines: algae blocks them in humid rooms.' },
-  { name: 'COLD ROOM + FRIDGE COILS CLEAN', category: 'cold', room: 'packing', days: 90, hours: null, note: 'Fogel cold rooms and reach-in fridges.' },
+  { name: 'COLD ROOM + FRIDGE COILS CLEAN', category: 'cold', room: 'outside', days: 90, hours: null, note: 'Fogel cold rooms (outside under the roof, by the fruiting door) and reach-in fridges.' },
   { name: 'CO2 METERS CALIBRATE', category: 'air', room: null, days: 180, hours: null, note: 'All CO2Meter units against fresh outdoor air or a reference.' },
   { name: 'STEAM GENERATOR DESCALE', category: 'steam', room: 'boiling', days: 60, hours: null, note: 'Sooner if the water test shows hard water.' },
   { name: 'STEAM BOX DOOR SEAL CHECK', category: 'steam', room: 'boiling', days: 90, hours: null, note: 'Look for cracks, flat spots, steam leaks at the corners.' },

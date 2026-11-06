@@ -53,6 +53,11 @@ export interface Practice {
   yieldDropPct: number
   /** One buyer's share of a week's standing orders (by value) above which the order list marks them, % (Joseph 6 Nov 2026: 30%, unconfirmed). */
   buyerCapPct: number
+  /**
+   * Flushes per species once you commit (Joseph 6 Nov 2026: test multiple flushes on every crop first).
+   * A species missing here is IN TEST: its lots stay open for up to TEST_FLUSH_MAX flushes until marked SPENT.
+   */
+  flushPlan: Record<string, number>
 }
 
 export const PRACTICE_ID = 'practice'
@@ -73,23 +78,30 @@ export const DEFAULT_PRACTICE: Practice = {
   slowerPct: 25,
   yieldDropPct: 15,
   buyerCapPct: 30,
+  flushPlan: {},
 }
 
 /** Which defaults are guesses waiting on Joseph (shown on screen and in the PR). */
 export const PRACTICE_GUESS: Partial<Record<keyof Practice, string>> = {
-  spareBlockPct: 'GUESS: 5% (ABOUT 7 OF 130). THE TEXTBOOK SAYS KEEP SPARES BUT GIVES NO NUMBER.',
-  spareMasters: 'TEXTBOOK SAYS 1-2 A WEEK, BUT TWO 75X RUNS HAVE NO FREE SLOT, SO 0 UNTIL THE FIRST RUN IS MEASURED.',
-  bagsPer75xRun: 'OPEN: 5-6 G2 BAGS A LOAD. 4 LB MASTERS MAY LET MORE FIT. MEASURE THE FIRST RUN.',
-  bankSlants: 'TEXTBOOK SAYS 3-5. 4 PICKED.',
-  bankWater: 'TEXTBOOK SAYS 3-5. 4 PICKED.',
-  slowerPct: 'GUESS: THE TEXTBOOK SAYS "CLEARLY SLOWER" WITHOUT A NUMBER.',
-  yieldDropPct: 'GUESS: NO SOURCE GIVES A NUMBER FOR A SLIPPING STRAIN.',
-  buyerCapPct: 'JOSEPH SAID 30% BUT MARKED IT UNCONFIRMED. THE TEXTBOOK SAYS ONLY "ONE-BUYER CAP".',
+  bagsPer75xRun: 'CONFIRMED 6 FOR NOW (JOSEPH, 6 NOV 2026). CHANGE IT AFTER THE FIRST REAL RUN.',
 }
 
 const num = (v: unknown, d: number, lo: number, hi: number) => {
   const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN
   return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : d
+}
+
+/** Max flushes a lot IN TEST can log before it counts as finished (mark SPENT sooner when the blocks stop). */
+export const TEST_FLUSH_MAX = 4
+
+function mergeFlushPlan(v: unknown): Record<string, number> {
+  const out: Record<string, number> = {}
+  if (v && typeof v === 'object')
+    for (const [k, n] of Object.entries(v as Record<string, unknown>)) {
+      const f = typeof n === 'number' ? Math.round(n) : NaN
+      if (f >= 1 && f <= TEST_FLUSH_MAX) out[k] = f
+    }
+  return out
 }
 
 /** Saved settings over the defaults. Bad or missing values fall back; nothing throws. */
@@ -114,6 +126,7 @@ export function mergePractice(v: unknown): Practice {
     slowerPct: num(o.slowerPct, d.slowerPct, 1, 200),
     yieldDropPct: num(o.yieldDropPct, d.yieldDropPct, 1, 90),
     buyerCapPct: num(o.buyerCapPct, d.buyerCapPct, 5, 100),
+    flushPlan: mergeFlushPlan(o.flushPlan),
   }
 }
 

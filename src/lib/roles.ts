@@ -76,14 +76,14 @@ export async function hashPin(pin: string, saltHex: string): Promise<string> {
 }
 export const newSalt = () => hex(crypto.getRandomValues(new Uint8Array(16)).buffer as ArrayBuffer)
 
-export const PIN_MIN = 4
-export const PIN_MAX = 12
+export const PIN_MIN = 8 // Joseph 6 Nov 2026: an 8-digit PIN
+export const PIN_MAX = 8
 export const PIN_TRIES = 5
 export const PIN_WAIT_MS = 30000
 export const validPin = (pin: string) => /^\d+$/.test(pin) && pin.length >= PIN_MIN && pin.length <= PIN_MAX
 
 export async function setOwnerPin(pin: string, kv: KV | null = ls()): Promise<DeviceLock> {
-  if (!validPin(pin)) throw new Error(`THE PIN IS ${PIN_MIN} TO ${PIN_MAX} DIGITS.`)
+  if (!validPin(pin)) throw new Error(PIN_MIN === PIN_MAX ? `THE PIN IS ${PIN_MIN} DIGITS.` : `THE PIN IS ${PIN_MIN} TO ${PIN_MAX} DIGITS.`)
   const salt = newSalt()
   const d: DeviceLock = { ...loadLock(kv), salt, hash: await hashPin(pin, salt), fails: 0, until: 0 }
   saveLock(d, kv)

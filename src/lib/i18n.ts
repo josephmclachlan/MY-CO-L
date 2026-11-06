@@ -15,7 +15,12 @@
 import { ES } from './es'
 
 export type Lang = 'EN' | 'ES'
-export const LANGS: Lang[] = ['EN', 'ES']
+/**
+ * Spanish is switched OFF for now (Joseph, 6 Nov 2026: "I am the only user, all English"). The table and the
+ * t() wrappers stay, so turning this back to true brings Spanish back with nothing else to change.
+ */
+export const SPANISH_ON = false
+export const LANGS: Lang[] = SPANISH_ON ? ['EN', 'ES'] : ['EN']
 export const LANG_NAME: Record<Lang, string> = { EN: 'ENGLISH', ES: 'ESPAÑOL' }
 
 export function tr(lang: Lang, s: string): string {
@@ -32,7 +37,7 @@ export function trf(lang: Lang, s: string, vars: Record<string, string | number>
 export const placeholders = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort()
 
 export function normLang(v: unknown): Lang {
-  return v === 'ES' ? 'ES' : 'EN'
+  return SPANISH_ON && v === 'ES' ? 'ES' : 'EN'
 }
 
 /** Spanish words typed at the > prompt that mean an English command. The screens' own command list stays English. */

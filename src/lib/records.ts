@@ -466,3 +466,69 @@ export function planSplit(lot: BlockLot, losses: LotLoss[], harvests: Harvest[],
 }
 
 export const speciesLabel = (key: string) => SPECIES.find((s) => s.id === key)?.name ?? key.toUpperCase()
+
+// ---------- FLUSH TEST (Joseph 6 Nov 2026: test multiple flushes on every crop before committing) ----------
+
+export interface FlushTestRow {
+  flush: number
+  /** Finished lots that picked anything on this flush. */
+  lots: number
+  /** Average kg per block on this flush across ALL finished lots (a lot with no pick on it counts 0). */
+  kgPerBlock: number
+  /** This flush as a share of the species' total kg on finished lots. */
+  sharePct: number
+  /** This flush's kg per block as a share of flush 1's. */
+  vsFirstPct: number | null
+  /** Average days from the first pick of the flush before to the first pick of this one. */
+  gapDays: number | null
+}
+
+export interface FlushTest {
+  species: string
+  finished: number
+  open: number
+  rows: FlushTestRow[]
+  /** Smallest flush count that keeps every flush adding at least `minAddPct` of flush 1. Null until 3 finished lots. */
+  suggest: number | null
+}
+
+/** Lots count once FINISHED (spent, or all the allowed flushes picked). Lost lots are left out. */
+export function flushTest(recs: LotRecord[], species: string, minAddPct = 15, minLots = 3): FlushTest {
+  const mine = recs.filter((r) => r.lot.species_key === species && r.lot.status !== 'lost')
+  const done = mine.filter((r) => r.complete && r.blocks > 0)
+  const open = mine.filter((r) => !r.complete && r.kg > 0).length
+  const maxF = Math.max(0, ...done.flatMap((r) => r.flushes.filter((f) => f.picks > 0).map((f) => f.flush)))
+  const total = done.reduce((n, r) => n + r.kg, 0)
+  const rows: FlushTestRow[] = []
+  for (let f = 1; f <= maxF; f++) {
+    const per = done.map((r) => r.flushes.find((x) => x.flush === f))
+    const kgPb = done.reduce((n, r, i) => n + (per[i] && per[i]!.picks > 0 ? per[i]!.kg / r.blocks : 0), 0) / (done.length || 1)
+    const kg = done.reduce((n, _r, i) => n + (per[i]?.kg ?? 0), 0)
+    const gaps: number[] = []
+    if (f > 1)
+      done.forEach((r) => {
+        const a = r.flushes.find((x) => x.flush === f - 1)?.firstPick
+        const b = r.flushes.find((x) => x.flush === f)?.firstPick
+        if (a && b) gaps.push(daysBetween(a, b))
+      })
+    rows.push({
+      flush: f,
+      lots: per.filter((p) => p && p.picks > 0).length,
+      kgPerBlock: kgPb,
+      sharePct: total > 0 ? (kg / total) * 100 : 0,
+      vsFirstPct: null,
+      gapDays: gaps.length ? gaps.reduce((a, b) => a + b, 0) / gaps.length : null,
+    })
+  }
+  const first = rows[0]?.kgPerBlock ?? 0
+  for (const r of rows) r.vsFirstPct = first > 0 ? (r.kgPerBlock / first) * 100 : null
+  let suggest: number | null = null
+  if (done.length >= minLots && rows.length) {
+    suggest = 1
+    for (const r of rows.slice(1)) {
+      if ((r.vsFirstPct ?? 0) >= minAddPct) suggest = r.flush
+      else break
+    }
+  }
+  return { species, finished: done.length, open, rows, suggest }
+}
