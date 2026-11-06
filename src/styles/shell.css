@@ -84,3 +84,49 @@ body.gl-open .main-panel { padding-bottom: var(--gl-pad, 330px); }
 .fkey { min-width: 0; }
 .fkey .flabel { max-width: 100%; overflow: hidden; text-overflow: clip; }
 html[lang='es'] .fkey .flabel { font-size: 0.56em; }
+
+/* ---------- tooltips (G11) ---------- */
+.tips-btn { font: inherit; color: var(--fg); background: transparent; border: 1px solid var(--fg-dim); padding: 0 8px; cursor: pointer; letter-spacing: 0.08em; white-space: nowrap; line-height: 1.5; }
+.tips-btn:hover, .tips-btn:focus-visible, .tips-btn.on { background: var(--fg); color: var(--bg); text-shadow: none; }
+.glove .tips-btn { min-height: 46px; }
+.tip-bubble {
+  position: fixed; z-index: 90; box-sizing: border-box; max-width: min(340px, calc(100vw - 16px)); padding: 7px 10px;
+  background: var(--bg); color: var(--fg); border: 1px solid var(--fg); box-shadow: 0 0 calc(12px * var(--glow-k, 1)) var(--glow);
+  font-size: 0.88em; line-height: 1.35; letter-spacing: 0.03em; pointer-events: none; overflow-wrap: anywhere;
+}
+.tip-bubble.sticky { pointer-events: auto; }
+.tip-bubble.none .tip-text { color: var(--fg-dim); }
+.tip-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.tip-actions button { font: inherit; font-size: 0.92em; color: var(--fg); background: transparent; border: 1px solid var(--fg-dim); padding: 4px 8px; min-height: 34px; cursor: pointer; letter-spacing: 0.06em; }
+.tip-actions button:hover, .tip-actions button:focus-visible { background: var(--fg); color: var(--bg); text-shadow: none; outline: none; }
+.glove .tip-actions button { min-height: 46px; }
+
+/* ---------- user guide (G11) ---------- */
+.guide { display: grid; gap: 10px; max-width: 78ch; }
+.gd-bar { display: grid; gap: 8px; }
+.gd-find { display: grid; gap: 3px; }
+.gd-find span { font-size: 0.8em; letter-spacing: 0.1em; color: var(--fg-dim); }
+.gd-find input { font: inherit; color: var(--fg); background: var(--bg-hi); border: 1px solid var(--fg-dim); padding: 6px 8px; min-height: 36px; min-width: 0; }
+.gd-find input:focus-visible { outline: none; border-color: var(--fg); box-shadow: 0 0 0 1px var(--fg); }
+.gd-pick { display: none; }
+@media (max-width: 700px) { .gd-pick { display: block; } }
+.index-list li.gd-group { cursor: default; color: var(--fg-dim); letter-spacing: 0.12em; font-size: 0.8em; padding-top: 8px; pointer-events: none; }
+.gd-title { margin: 4px 0 0; font-size: 1.25em; letter-spacing: 0.1em; font-weight: normal; overflow-wrap: anywhere; }
+.gd-what { margin: 2px 0 6px; color: var(--fg-dim); }
+.gd-page { display: grid; gap: 10px; }
+.gd-page p, .gd-page li, .gd-page dd, .gd-page dt { line-height: 1.5; letter-spacing: 0.02em; overflow-wrap: anywhere; }
+.gd-page p { margin: 0 0 6px; }
+.gd-block { border-top: 1px dashed var(--fg-faint); padding-top: 8px; }
+.gd-block h3 { margin: 0 0 6px; font-size: 1em; font-weight: normal; letter-spacing: 0.14em; color: var(--fg); }
+.gd-block ol { margin: 0; padding-left: 1.6em; display: grid; gap: 4px; }
+.gd-block dl { margin: 0; display: grid; gap: 4px; }
+.gd-row { display: grid; grid-template-columns: minmax(8em, 14em) minmax(0, 1fr); gap: 2px 12px; }
+.gd-row dt { color: var(--fg); font-weight: bold; margin: 0; }
+.gd-row dd { margin: 0; }
+@media (max-width: 700px) { .gd-row { grid-template-columns: minmax(0, 1fr); } }
+.gd-open { justify-self: start; }
+.gd-next { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; border-top: 1px dashed var(--fg-faint); padding-top: 10px; }
+.gd-results { display: grid; gap: 6px; }
+.gd-hit { display: grid; gap: 2px; text-align: left; font: inherit; color: var(--fg); background: transparent; border: 0; border-left: 2px solid var(--fg-dim); padding: 4px 8px; cursor: pointer; min-height: 40px; overflow-wrap: anywhere; }
+.gd-hit span { color: var(--fg-dim); font-size: 0.9em; }
+.gd-hit:hover, .gd-hit:focus-visible { background: var(--bg-hi); outline: none; }

@@ -100,6 +100,17 @@ Modules 1 and 4-9 show "NOT YET INSTALLED" until their build threads land.
   farm PC) set on ASK > ENGINE. No cloud model, no API key. Details and model sizes: [docs/ASSISTANT.md](docs/ASSISTANT.md).
 - Migration `0017` lets the edit history record the ASSISTANT source.
 
+## User guide and tooltips (module 23, build G11)
+
+- **USER GUIDE** (module 23, or type `GUIDE`): plain-English pages for every screen, the keys, saving and UNDO, plus words and
+  what to do when something goes wrong. Type `GUIDE VITALS` (or any screen) for that page. It has its own search box.
+  The same text is the printable file [docs/USER-MANUAL.md](docs/USER-MANUAL.md). Edit the pages in `src/guide/pages-*.ts`,
+  then run `npm run docs:guide` (a test fails if the file is out of step).
+- **Tooltips** on every control: rest the mouse on it, move to it with the keyboard, or on a phone tap **? TIPS** in the status
+  line and then tap the control (it shows its note instead of pressing). Esc or ? TIPS again leaves tip mode. Tip text is in
+  `src/guide/tips.ts` by label; `data-tip` on an element overrides it. `guide.test.ts` checks every key can match.
+- Public build: yes. It is about the app, not the textbook; the textbook still stays in the private copy only.
+
 ## Setting it up
 
 Step-by-step, no git commands needed: **[docs/SETUP.md](docs/SETUP.md)**.

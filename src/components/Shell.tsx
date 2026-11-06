@@ -30,6 +30,19 @@ interface Props {
   undo?: ReactNode
   /** Glove mode badge (tap to switch it off). */
   glove?: ReactNode
+  /** The ? TIPS button. */
+  tips?: ReactNode
+}
+
+const FKEY_TIP: Record<number, string> = {
+  1: 'F1: the short list of commands and keys.',
+  2: 'F2: the main menu.',
+  3: 'F3: look and sound settings.',
+  4: 'F4: switch all sound off, or back on.',
+  5: 'F5: change the screen colour.',
+  6: 'F6: sunlight mode (CLEAN) or the glass look (GLASS).',
+  7: 'F7: replay the start-up text.',
+  8: 'F8: log in to or out of the database.',
 }
 
 function useClock() {
@@ -43,7 +56,7 @@ function useClock() {
 }
 
 /** The frame every screen shares: title bar, status line, index column, prompt, hint line and F-key bar. */
-export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack, lamp, undo, glove }: Props) {
+export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack, lamp, undo, glove, tips }: Props) {
   const { settings, sound, session } = useApp()
   const { t } = useT()
   const clock = useClock()
@@ -98,6 +111,7 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
         <span>{settings.look.clean ? t('CLEAN') : settings.look.theme}</span>
         {lamp && <span className="sl-lamp">{lamp}</span>}
         {glove}
+        {tips}
         {undo}
       </div>
       <div className={`body ${index ? 'has-index' : ''} ${bodyClass ?? ''}`}>
@@ -142,6 +156,7 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
           <button
             key={k.f}
             type="button"
+            data-tip={FKEY_TIP[k.f] ?? ''}
             className={`fkey ${k.f > 4 ? 'fkey-extra' : ''} ${k.active ? 'active' : ''}`}
             onClick={() => {
               setMore(false)
@@ -152,7 +167,7 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
             <span className="flabel">{k.label}</span>
           </button>
         ))}
-        <button type="button" className={`fkey fkey-more ${more ? 'active' : ''}`} aria-expanded={more} onClick={() => setMore((m) => !m)}>
+        <button type="button" data-tip={t('Show or hide the other four function keys, F5 to F8.')} className={`fkey fkey-more ${more ? 'active' : ''}`} aria-expanded={more} onClick={() => setMore((m) => !m)}>
           <span className="fnum">F5-F8</span>
           <span className="flabel">{t(more ? 'LESS' : 'MORE')}</span>
         </button>

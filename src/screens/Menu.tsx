@@ -10,7 +10,7 @@ import { useNag } from './Data'
 /** Own little sign per module, in the spirit of the door-sign set. Original shapes only. */
 const GLYPHS: Record<string, string> = {
   SPECIMEN: '\u25C8', VITALS: '\u25B2', DECK: '\u25A3', CARGO: '\u25A4', XENO: '\u2B21',
-  HAZARD: '\u26A0', PROPULSION: '\u224B', LEDGER: '\u25EB', TRADE: '\u21C4', SEQUENCE: '\u25A6', MANUAL: '\u25A5', HISTORY: '\u21BA', YIELD: '\u2261', ORDERS: '\u21BB', MONEY: '\u20A1', FACILITY: '\u2316', ATMOS: '\u223F', SEARCH: '\u2315', DATA: '\u25A8', STAFF: '\u2B22',
+  HAZARD: '\u26A0', PROPULSION: '\u224B', LEDGER: '\u25EB', TRADE: '\u21C4', SEQUENCE: '\u25A6', MANUAL: '\u25A5', HISTORY: '\u21BA', YIELD: '\u2261', ORDERS: '\u21BB', MONEY: '\u20A1', FACILITY: '\u2316', ATMOS: '\u223F', SEARCH: '\u2315', DATA: '\u25A8', STAFF: '\u2B22', ASK: '\u2370', GUIDE: '\u25CE',
 }
 
 /** Rotating prompt line for return visits to the menu. Original wording. */
@@ -78,6 +78,7 @@ export function Menu({ selected, setSelected, onOpen, firstShow }: Props) {
                 aria-selected={i === selected}
                 className={`menu-item ${i === selected ? 'sel' : ''}`}
                 tabIndex={0}
+                data-tip={`${t(m.name)}: ${t(m.what)}`}
                 onFocus={() => setSelected(i)}
                 onMouseEnter={() => setSelected(i)}
                 onClick={() => onOpen(i)}

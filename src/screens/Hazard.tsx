@@ -383,7 +383,7 @@ export function HazardIndex({ x, set }: { x: HazardState; set: SetHazard }) {
             {list.filter((h) => h.kind === k).map((h) => {
               const c = counts.get(h.id)
               return (
-                <li tabIndex={0} key={h.id} className={x.mode === 'file' && h.id === x.id ? 'sel' : ''} onClick={() => (sound.chirp(), set({ mode: 'file', id: h.id, tab: x.id === h.id ? x.tab : 'SPOT' }))}>
+                <li tabIndex={0} key={h.id} data-tip="Open this entry: how to spot it, cause, treatment and prevention." className={x.mode === 'file' && h.id === x.id ? 'sel' : ''} onClick={() => (sound.chirp(), set({ mode: 'file', id: h.id, tab: x.id === h.id ? x.tab : 'SPOT' }))}>
                   <span className="hz-li">
                     <HazardGlyph kind={h.kind} size={14} /> {h.name}
                   </span>

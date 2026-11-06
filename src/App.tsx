@@ -33,6 +33,10 @@ import { Ask, AskIndex, ASK_START, type AskState } from './screens/Ask'
 import type { Go } from './lib/search'
 import { Data, DataIndex, DATA_START, type DataState } from './screens/Data'
 import { Staff, StaffIndex } from './screens/Staff'
+import { Guide, GuideIndex, GUIDE_START, type GuideState } from './screens/Guide'
+import { TipLayer, TipsButton } from './components/Tips'
+import { tipModeOn, toggleTipMode, useTipMode } from './guide/tipStore'
+import { guideSectionFor } from './guide/content'
 import { GlovePad } from './components/GlovePad'
 import { useT } from './settings/useT'
 import { useRole } from './settings/RoleContext'
@@ -83,6 +87,7 @@ const SEARCH_IDX = MODULES.findIndex((m) => m.key === 'SEARCH')
 const DATA_IDX = MODULES.findIndex((m) => m.key === 'DATA')
 const STAFF_IDX = MODULES.findIndex((m) => m.key === 'STAFF')
 const ASK_IDX = MODULES.findIndex((m) => m.key === 'ASK')
+const GUIDE_IDX = MODULES.findIndex((m) => m.key === 'GUIDE')
 
 /** Words that start a question or a command for the farm assistant (ASK), when more words follow. */
 const ASK_WORDS = new Set(['ASK', 'HOW', 'WHAT', 'WHATS', "WHAT'S", 'WHO', 'WHOS', "WHO'S", 'WHICH', 'WHEN', 'IS', 'ARE', 'WAS', 'DID', 'DO', 'DOES', 'HAS', 'HAVE', 'ANY', 'TELL', 'SHOW', 'OPEN', 'LIST', 'GIVE', 'LOG', 'ADD', 'RECORD', 'PICKED', 'HARVESTED', 'RECEIVED', 'USED', 'MARK', 'MOVE', 'SET', 'POWER', 'GENERATOR', 'GRID', 'CUANTOS', 'CUANTAS', 'CUANTO', 'QUIEN', 'QUE', 'CUAL'])
@@ -110,6 +115,7 @@ interface Snap {
   srch: SearchState
   dat: DataState
   askS: AskState
+  guide: GuideState
 }
 const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
@@ -168,6 +174,9 @@ export default function App() {
   const setDat = useCallback((p: Partial<DataState>) => setDatState((c) => ({ ...c, ...p })), [])
   const [askS, setAskState] = useState<AskState>(ASK_START)
   const setAsk = useCallback((p: Partial<AskState> | ((c: AskState) => Partial<AskState>)) => setAskState((c) => ({ ...c, ...(typeof p === 'function' ? p(c) : p) })), [])
+  const [guide, setGuideState] = useState<GuideState>(GUIDE_START)
+  const setGuide = useCallback((p: Partial<GuideState>) => setGuideState((c) => ({ ...c, ...p })), [])
+  const tipMode = useTipMode()
   const { t, tf, lang } = useT()
   const roleInfo = useRole()
   const roleRef = useRef(roleInfo)
@@ -182,7 +191,7 @@ export default function App() {
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac, atm, srch, dat, askS }
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac, atm, srch, dat, askS, guide }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -237,6 +246,7 @@ export default function App() {
     setSrchState(s.srch)
     setDatState(s.dat)
     setAskState({ ...s.askS, queued: null })
+    setGuideState(s.guide)
     power.setSelectedRoom(s.room)
     setReply(null)
     setSweep((n) => n + 1)
@@ -380,6 +390,14 @@ export default function App() {
     setAsk(p)
     setSelected(ASK_IDX)
     if (!here) go({ name: 'module', idx: ASK_IDX }, false)
+  }
+  const openGuide = (p: Partial<GuideState>) => {
+    const here = view.name === 'module' && view.idx === GUIDE_IDX
+    if (!here) pushHist()
+    setGuide({ q: '', ...p })
+    setSelected(GUIDE_IDX)
+    if (!here) go({ name: 'module', idx: GUIDE_IDX }, false)
+    else sound.chirp()
   }
   const openModuleKey = (key: string) => {
     const idx = MODULES.findIndex((m) => m.key === key)
@@ -569,6 +587,9 @@ export default function App() {
     },
   })
 
+  /** Which guide page explains the screen being shown. */
+  const guideScreen = view.name === 'module' ? MODULES[view.idx].key : view.name.toUpperCase()
+
   // ---------- commands ----------
 
   const onCommand = (raw: string) => {
@@ -591,6 +612,13 @@ export default function App() {
     const word0 = cmd0.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[?¿]/g, '')
     if (roleInfo.canOpen('ASK') && ((cmd === 'ASK' && arg) || (rest.length > 0 && ASK_WORDS.has(word0)) || (raw.trim().endsWith('?') && raw.trim().length > 2) || (onAsk && /^(Y|YES|N|NO|OK|SI|CONFIRM|CANCEL)$/.test(cmd0))))
       return openAsk({ tab: 'ASK', queued: cmd === 'ASK' ? raw.trim().replace(/^ask\s+/i, '') : raw.trim() })
+    // User guide and tooltips.
+    if (['GUIDE', 'HOWTO', 'USERGUIDE', 'GUIDEBOOK'].includes(cmd)) return openGuide({ sec: arg ? guideSectionFor(arg) : guideScreen })
+    if (['TIPS', 'TIP', 'TOOLTIPS'].includes(cmd)) {
+      toggleTipMode()
+      const on = tipModeOn()
+      return say(t(on ? 'TIP MODE ON' : 'TIP MODE OFF'))
+    }
     if (['BULKEDIT', 'CHANGEMANY', 'MANY', 'STOCKTAKE'].includes(cmd)) return openSearch({ tab: 'BULK', ...(cmd === 'STOCKTAKE' ? { bulk: 'stock' as const, bq: '' } : {}) })
     // Data: BACKUP, EXPORT, RESTORE.
     if (['BACKUP', 'ZIP', 'SAVEDATA'].includes(cmd)) return openData({ tab: 'BACKUP' })
@@ -908,12 +936,12 @@ export default function App() {
     <>
       <div className="section-title">{t('INDEX')}</div>
       <ul className="index-list">
-        <li tabIndex={0} onClick={() => go({ name: 'menu' })}>
+        <li tabIndex={0} data-tip={t('The main menu.')} onClick={() => go({ name: 'menu' })}>
           <span>00 {t('CORE')}</span>
           <span className="k">{t('ONLINE')}</span>
         </li>
         {MODULES.map((m, i) => roleInfo.canOpen(m.key) && (
-          <li tabIndex={0} key={m.key} className={view.name === 'module' && view.idx === i ? 'sel' : ''} onClick={() => (setSelected(i), go({ name: 'module', idx: i }))}>
+          <li tabIndex={0} key={m.key} data-tip={`${t(m.name)}: ${t(m.what)}`} className={view.name === 'module' && view.idx === i ? 'sel' : ''} onClick={() => (setSelected(i), go({ name: 'module', idx: i }))}>
             <span>
               {String(m.num).padStart(2, '0')} {m.key}
             </span>
@@ -1065,6 +1093,7 @@ export default function App() {
       else if (view.idx === SEARCH_IDX) content = <Search x={srch} set={setSrch} say={say} onOpen={openHit} />
       else if (view.idx === DATA_IDX) content = <Data x={dat} set={setDat} say={say} />
       else if (view.idx === STAFF_IDX) content = <Staff say={say} />
+      else if (view.idx === GUIDE_IDX) content = <Guide x={guide} set={setGuide} onGo={openModuleKey} />
       else if (view.idx === ASK_IDX) content = <Ask x={askS} set={setAsk} say={say} onGo={openGo} />
       else if (view.idx === HISTORY_IDX) content = <History x={hist} set={setHist} say={say} />
       else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} onOpenPrices={() => openLedger({ sel: 'settings' })} onOpenOrders={() => openOrders({ tab: 'ORDERS' })} />
@@ -1116,6 +1145,8 @@ export default function App() {
     hints.module = 'OWNER SEES EVERYTHING // STAFF LOGS THE WORK AND SEES NO MONEY // THE OWNER PIN UNLOCKS A LOCKED DEVICE // F2 MENU'
   if (view.name === 'module' && view.idx === ASK_IDX)
     hints.module = 'TYPE A QUESTION OR A COMMAND IN PLAIN WORDS // SAVES WAIT FOR CONFIRM, UNDO REVERSES THEM // ON ANY SCREEN TYPE ASK OR END WITH ? // F2 MENU'
+  if (view.name === 'module' && view.idx === GUIDE_IDX)
+    hints.module = 'PICK A PAGE FROM THE LIST (ON A PHONE: THE PICKER AT THE TOP) // TYPE IN THE BOX TO SEARCH THE GUIDE // ? TIPS EXPLAINS ANY CONTROL // F2 MENU'
   if (view.name === 'module' && view.idx === HISTORY_IDX)
     hints.module = 'TAP A CHANGE TO SEE THAT RECORD // UNDO OR CTRL+Z REVERSES THE LAST CHANGE // TYPE SYNC FOR SAVING STATUS // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
@@ -1123,6 +1154,8 @@ export default function App() {
 
   const hint = reply ? (
     <TypeText key={reply.id} className={reply.warn ? 'warn' : ''} lines={[reply.text]} />
+  ) : tipMode ? (
+    t('TIP MODE: TAP ANY CONTROL TO READ WHAT IT DOES. TAP ? TIPS AGAIN OR PRESS ESC TO LEAVE.')
   ) : (
     t(hints[view.name])
   )
@@ -1133,6 +1166,7 @@ export default function App() {
     <Crt alert={alert}>
       <ReminderWatcher />
       <GlovePad />
+      {stage === 'shell' && <TipLayer screen={guideScreen} onGuide={(k) => openGuide({ sec: k })} />}
       {stage === 'login' ? (
         <div className="shell" style={{ gridTemplateRows: 'auto minmax(0,1fr)' }}>
           <header className="titlebar">
@@ -1192,6 +1226,8 @@ export default function App() {
                             ? <StaffIndex />
                           : view.name === 'module' && view.idx === ASK_IDX
                             ? <AskIndex x={askS} set={setAsk} />
+                          : view.name === 'module' && view.idx === GUIDE_IDX
+                            ? <GuideIndex x={guide} set={setGuide} />
                           : moduleIndex
             }
             keys={keys}
@@ -1206,7 +1242,8 @@ export default function App() {
             lamp={<SyncLamp onOpen={() => openHistory({ tab: 'SYNC' })} />}
             glove={settings.glove ? <button type="button" className="gl-badge" title={t('Glove mode is on. Tap to switch it off.')} onClick={() => update((x) => ({ ...x, glove: false }))}>{t('GLOVE')} {'\u2715'}</button> : undefined}
             undo={<UndoButton say={say} />}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX || view.idx === ATMOS_IDX || view.idx === SEARCH_IDX || view.idx === DATA_IDX || view.idx === STAFF_IDX || view.idx === ASK_IDX) ? ' view-ledger' : ''}`}
+            tips={<TipsButton />}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX || view.idx === ATMOS_IDX || view.idx === SEARCH_IDX || view.idx === DATA_IDX || view.idx === STAFF_IDX || view.idx === ASK_IDX || view.idx === GUIDE_IDX) ? ' view-ledger' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>

@@ -248,7 +248,7 @@ export function SpecimenIndex({ index, onPick }: { index: number; onPick: (i: nu
     const b = planBags(sp)
     const part = !!b && !CORE.some((c) => c.key === sp.id) && sp.id !== getPlan().slot
     return (
-      <li tabIndex={0} key={sp.id} className={i === index ? 'sel' : ''} onClick={() => (sound.chirp(), onPick(i))}>
+      <li tabIndex={0} key={sp.id} data-tip={`Open the ${sp.name.toLowerCase()} file: how to grow it, with its climate, timeline and yield.`} className={i === index ? 'sel' : ''} onClick={() => (sound.chirp(), onPick(i))}>
         <span>{String(sp.order).padStart(2, '0')} {sp.name}</span>
         <span className="k">{b ? `${b}${part ? '*' : ''}` : ''}</span>
       </li>
