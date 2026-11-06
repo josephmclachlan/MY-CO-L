@@ -92,6 +92,8 @@ export const TABLE_NAMES: Record<string, [string, string]> = {
   strain_trials: ['STRAIN TRIAL', 'STRAIN TRIALS'],
   flush_log: ['FLUSH PIN DAY', 'FLUSH PIN DAYS'],
   photos: ['PHOTO', 'PHOTOS'],
+  standing_orders: ['STANDING ORDER', 'STANDING ORDERS'],
+  order_weeks: ['ORDER WEEK CHANGE', 'ORDER WEEK CHANGES'],
   sensor_readings: ['SENSOR READING', 'SENSOR READINGS'],
 }
 
@@ -108,6 +110,8 @@ export const TABLE_SCREEN: Record<string, string> = {
   strain_trials: 'PRODUCTION RECORDS',
   flush_log: 'PRODUCTION RECORDS',
   photos: 'MISSION CONTROL',
+  standing_orders: 'STANDING ORDERS',
+  order_weeks: 'STANDING ORDERS',
   hazard_logs: 'HAZARD INDEX',
   cook_runs: 'PROPULSION',
   cook_readings: 'PROPULSION',
@@ -176,6 +180,7 @@ export function rowName(table: string, r: Row | null | undefined): string {
     if (typeof v === 'string' && v.trim()) return k === 'moved_at' ? v.slice(0, 10) : v.toUpperCase()
   }
   if (table === 'photos') return `PHOTO ${typeof r.caption === 'string' && r.caption ? r.caption.toUpperCase() : String(r.taken_at ?? '').slice(0, 10)}`
+  if (table === 'order_weeks') return `WEEK ${String(r.week_start ?? '')}`
   if (table === 'flush_log') return `FLUSH ${String(r.flush)} PINS ${String(r.pinned_on ?? '')}`
   if (table === 'app_settings') return String(r.id).toUpperCase()
   return `#${String(r.id).slice(0, 8)}`

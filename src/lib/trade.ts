@@ -15,6 +15,8 @@ export interface Sale extends Row {
   amount_crc: number
   lot_codes: string[] | null
   notes: string | null
+  /** Set when the sale was ticked off a standing order on the pick list (G5). */
+  order_id?: string | null
   created_at?: string
   updated_at?: string
 }
