@@ -1,0 +1,125 @@
+# MY/CO/L on the farm's own computer.
+#
+# What runs (each in its own box, "container"):
+#   db      Postgres 16: all farm records. Data lives in ./data/postgres on this computer.
+#   auth    GoTrue: the login (same login program Supabase uses, so the app needs no changes).
+#   rest    PostgREST: lets the app read and write tables (same program Supabase uses).
+#   web     Caddy: serves the app and puts everything under ONE address:
+#             /            the app
+#             /rest/v1/    the tables (rest)
+#             /auth/v1/    the login (auth)
+#             /llm/        the assistant's local model (ollama), chat only
+#   ollama  the local model for ASK THE LATTICE (optional: profile "ai")
+#   bridge  reads Govee sensors into the climate log (optional: profile "sensors")
+#
+# Start everything with:  ./mycol.sh start      (see docs/SELF-HOST.md)
+# Every box restarts by itself after a crash or a power cut.
+
+name: mycol
+
+services:
+  db:
+    image: postgres:16.10-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run ./mycol.sh setup first}
+      POSTGRES_DB: postgres
+      AUTH_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./db/00-roles.sh:/docker-entrypoint-initdb.d/00-roles.sh:ro
+    command: ["postgres", "-c", "shared_buffers=128MB", "-c", "max_connections=40"]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    stop_grace_period: 60s
+
+  auth:
+    image: supabase/gotrue:v2.177.0
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${SITE_URL}/auth/v1
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/postgres?search_path=auth
+      GOTRUE_SITE_URL: ${SITE_URL}
+      GOTRUE_URI_ALLOW_LIST: ${SITE_URL},${PAGES_ORIGIN}
+      # Nobody can sign themselves up. Logins are made with ./mycol.sh add-user.
+      GOTRUE_DISABLE_SIGNUP: "true"
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_EXTERNAL_PHONE_ENABLED: "false"
+      GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: "false"
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_RATE_LIMIT_TOKEN_REFRESH: 150
+      GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED: "true"
+      GOTRUE_LOG_LEVEL: warn
+
+  rest:
+    image: postgrest/postgrest:v12.2.3
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@db:5432/postgres
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_DB_POOL: 10
+      PGRST_LOG_LEVEL: warn
+
+  web:
+    image: caddy:2.10.0-alpine
+    restart: unless-stopped
+    depends_on: [auth, rest]
+    environment:
+      PAGES_ORIGIN: ${PAGES_ORIGIN}
+      OLLAMA_HOST_PORT: ${OLLAMA_HOST_PORT:-ollama:11434}
+    ports:
+      # Only this computer (and Tailscale / Cloudflare on it) can reach the app directly.
+      # Set WEB_BIND=0.0.0.0 in .env to let farm wifi reach http://<this-computer>:8080 (see docs).
+      - "${WEB_BIND:-127.0.0.1}:8080:8080"
+    extra_hosts:
+      # lets OLLAMA_HOST_PORT=host.docker.internal:11434 reach an Ollama installed outside Docker
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./app:/srv/app:ro
+      - ./data/caddy:/data
+
+  ollama:
+    image: ollama/ollama:${OLLAMA_VERSION:-0.12.6}
+    profiles: ["ai"]
+    restart: unless-stopped
+    environment:
+      # One question at a time, one model in memory: right for a small farm box.
+      OLLAMA_NUM_PARALLEL: 1
+      OLLAMA_MAX_LOADED_MODELS: 1
+      OLLAMA_KEEP_ALIVE: 24h
+    volumes:
+      - ./data/ollama:/root/.ollama
+
+  bridge:
+    image: node:22-alpine
+    profiles: ["sensors"]
+    restart: unless-stopped
+    depends_on: [rest]
+    working_dir: /bridge
+    command: ["node", "bridge.mjs"]
+    environment:
+      REST_URL: http://rest:3000
+      SERVICE_KEY: ${SERVICE_KEY}
+      GOVEE_API_KEY: ${GOVEE_API_KEY:-}
+      GOVEE_EVERY_MIN: ${GOVEE_EVERY_MIN:-10}
+      GOVEE_UNIT: ${GOVEE_UNIT:-F}
+    volumes:
+      - ./bridge:/bridge:ro

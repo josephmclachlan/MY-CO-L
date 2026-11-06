@@ -23,7 +23,9 @@ export interface EngineCfg {
   timeoutSec: number
 }
 
-export const DEFAULT_ENGINE: EngineCfg = { kind: 'off', url: 'http://localhost:11434', model: 'qwen2.5:3b', mode: 'rules_first', timeoutSec: 60 }
+/** On the farm box (selfhost/) the model sits behind the same address as the app, at /llm. */
+const SELF_HOSTED = import.meta.env?.VITE_SUPABASE_URL === 'self'
+export const DEFAULT_ENGINE: EngineCfg = { kind: 'off', url: SELF_HOSTED ? '/llm' : 'http://localhost:11434', model: 'qwen2.5:3b', mode: 'rules_first', timeoutSec: 60 }
 
 const KEY = 'mycol.assistant.v1'
 export function loadEngine(): EngineCfg {
@@ -62,16 +64,18 @@ export const engineOn = (c: EngineCfg) => c.kind !== 'off' && c.mode !== 'rules'
  * A page served over https may not call a plain http address unless it is this same computer.
  */
 export function addressProblem(c: EngineCfg, pageProtocol: string): string | null {
+  // A path such as /llm is on the same computer that served this page (the farm box's proxy): always allowed.
+  if (/^\/[^/]/.test(c.url)) return null
   let u: URL
   try {
     u = new URL(c.url)
   } catch {
-    return 'THE ADDRESS IS NOT A WEB ADDRESS. IT LOOKS LIKE http://localhost:11434.'
+    return 'THE ADDRESS IS NOT A WEB ADDRESS. IT LOOKS LIKE http://localhost:11434 (OR /llm ON THE FARM BOX).'
   }
   if (u.protocol !== 'http:' && u.protocol !== 'https:') return 'THE ADDRESS MUST START WITH http:// OR https://.'
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(u.hostname)
   if (pageProtocol === 'https:' && u.protocol === 'http:' && !local)
-    return 'THIS PAGE IS HTTPS, SO THE BROWSER BLOCKS A PLAIN http:// ADDRESS ON ANOTHER COMPUTER. RUN THE MODEL ON THIS SAME COMPUTER (localhost), OR OPEN THE APP FROM THE FARM PC ITSELF (G13 SERVES BOTH TOGETHER).'
+    return 'THIS PAGE IS HTTPS, SO THE BROWSER BLOCKS A PLAIN http:// ADDRESS ON ANOTHER COMPUTER. RUN THE MODEL ON THIS SAME COMPUTER (localhost), OR USE THE FARM BOX\'S https ADDRESS (ITS /llm PATH SERVES THE MODEL).'
   return null
 }
 

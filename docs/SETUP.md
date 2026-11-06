@@ -9,6 +9,7 @@ and only when you want them: the app already runs without any of them (it says L
 | 2. GitHub Pages | Now, for a real address you can install on your phone | GitHub Pro, about US$4/month |
 | 3. Supabase (database and login) | When you want to save farm records | Free |
 | 4. Cloudflare Pages | At launch | Free |
+| Or: the farm box | Instead of Supabase: everything on your own computer at the farm | See [SELF-HOST.md](SELF-HOST.md) |
 
 Passwords and keys always go in those websites' dashboards, never in the code.
 
