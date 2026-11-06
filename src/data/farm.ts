@@ -78,4 +78,5 @@ export const MODULES: ModuleDef[] = [
   { key: 'MISSION', num: 12, name: 'MISSION CONTROL', what: 'LOTS, BOARD, HARVEST LOG', build: 12 },
   { key: 'MANUAL', num: 11, name: 'MANUAL', what: 'THE TEXTBOOK', build: 5 },
   { key: 'HISTORY', num: 13, name: 'HISTORY', what: 'EDITS, UNDO AND SYNC', build: 13 },
+  { key: 'YIELD', num: 14, name: 'PRODUCTION RECORDS', what: 'BE%, SCORECARD, TRIALS', build: 14 },
 ]

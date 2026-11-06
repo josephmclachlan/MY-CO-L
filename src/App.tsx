@@ -23,9 +23,11 @@ import { Propulsion, CookIndex, COOK_START, COOK_TABS, type CookState } from './
 import { Ledger, LedgerIndex, LEDGER_START, type LedgerState } from './screens/Ledger'
 import { Trade, TradeIndex, TRADE_START, TRADE_TABS, type TradeState } from './screens/Trade'
 import { Mission, MissionIndex, MISSION_START, type MissionState } from './screens/Mission'
+import { Yield, YieldIndex, YIELD_START, YIELD_TABS, type YieldState } from './screens/Yield'
 import { History, HistoryIndex, HISTORY_START, HistoryNavContext, SyncLamp, UndoButton, undoneText, type HistoryState } from './screens/History'
 import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
+import { cartFromHash } from './lib/scan'
 import { useStore, useStoreStatus, useTable } from './store/StoreContext'
 import { useRates } from './store/useRates'
 import { useFxSync } from './store/useFx'
@@ -56,6 +58,7 @@ const LEDGER_IDX = MODULES.findIndex((m) => m.key === 'LEDGER')
 const TRADE_IDX = MODULES.findIndex((m) => m.key === 'TRADE')
 const MISSION_IDX = MODULES.findIndex((m) => m.key === 'MISSION')
 const HISTORY_IDX = MODULES.findIndex((m) => m.key === 'HISTORY')
+const YIELD_IDX = MODULES.findIndex((m) => m.key === 'YIELD')
 
 /** Everything needed to put the terminal back on a screen: Back restores one of these. */
 interface Snap {
@@ -72,6 +75,7 @@ interface Snap {
   trade: TradeState
   mission: MissionState
   hist: HistoryState
+  yld: YieldState
 }
 const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
@@ -114,6 +118,8 @@ export default function App() {
   const setMission = useCallback((p: Partial<MissionState>) => setMissionState((c) => ({ ...c, ...p })), [])
   const [hist, setHistState] = useState<HistoryState>(HISTORY_START)
   const setHist = useCallback((p: Partial<HistoryState>) => setHistState((c) => ({ ...c, ...p })), [])
+  const [yld, setYldState] = useState<YieldState>(YIELD_START)
+  const setYld = useCallback((p: Partial<YieldState>) => setYldState((c) => ({ ...c, ...p })), [])
   const store = useStore()
   const strains = useTable<Strain>('strains')
   useFxSync() // today's colones per dollar, once a day when online
@@ -121,7 +127,7 @@ export default function App() {
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist }
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -163,6 +169,7 @@ export default function App() {
     setTradeState(s.trade)
     setMissionState(s.mission)
     setHistState(s.hist)
+    setYldState(s.yld)
     power.setSelectedRoom(s.room)
     setReply(null)
     setSweep((n) => n + 1)
@@ -244,6 +251,14 @@ export default function App() {
     if (!here) go({ name: 'module', idx: MISSION_IDX }, false)
     else sound.chirp()
   }
+  const openYield = (p: Partial<YieldState>) => {
+    const here = view.name === 'module' && view.idx === YIELD_IDX
+    if (!here) pushHist()
+    setYld(p)
+    setSelected(YIELD_IDX)
+    if (!here) go({ name: 'module', idx: YIELD_IDX }, false)
+    else sound.chirp()
+  }
   const openHistory = (p: Partial<HistoryState>) => {
     const here = view.name === 'module' && view.idx === HISTORY_IDX
     if (!here) pushHist()
@@ -284,7 +299,14 @@ export default function App() {
     setStage('shell')
     // A scanned label opens straight onto its record: #xeno/c/<id>.
     const key = keyFromHash(window.location.hash)
-    if (key) {
+    const cart = cartFromHash(window.location.hash)
+    if (cart) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+      setMissionState((m) => ({ ...m, tab: 'SCAN', scan: `#cart/${cart}` }))
+      setSelected(MISSION_IDX)
+      setView({ name: 'module', idx: MISSION_IDX })
+      setFirstMenu(false)
+    } else if (key) {
       window.history.replaceState(null, '', window.location.pathname + window.location.search)
       setXenoState({ tab: 'LINEAGE', strain: null, node: key })
       setSelected(XENO_IDX)
@@ -472,6 +494,18 @@ export default function App() {
     if (['TODAY', 'TODO'].includes(cmd)) return openMission({ tab: 'TODAY' })
     if (['HARVEST', 'PICK', 'PICKED'].includes(cmd)) return openMission({ tab: 'HARVEST' })
     if (['LOT', 'NEWLOT', 'KNOCK'].includes(cmd)) return openMission({ tab: 'NEWLOT' })
+    if (['BULK', 'BULKS'].includes(cmd)) return openMission({ tab: 'BULK' })
+    if (['SCAN', 'QR', 'CART', 'CARTS'].includes(cmd)) return openMission({ tab: 'SCAN' })
+    if (['SPLIT'].includes(cmd)) return openMission({ tab: 'BULK', bulk: 'SPLIT' })
+    // Production records: YIELD, FLUSH, SCORECARD, TRIAL, FADING.
+    if (['YIELD', 'RECORDS', 'FLUSH', 'FLUSHES', 'BE'].includes(cmd)) return openYield({ tab: 'FLUSHES' })
+    if (['SCORECARD', 'SCORE', 'FADING'].includes(cmd)) return openYield({ tab: 'SCORECARD' })
+    if (['TRIAL', 'TRIALS'].includes(cmd)) return openYield({ tab: 'TRIALS' })
+    const yTab = YIELD_TABS.find((t) => t === cmd)
+    if (yTab && view.name === 'module' && view.idx === YIELD_IDX) {
+      setYld({ tab: yTab })
+      return sound.chirp()
+    }
     // Power and rooms.
     const openVitals = () => {
       setSelected(VITALS_IDX)
@@ -784,7 +818,8 @@ export default function App() {
             }}
           />
         )
-      else if (view.idx === MISSION_IDX) content = <Mission x={mission} set={setMission} say={say} />
+      else if (view.idx === MISSION_IDX) content = <Mission x={mission} set={setMission} say={say} openRecord={(key, strainId) => openXeno({ tab: 'LINEAGE', strain: strainId, node: key })} />
+      else if (view.idx === YIELD_IDX) content = <Yield x={yld} set={setYld} say={say} />
       else if (view.idx === HISTORY_IDX) content = <History x={hist} set={setHist} say={say} />
       else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} onOpenPrices={() => openLedger({ sel: 'settings' })} />
       else if (view.idx === MANUAL_IDX) content = <Manual loc={manualLoc} onOpen={openManual} />
@@ -816,7 +851,9 @@ export default function App() {
   if (view.name === 'module' && view.idx === TRADE_IDX)
     hints.module = 'NEW SALE: KG, TAP CHANNEL, SAVE // TYPE TOTALS, BUYERS OR LOG // MARGIN USES LEDGER COST // F2 MENU'
   if (view.name === 'module' && view.idx === MISSION_IDX)
-    hints.module = 'BOARD SHOWS EVERY ACTIVE LOT // TYPE TODAY, HARVEST OR LOT // KG LOGGED FEEDS LEDGER AND TRADE // F2 MENU'
+    hints.module = 'BOARD SHOWS EVERY ACTIVE LOT // TYPE TODAY, HARVEST, LOT, BULK OR SCAN // KG LOGGED FEEDS LEDGER AND TRADE // F2 MENU'
+  if (view.name === 'module' && view.idx === YIELD_IDX)
+    hints.module = 'FLUSH LOG: BE% PER LOT AND FLUSH // SCORECARD: BY STRAIN, COOK, ROOM, WEEK, WORKER // TYPE TRIAL OR FADING // F2 MENU'
   if (view.name === 'module' && view.idx === HISTORY_IDX)
     hints.module = 'TAP A CHANGE TO SEE THAT RECORD // UNDO OR CTRL+Z REVERSES THE LAST CHANGE // TYPE SYNC FOR SAVING STATUS // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
@@ -873,6 +910,8 @@ export default function App() {
                             ? <MissionIndex x={mission} set={setMission} />
                           : view.name === 'module' && view.idx === HISTORY_IDX
                             ? <HistoryIndex x={hist} set={setHist} />
+                          : view.name === 'module' && view.idx === YIELD_IDX
+                            ? <YieldIndex x={yld} set={setYld} />
                           : moduleIndex
             }
             keys={keys}
@@ -886,7 +925,7 @@ export default function App() {
             onBack={histLen > 0 ? goBack : undefined}
             lamp={<SyncLamp onOpen={() => openHistory({ tab: 'SYNC' })} />}
             undo={<UndoButton say={say} />}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX) ? ' view-ledger' : ''}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX) ? ' view-ledger' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>

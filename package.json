@@ -11,7 +11,7 @@
     "typecheck": "tsc -b",
     "build:preview": "node scripts/build-preview.mjs",
     "test": "vitest run",
-    "test:stress": "STRESS_SEEDS=200 vitest run src/lib/stress.test.ts && STRESS_SEEDS=40 vitest run src/lib/bank.test.ts"
+    "test:stress": "STRESS_SEEDS=200 vitest run src/lib/stress.test.ts && STRESS_SEEDS=40 vitest run src/lib/bank.test.ts && STRESS_SEEDS=12 STRESS_STEPS=2500 vitest run src/lib/records.stress.test.ts"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.2.6",
@@ -19,6 +19,7 @@
     "@fontsource/share-tech-mono": "^5.2.6",
     "@fontsource/vt323": "^5.2.6",
     "@supabase/supabase-js": "^2.76.0",
+    "jsqr": "^1.4.0",
     "qrcode-generator": "^1.5.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

@@ -1,0 +1,45 @@
+/* PRODUCTION RECORDS, bulk actions, photos and the scanner (build G4). Reuses the cook/ledger boxes. */
+.rc-wrap { min-width: 0; max-width: 100%; overflow-x: auto; }
+.rc-table { width: 100%; font-size: 0.82em; }
+.rc-table th, .rc-table td { padding: 3px 5px; white-space: nowrap; }
+.rc-table tbody tr[tabindex] { cursor: pointer; }
+.rc-table tbody tr.sel td { background: var(--fg); color: var(--bg); text-shadow: none; }
+.rc-table tr.best td, .rc-table td.best { color: var(--fg); font-weight: bold; }
+.rc-table tr.worst td { color: var(--fg-dim); }
+.rc-input input { width: 100%; min-width: 4.2em; max-width: 9em; box-sizing: border-box; }
+.rc-checks { display: flex; flex-wrap: wrap; gap: 6px; }
+.rc-checks .btn { min-height: 34px; text-align: left; }
+.rc-line { border-left: 2px solid var(--fg-faint); padding-left: 8px; display: grid; gap: 6px; }
+.rc-more { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; border-top: 1px dashed var(--fg-faint); padding-top: 8px; }
+.rc-code { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.rc-code .ck-field { flex: 1 1 14em; }
+.rc-inline { display: inline-block; min-width: 9em; }
+.rc-list li { cursor: pointer; }
+
+.ph-strip { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; border-top: 1px dashed var(--fg-faint); padding-top: 6px; min-width: 0; }
+.ph-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: end; }
+.ph-cap { display: grid; gap: 2px; flex: 1 1 10em; min-width: 0; }
+.ph-cap input { width: 100%; box-sizing: border-box; }
+.ph-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ph-thumb { width: 64px; height: 64px; padding: 0; border: 1px solid var(--fg-dim); background: #000; cursor: pointer; overflow: hidden; }
+.ph-thumb.sel { outline: 2px solid var(--fg); }
+.ph-thumb:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.ph-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; filter: sepia(0.2) hue-rotate(60deg) saturate(0.8); }
+.ph-big { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+.ph-big img { box-sizing: border-box; max-width: 100%; max-height: 52vh; object-fit: contain; border: 1px solid var(--fg-dim); background: #000; justify-self: start; }
+
+.sc-box { display: grid; gap: 8px; }
+.sc-view { position: relative; width: 100%; max-width: 420px; aspect-ratio: 1 / 1; border: 1px solid var(--fg-dim); background: #000; overflow: hidden; }
+.sc-view video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sc-aim { position: absolute; inset: 14%; border: 2px solid var(--fg); box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.35); pointer-events: none; }
+
+@media (max-width: 700px) {
+  .hide-sm { display: none; }
+  .rc-table { font-size: 0.78em; }
+  .rc-table th, .rc-table td { padding: 3px 4px; }
+  .rc-table td:first-child, .rc-table th:first-child { white-space: normal; overflow-wrap: anywhere; }
+  .ph-thumb { width: 56px; height: 56px; }
+  .rc-checks .btn { flex: 1 1 44%; }
+}
+.rc-result { display: grid; gap: 10px; min-width: 0; scroll-margin-top: 4px; }
+.rc-result:empty { display: none; }

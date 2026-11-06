@@ -3,7 +3,9 @@ import { HistoryButton } from './History'
 import { PickInput } from '../components/PickInput'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import qrcode from 'qrcode-generator'
+import { QrSvg } from '../components/Qr'
+import { PhotoStrip } from '../components/PhotoStrip'
+import { dropExtras } from '../lib/recordsActions'
 import { useApp } from '../settings/AppContext'
 import { useStore, useStoreStatus, useTable } from '../store/StoreContext'
 import { RefText } from '../manual/ManualLinks'
@@ -724,13 +726,14 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
             </>
           )}
           {c.status !== 'discarded' && <button type="button" className="btn" onClick={() => void run(() => setCultureStatus(store, c, 'discarded'), 'DISCARDED')}>DISCARD</button>}
-          <Confirm label="DELETE RECORD" disabled={kids} onYes={() => void run(() => store.del('cultures', c.id), 'RECORD DELETED').then(() => set({ node: null }))} />
+          <Confirm label="DELETE RECORD" disabled={kids} onYes={() => void run(async () => { await dropExtras(store, 'cultures', [c.id]); await store.del('cultures', c.id) }, 'RECORD DELETED').then(() => set({ node: null }))} />
           <HistoryButton table="cultures" id={c.id} />
         </div>
         <div className="cg-fields">
           <Field label="LOCATION" value={c.location ?? ''} placeholder="NOT SET" onSave={(v) => void run(() => store.put('cultures', { ...c, location: v || null }), 'LOCATION SAVED')} />
           <Field label="NOTES" value={c.notes ?? ''} placeholder="NONE" onSave={(v) => void run(() => store.put('cultures', { ...c, notes: v || null }), 'NOTES SAVED')} />
         </div>
+        <PhotoStrip table="cultures" id={c.id} say={say} />
       </div>
     )
   }
@@ -798,7 +801,7 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
           {live && g.status !== 'cold_storage' && <button type="button" className="btn" onClick={() => void run(() => setGrainStatus(store, g, 'cold_storage'), 'INTO COLD STORAGE')}>TO FRIDGE</button>}
           {live && <button type="button" className="btn" onClick={() => void run(() => setGrainStatus(store, g, 'used_up'), 'MARKED USED UP')}>USED UP</button>}
           {live && <button type="button" className="btn" onClick={() => void run(() => setGrainStatus(store, g, 'discarded'), 'DISCARDED')}>DISCARD</button>}
-          <Confirm label="DELETE RECORD" disabled={kids} onYes={() => void run(() => store.del('grain_runs', g.id), 'RECORD DELETED').then(() => set({ node: null }))} />
+          <Confirm label="DELETE RECORD" disabled={kids} onYes={() => void run(async () => { await dropExtras(store, 'grain_runs', [g.id]); await store.del('grain_runs', g.id) }, 'RECORD DELETED').then(() => set({ node: null }))} />
           <HistoryButton table="grain_runs" id={g.id} />
         </div>
         <div className="cg-add xn-add">
@@ -814,6 +817,7 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
           <Field label="LOCATION" value={g.location ?? ''} placeholder="NOT SET" onSave={(v) => void run(() => store.put('grain_runs', { ...g, location: v || null }), 'LOCATION SAVED')} />
           <Field label="RESULT / NOTES" value={g.result ?? ''} placeholder="NONE" onSave={(v) => void run(() => store.put('grain_runs', { ...g, result: v || null }), 'SAVED')} />
         </div>
+        <PhotoStrip table="grain_runs" id={g.id} say={say} />
       </div>
     )
   }
@@ -830,7 +834,7 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
           </button>
         ))}
         <button type="button" className={`btn hazard ${l.status === 'lost' ? 'on' : ''}`} onClick={() => void run(() => setLotStatus(store, l, 'lost'), 'LOT MARKED LOST')}>LOST</button>
-        <Confirm label="DELETE LOT" onYes={() => void run(() => store.del('block_lots', l.id), 'LOT DELETED').then(() => set({ node: null }))} />
+        <Confirm label="DELETE LOT" onYes={() => void run(async () => { await dropExtras(store, 'block_lots', [l.id]); await store.del('block_lots', l.id) }, 'LOT DELETED').then(() => set({ node: null }))} />
         <HistoryButton table="block_lots" id={l.id} />
       </div>
       <div className="cg-add xn-add">
@@ -849,6 +853,8 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
       <div className="cg-fields">
         <Field label="NOTES" wide value={l.notes ?? ''} placeholder="NONE" onSave={(v) => void run(() => store.put('block_lots', { ...l, notes: v || null }), 'SAVED')} />
       </div>
+      <div className="dim tiny">CART {l.cart ?? 'NOT SET'} // ROOM {l.room ? l.room.toUpperCase() : 'NOT SET'}{l.knocked_by ? ` // KNOCKED BY ${l.knocked_by}` : ''}. CHANGE THEM, SPLIT THE LOT OR LOG PICKS IN MISSION CONTROL.</div>
+      <PhotoStrip table="block_lots" id={l.id} say={say} />
     </div>
   )
 }
@@ -1060,24 +1066,6 @@ function G2_SRC(key: string): ReactNode {
 }
 
 // ---------- LABELS ----------
-
-function QrSvg({ text }: { text: string }) {
-  const path = useMemo(() => {
-    const q = qrcode(0, 'M')
-    q.addData(text)
-    q.make()
-    const n = q.getModuleCount()
-    let dd = ''
-    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) dd += `M${c + 2} ${r + 2}h1v1h-1z`
-    return { dd, n: n + 4 }
-  }, [text])
-  return (
-    <svg className="qr" viewBox={`0 0 ${path.n} ${path.n}`} shapeRendering="crispEdges" aria-label="QR code">
-      <rect width={path.n} height={path.n} fill="#fff" />
-      <path d={path.dd} fill="#000" />
-    </svg>
-  )
-}
 
 interface LabelData {
   key: string

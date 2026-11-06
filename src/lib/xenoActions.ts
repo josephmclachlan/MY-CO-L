@@ -2,6 +2,7 @@
 
 import { uuid, type Store } from './store'
 import type { HazardLog, LotLoss } from './hazard'
+import { dropExtras } from './recordsActions'
 import { bankBatch, decideTest, logCheck, startTest } from './bankActions'
 import {
   childP,
@@ -291,10 +292,13 @@ export async function removeDemo(store: Store, strains: Strain[], cultures: Cult
   await Promise.all([store.ensure('bank_tests'), store.ensure('viability_checks')])
   await store.del('viability_checks', store.rows('viability_checks').filter((h) => h.strain_id === s.id).map((h) => h.id))
   await store.del('bank_tests', store.rows('bank_tests').filter((h) => h.strain_id === s.id).map((h) => h.id))
+  await dropExtras(store, 'block_lots', [...lotIds])
   await store.del('block_lots', lots.filter((l) => l.strain_id === s.id || (l.grain_run_id && gIds.has(l.grain_run_id))).map((l) => l.id))
   // Children before parents, for the database's foreign keys.
   const gs = runs.filter((g) => g.strain_id === s.id).sort((a, b) => (a.generation === b.generation ? 0 : a.generation === 'G2' ? -1 : 1))
   await store.del('grain_runs', gs.map((g) => g.id))
+  await dropExtras(store, 'grain_runs', gs.map((g) => g.id))
+  await dropExtras(store, 'cultures', cultures.filter((c) => c.strain_id === s.id).map((c) => c.id))
   const cs = cultures.filter((c) => c.strain_id === s.id).sort((a, b) => (b.p_level ?? 0) - (a.p_level ?? 0))
   await store.del('cultures', cs.map((c) => c.id))
   await store.del('strains', s.id)
