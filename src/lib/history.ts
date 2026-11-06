@@ -97,6 +97,13 @@ export const TABLE_NAMES: Record<string, [string, string]> = {
   cash_moves: ['MONEY ENTRY', 'MONEY ENTRIES'],
   budget_lines: ['BUDGET FIGURE', 'BUDGET FIGURES'],
   waste_log: ['WASTE ENTRY', 'WASTE ENTRIES'],
+  power_cuts: ['POWER CUT', 'POWER CUTS'],
+  water_tests: ['WATER TEST', 'WATER TESTS'],
+  maint_items: ['MAINTENANCE ITEM', 'MAINTENANCE ITEMS'],
+  maint_log: ['MAINTENANCE LOG LINE', 'MAINTENANCE LOG LINES'],
+  clean_log: ['CLEANING ENTRY', 'CLEANING ENTRIES'],
+  checklist_runs: ['CHECKLIST SIGN-OFF', 'CHECKLIST SIGN-OFFS'],
+  reminders: ['REMINDER', 'REMINDERS'],
   sensor_readings: ['SENSOR READING', 'SENSOR READINGS'],
 }
 
@@ -118,6 +125,13 @@ export const TABLE_SCREEN: Record<string, string> = {
   cash_moves: 'MONEY',
   budget_lines: 'MONEY',
   waste_log: 'MONEY',
+  power_cuts: 'FACILITY LOGS',
+  water_tests: 'FACILITY LOGS',
+  maint_items: 'FACILITY LOGS',
+  maint_log: 'FACILITY LOGS',
+  clean_log: 'FACILITY LOGS',
+  checklist_runs: 'FACILITY LOGS',
+  reminders: 'FACILITY LOGS',
   hazard_logs: 'HAZARD INDEX',
   cook_runs: 'PROPULSION',
   cook_readings: 'PROPULSION',
@@ -183,6 +197,13 @@ export function rowName(table: string, r: Row | null | undefined): string {
   if (table === 'budget_lines') return `BUDGET ${String(r.month ?? '')} ${String(r.line ?? '').toUpperCase()}`
   if (table === 'cash_moves') return `${String(r.day ?? '')} ${String(r.line ?? '').toUpperCase()}`
   if (table === 'waste_log') return `WASTE ${String(r.logged_on ?? '')}`
+  if (table === 'power_cuts') return `${r.kind === 'test' ? 'TEST RUN' : 'CUT'} ${Number.isFinite(Date.parse(String(r.down_at))) ? new Date(Date.parse(String(r.down_at)) - 6 * 3600000).toISOString().slice(0, 16).replace('T', ' ') : ''}`
+  if (table === 'water_tests') return `WATER ${String(r.tested_on ?? '')} ${String(r.point ?? '').toUpperCase()}`
+  if (table === 'maint_items') return String(r.name ?? '')
+  if (table === 'maint_log') return `DONE ${String(r.done_on ?? '')}`
+  if (table === 'clean_log') return `CLEAN ${String(r.room_id ?? '').toUpperCase()} ${String(r.cleaned_on ?? '')}`
+  if (table === 'checklist_runs') return `${String(r.template ?? '').toUpperCase()} ${String(r.done_on ?? '')}`
+  if (table === 'reminders') return String(r.text ?? '').slice(0, 40)
   if (table === 'sales' && typeof r.receipt_no === 'string' && r.receipt_no) return `${r.receipt_no} ${String(r.buyer ?? '').toUpperCase()}`.trim()
   const pick = ['code', 'lot_code', 'label', 'name', 'buyer', 'unit_label', 'run_ref', 'checked_on', 'started_on', 'harvested_on', 'sold_on', 'moved_at']
   for (const k of pick) {

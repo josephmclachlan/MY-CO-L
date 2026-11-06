@@ -20,6 +20,7 @@ import { roomById } from '../data/rooms'
 import { LoadBar } from '../components/LoadBar'
 import { Meter } from '../components/Meter'
 import { TypeText } from '../components/TypeText'
+import { PowerCutBox } from './Facility'
 
 export const fmtW = (n: number) => `${Math.round(n).toLocaleString('en-US')} W`
 export const fmtA = (n: number) => `${n.toFixed(1)} A`
@@ -152,7 +153,7 @@ function BreakerDetail({ onOpenRoom }: { onOpenRoom: (r: RoomId) => void }) {
 }
 
 /** VITALS: the breaker board against the power budget. */
-export function Vitals({ onOpenRoom }: { onOpenRoom: (r: RoomId) => void }) {
+export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => void; onOpenCuts?: () => void }) {
   const { sound } = useApp()
   const p = usePower()
   const { state, reading: r, warns, peak, on } = p
@@ -313,6 +314,12 @@ export function Vitals({ onOpenRoom }: { onOpenRoom: (r: RoomId) => void }) {
         </section>
       )}
 
+      {onOpenCuts && (
+        <section className="box" id="v-cuts-box">
+          <PowerCutBox onOpen={onOpenCuts} />
+        </section>
+      )}
+
       <section className="box" id="v-rules">
         <div className="section-title">RULES</div>
         <TypeText key={warns.map((w) => w.id).join(',') || 'clear'} group={4} lines={warnLines} />
@@ -378,6 +385,7 @@ export function VitalsIndex() {
         {[
           ['BUDGET', 'v-budget'],
           ...(gen ? [['GENERATOR', 'v-gen']] : []),
+          ['POWER CUTS', 'v-cuts-box'],
           ['RULES', 'v-rules'],
           ['PRESETS', 'v-presets'],
           ['MAIN PANEL', 'v-main'],

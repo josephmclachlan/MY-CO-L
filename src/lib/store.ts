@@ -23,6 +23,7 @@ export const BACKUP_TABLES = [
   'items', 'item_prices', 'stock_moves', 'energy_bills', 'labour_entries', 'reference_entries', 'app_settings', 'fx_rates',
   'bank_tests', 'viability_checks', 'strain_trials', 'flush_log', 'photos', 'standing_orders', 'order_weeks',
   'cash_moves', 'budget_lines', 'waste_log',
+  'power_cuts', 'water_tests', 'maint_items', 'maint_log', 'clean_log', 'checklist_runs', 'reminders',
   'edit_log',
 ] as const
 

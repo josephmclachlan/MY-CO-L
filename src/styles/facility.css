@@ -1,0 +1,49 @@
+/* FACILITY LOGS (build G7). Reuses the cook/ledger boxes, records tables and money marks. */
+.fc-dt { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.fc-run { display: grid; gap: 6px; border: 1px dashed var(--fg-faint); padding: 6px; margin: 4px 0; min-width: 0; }
+.fc-spark { width: 110px; height: 28px; display: block; overflow: visible; }
+.fc-spark .line { fill: none; stroke: var(--fg); stroke-width: 1.5; stroke-linejoin: round; filter: drop-shadow(0 0 2px var(--glow)); }
+.fc-spark .lim { stroke: var(--hazard); stroke-width: 1; stroke-dasharray: 3 3; }
+.fc-spark .pt { fill: var(--fg); }
+.fc-total td { border-top: 1px solid var(--fg-dim); color: var(--fg); }
+.fc-live b { font-size: 1.15em; }
+.fc-fold { text-align: left; width: 100%; }
+.fc-foldbody { display: grid; gap: 8px; margin-top: 8px; min-width: 0; }
+.fc-off { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+.fc-off span { flex: 1 1 14em; min-width: 0; overflow-wrap: anywhere; }
+.fc-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.fc-steps li { border-bottom: 1px dotted var(--fg-faint); padding-bottom: 5px; min-width: 0; }
+.fc-steps li.done.ok .fc-text { color: var(--fg-dim); }
+.fc-steps li.done.skip .fc-text { color: var(--fg-dim); text-decoration: line-through; }
+.fc-step { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: start; }
+.fc-text { overflow-wrap: anywhere; min-width: 0; }
+.fc-text small { display: block; }
+.fc-tick { min-width: 3.4em; }
+.fc-why { width: 100%; box-sizing: border-box; margin-top: 4px; }
+.fc-rem { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.fc-rem li { display: grid; grid-template-columns: 7em minmax(0, 1fr) auto; gap: 8px; align-items: start; border-bottom: 1px dotted var(--fg-faint); padding-bottom: 4px; }
+.fc-rem li.warn .fc-rtext { color: var(--hazard); text-shadow: none; }
+.fc-kind { color: var(--bg); background: var(--fg-dim); text-align: center; letter-spacing: 0.08em; font-size: 0.78em; padding: 0 4px; text-shadow: none; }
+.fc-rtext { overflow-wrap: anywhere; min-width: 0; }
+.fc-ract { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.fc-lines { margin: 0; display: grid; gap: 3px; }
+.fc-lines > div { display: grid; grid-template-columns: 11em minmax(0, 1fr); gap: 8px; border-bottom: 1px dotted var(--fg-faint); }
+.fc-lines dt { color: var(--fg-dim); }
+.fc-lines dd { margin: 0; overflow-wrap: anywhere; min-width: 0; }
+.fc-lines > div.warn dd { color: var(--hazard); text-shadow: none; }
+.fc-lines2 { display: grid; gap: 3px; color: var(--fg-dim); }
+.fc-check { display: flex; gap: 8px; align-items: center; }
+.fc-board { margin-top: 10px; display: grid; gap: 6px; min-width: 0; max-width: 24em; width: 100%; }
+.fc-board .fc-lines > div { grid-template-columns: 8.5em minmax(0, 1fr); }
+.v-cuts { display: grid; gap: 6px; margin-top: 10px; min-width: 0; }
+.fc tr.od-row.over .lg-warn-text { color: var(--hazard); }
+.fc tr.sel .lg-warn-text { color: var(--bg) !important; }
+@media (max-width: 700px) {
+  .fc-step { grid-template-columns: auto minmax(0, 1fr); }
+  .fc-step > .btn:last-child { grid-column: 2; justify-self: start; }
+  .fc-rem li { grid-template-columns: minmax(0, 1fr); }
+  .fc-ract { justify-content: flex-start; }
+  .fc-lines > div { grid-template-columns: 8.5em minmax(0, 1fr); }
+  .fc-board { max-width: none; }
+  .fc-spark { width: 90px; }
+}
