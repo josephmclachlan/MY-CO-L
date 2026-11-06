@@ -6,6 +6,7 @@
 
 export const ES: Record<string, string> = {
   'Show or hide the other four function keys, F5 to F8.': 'Mostrar u ocultar las otras cuatro teclas de función, F5 a F8.',
+  'Hide this message.': 'Ocultar este mensaje.',
   'USER GUIDE': 'GUÍA DE USO',
   'HOW TO USE EVERY SCREEN': 'CÓMO USAR CADA PANTALLA',
   'TIP MODE ON': 'MODO AYUDA ACTIVADO',

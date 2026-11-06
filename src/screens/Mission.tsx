@@ -335,8 +335,11 @@ function HarvestForm({ m, say }: { m: M; say: Say }) {
     if (!initials.trim()) return say(tt('TYPE YOUR INITIALS.'), true)
     if (fl < 1 || fl > 9) return say(tt('FLUSH MUST BE 1 TO 9.'), true)
     try {
-      if (row.lot.status === 'incubating') await store.put('block_lots', { ...row.lot, status: 'fruiting', to_fruiting_on: row.lot.to_fruiting_on ?? day, room: 'fruiting' })
-      await store.put('harvests', { id: uuid(), block_lot_id: row.lot.id, harvested_on: day, flush: Math.floor(fl), kg: k, grade, initials: initials.trim().toUpperCase(), notes: null, created_at: new Date().toISOString() })
+      // One UNDO step and one history line, even when the pick also moves the lot to fruiting.
+      await store.action(`HARVEST ${row.lot.lot_code}`, async () => {
+        if (row.lot.status === 'incubating') await store.put('block_lots', { ...row.lot, status: 'fruiting', to_fruiting_on: row.lot.to_fruiting_on ?? day, room: 'fruiting' })
+        await store.put('harvests', { id: uuid(), block_lot_id: row.lot.id, harvested_on: day, flush: Math.floor(fl), kg: k, grade, initials: initials.trim().toUpperCase(), notes: null, created_at: new Date().toISOString() })
+      })
       try {
         localStorage.setItem(INITIALS_KEY, initials.trim().toUpperCase())
       } catch {

@@ -32,6 +32,10 @@ interface Props {
   glove?: ReactNode
   /** The ? TIPS button. */
   tips?: ReactNode
+  /** The answer to the last action or command, shown in a bar above the prompt. */
+  result?: { text: ReactNode; warn?: boolean; id: number } | null
+  /** Closes the result bar. */
+  onCloseResult?: () => void
 }
 
 const FKEY_TIP: Record<number, string> = {
@@ -56,7 +60,7 @@ function useClock() {
 }
 
 /** The frame every screen shares: title bar, status line, index column, prompt, hint line and F-key bar. */
-export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack, lamp, undo, glove, tips }: Props) {
+export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack, lamp, undo, glove, tips, result, onCloseResult }: Props) {
   const { settings, sound, session } = useApp()
   const { t } = useT()
   const clock = useClock()
@@ -118,6 +122,17 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
         <main className="panel main-panel" ref={mainRef} data-kbd-zone="main">{children}</main>
         {index && <aside className="panel index-panel" data-kbd-zone="index">{index}</aside>}
       </div>
+      {result && (
+        <div key={result.id} className={`result-bar ${result.warn ? 'warn' : ''}`} role="status" aria-live="polite">
+          <span className="result-sign" aria-hidden>{result.warn ? '!' : '\u25B8'}</span>
+          <span className="result-text">{result.text}</span>
+          {onCloseResult && (
+            <button type="button" className="result-x" data-tip={t('Hide this message.')} aria-label={t('Hide this message.')} onClick={onCloseResult}>
+              {'\u2715'}
+            </button>
+          )}
+        </div>
+      )}
       <form
         className="prompt"
         onSubmit={(e) => {

@@ -35,6 +35,7 @@ import { Data, DataIndex, DATA_START, type DataState } from './screens/Data'
 import { Staff, StaffIndex } from './screens/Staff'
 import { Guide, GuideIndex, GUIDE_START, type GuideState } from './screens/Guide'
 import { TipLayer, TipsButton } from './components/Tips'
+import { useTableCards } from './components/TableCards'
 import { tipModeOn, toggleTipMode, useTipMode } from './guide/tipStore'
 import { guideSectionFor } from './guide/content'
 import { GlovePad } from './components/GlovePad'
@@ -279,6 +280,12 @@ export default function App() {
   )
 
   const say = useCallback((text: string, warn?: boolean) => setReply({ text, warn, id: Date.now() }), [])
+  // A plain result fades after 12 s; a warning stays until closed or the next command.
+  useEffect(() => {
+    if (!reply || reply.warn) return
+    const tm = window.setTimeout(() => setReply((r) => (r && r.id === reply.id ? null : r)), 12000)
+    return () => window.clearTimeout(tm)
+  }, [reply])
 
   const openXeno = (p: Partial<XenoState>) => {
     const here = view.name === 'module' && view.idx === XENO_IDX
@@ -578,6 +585,7 @@ export default function App() {
   })
 
   // Arrows, Enter, [ ], page keys, Backspace / Esc = BACK on every screen.
+  useTableCards()
   useKeyNav({
     enabled: stage === 'shell',
     onBack: () => {
@@ -1152,9 +1160,8 @@ export default function App() {
   if (view.name === 'module' && view.idx === MANUAL_IDX)
     hints.module = 'PICK A CHAPTER OR SECTION FROM THE CONTENTS // TAP A LINK TO JUMP // BACK RETURNS TO WHERE YOU WERE // F2 MENU'
 
-  const hint = reply ? (
-    <TypeText key={reply.id} className={reply.warn ? 'warn' : ''} lines={[reply.text]} />
-  ) : tipMode ? (
+  const result = reply ? { id: reply.id, warn: reply.warn, text: <TypeText key={reply.id} lines={[reply.text]} /> } : null
+  const hint = tipMode ? (
     t('TIP MODE: TAP ANY CONTROL TO READ WHAT IT DOES. TAP ? TIPS AGAIN OR PRESS ESC TO LEAVE.')
   ) : (
     t(hints[view.name])
@@ -1233,6 +1240,8 @@ export default function App() {
             keys={keys}
             onKey={onKey}
             hint={hint}
+            result={result}
+            onCloseResult={() => setReply(null)}
             onCommand={(c) => {
               setReply(null)
               onCommand(c)

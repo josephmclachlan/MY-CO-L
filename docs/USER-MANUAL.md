@@ -76,7 +76,7 @@ It looks like an old green-screen computer on purpose. Everything on it works by
 
 ### YOUR FIRST FIVE MINUTES
 
-1. Tap or press any key on the dark start screen. The boot text runs, then the MAIN MENU appears. After the first time, any key or tap skips the boot text.
+1. Tap or press any key on the dark start screen. The boot text runs, then the MAIN MENU appears. Any key or tap skips the boot text (unless TUNE > BOOT is set to ALWAYS FULL).
 2. On the MAIN MENU, tap a module (a numbered line) to open it. You can also type its number or name at the > prompt and press Enter. Try 12 for MISSION CONTROL.
 3. Look at the top left of any screen for the BACK button. It returns you to the screen you came from, with everything as you left it.
 4. Tap ? TIPS in the grey line under the title bar. Now tap a button: instead of pressing it, you get a note saying what it does. Tap ? TIPS again to leave. While tip mode is on, buttons do not press, so nothing saves.
@@ -102,10 +102,11 @@ The OWNER sees everything. A STAFF login logs the work (harvests, lots, power cu
 
 - **TITLE BAR**: The dark bar at the top. It shows the screen name. The < BACK button at the left goes back one step. On a phone the little saving lamp sits in the status line instead.
 - **STATUS LINE**: The small grey line under it: the device clock, DB LINKED or LOCAL MODE, NET OK or NET DOWN, the sound and look in use, the saving lamp, the ? TIPS button, the UNDO button (it shows up after your first saved change), and GLOVE when glove mode is on.
-- **INDEX (LEFT)**: The menu column on the left of a desktop screen. It lists the tabs or records for the screen you are on. On a phone it is hidden and the tabs sit across the top of the page instead.
+- **INDEX (LEFT)**: The menu column on the left of a desktop screen. It lists the tabs or records for the screen you are on. On a phone it is hidden: pick the tab from the SHOW list (or the strip of tabs) at the top of the page instead.
 - **MAIN PANEL**: The big box with the work in it. It scrolls by itself.
+- **ANSWER BAR**: A boxed line just above the prompt that appears after you save something, undo, or type a command. It says what happened. It is red when something went wrong and stays until you close it with X; other answers fade after about 12 seconds.
 - **> PROMPT**: The line with a blinking block. Type a word and press Enter: a number opens a module, a name opens a screen, FIND looks for a record. HELP lists every command.
-- **HINT LINE**: One line of advice for the screen you are on. After you save something it shows what happened.
+- **HINT LINE**: One line of advice for the screen you are on, under the prompt.
 - **F-KEY BAR**: The eight buttons at the bottom: F1 HELP, F2 MENU, F3 TUNE, F4 MUTE or SOUND, F5 THEME, F6 CLEAN or GLASS, F7 BOOT, F8 LOGIN or LOGOUT. On a phone you see four and a MORE key that opens the other four.
 
 ### THE SAVING LAMP AND UNDO
@@ -192,7 +193,7 @@ With no signal the app keeps working and queues the change. The lamp shows WAITI
 ### UNDO
 
 1. Press UNDO in the status line, or press Ctrl+Z, or type UNDO.
-2. The last saved change is reversed. The hint line says what was undone.
+2. The last saved change is reversed. The answer bar above the prompt says what was undone.
 3. You can undo many steps in a row, up to 40, until you close the app. After that use HISTORY to put old values back.
 
 ### HISTORY
@@ -873,7 +874,7 @@ Tip mode may be on. The ? TIPS button in the status line is lit. Tap it to turn 
 
 ### I CANNOT OPEN A SCREEN
 
-The sentence on the hint line says why. A staff login cannot open money screens, history, data or the textbook. Ask the owner.
+The answer bar above the prompt says why. A staff login cannot open money screens, history, data or the textbook. Ask the owner.
 
 ### THE SCREEN IS HARD TO READ
 

@@ -43,3 +43,41 @@
 }
 .rc-result { display: grid; gap: 10px; min-width: 0; scroll-margin-top: 4px; }
 .rc-result:empty { display: none; }
+
+/* Phones: a table too wide for the screen becomes cards (see components/TableCards.tsx), never a sideways slide. */
+@media (max-width: 700px) {
+  .as-cards { overflow-x: visible; }
+  .as-cards table,
+  .as-cards tbody,
+  .as-cards tr { display: block; width: auto; min-width: 0; }
+  .as-cards thead { display: none; }
+  .as-cards tr { border: 1px solid var(--fg-faint); margin: 0 0 6px; padding: 4px 6px; }
+  .as-cards tr.sel { outline: 2px solid var(--fg); }
+  .as-cards td,
+  .as-cards td:first-child {
+    display: block;
+    position: relative;
+    border: 0;
+    padding: 2px 0 2px 42%;
+    min-height: 1.3em;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
+  }
+  .as-cards td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 40%;
+    color: var(--fg-dim);
+    letter-spacing: 0.06em;
+    font-size: 0.92em;
+    overflow-wrap: anywhere;
+  }
+  .as-cards td[data-label=''] { padding-left: 0; }
+  .as-cards td[data-label='']::before { display: none; }
+  .as-cards td:empty { display: none; }
+  .as-cards td .btn, .as-cards td button { margin: 2px 6px 2px 0; }
+  .as-cards tr.sel td::before { color: inherit; }
+}

@@ -42,10 +42,8 @@
 }
 /* Warning colour on a selected (bright) row would vanish: use the row's dark text instead. */
 .mn tr.sel .lg-warn-text, .mn tr.sel .mn-down, .mn tr.sel small { color: var(--bg) !important; }
-.mn-swipe { display: none; }
 .mn-danger { margin-top: 4px; align-items: center; border-top: 1px dashed var(--fg-faint); padding-top: 6px; }
 @media (max-width: 700px) {
-  .mn-swipe { display: block; }
   .mn-linegrid { grid-template-columns: minmax(0, 1fr); position: sticky; left: 0; max-width: calc(100vw - 112px); }
   .mn-linegrid b { white-space: nowrap; }
 }

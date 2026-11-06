@@ -53,6 +53,9 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
   const { t: tt } = useT()
   const [test, setTest] = useState<{ t: Test; id: number } | null>(null)
   const run = (t: Test) => setTest({ t, id: Date.now() })
+  // Each test shows its output right under the row that started it, so it never sits on top of another control.
+  const where = (k: Test['kind']): string => (k === 'readout' ? 'typing' : k)
+  const out = (...kinds: Test['kind'][]) => (test && kinds.map(where).includes(where(test.t.kind)) ? <TestOut test={test} /> : null)
 
   const setLook = <K extends keyof LookSettings>(k: K, v: LookSettings[K]) =>
     update((s) => ({ ...s, look: { ...s.look, [k]: v } }))
@@ -175,6 +178,7 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
             TEST READOUT
           </button>
         </div>
+        {out('typing', 'readout')}
         <div className="tune-row">
           <span className="lbl">TYPING VOICE</span>
           {(['CLACK', 'BLIP'] as const).map((v) => (
@@ -191,6 +195,7 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
             TEST CHATTER
           </button>
         </div>
+        {out('chatter')}
 
         <Meter label="DRONE" value={snd.drone} onChange={(v) => setSound('drone', v)} format={pct} disabled={disabled} />
         <div className="tune-row">
@@ -199,6 +204,7 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
             TEST DRONE
           </button>
         </div>
+        {out('drone')}
 
         <Meter label="ROOM HUM" value={snd.hum} onChange={(v) => setSound('hum', v)} format={pct} disabled={disabled} />
 
@@ -224,6 +230,7 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
             ALARM
           </button>
         </div>
+        {test?.t.kind === 'signal' && test.t.text !== 'DEFAULTS RESTORED' && <TestOut test={test} />}
 
         <Meter label="WARBLE" value={snd.warble} onChange={(v) => setSound('warble', v)} format={pct} disabled={disabled} />
         <div className="tune-row">
@@ -232,6 +239,7 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
             TEST WARBLE
           </button>
         </div>
+        {out('warble')}
 
         <div className="tune-row">
           <span className="lbl">GLITCHES</span>
@@ -250,6 +258,7 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
             TEST GLITCH
           </button>
         </div>
+        {out('glitch')}
         <Meter label="GLITCH" value={snd.glitch} onChange={(v) => setSound('glitch', v)} format={pct} disabled={disabled || !snd.glitchOn} />
 
         <div className="tune-row">
@@ -288,29 +297,36 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
             RESET ALL
           </button>
         </div>
+        {test?.t.kind === 'signal' && test.t.text === 'DEFAULTS RESTORED' && <TestOut test={test} />}
       </section>
-      <div className="test-out" aria-live="polite">
-        <div className="dim">TEST OUTPUT</div>
-        {test?.t.kind === 'typing' && (
-          <TypeText
-            key={test.id}
-            lines={['LOT B1104 // 40 BLOCKS // KNOCKED TUE', 'BREAKER S17 // 75X // 1650W // CIRCUIT CLEAR']}
-          />
-        )}
-        {test?.t.kind === 'readout' && (
-          <TypeText
-            key={test.id}
-            group={5}
-            speed={20}
-            lines={['S13 MEGACHEF 1 ..... 1200W', 'S14 MEGACHEF 2 ..... 1200W', 'S15 MEGACHEF 3 ..... 1200W', 'S16 MEGACHEF 4 ..... 1200W', 'S17 75X ............ 1650W']}
-          />
-        )}
-        {test?.t.kind === 'chatter' && <DataColumns key={test.id} rows={3} cols={4} duration={2000} />}
-        {test?.t.kind === 'drone' && <DroneTest key={test.id} />}
-        {test?.t.kind === 'warble' && <WarbleTest key={test.id} />}
-        {test?.t.kind === 'signal' && <div key={test.id}>{test.t.text}</div>}
-        {test?.t.kind === 'glitch' && <div key={test.id}>SIGNAL FAULT // RECOVERED</div>}
-      </div>
+    </div>
+  )
+}
+
+/** What a TEST button shows, under its own row. */
+function TestOut({ test }: { test: { t: Test; id: number } }) {
+  return (
+    <div className="test-out" aria-live="polite">
+      <div className="dim">TEST OUTPUT</div>
+      {test.t.kind === 'typing' && (
+        <TypeText
+          key={test.id}
+          lines={['LOT B1104 // 40 BLOCKS // KNOCKED TUE', 'BREAKER S17 // 75X // 1650W // CIRCUIT CLEAR']}
+        />
+      )}
+      {test.t.kind === 'readout' && (
+        <TypeText
+          key={test.id}
+          group={5}
+          speed={20}
+          lines={['S13 MEGACHEF 1 ..... 1200W', 'S14 MEGACHEF 2 ..... 1200W', 'S15 MEGACHEF 3 ..... 1200W', 'S16 MEGACHEF 4 ..... 1200W', 'S17 75X ............ 1650W']}
+        />
+      )}
+      {test.t.kind === 'chatter' && <DataColumns key={test.id} rows={3} cols={4} duration={2000} />}
+      {test.t.kind === 'drone' && <DroneTest key={test.id} />}
+      {test.t.kind === 'warble' && <WarbleTest key={test.id} />}
+      {test.t.kind === 'signal' && <div key={test.id}>{test.t.text}</div>}
+      {test.t.kind === 'glitch' && <div key={test.id}>SIGNAL FAULT // RECOVERED</div>}
     </div>
   )
 }

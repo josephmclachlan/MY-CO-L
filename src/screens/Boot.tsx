@@ -18,7 +18,9 @@ export function Boot({ onDone }: { onDone: () => void }) {
   const [testDone, setTestDone] = useState(false)
   const [colsDone, setColsDone] = useState(false)
   const doneRef = useRef(false)
-  const canSkip = settings.bootSeen && !settings.fullBoot
+  // A tap or key skips the boot, the very first one too (it used to ignore taps for about 12 s).
+  // TUNE > BOOT > ALWAYS FULL turns skipping off.
+  const canSkip = !settings.fullBoot
 
   const finish = () => {
     if (doneRef.current) return
@@ -50,13 +52,19 @@ export function Boot({ onDone }: { onDone: () => void }) {
     }
   }, [testDone, colsDone, phase, sound])
 
-  // Any key or tap skips, once the full boot has been seen.
+  // Any key or tap skips. A short pause first, so the tap that powered the screen on (or a double tap) doesn't skip it too.
   useEffect(() => {
     if (!canSkip) return
     const skip = () => finish()
-    window.addEventListener('keydown', skip)
-    window.addEventListener('pointerdown', skip)
+    let armed = false
+    const t = window.setTimeout(() => {
+      armed = true
+      window.addEventListener('keydown', skip)
+      window.addEventListener('pointerdown', skip)
+    }, 500)
     return () => {
+      window.clearTimeout(t)
+      if (!armed) return
       window.removeEventListener('keydown', skip)
       window.removeEventListener('pointerdown', skip)
     }
@@ -100,7 +108,7 @@ export function Boot({ onDone }: { onDone: () => void }) {
           )}
         </div>
       )}
-      {canSkip && <div className="boot-skip dim">ANY KEY TO SKIP</div>}
+      {canSkip && <div className="boot-skip dim">TAP OR PRESS ANY KEY TO SKIP</div>}
     </div>
   )
 }

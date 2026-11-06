@@ -139,7 +139,8 @@
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-auto-rows: auto;
   grid-template-columns: minmax(0, 1fr);
   padding: clamp(8px, 1.6vw, 18px);
   gap: 6px;
@@ -233,6 +234,52 @@
   border: 0;
   background: transparent;
   color: transparent;
+}
+/* The answer to the last action, above the prompt: big enough to notice, never inside the page. */
+.result-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--fg);
+  background: color-mix(in srgb, var(--fg) 12%, var(--bg));
+  color: var(--fg);
+  padding: 6px 10px;
+  font-size: 0.95em;
+  line-height: 1.3;
+  animation: result-in 0.25s ease-out;
+}
+.result-bar.warn {
+  border-color: var(--warn, #ff5a4e);
+  color: var(--warn, #ff5a4e);
+  background: color-mix(in srgb, var(--warn, #ff5a4e) 12%, var(--bg));
+}
+.result-sign {
+  flex: none;
+  font-weight: bold;
+}
+.result-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  max-height: 4.2em;
+  overflow-y: auto;
+}
+.result-x {
+  flex: none;
+  background: none;
+  border: 1px solid currentColor;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+@keyframes result-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .result-bar { animation: none; }
 }
 .hintline {
   font-size: 0.78em;
@@ -552,7 +599,7 @@
   grid-template-columns: 9em minmax(0, 1fr) 3.2em;
   gap: 10px;
   align-items: center;
-  margin: 7px 0;
+  margin: 9px 0;
 }
 .meter-label {
   color: var(--fg-dim);
@@ -584,9 +631,10 @@
 }
 .meter input {
   position: absolute;
-  inset: -8px 0;
+  /* Bigger than the bar for fingers, but never reaching into the next meter (that made one slider grab another's taps). */
+  inset: -7px 0;
   width: 100%;
-  height: calc(100% + 16px);
+  height: calc(100% + 14px);
   margin: 0;
   opacity: 0;
   cursor: pointer;
@@ -620,13 +668,12 @@
 
 /* Test output stays pinned to the bottom of the tuning panel while scrolling. */
 .test-out {
-  position: sticky;
-  bottom: -12px;
+  /* Sits under the row whose TEST button was pressed; it used to float over the sliders. */
   background: var(--bg);
   border: 1px solid var(--fg-dim);
   padding: 8px 12px;
-  min-height: 4.6em;
-  z-index: 2;
+  margin: 4px 0 10px;
+  min-height: 3em;
 }
 
 .login {

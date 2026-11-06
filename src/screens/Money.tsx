@@ -212,7 +212,6 @@ export function Money({ x, set, say, onOpenTrade, onOpenLedger }: { x: MoneyStat
           {MONEY_TABS.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
         </Select>
       </label>
-      <div className="dim tiny mn-swipe">WIDE TABLES SLIDE SIDEWAYS: SWIPE THEM LEFT FOR MORE COLUMNS.</div>
       {(x.tab === 'OWED' || x.tab === 'RECEIPTS') && <div className="od-pay" role="note">{PAYMENT_RULE}</div>}
       {x.tab === 'OWED' && <OwedTab d={d} say={say} onOpenTrade={onOpenTrade} set={set} />}
       {x.tab === 'RECEIPTS' && <ReceiptsTab d={d} x={x} set={set} say={say} />}
