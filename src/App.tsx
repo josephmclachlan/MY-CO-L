@@ -26,6 +26,7 @@ import { Mission, MissionIndex, MISSION_START, type MissionState } from './scree
 import { Yield, YieldIndex, YIELD_START, YIELD_TABS, type YieldState } from './screens/Yield'
 import { Orders, OrdersIndex, ORDERS_START, ORDERS_TABS, type OrdersState } from './screens/Orders'
 import { Money, MoneyIndex, MONEY_START, MONEY_TABS, type MoneyState } from './screens/Money'
+import { Facility, FacilityIndex, FAC_START, FAC_TABS, ReminderWatcher, type FacState, type GoScreen } from './screens/Facility'
 import { History, HistoryIndex, HISTORY_START, HistoryNavContext, SyncLamp, UndoButton, undoneText, type HistoryState } from './screens/History'
 import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
@@ -63,6 +64,7 @@ const HISTORY_IDX = MODULES.findIndex((m) => m.key === 'HISTORY')
 const YIELD_IDX = MODULES.findIndex((m) => m.key === 'YIELD')
 const ORDERS_IDX = MODULES.findIndex((m) => m.key === 'ORDERS')
 const MONEY_IDX = MODULES.findIndex((m) => m.key === 'MONEY')
+const FACILITY_IDX = MODULES.findIndex((m) => m.key === 'FACILITY')
 
 /** Everything needed to put the terminal back on a screen: Back restores one of these. */
 interface Snap {
@@ -82,6 +84,7 @@ interface Snap {
   yld: YieldState
   ord: OrdersState
   money: MoneyState
+  fac: FacState
 }
 const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
@@ -130,6 +133,8 @@ export default function App() {
   const setOrd = useCallback((p: Partial<OrdersState>) => setOrdState((c) => ({ ...c, ...p })), [])
   const [money, setMoneyState] = useState<MoneyState>(MONEY_START)
   const setMoney = useCallback((p: Partial<MoneyState>) => setMoneyState((c) => ({ ...c, ...p })), [])
+  const [fac, setFacState] = useState<FacState>(FAC_START)
+  const setFac = useCallback((p: Partial<FacState>) => setFacState((c) => ({ ...c, ...p })), [])
   const store = useStore()
   const strains = useTable<Strain>('strains')
   useFxSync() // today's colones per dollar, once a day when online
@@ -137,7 +142,7 @@ export default function App() {
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money }
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -182,6 +187,7 @@ export default function App() {
     setYldState(s.yld)
     setOrdState(s.ord)
     setMoneyState(s.money)
+    setFacState(s.fac)
     power.setSelectedRoom(s.room)
     setReply(null)
     setSweep((n) => n + 1)
@@ -286,6 +292,25 @@ export default function App() {
     setSelected(MONEY_IDX)
     if (!here) go({ name: 'module', idx: MONEY_IDX }, false)
     else sound.chirp()
+  }
+  const openFacility = (p: Partial<FacState>) => {
+    const here = view.name === 'module' && view.idx === FACILITY_IDX
+    if (!here) pushHist()
+    setFac(p)
+    setSelected(FACILITY_IDX)
+    if (!here) go({ name: 'module', idx: FACILITY_IDX }, false)
+    else sound.chirp()
+  }
+  const openModuleKey = (key: string) => {
+    const idx = MODULES.findIndex((m) => m.key === key)
+    if (idx < 0) return
+    setSelected(idx)
+    go({ name: 'module', idx })
+  }
+  const goScreen = (screen: GoScreen, tab?: string) => {
+    if (screen === 'FACILITY') return openFacility({ tab: (FAC_TABS.find((t) => t === tab) ?? 'STATUS') })
+    if (screen === 'MONEY') return openMoney({ tab: (MONEY_TABS.find((t) => t === tab) ?? 'OWED') })
+    return openModuleKey(screen === 'XENO' ? 'XENO' : screen)
   }
   const openHistory = (p: Partial<HistoryState>) => {
     const here = view.name === 'module' && view.idx === HISTORY_IDX
@@ -560,6 +585,19 @@ export default function App() {
       setMoney({ tab: mTab })
       return sound.chirp()
     }
+    // Facility logs: power cuts, water, upkeep, cleaning, checklists, reminders.
+    if (['FACILITY', 'FACILITIES', 'STATIONBOARD', 'BOARDSTATUS'].includes(cmd)) return openFacility({ tab: 'STATUS' })
+    if (['POWERCUT', 'POWERCUTS', 'CUT', 'CUTS', 'OUTAGE', 'OUTAGES', 'BLACKOUT'].includes(cmd)) return openFacility({ tab: 'POWER CUTS' })
+    if (['WATER', 'WATERTEST', 'WATERLOG'].includes(cmd)) return openFacility({ tab: 'WATER' })
+    if (['CHECKLIST', 'CHECKLISTS', 'SIGNOFF'].includes(cmd)) return openFacility({ tab: 'CHECKLISTS' })
+    if (['MAINT', 'MAINTENANCE', 'UPKEEP', 'EQUIPMENT'].includes(cmd)) return openFacility({ tab: 'MAINTENANCE' })
+    if (['CLEANING', 'SANITATION', 'CLEANLOG'].includes(cmd)) return openFacility({ tab: 'CLEANING' })
+    if (['REMINDERS', 'REMINDER', 'REMIND'].includes(cmd)) return openFacility({ tab: 'REMINDERS' })
+    const fTab = FAC_TABS.find((t) => t.replace(' ', '') === cmd)
+    if (fTab && view.name === 'module' && view.idx === FACILITY_IDX) {
+      setFac({ tab: fTab })
+      return sound.chirp()
+    }
     // Power and rooms.
     const openVitals = () => {
       setSelected(VITALS_IDX)
@@ -800,6 +838,7 @@ export default function App() {
       if (view.idx === VITALS_IDX)
         content = (
           <Vitals
+            onOpenCuts={() => openFacility({ tab: 'POWER CUTS' })}
             onOpenRoom={(r) => {
               power.setSelectedRoom(r)
               setSelected(DECK_IDX)
@@ -875,6 +914,7 @@ export default function App() {
       else if (view.idx === MISSION_IDX) content = <Mission x={mission} set={setMission} say={say} openRecord={(key, strainId) => openXeno({ tab: 'LINEAGE', strain: strainId, node: key })} onOpenOrders={(tab) => openOrders({ tab })} />
       else if (view.idx === YIELD_IDX) content = <Yield x={yld} set={setYld} say={say} />
       else if (view.idx === ORDERS_IDX) content = <Orders x={ord} set={setOrd} say={say} />
+      else if (view.idx === FACILITY_IDX) content = <Facility x={fac} set={setFac} say={say} onGo={goScreen} />
       else if (view.idx === MONEY_IDX) content = <Money x={money} set={setMoney} say={say} onOpenTrade={() => openTrade({ tab: 'SALE' })} onOpenLedger={() => openLedger({ sel: 'bills' })} />
       else if (view.idx === HISTORY_IDX) content = <History x={hist} set={setHist} say={say} />
       else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} onOpenPrices={() => openLedger({ sel: 'settings' })} onOpenOrders={() => openOrders({ tab: 'ORDERS' })} />
@@ -914,6 +954,8 @@ export default function App() {
     hints.module = 'EVERY BUYER PAYS CASH ON DELIVERY // PICK LIST COMPARES ORDERS WITH THE FORECAST // TYPE FORECAST, PACK OR WHATSAPP // F2 MENU'
   if (view.name === 'module' && view.idx === MONEY_IDX)
     hints.module = 'CASH ON DELIVERY // US$ AT EACH RECORD\'S OWN DAY // TYPE OWED, PNL, CASH, TRENDS, WASTE, TRACE OR WHATIF // F2 MENU'
+  if (view.name === 'module' && view.idx === FACILITY_IDX)
+    hints.module = 'PRESS POWER WENT OUT THE MOMENT THE GRID FAILS // TYPE POWERCUT, WATER, CHECKLIST, MAINT, CLEANING OR REMINDERS // TIMES ARE THE FARM CLOCK // F2 MENU'
   if (view.name === 'module' && view.idx === HISTORY_IDX)
     hints.module = 'TAP A CHANGE TO SEE THAT RECORD // UNDO OR CTRL+Z REVERSES THE LAST CHANGE // TYPE SYNC FOR SAVING STATUS // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
@@ -929,6 +971,7 @@ export default function App() {
     <ManualLinksContext.Provider value={links}>
     <HistoryNavContext.Provider value={openRecordHistory}>
     <Crt alert={alert}>
+      <ReminderWatcher />
       {stage === 'login' ? (
         <div className="shell" style={{ gridTemplateRows: 'auto minmax(0,1fr)' }}>
           <header className="titlebar">
@@ -976,6 +1019,8 @@ export default function App() {
                             ? <OrdersIndex x={ord} set={setOrd} />
                           : view.name === 'module' && view.idx === MONEY_IDX
                             ? <MoneyIndex x={money} set={setMoney} />
+                          : view.name === 'module' && view.idx === FACILITY_IDX
+                            ? <FacilityIndex x={fac} set={setFac} />
                           : moduleIndex
             }
             keys={keys}
@@ -989,7 +1034,7 @@ export default function App() {
             onBack={histLen > 0 ? goBack : undefined}
             lamp={<SyncLamp onOpen={() => openHistory({ tab: 'SYNC' })} />}
             undo={<UndoButton say={say} />}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX) ? ' view-ledger' : ''}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX) ? ' view-ledger' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>
