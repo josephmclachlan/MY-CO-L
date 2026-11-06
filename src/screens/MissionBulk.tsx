@@ -10,7 +10,7 @@ import { GRADES } from '../data/ledger'
 import { speciesName } from '../store/useLedger'
 import { hazardName } from '../lib/hazard'
 import { nextFlush } from '../lib/mission'
-import { addDays, todayIso, type BlockLot, type LotStatus } from '../lib/xeno'
+import { addDays, notFuture, todayIso, type BlockLot, type LotStatus } from '../lib/xeno'
 import { planSplit, ROOM_CHOICES, roomName, speciesLabel, survivors } from '../lib/records'
 import { bulkLots, harvestSession, inoculateCart, splitLot, cleanCart, type CartLine } from '../lib/recordsActions'
 import { expectFor } from '../lib/mission'
@@ -105,7 +105,10 @@ export function HarvestSession({ m, say, only }: { m: MLike; say: Say; only?: st
 
   const save = async () => {
     const ok = await run(
-      () => harvestSession(store, { day, initials: by, rows: entries.map((e) => ({ lot: e.r.lot, kg: e.k, flush: Math.floor(e.f), grade })) }),
+      async () => {
+        notFuture(day, 'HARVEST')
+        return harvestSession(store, { day, initials: by, rows: entries.map((e) => ({ lot: e.r.lot, kg: e.k, flush: Math.floor(e.f), grade })) })
+      },
       tf('HARVEST SESSION // {n} LOTS // {kg} KG', { n: entries.length, kg: kg1(total) }),
     )
     if (ok) {
@@ -201,6 +204,7 @@ export function InoculateCart({ m, say }: { m: MLike; say: Say }) {
     const cl: CartLine[] = lines.map((l) => ({ species: l.species, strainId: l.strainId || null, grainId: l.grainId || null, blocks: num(l.blocks) ?? 0 }))
     let made: BlockLot[] = []
     const ok = await run(async () => {
+      notFuture(knock, 'KNOCK')
       made = await inoculateCart(store, { cart: name ?? '', knock, by, cookId: cookId || null, room, lines: cl, lots: m.lots, strains: m.strains, grain: m.grain })
     }, `CART ${name} INOCULATED // ${total} BLOCKS`)
     if (ok) {

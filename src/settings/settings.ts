@@ -1,3 +1,4 @@
+import { normLang } from '../lib/i18n'
 // Every adjustable look and sound value lives here, with its default.
 // Settings are saved on this device (localStorage), so phone and laptop can be
 // tuned differently: a phone speaker wants different levels than a laptop.
@@ -97,7 +98,7 @@ export function loadSettings(): Settings {
     return {
       ...DEFAULTS,
       ...saved,
-      lang: saved.lang === 'ES' ? 'ES' : 'EN',
+      lang: normLang(saved.lang),
       glove: saved.glove === true,
       look: { ...DEFAULTS.look, ...(saved.look ?? {}) },
       sound: { ...DEFAULTS.sound, ...(saved.sound ?? {}) },

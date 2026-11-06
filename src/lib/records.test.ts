@@ -9,7 +9,7 @@ import type { Harvest } from './ledger'
 import type { LotLoss } from './hazard'
 import type { CookRun } from './cook'
 import {
-  allRecords, BLOCK_DRY_KG, fadingStrains, groupStats, isoWeek, lotRecord, nextPinFlush, pickerTotals, planSplit, scorecard, splitCode, survivors, trialArms, trialVerdict,
+  allRecords, BLOCK_DRY_KG, fadingStrains, flushTest, groupStats, isoWeek, lotRecord, nextPinFlush, pickerTotals, planSplit, scorecard, splitCode, survivors, trialArms, trialVerdict,
   type FlushLog, type StrainTrial,
 } from './records'
 import { bulkLots, createTrial, dropExtras, harvestSession, inoculateCart, logPins, setLotPlace, splitLot } from './recordsActions'
@@ -464,5 +464,42 @@ describe('scan: what a label or a typed code opens', () => {
   })
   it('cart label address round-trips', () => {
     expect(cartUrl('C-07')).toMatch(/#cart\/C-07$/)
+  })
+})
+
+describe('flush test (Joseph 6 Nov 2026: test multiple flushes before committing)', () => {
+  // Three spent lion's mane lots of 10 blocks (no losses):
+  //   L1: flush 1 10 kg (day 1), flush 2 5 kg (day 15), flush 3 1 kg (day 30)
+  //   L2: flush 1 12 kg (day 1), flush 2 6 kg (day 13)
+  //   L3: flush 1 8 kg (day 1),  flush 2 4 kg (day 14), flush 3 1 kg (day 29)
+  // kg/block: flush 1 = (1 + 1.2 + 0.8) / 3 = 1.0; flush 2 = (0.5 + 0.6 + 0.4) / 3 = 0.5; flush 3 = (0.1 + 0 + 0.1) / 3 = 0.0667
+  // vs flush 1: 100%, 50%, 6.7% -> suggest 2 (flush 3 adds under 15%). Gaps: f2 (14+12+13)/3 = 13, f3 (15+15)/2 = 15.
+  const L = (id: string, status: BlockLot['status'] = 'spent') => lot(id, id, { species_key: 'lions-mane', bag_count: 10, knock_date: '2026-09-01', status })
+  const lots = [L('L1'), L('L2'), L('L3'), L('L4', 'fruiting')]
+  const h = [
+    harv('a1', 'L1', '2026-10-01', 10, 1), harv('a2', 'L1', '2026-10-15', 5, 2), harv('a3', 'L1', '2026-10-30', 1, 3),
+    harv('b1', 'L2', '2026-10-01', 12, 1), harv('b2', 'L2', '2026-10-13', 6, 2),
+    harv('c1', 'L3', '2026-10-01', 8, 1), harv('c2', 'L3', '2026-10-14', 4, 2), harv('c3', 'L3', '2026-10-29', 1, 3),
+    harv('d1', 'L4', '2026-10-20', 9, 1),
+  ]
+  const recs = allRecords(lots, [], h, [])
+  it('a lot in test stays open after flush 1 until marked spent', () => {
+    expect(recs.find((r) => r.lot.id === 'L4')!.complete).toBe(false)
+    expect(recs.find((r) => r.lot.id === 'L2')!.complete).toBe(true)
+  })
+  it('shows what each flush gives and suggests a count', () => {
+    const t = flushTest(recs, 'lions-mane')
+    expect(t.finished).toBe(3)
+    expect(t.open).toBe(1)
+    expect(t.rows.map((r) => Number(r.kgPerBlock.toFixed(4)))).toEqual([1, 0.5, 0.0667])
+    expect(t.rows.map((r) => r.lots)).toEqual([3, 3, 2])
+    expect(t.rows[1].vsFirstPct).toBeCloseTo(50, 6)
+    expect(t.rows.map((r) => r.gapDays)).toEqual([null, 13, 15])
+    expect(t.rows.reduce((n, r) => n + r.sharePct, 0)).toBeCloseTo(100, 6)
+    expect(t.suggest).toBe(2)
+  })
+  it('waits for 3 finished lots before suggesting', () => {
+    expect(flushTest(recs.filter((r) => r.lot.id !== 'L3'), 'lions-mane').suggest).toBeNull()
+    expect(flushTest(recs, 'blue-oyster')).toMatchObject({ finished: 0, rows: [], suggest: null })
   })
 })

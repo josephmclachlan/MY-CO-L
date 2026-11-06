@@ -31,6 +31,16 @@ export function Manual({ loc, onOpen }: Props) {
       </div>
     )
   if (state.status === 'loading') return <span className="processing">LOADING MANUAL</span>
+  if (state.status === 'missing')
+    return (
+      <div>
+        <div className="section-title">MANUAL</div>
+        <div className="warn">MANUAL NOT AVAILABLE</div>
+        <div className="dim" style={{ marginTop: 8 }}>
+          {state.why}
+        </div>
+      </div>
+    )
   return <Reader data={state.data} loc={loc} onOpen={onOpen} />
 }
 

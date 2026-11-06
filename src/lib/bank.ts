@@ -11,6 +11,7 @@ import type { Harvest } from './ledger'
 import {
   addDays,
   daysBetween,
+  grainRemaining,
   isActiveCulture,
   todayIso,
   type AgeCheck,
@@ -53,6 +54,11 @@ export interface Practice {
   yieldDropPct: number
   /** One buyer's share of a week's standing orders (by value) above which the order list marks them, % (Joseph 6 Nov 2026: 30%, unconfirmed). */
   buyerCapPct: number
+  /**
+   * Flushes per species once you commit (Joseph 6 Nov 2026: test multiple flushes on every crop first).
+   * A species missing here is IN TEST: its lots stay open for up to TEST_FLUSH_MAX flushes until marked SPENT.
+   */
+  flushPlan: Record<string, number>
 }
 
 export const PRACTICE_ID = 'practice'
@@ -73,23 +79,30 @@ export const DEFAULT_PRACTICE: Practice = {
   slowerPct: 25,
   yieldDropPct: 15,
   buyerCapPct: 30,
+  flushPlan: {},
 }
 
 /** Which defaults are guesses waiting on Joseph (shown on screen and in the PR). */
 export const PRACTICE_GUESS: Partial<Record<keyof Practice, string>> = {
-  spareBlockPct: 'GUESS: 5% (ABOUT 7 OF 130). THE TEXTBOOK SAYS KEEP SPARES BUT GIVES NO NUMBER.',
-  spareMasters: 'TEXTBOOK SAYS 1-2 A WEEK, BUT TWO 75X RUNS HAVE NO FREE SLOT, SO 0 UNTIL THE FIRST RUN IS MEASURED.',
-  bagsPer75xRun: 'OPEN: 5-6 G2 BAGS A LOAD. 4 LB MASTERS MAY LET MORE FIT. MEASURE THE FIRST RUN.',
-  bankSlants: 'TEXTBOOK SAYS 3-5. 4 PICKED.',
-  bankWater: 'TEXTBOOK SAYS 3-5. 4 PICKED.',
-  slowerPct: 'GUESS: THE TEXTBOOK SAYS "CLEARLY SLOWER" WITHOUT A NUMBER.',
-  yieldDropPct: 'GUESS: NO SOURCE GIVES A NUMBER FOR A SLIPPING STRAIN.',
-  buyerCapPct: 'JOSEPH SAID 30% BUT MARKED IT UNCONFIRMED. THE TEXTBOOK SAYS ONLY "ONE-BUYER CAP".',
+  bagsPer75xRun: 'CONFIRMED 6 FOR NOW (JOSEPH, 6 NOV 2026). CHANGE IT AFTER THE FIRST REAL RUN.',
 }
 
 const num = (v: unknown, d: number, lo: number, hi: number) => {
   const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN
   return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : d
+}
+
+/** Max flushes a lot IN TEST can log before it counts as finished (mark SPENT sooner when the blocks stop). */
+export const TEST_FLUSH_MAX = 4
+
+function mergeFlushPlan(v: unknown): Record<string, number> {
+  const out: Record<string, number> = {}
+  if (v && typeof v === 'object')
+    for (const [k, n] of Object.entries(v as Record<string, unknown>)) {
+      const f = typeof n === 'number' ? Math.round(n) : NaN
+      if (f >= 1 && f <= TEST_FLUSH_MAX) out[k] = f
+    }
+  return out
 }
 
 /** Saved settings over the defaults. Bad or missing values fall back; nothing throws. */
@@ -114,6 +127,7 @@ export function mergePractice(v: unknown): Practice {
     slowerPct: num(o.slowerPct, d.slowerPct, 1, 200),
     yieldDropPct: num(o.yieldDropPct, d.yieldDropPct, 1, 90),
     buyerCapPct: num(o.buyerCapPct, d.buyerCapPct, 5, 100),
+    flushPlan: mergeFlushPlan(o.flushPlan),
   }
 }
 
@@ -354,6 +368,48 @@ export function bankStatus(strain: Strain, cultures: Culture[], checks: Viabilit
   if (out.due) out.warnings.push(`${out.due} TUBE${out.due > 1 ? 'S' : ''} DUE OR ON WATCH`)
   if (sl + wt > 0 && out.passed === 0 && out.pendingTests === 0) out.warnings.push('NO T/E TEST ON FILE: TEST BEFORE THE STRAIN FEEDS PRODUCTION')
   return out
+}
+
+// ---------- Friday culture check (Catawba's lab routine, t26: Joseph 6 Nov 2026 asked to mirror Catawba) ----------
+// "Each Friday, every strain in use should have a fresh plate or P2 wedge in the fridge, its slants and water tube
+// banked, and a backup spawn bag less than 6 weeks old." {F24-0040 F24-0041 F24-0042}
+
+export const FRESH_PLATE_DAYS = 30
+export const BACKUP_SPAWN_DAYS = 42
+
+export interface FridayRow {
+  strain: Strain
+  /** Newest clean working plate (P1 or later) made in the last 30 days, if any. */
+  plate: Culture | null
+  slant: boolean
+  water: boolean
+  /** Grain (G1 or G2) under 6 weeks old with bags left, if any. */
+  spawn: GrainRun | null
+  missing: string[]
+}
+
+export function fridayCheck(strains: Strain[], cultures: Culture[], runs: GrainRun[], lots: BlockLot[], checks: ViabilityCheck[], tests: BankTest[], p: Practice = DEFAULT_PRACTICE, now = todayIso()): FridayRow[] {
+  return strains
+    .filter((s) => s.active)
+    .map((strain) => {
+      const plate =
+        cultures
+          .filter((c) => c.strain_id === strain.id && c.kind === 'plate' && isActiveCulture(c) && (c.p_level ?? 1) >= 1 && daysBetween(c.made_on, now) <= FRESH_PLATE_DAYS && c.made_on <= now)
+          .sort((a, b) => b.made_on.localeCompare(a.made_on))[0] ?? null
+      const b = bankStatus(strain, cultures, checks, tests, p, now)
+      const spawn =
+        runs
+          .filter((g) => g.strain_id === strain.id && ['incubating', 'ready', 'cold_storage'].includes(g.status) && daysBetween(g.inoculated_on, now) <= BACKUP_SPAWN_DAYS && grainRemaining(g, runs, lots) > 0)
+          .sort((a, b2) => b2.inoculated_on.localeCompare(a.inoculated_on))[0] ?? null
+      const slant = b.slants + b.offsiteSlants > 0
+      const water = b.water + b.offsiteWater > 0
+      const missing: string[] = []
+      if (!plate) missing.push('FRESH PLATE')
+      if (!slant) missing.push('SLANT')
+      if (!water) missing.push('WATER TUBE')
+      if (!spawn) missing.push('BACKUP SPAWN')
+      return { strain, plate, slant, water, spawn, missing }
+    })
 }
 
 // ---------- contamination by stage (t16 Our farm) ----------

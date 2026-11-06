@@ -4,7 +4,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { ES } from './es'
-import { ES_COMMANDS, normLang, placeholders, tr, trf } from './i18n'
+import { ES_COMMANDS, SPANISH_ON, normLang, placeholders, tr, trf } from './i18n'
 
 const ROOT = join(__dirname, '..')
 const files: string[] = []
@@ -107,7 +107,8 @@ describe('Spanish dictionary', () => {
     expect(trf('ES', '{n} FOUND', { n: 3 })).toBe('3 ENCONTRADOS')
     expect(trf('EN', '{n} FOUND', { n: 3 })).toBe('3 FOUND')
     expect(trf('ES', 'STOCK TAKE // {c} COUNTS SAVED', { c: 4 })).toBe('CONTEO DE INVENTARIO // 4 CONTEOS GUARDADOS')
-    expect(normLang('ES')).toBe('ES')
+    // Spanish is switched off for now (Joseph 6 Nov 2026): a saved ES falls back to English.
+    expect(normLang('ES')).toBe(SPANISH_ON ? 'ES' : 'EN')
     expect(normLang('fr')).toBe('EN')
     expect(normLang(undefined)).toBe('EN')
   })

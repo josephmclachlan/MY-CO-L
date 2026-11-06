@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buyers, byChannel, lastSaleTo, margin, newSale, parseLots, weekly } from './trade'
+import { buyers, byChannel, lastSaleTo, lotLooksRight, margin, newSale, parseLots, weekly } from './trade'
 import { weekOf } from './ledger'
 
 const s = (p: Parameters<typeof newSale>[0]) => newSale(p)
@@ -33,5 +33,12 @@ describe('trade', () => {
   })
   it('weekly buckets', () => {
     expect(weekly(list, weekOf).map((w) => w.week)).toEqual(['2026-11-02', '2026-11-09'])
+  })
+})
+
+describe('Catawba lot codes (Joseph 6 Nov 2026)', () => {
+  it('accepts one or two letters, MMDD, and the -2 / -S1 suffixes', () => {
+    for (const ok of ['B1020', 'CT1103', 'PK0915', 'GF0101-2', 'B1020-S1']) expect(lotLooksRight(ok)).toBe(true)
+    for (const bad of ['B102', 'ABC1020', '1020', 'b1020', 'CT11030']) expect(lotLooksRight(bad)).toBe(false)
   })
 })

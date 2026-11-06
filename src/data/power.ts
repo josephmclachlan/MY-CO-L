@@ -194,13 +194,13 @@ export const MAIN: Circuit[] = [
 export const SUB: Circuit[] = [
   {
     id: 's1', tag: 'S1', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'FOGEL 3-DOOR COLD ROOM 1', short: 'COLD ROOM 1', note: 'Compressor load. Put a voltage protector on it.',
-    items: [it('fogel1', 'Fogel 3-door cold room 1', 1, 800, 'packing')],
+    name: 'FOGEL 3-DOOR COLD ROOM 1', short: 'COLD ROOM 1', note: 'Compressor load. Put a voltage protector on it. Sits outside under the roof, by the fruiting room door (Joseph, 6 Nov 2026).',
+    items: [it('fogel1', 'Fogel 3-door cold room 1', 1, 800, 'outside', true, false)],
   },
   {
     id: 's2', tag: 'S2', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'FOGEL 3-DOOR COLD ROOM 2', short: 'COLD ROOM 2', note: 'Start 5-10 s after cold room 1.',
-    items: [it('fogel2', 'Fogel 3-door cold room 2', 1, 800, 'packing')],
+    name: 'FOGEL 3-DOOR COLD ROOM 2', short: 'COLD ROOM 2', note: 'Start 5-10 s after cold room 1. Outside under the roof, by the fruiting room door.',
+    items: [it('fogel2', 'Fogel 3-door cold room 2', 1, 800, 'outside', true, false)],
   },
   {
     id: 's3', tag: 'S3', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
@@ -211,8 +211,8 @@ export const SUB: Circuit[] = [
     ],
   },
   {
-    id: 's4', tag: 'S4', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: false,
-    name: '3 HEPA FAN FILTER UNITS 2X4', short: 'HEPA FFU x3', note: '150 W each. Keeps the lab positive.',
+    id: 's4', tag: 'S4', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
+    name: '3 HEPA FAN FILTER UNITS 2X4', short: 'HEPA FFU x3', note: '150 W each. Keeps the lab positive. On the generator list (Joseph, 6 Nov 2026): not in the electrical package list.',
     items: [it('ffu', 'Clean Room International 2x4 HEPA fan filter unit', 3, 450, 'lab', true, false)],
   },
   {
@@ -230,7 +230,7 @@ export const SUB: Circuit[] = [
     name: 'TAC XL FOGGER + CHEST FRIDGE', short: 'FOGGER + FRIDGE', note: 'Fogger about 300 W (est), chest fridge 150 W.',
     items: [
       it('tac', 'TAC Misting XL sonic fogger', 1, 300, 'fruiting'),
-      it('chest', 'Square chest fridge (lab fridge)', 1, 150, 'lab'),
+      it('chest', 'Square chest fridge (culture fridge, on the generator list: Joseph 6 Nov 2026)', 1, 150, 'lab'),
     ],
   },
   {
@@ -266,7 +266,7 @@ export const SUB: Circuit[] = [
   {
     id: 'bag', tag: 'S11', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'int', em: false,
     name: 'THOR MINI BAGGER', short: 'BAGGER', note: 'Weekly bag run. The water pump (ckt 18, L2) runs with it.',
-    items: [it('thor', 'Thor mini bagger', 1, 600, 'boiling')],
+    items: [it('thor', 'Thor mini bagger', 1, 600, 'packing', true, false)],
   },
   {
     id: 'seal', tag: 'S12', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'int', em: false,
@@ -330,8 +330,10 @@ export function allCircuits(opt: HeaterOption): Circuit[] {
 
 /** Continuous loads: s1-s10 plus the four mini-splits. */
 export const BASE = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10', 'c34', 'c56', 'c78', 'c910']
-/** Generator emergency list: cold rooms, extraction, fogger + chest fridge, lab controls. */
-export const EMERG = ['s1', 's2', 's3', 's6', 's8']
+/** The electrical package's generator list: cold rooms, extraction, fogger + chest fridge, lab controls. */
+export const PACKAGE_EMERG = ['s1', 's2', 's3', 's6', 's8']
+/** The farm's generator emergency list: the package list plus the lab HEPA units (S4, 450 W), added by Joseph 6 Nov 2026. */
+export const EMERG = [...PACKAGE_EMERG, 's4']
 export const MEGACHEFS = ['m1', 'm2', 'm3', 'm4']
 export const HEATER_IDS = ['c12', 'c12b']
 export const AC_IDS = ['c34', 'c56', 'c78', 'c910']

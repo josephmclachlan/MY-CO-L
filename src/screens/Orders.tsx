@@ -47,6 +47,7 @@ import {
 } from '../lib/orders'
 import { holdFor, owed } from '../lib/money'
 import type { Sale } from '../lib/trade'
+import { SPANISH_ON } from '../lib/i18n'
 import { changeTerms, createOrder, deleteOrder, deliverAll, deliverLine, endOrder, restartOrder, setNote, setWeekKg } from '../lib/ordersActions'
 
 // STANDING ORDERS: what each buyer takes every week, the 1-3 week harvest forecast from the lots in the rooms,
@@ -783,7 +784,7 @@ function ListTab({ d, x, set, say }: { d: OrdersData; x: OrdersState; set: SetOr
   const { sound } = useApp()
   const [edited, setEdited] = useState<{ key: string; text: string } | null>(null)
   const offs = useMemo(() => offers(d.plan, (s) => salePrice(s, 'fresh').price, (s) => nice(sp(s))), [d.plan])
-  const text = useMemo(() => whatsappText({ lang: x.lang, week: d.week, offers: offs, farm: STATION.company, nameEs: (s) => NAME_ES[s] ?? nice(sp(s)) }), [x.lang, d.week, offs])
+  const text = useMemo(() => whatsappText({ lang: SPANISH_ON ? x.lang : 'EN', week: d.week, offers: offs, farm: STATION.company, nameEs: (s) => NAME_ES[s] ?? nice(sp(s)) }), [x.lang, d.week, offs])
   const key = `${x.lang}|${d.week}|${text}`
   const shown = edited && edited.key === key ? edited.text : text
   const [msg, setMsg] = useState('')
@@ -810,10 +811,10 @@ function ListTab({ d, x, set, say }: { d: OrdersData; x: OrdersState; set: SetOr
       </div>
       <div className="ck-box">
         <div className="section-title">MESSAGE</div>
-        <div className="lg-btns" role="group" aria-label="Language">
+        {SPANISH_ON && <div className="lg-btns" role="group" aria-label="Language">
           {(['EN', 'ES'] as Lang[]).map((l) => <button key={l} type="button" className={`btn ${x.lang === l ? 'on' : ''}`} aria-pressed={x.lang === l} onClick={() => (sound.chirp(), set({ lang: l }))}>{l === 'EN' ? 'ENGLISH' : 'ESPAÑOL'}</button>)}
-        </div>
-        {x.lang === 'ES' && <div className="dim tiny">SPANISH NAMES AND WORDING ARE A GUESS: READ THEM BEFORE SENDING. <Guess /></div>}
+        </div>}
+        {SPANISH_ON && x.lang === 'ES' && <div className="dim tiny">SPANISH NAMES AND WORDING ARE A GUESS: READ THEM BEFORE SENDING. <Guess /></div>}
         <label className="ck-field">
           <span>EDIT IT IF YOU LIKE, THEN COPY</span>
           <textarea className="od-text" aria-label="WhatsApp message" rows={Math.min(14, shown.split('\n').length + 1)} value={shown} onChange={(e) => setEdited({ key, text: e.target.value })} />

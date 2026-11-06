@@ -113,6 +113,18 @@ nobody can download or delete models from a browser.
 The first question after a restart (or each new day) is the slowest, because the model reads the whole tool list
 once. Later questions reuse that.
 
+## 6b. The textbook (MANUAL screen)
+
+The textbook is never in the download (GitHub can be read by others). Copy it onto the box once:
+
+```
+./mycol.sh manual manual.json      # the file is in the project files, farm-box folder
+```
+
+Then open **MANUAL** in the app. The box hands the textbook only to someone logged in, so log in first. It is not
+kept for offline use: with the box off, MANUAL says so. Updates leave it in place; run the command again only when
+a new textbook file is made. WHY? links open the cited section the same way.
+
 ## 7. Updates
 
 - With internet on the box: make a GitHub token once (GitHub > Settings > Developer settings > Fine-grained

@@ -16,7 +16,7 @@ export const STAFF_GUESSES = [
   'STAFF can open: specimen files, vitals, deck plan, stock (without prices), genetics, hazard index, cook log (without costs), production sequence, mission control (harvests, bulk, scan), production records, facility logs, climate, search. Owner only: ledger, trade, standing orders, money, history, data, manual.',
   'Staff read every money table as empty and cannot write it. In the database (migration 0016) the same rule is enforced by the server, so changing the app does not get around it.',
   'In local mode (no Supabase account) the lock is a convenience: it keeps a helper out of the money screens, but the data sits in this browser and anyone who knows how can get at it. The PIN is 4 to 12 digits, kept scrambled (not readable), five wrong tries wait 30 seconds.',
-  'Staff screens and prompts can be set to Spanish on TUNE (or type ESPAÑOL). The Spanish was written by Claude: have a native speaker on the farm read it.',
+  'Spanish is switched off for now (your call, 6 Nov 2026: one user, all English). It can come back later.',
   'History for staff: their own writes are logged with the login e-mail (linked) or the name set on HISTORY (local), but staff cannot open the history screen.',
 ]
 
@@ -57,7 +57,7 @@ export function Staff({ say }: { say: Say }) {
   const ownerNames = OWNER_ONLY_MODULES.map(name)
 
   const savePin = async () => {
-    if (!validPin(pin)) return say(tf('THE PIN IS {a} TO {b} DIGITS.', { a: PIN_MIN, b: PIN_MAX }), true)
+    if (!validPin(pin)) return say(tf('THE PIN IS {n} DIGITS.', { n: PIN_MIN }), true)
     if (pin !== pin2) return say(t('THE TWO PINS DO NOT MATCH.'), true)
     try {
       await r.setPin(pin)
@@ -107,7 +107,7 @@ export function Staff({ say }: { say: Say }) {
         <Box title={t('OWNER: UNLOCK THIS DEVICE')}>
           <label className="ck-field">
             <span>{t('OWNER PIN')}</span>
-            <input className="sr-input" type="password" inputMode="numeric" autoComplete="off" aria-label={t('Owner PIN')} value={tryPin} maxLength={PIN_MAX} onChange={(e) => setTryPin(e.target.value.replace(/\D/g, ''))} onKeyDown={(e) => { if (e.key === 'Enter') void unlock() }} />
+            <input className="sr-input" type="password" inputMode="numeric" autoComplete="off" aria-label={t('Owner PIN')} value={tryPin} maxLength={12} onChange={(e) => setTryPin(e.target.value.replace(/\D/g, ''))} onKeyDown={(e) => { if (e.key === 'Enter') void unlock() }} />
           </label>
           <button type="button" className="btn on" disabled={!tryPin} onClick={() => void unlock()}>{t('UNLOCK')}</button>
           {msg && <div className={msg.warn ? 'warn' : ''}>{msg.text}</div>}
@@ -121,7 +121,7 @@ export function Staff({ say }: { say: Say }) {
             <div className="dim tiny">{t('1. SET AN OWNER PIN. 2. LOCK. TO GET OWNER ACCESS BACK, OPEN THE STAFF SCREEN AND TYPE THE PIN.')}</div>
             <div className="ck-fields">
               <label className="ck-field">
-                <span>{r.hasPin ? t('NEW OWNER PIN') : t('OWNER PIN')} ({PIN_MIN}-{PIN_MAX} {t('DIGITS')})</span>
+                <span>{r.hasPin ? t('NEW OWNER PIN') : t('OWNER PIN')} ({PIN_MIN} {t('DIGITS')})</span>
                 <input className="sr-input" type="password" inputMode="numeric" autoComplete="off" aria-label={t('Owner PIN')} value={pin} maxLength={PIN_MAX} onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))} />
               </label>
               <label className="ck-field">

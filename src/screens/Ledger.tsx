@@ -1,6 +1,6 @@
 import { Select } from '../components/Select'
 import { PickInput } from '../components/PickInput'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useCargoPrefs, useStore } from '../store/StoreContext'
 import { speciesName, useLedger, type LedgerData } from '../store/useLedger'
@@ -16,6 +16,9 @@ import { uuid } from '../lib/store'
 import { Confirm, Field, Guess } from './CookParts'
 import { weekSplit } from '../data/cropplan'
 import { nextKnockDay, todayIso } from '../lib/xeno'
+import { useTable } from '../store/StoreContext'
+import type { Sale } from '../lib/trade'
+import { OUTPUT_UNIT, TASKS, TASK_LABEL, taskOf, taskReport, timerHours, type TaskId, type TaskTimer } from '../lib/tasks'
 
 // LEDGER: cost of goods. ₡ first, US$ second. Every figure says if it is ACTUAL or an ESTIMATE.
 
@@ -51,7 +54,7 @@ export function Tag({ b }: { b: Basis }) {
 const PICKS: { id: LedgerSel; label: string }[] = [
   { id: 'overview', label: 'OVERVIEW + PLAN WEEK' },
   { id: 'bills', label: 'ICE BILLS' },
-  { id: 'labour', label: 'LABOUR HOURS' },
+  { id: 'labour', label: 'LABOUR + TASK HOURS' },
   { id: 'settings', label: 'PRICES + COSTS' },
 ]
 
@@ -339,42 +342,118 @@ function Bills({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
 
 // ---------- labour ----------
 
+const TIMER_KEY = 'mycol.tasktimer.v1'
+function loadTimer(): TaskTimer | null {
+  try {
+    const v = JSON.parse(localStorage.getItem(TIMER_KEY) ?? 'null') as TaskTimer | null
+    return v && typeof v.since === 'number' && TASKS.some((t) => t.id === v.task) ? v : null
+  } catch {
+    return null
+  }
+}
+function saveTimer(t: TaskTimer | null) {
+  try {
+    if (t) localStorage.setItem(TIMER_KEY, JSON.stringify(t))
+    else localStorage.removeItem(TIMER_KEY)
+  } catch {
+    // A blocked store only loses the running timer, never a saved line.
+  }
+}
+const clock = (ms: number) => {
+  const m = Math.max(0, Math.floor(ms / 60000))
+  return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`
+}
+
 function Labour({ d, say }: { d: LedgerData; fx: number; say: Say }) {
   const fxd = useFx()
   const store = useStore()
+  const sales = useTable<Sale>('sales')
   const [rt, saveRt] = useRatesEditor()
   const p = { rate: rt.labourRate, labourOn: rt.labourOn }
   const [day, setDay] = useState(today())
   const [person, setPerson] = useState('')
   const [hours, setHours] = useState('')
-  const [task, setTask] = useState('')
+  const [task, setTask] = useState<TaskId | ''>('')
+  const [detail, setDetail] = useState('')
   const [lot, setLot] = useState('')
+  const [timer, setTimer] = useState<TaskTimer | null>(loadTimer)
+  const [now, setNow] = useState(Date.now())
+  const [weeks, setWeeks] = useState(8)
+  useEffect(() => {
+    if (!timer) return
+    const h = setInterval(() => setNow(Date.now()), 15000)
+    return () => clearInterval(h)
+  }, [timer])
   const people = [...new Set(d.labour.map((e) => e.person))]
   const lots = [...d.lots].sort((a, b) => b.knock_date.localeCompare(a.knock_date)).slice(0, 30)
   const list = [...d.labour].sort((a, b) => b.worked_on.localeCompare(a.worked_on)).slice(0, 60)
+  const report = useMemo(() => taskReport(d.labour, { lots: d.lots, harvests: d.harvests, sales }, todayIso(), weeks), [d.labour, d.lots, d.harvests, sales, weeks])
+  const taskText = (t: TaskId | '', extra: string) => (t ? `${TASK_LABEL[t]}${extra.trim() ? ` // ${extra.trim().toUpperCase()}` : ''}` : extra.trim().toUpperCase() || null)
+  const write = async (row: LabourEntry, ok: string) => {
+    try {
+      await store.put('labour_entries', row)
+      say(ok)
+      return true
+    } catch (e) {
+      say(e instanceof Error ? e.message.toUpperCase() : 'SAVE FAILED', true)
+      return false
+    }
+  }
   const save = async () => {
     const h = num(hours)
     if (!person.trim()) return say('WHO WORKED?', true)
     if (h === null || h <= 0) return say('TYPE THE HOURS.', true)
-    const row: LabourEntry = { id: uuid(), worked_on: day, person: person.trim(), hours: h, task: task.trim() || null, block_lot_id: lot || null, notes: null, created_at: new Date().toISOString() }
-    try {
-      await store.put('labour_entries', row)
+    if (!task && !detail.trim()) return say('PICK A TASK.', true)
+    const row: LabourEntry = { id: uuid(), worked_on: day, person: person.trim(), hours: h, task: taskText(task, detail), block_lot_id: lot || null, notes: null, created_at: new Date().toISOString() }
+    if (await write(row, `${h} H OF ${TASK_LABEL[taskOf(row.task)]} LOGGED FOR ${row.person.toUpperCase()}`)) {
       setHours('')
-      setTask('')
-      say(`${h} H LOGGED FOR ${row.person.toUpperCase()}`)
-    } catch (e) {
-      say(e instanceof Error ? e.message.toUpperCase() : 'SAVE FAILED', true)
+      setDetail('')
     }
+  }
+  const start = () => {
+    if (!person.trim()) return say('WHO IS WORKING?', true)
+    if (!task) return say('PICK A TASK TO TIME.', true)
+    const t: TaskTimer = { task, person: person.trim(), lot: lot || null, since: Date.now() }
+    saveTimer(t)
+    setTimer(t)
+    setNow(Date.now())
+    say(`TIMER STARTED: ${TASK_LABEL[task]} // ${t.person.toUpperCase()}`)
+  }
+  const stop = async () => {
+    if (!timer) return
+    const h = timerHours(timer.since, Date.now())
+    const row: LabourEntry = { id: uuid(), worked_on: todayIso(), person: timer.person, hours: h, task: TASK_LABEL[timer.task], block_lot_id: timer.lot, notes: 'TIMED', created_at: new Date().toISOString() }
+    if (await write(row, `${h} H OF ${TASK_LABEL[timer.task]} LOGGED FOR ${timer.person.toUpperCase()}`)) {
+      saveTimer(null)
+      setTimer(null)
+    }
+  }
+  const cancel = () => {
+    saveTimer(null)
+    setTimer(null)
+    say('TIMER CANCELLED. NOTHING SAVED.')
   }
   return (
     <div className="lg-stack">
       <div className="ck-box">
-        <div className="section-title">LOG HOURS</div>
+        <div className="section-title">LOG HOURS // PICK THE TASK</div>
+        {timer && (
+          <div className="lg-warn">
+            TIMING {TASK_LABEL[timer.task]} // {timer.person.toUpperCase()} // {clock(now - timer.since)}
+            <div className="ck-btns">
+              <button type="button" className="btn on" onClick={() => void stop()}>STOP + SAVE</button>
+              <button type="button" className="btn" onClick={cancel}>CANCEL TIMER</button>
+            </div>
+          </div>
+        )}
+        <div className="lg-btns" role="group" aria-label="Task">
+          {TASKS.map((t) => (
+            <button key={t.id} type="button" className={`btn${task === t.id ? ' on' : ''}`} aria-pressed={task === t.id} onClick={() => setTask(task === t.id ? '' : t.id)}>{t.label}</button>
+          ))}
+        </div>
         <div className="ck-fields">
-          <label className="ck-field"><span>DAY</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value)} /></label>
           <label className="ck-field"><span>WHO</span><input list="lg-people" value={person} onChange={(e) => setPerson(e.target.value)} /></label>
-          <label className="ck-field"><span>HOURS</span><input inputMode="decimal" value={hours} onChange={(e) => setHours(e.target.value)} /></label>
-          <label className="ck-field"><span>TASK</span><input value={task} placeholder="KNOCK, HARVEST, PACK..." onChange={(e) => setTask(e.target.value)} /></label>
+          <label className="ck-field"><span>DETAIL (OPTIONAL)</span><input value={detail} placeholder="E.G. ROW 3, NEW BUYER" onChange={(e) => setDetail(e.target.value)} /></label>
           <label className="ck-field">
             <span>LOT (OPTIONAL)</span>
             <Select value={lot} onChange={(e) => setLot(e.target.value)}>
@@ -384,8 +463,47 @@ function Labour({ d, say }: { d: LedgerData; fx: number; say: Say }) {
           </label>
         </div>
         <datalist id="lg-people">{people.map((x) => <option key={x} value={x} />)}</datalist>
-        <div className="dim tiny">HOURS WITH NO LOT ARE SHARED OVER EVERY LOT IN THE ROOMS THAT DAY, BY BLOCKS. <Guess /></div>
+        {!timer && <div className="ck-btns"><button type="button" className="btn" onClick={start}>START TIMER</button></div>}
+        <div className="section-title" style={{ marginTop: 8 }}>OR TYPE THE HOURS</div>
+        <div className="ck-fields">
+          <label className="ck-field"><span>DAY</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value)} /></label>
+          <label className="ck-field"><span>HOURS</span><input inputMode="decimal" value={hours} onChange={(e) => setHours(e.target.value)} /></label>
+        </div>
         <div className="ck-btns"><button type="button" className="btn on" onClick={() => void save()}>SAVE HOURS</button></div>
+        <div className="dim tiny">THE TIMER KEEPS RUNNING IF YOU LEAVE THE SCREEN OR CLOSE THE APP ON THIS DEVICE. IT ROUNDS TO 3 MINUTES.</div>
+      </div>
+      <div className="ck-box">
+        <div className="section-title">HOURS PER TASK // {report.total.toFixed(1)} H IN {weeks} WEEKS</div>
+        <div className="lg-btns">
+          {[4, 8, 13, 26].map((k) => <button key={k} type="button" className={`btn${weeks === k ? ' on' : ''}`} onClick={() => setWeeks(k)}>{k} WEEKS</button>)}
+        </div>
+        {report.rows.length ? (
+          <div className="rc-wrap">
+            <table className="lg-table rc-table">
+              <thead><tr><th>TASK</th><th>HOURS</th><th>H/WEEK</th><th>SHARE</th><th>OUTPUT</th><th>RATE</th><th>WHO</th></tr></thead>
+              <tbody>
+                {report.rows.map((r) => {
+                  const out = TASKS.find((t) => t.id === r.task)!.out
+                  return (
+                    <tr key={r.task}>
+                      <td>{TASK_LABEL[r.task]}</td>
+                      <td>{r.hours.toFixed(1)}</td>
+                      <td>{r.avgPerWeek.toFixed(1)}</td>
+                      <td>{r.sharePct.toFixed(0)}%</td>
+                      <td>{r.output === null ? '-' : out === 'blocks' ? `${r.output} BLOCKS` : `${r.output.toFixed(1)} KG`}</td>
+                      <td>{r.perHour === null || !out ? '-' : `${r.perHour.toFixed(1)} ${OUTPUT_UNIT[out]}`}</td>
+                      <td>{r.people.join(', ')}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="dim">NO HOURS IN THESE WEEKS YET. PICK A TASK ABOVE AND START THE TIMER, OR TYPE THE HOURS.</div>
+        )}
+        {report.byPerson.length > 1 && <div className="dim tiny">BY PERSON: {report.byPerson.map((x) => `${x.person} ${x.hours.toFixed(1)} H`).join(' // ')}</div>}
+        <div className="dim tiny">RATE = OUTPUT ON THE DAYS THE TASK WAS LOGGED, PER HOUR: KNOCK = BLOCKS KNOCKED THAT DAY; MIX + BAG AND STEAM RUN = BLOCKS KNOCKED THAT WEEK; HARVEST = KG PICKED THAT DAY; PACK AND SELL + DELIVER = KG SOLD THAT DAY. OLD LINES WITH TYPED TASKS ARE MATCHED BY THEIR WORDS. <Guess /></div>
       </div>
       <div className="ck-box">
         <div className="section-title">RATE</div>

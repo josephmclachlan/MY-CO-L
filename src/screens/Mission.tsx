@@ -12,7 +12,7 @@ import { weekSplit } from '../data/cropplan'
 import { GRADES } from '../data/ledger'
 import { HazardPick } from '../components/HazardPick'
 import { hazardName, type LotLoss } from '../lib/hazard'
-import { addDays, RATIO, todayIso, type BlockLot, type Culture, type GrainRun, type Strain } from '../lib/xeno'
+import { addDays, notFuture, RATIO, todayIso, type BlockLot, type Culture, type GrainRun, type Strain } from '../lib/xeno'
 import { lossLot, setLotStatus } from '../lib/xenoActions'
 import { uuid } from '../lib/store'
 import type { Harvest } from '../lib/ledger'
@@ -190,12 +190,12 @@ function LotCard({ r, m, say }: { r: BoardRow; m: M; say: Say }) {
         <div className="ck-field">
           <span>FIRST HARVEST</span>
           <b className={FLAG_CLASS[r.harvestFlag]}>{r.harvestOn ?? 'NO DATA'}</b>
-          <em>{r.harvestFlag === 'NO DATA' ? 'NO FIGURE IN SOURCES' : `${r.harvestFlag}${r.harvestFlag === 'PICKING' ? ` // FLUSH ${r.flushesDone} OF ${ex.flushes}` : ''} // ${ex.src}`}</em>
+          <em>{r.harvestFlag === 'NO DATA' ? 'NO FIGURE IN SOURCES' : `${r.harvestFlag}${r.harvestFlag === 'PICKING' ? (ex.flushTest ? ` // FLUSH ${r.flushesDone} // FLUSH TEST: MARK SPENT WHEN DONE` : ` // FLUSH ${r.flushesDone} OF ${ex.flushes}`) : ''} // ${ex.src}`}</em>
         </div>
         <div className="ck-field">
           <span>KG EXPECTED / LOGGED</span>
           <b>{r.expKg === null ? 'NO DATA' : kg1(r.expKg)} / {kg1(r.gotKg)}</b>
-          <em>{r.expKg === null ? '' : `${Math.round((r.gotKg / r.expKg) * 100)}% OF EXPECTED`}{ex.flushGuess ? ' // FLUSH COUNT GUESS' : ''}</em>
+          <em>{r.expKg === null ? '' : `${Math.round((r.gotKg / r.expKg) * 100)}% OF EXPECTED`}{ex.flushTest ? ' // EXPECTED = CATAWBA ONE FLUSH' : ''}</em>
         </div>
       </div>
       <div className="lg-btns">
@@ -335,6 +335,7 @@ function HarvestForm({ m, say }: { m: M; say: Say }) {
     if (!initials.trim()) return say(tt('TYPE YOUR INITIALS.'), true)
     if (fl < 1 || fl > 9) return say(tt('FLUSH MUST BE 1 TO 9.'), true)
     try {
+      notFuture(day, 'HARVEST')
       // One UNDO step and one history line, even when the pick also moves the lot to fruiting.
       await store.action(`HARVEST ${row.lot.lot_code}`, async () => {
         if (row.lot.status === 'incubating') await store.put('block_lots', { ...row.lot, status: 'fruiting', to_fruiting_on: row.lot.to_fruiting_on ?? day, room: 'fruiting' })
@@ -535,10 +536,10 @@ function NewLot({ m, say, done }: { m: M; say: Say; done: () => void }) {
 
 const GUESS_LIST = [
   'Move-to-fruiting window: species without a stated block incubation range use 14 days (golden, pink, phoenix, comb tooth, king and others).',
-  'Flushes: oysters 1 and lion\'s mane 2 come from your farm notes. Every other species is assumed 1.',
+  'Flushes: every species is IN TEST until you commit a count in PRODUCTION RECORDS > FLUSH TEST (your call, 6 Nov 2026). A lot in test stays open for up to 4 flushes; mark it SPENT when the blocks stop.',
   'Expected kg uses Catawba lb per block for ALL flushes, times surviving blocks. Your own yields replace it as picks are logged.',
-  'Harvest grades A, B and SECONDS (same as TRADE).',
-  'Lot-code letters other than B are first guesses (LOT_LETTER). A second lot of the same species on one day gets -2.',
+  'Harvest grades A or SECONDS (your call, 6 Nov 2026; same as TRADE).',
+  'Lot codes use Catawba letters (your call, 6 Nov 2026): B, L, CT, Y golden, X phoenix, PK, BK, KG, C, P, GF maitake; SH, RS, CM are ours. A second lot of the same species on one day gets -2.',
   'A harvest logged on a lot still marked incubating moves it to fruiting automatically.',
   'Block count prefilled from the species share of the 130-bag week; the split itself is still unconfirmed.',
   'A new lot starts in the INCUBATION room; moving it to fruiting (or its first pick) sets the room to FRUITING. Change either in PLACE, SPLIT, PHOTOS.',

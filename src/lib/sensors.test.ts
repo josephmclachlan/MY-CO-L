@@ -139,7 +139,12 @@ describe('CSV import (Govee app export)', () => {
 describe('bands and checks', () => {
   it('uses the farm\'s written limits, then Joseph\'s changes', () => {
     expect(bandFor(S, 'fridge', 'temp')).toEqual({ lo: 1, hi: 4 })
-    expect(bandFor(S, 'fruiting', 'temp')).toEqual({ lo: 13, hi: 19 })
+    // Joseph 6 Nov 2026: every growing room 13-20 C, fruiting CO2 ceiling 1,000, 10 minute delay everywhere.
+    for (const p of ['lab', 'packing', 'incubation', 'fruiting'] as const) expect(bandFor(S, p, 'temp')).toEqual({ lo: 13, hi: 20 })
+    expect(bandFor(S, 'fruiting', 'co2')).toEqual({ lo: null, hi: 1000 })
+    expect(bandFor(S, 'incubation', 'co2')).toEqual({ lo: null, hi: 4000 })
+    expect(bandFor(S, 'packing', 'co2')).toEqual({ lo: null, hi: 600 })
+    for (const d of Object.values(S.delayMin)) expect(d).toBe(10)
     expect(bandFor(S, 'fruiting', 'rh')).toEqual({ lo: 80, hi: 96 })
     expect(bandFor(S, 'outside', 'temp')).toBeNull()
     const s2 = mergeSensorSettings({ bands: { fruiting: { temp: { lo: 12, hi: 18 }, rh: null } } })
@@ -178,6 +183,8 @@ describe('bands and checks', () => {
 
 describe('status, excursions and time in band (hand-worked)', () => {
   // Fruiting air every 10 min from 10:00: 16, 17, 19.5, 20, 19.2, 18, 16 (band 13-19, delay 15 min).
+  // Hand-worked on a band Joseph could set on SET POINTS (the defaults are now 13-20, 10 min).
+  const S = mergeSensorSettings({ bands: { fruiting: { temp: { lo: 13, hi: 19 } } }, delayMin: { fruiting: 15 } })
   const t0 = at('2026-11-05', '10:00')
   const temps = [16, 17, 19.5, 20, 19.2, 18, 16]
   const rows = temps.map((v, i) => rd('fruiting', t0 + i * 10 * MIN, { temp_c: v }))
@@ -267,6 +274,7 @@ describe('alarms', () => {
 
 describe('alarm ranking', () => {
   it('puts the reading furthest past its limit first', () => {
+    const S = mergeSensorSettings({ bands: { fruiting: { temp: { lo: 13, hi: 19 } } } })
     const now = at('2026-11-06', '12:00')
     // Fruiting 20 C = 1 C over 19; fridge 9 C = 5 C over 4; fruiting RH 70% = 10% under 80 = 2 steps of 5%. Hand readings alarm at once.
     const idx = indexReadings([

@@ -43,6 +43,7 @@ import {
   shortfall,
   speciesOf,
   strainStock,
+  notFuture,
   todayIso,
   type AgeCheck,
   type BlockLot,
@@ -788,7 +789,10 @@ function NodePanel({ k, d, strain, say, set, onLabel }: { k: string; d: XData; s
               className="btn"
               onClick={() => {
                 if ((Number(g2used) || 0) > left) return say(`ONLY ${left} G2 BAGS LEFT IN THIS RUN.`, true)
-                void run(() => addLot(store, { strain, run: g, lot_code: lotCode || `${letter}${mmdd(knock)}`, blocks: Number(blocks) || 1, g2Used: Number(g2used) || 0, knock_date: knock }), `LOT ${lotCode} LOGGED`)
+                void run(() => {
+                  notFuture(knock, 'KNOCK')
+                  return addLot(store, { strain, run: g, lot_code: lotCode || `${letter}${mmdd(knock)}`, blocks: Number(blocks) || 1, g2Used: Number(g2used) || 0, knock_date: knock })
+                }, `LOT ${lotCode} LOGGED`)
               }}
             >
               LOG BLOCK LOT

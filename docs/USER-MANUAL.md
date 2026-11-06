@@ -150,7 +150,7 @@ With wet or gloved hands type GLOVE (or turn it on under TUNE). Buttons get bigg
 
 ### LANGUAGE
 
-Type SPANISH or ESPANOL for Spanish screens, ENGLISH to come back. This guide and the tips are in English. The Spanish screen text was written by Claude and should be read by a native speaker.
+The app is English only for now. Spanish screens are switched off and can be turned back on later.
 
 ## WORDS YOU CAN TYPE
 
@@ -177,7 +177,7 @@ On a screen with tabs, typing a tab name (like CURVE on the cook log) switches t
 - **UNDO, HISTORY, SYNC**: Undo, the change history, the saving status.
 - **BACKUP, EXPORT, RESTORE**: Data safety.
 - **ASK words**: Ask the farm assistant. Anything ending in ? also goes to it.
-- **GLOVE, SPANISH, ENGLISH**: Glove mode and screen language.
+- **GLOVE**: Glove mode: big buttons and a number pad.
 - **THEME name, CLEAN, MUTE**: Look and sound.
 
 ## SAVING, UNDO AND HISTORY
@@ -262,7 +262,7 @@ F1 or the word HELP shows every command you can type, grouped by screen, and the
 
 - **LOOK**: Theme colour, glass strength (curve, grain, scanlines, glow), CLEAN mode for sunlight.
 - **SOUND**: Sound on or off, the typing sound, chatter or tick mode, volume. TEST buttons play each sound so you can hear it. Sound only plays when something appears on screen.
-- **LANGUAGE AND GLOVES**: English or Spanish, and glove mode.
+- **LANGUAGE AND GLOVES**: Glove mode (the language row is hidden while the app is English only).
 - **SYSTEM**: Replay the boot, test the alarm.
 
 ### GOOD TO KNOW
@@ -342,13 +342,16 @@ Staff can use all of this screen.
 ### THE TABS
 
 - **FLUSH LOG**: BE% for each lot and flush, with the day the first pins appeared.
+- **WEEKLY HARVEST**: Kilos picked per species for each week, with the 4-week average. The same shape as Catawba's weekly harvest table.
+- **KNOCK CHART**: Blocks knocked per species for each week and the kilos to expect from them. The same shape as Catawba's inoculation chart.
+- **FLUSH TEST**: Every crop starts in test: lots stay open for up to 4 flushes until you mark them spent. This tab shows what each flush gave (kg per block, share of flush 1, days between flushes) and a suggested count. COMMIT 1-4 sets the count for that species; BACK TO TEST undoes it.
 - **SCORECARD**: Results grouped by strain, cook run, room, week or worker. Pick a grouping at the top.
 - **STRAIN TRIALS**: Put two or more strains side by side and see which wins. START TRIAL begins one.
 - **GUESSES**: The rules the app guessed, for you to check.
 
 ### GOOD TO KNOW
 
-Only complete lots (spent, or all flushes picked) count toward averages. Fading needs at least five finished lots of a strain.
+Only complete lots (spent, or all committed flushes picked; 4 while a crop is in test) count toward averages. Fading needs at least five finished lots of a strain.
 
 ## CARGO (4)
 
@@ -456,7 +459,7 @@ The model turns slowly on purpose. Numbers marked as context come from other con
 ### THE TABS
 
 - **STRAINS**: Every strain you hold. REGISTER adds one.
-- **BANK**: The culture bank: slants and water tubes, due dates, viability checks, T/E tests.
+- **BANK**: The culture bank: slants and water tubes, due dates, viability checks, T/E tests. FRIDAY CULTURE CHECK lists any strain missing a fresh plate (under 30 days), a slant, a water tube or backup spawn under 6 weeks old.
 - **STOCK**: Cultures and grain runs in stock.
 - **LINEAGE**: A strain's family tree. Tap a node to log the next step.
 - **PLANNER**: Works back from the weekly bag run to how many G2, G1 and masters you need.
@@ -598,7 +601,7 @@ The alarm limits and delays are GUESSES until you confirm them.
 
 - **OVERVIEW + PLAN WEEK**: Cost of goods: what one block and one kilogram cost, split into parts, and the cost of the planned week.
 - **ICE BILLS**: Type in each electricity bill. The app checks the bill against the ICE tariff.
-- **LABOUR HOURS**: Log hours worked. They count toward cost when labour is switched on.
+- **LABOUR + TASK HOURS**: Log hours against a standard task (MIX + BAG, STEAM RUN, KNOCK, HARVEST, PACK and so on). Pick the task and who, then START TIMER and STOP + SAVE when done, or type the hours. HOURS PER TASK shows hours each week, share of all hours, and a rate where there is an output: blocks an hour for knocking, kg an hour for picking and packing. Labour is off in costs by default; the hours are for tracking.
 - **PRICES + COSTS**: Every price and cost the app uses: sale price per kg, electricity tariff, labour rate, wear. Blank means the built-in number.
 
 ### TYPE AN ELECTRICITY BILL
