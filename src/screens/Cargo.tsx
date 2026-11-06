@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { HistoryButton } from './History'
 import { useRef, useState, type ReactNode } from 'react'
 import { useFx, useFxSync } from '../store/useFx'
 import { useApp } from '../settings/AppContext'
@@ -101,7 +102,7 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
 
   const run = async (fn: () => Promise<void>, ok: string) => {
     try {
-      await fn()
+      await store.action(ok, fn)
       sound.confirm()
       say(ok)
     } catch (e) {
@@ -262,8 +263,9 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
       )}
       {mine.length > 8 && <div className="dim tiny">SHOWING THE LATEST 8 OF {mine.length}.</div>}
 
-      <div style={{ marginTop: 12 }}>
-        <Confirm label="DELETE ITEM AND ITS HISTORY" onYes={() => void run(async () => { await removeItem(store, item.id); onClose() }, 'ITEM DELETED')} />
+      <div className="lg-btns" style={{ marginTop: 12 }}>
+        <Confirm label="DELETE ITEM AND ITS MOVES" onYes={() => void run(async () => { await removeItem(store, item.id); onClose() }, 'ITEM DELETED')} />
+        <HistoryButton table="items" id={item.id} />
       </div>
     </div>
   )
@@ -288,7 +290,7 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
 
   const guard = async (fn: () => Promise<string>) => {
     try {
-      const t = await fn()
+      const t = await store.action(null, fn)
       sound.confirm()
       say(t)
     } catch (e) {

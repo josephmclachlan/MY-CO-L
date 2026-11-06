@@ -23,6 +23,10 @@ interface Props {
   bodyClass?: string
   /** Present when there is somewhere to go back to. */
   onBack?: () => void
+  /** Save/sync lamp for the title bar. */
+  lamp?: ReactNode
+  /** UNDO button for the status line. */
+  undo?: ReactNode
 }
 
 function useClock() {
@@ -36,7 +40,7 @@ function useClock() {
 }
 
 /** The frame every screen shares: title bar, status line, index column, prompt, hint line and F-key bar. */
-export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack }: Props) {
+export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack, lamp, undo }: Props) {
   const { settings, sound, session } = useApp()
   const clock = useClock()
   const [cmd, setCmd] = useState('')
@@ -77,16 +81,19 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
           )}
           <span className="tb-sys">{STATION.system} <span className="tb-sep">//</span> </span>{title}
         </span>
+        {lamp && <span className="tb-lamp">{lamp}</span>}
         <span className="tb-right">
           {STATION.company} <span className="tb-sep">//</span> {STATION.station}
         </span>
       </header>
-      <div className="statusline">
+      <div className="statusline" data-kbd-zone="status">
         <span>{clock}</span>
         <span>{db}</span>
         <span className={online ? '' : 'warn'}>{online ? 'NET OK' : 'NET DOWN // CACHED'}</span>
         <span>SND {settings.sound.enabled ? settings.sound.mode : 'MUTED'}</span>
         <span>{settings.look.clean ? 'CLEAN' : settings.look.theme}</span>
+        {lamp && <span className="sl-lamp">{lamp}</span>}
+        {undo}
       </div>
       <div className={`body ${index ? 'has-index' : ''} ${bodyClass ?? ''}`}>
         <main className="panel main-panel" ref={mainRef} data-kbd-zone="main">{children}</main>

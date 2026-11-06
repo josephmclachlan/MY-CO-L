@@ -124,7 +124,7 @@ export async function syncRates(store: Store, need: string[], today: string, opt
       const day = d === today ? (got.day && got.day <= today ? got.day : today) : d
       const now = store.rows<FxRate>(FX_TABLE).find((r) => r.day === day)
       if (now?.source === 'MANUAL') continue
-      await store.put(FX_TABLE, { id: day, day, crc_per_usd: Math.round(got.rate * 100) / 100, source: 'AUTO', fetched_at: new Date().toISOString() })
+      await store.put(FX_TABLE, { id: day, day, crc_per_usd: Math.round(got.rate * 100) / 100, source: 'AUTO', fetched_at: new Date().toISOString() }, { label: `EXCHANGE RATE ${day} FETCHED` })
       saved++
     } catch {
       failed.add(d)

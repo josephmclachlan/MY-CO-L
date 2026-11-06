@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "build:preview": "node scripts/build-preview.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:stress": "STRESS_SEEDS=200 vitest run src/lib/stress.test.ts"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.2.6",

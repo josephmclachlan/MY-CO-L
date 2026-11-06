@@ -23,9 +23,10 @@ import { Propulsion, CookIndex, COOK_START, COOK_TABS, type CookState } from './
 import { Ledger, LedgerIndex, LEDGER_START, type LedgerState } from './screens/Ledger'
 import { Trade, TradeIndex, TRADE_START, TRADE_TABS, type TradeState } from './screens/Trade'
 import { Mission, MissionIndex, MISSION_START, type MissionState } from './screens/Mission'
+import { History, HistoryIndex, HISTORY_START, HistoryNavContext, SyncLamp, UndoButton, undoneText, type HistoryState } from './screens/History'
 import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
-import { useStoreStatus, useTable } from './store/StoreContext'
+import { useStore, useStoreStatus, useTable } from './store/StoreContext'
 import { useRates } from './store/useRates'
 import { useFxSync } from './store/useFx'
 import { SPECIES } from './data/species'
@@ -54,6 +55,7 @@ const COOK_IDX = MODULES.findIndex((m) => m.key === 'PROPULSION')
 const LEDGER_IDX = MODULES.findIndex((m) => m.key === 'LEDGER')
 const TRADE_IDX = MODULES.findIndex((m) => m.key === 'TRADE')
 const MISSION_IDX = MODULES.findIndex((m) => m.key === 'MISSION')
+const HISTORY_IDX = MODULES.findIndex((m) => m.key === 'HISTORY')
 
 /** Everything needed to put the terminal back on a screen: Back restores one of these. */
 interface Snap {
@@ -69,6 +71,7 @@ interface Snap {
   ledger: LedgerState
   trade: TradeState
   mission: MissionState
+  hist: HistoryState
 }
 const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
 
@@ -109,13 +112,16 @@ export default function App() {
   const setTrade = useCallback((p: Partial<TradeState>) => setTradeState((c) => ({ ...c, ...p })), [])
   const [mission, setMissionState] = useState<MissionState>(MISSION_START)
   const setMission = useCallback((p: Partial<MissionState>) => setMissionState((c) => ({ ...c, ...p })), [])
+  const [hist, setHistState] = useState<HistoryState>(HISTORY_START)
+  const setHist = useCallback((p: Partial<HistoryState>) => setHistState((c) => ({ ...c, ...p })), [])
+  const store = useStore()
   const strains = useTable<Strain>('strains')
   useFxSync() // today's colones per dollar, once a day when online
   useRates() // keeps the prices and costs from PRICES + COSTS live for every screen's maths
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission }
+  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -156,6 +162,7 @@ export default function App() {
     setLedgerState(s.ledger)
     setTradeState(s.trade)
     setMissionState(s.mission)
+    setHistState(s.hist)
     power.setSelectedRoom(s.room)
     setReply(null)
     setSweep((n) => n + 1)
@@ -237,6 +244,33 @@ export default function App() {
     if (!here) go({ name: 'module', idx: MISSION_IDX }, false)
     else sound.chirp()
   }
+  const openHistory = (p: Partial<HistoryState>) => {
+    const here = view.name === 'module' && view.idx === HISTORY_IDX
+    if (!here) pushHist()
+    setHist(p)
+    setSelected(HISTORY_IDX)
+    if (!here) go({ name: 'module', idx: HISTORY_IDX }, false)
+    else sound.chirp()
+  }
+  const openHistoryRef = useRef(openHistory)
+  openHistoryRef.current = openHistory
+  // Opening one record's history is always a Back step, so BACK returns to the list or screen it came from.
+  const openRecordHistory = useCallback(
+    (table: string, id: string) => {
+      if (snapRef.current.view.name === 'module' && snapRef.current.view.idx === HISTORY_IDX) pushHist()
+      openHistoryRef.current({ tab: 'RECORD', rec: { table, id } })
+    },
+    [pushHist],
+  )
+  const undoNow = useCallback(() => {
+    void store.undo().then(
+      (l) => {
+        sound.chirp()
+        say(undoneText(store, l), !l)
+      },
+      (e: Error) => say(e.message.toUpperCase(), true),
+    )
+  }, [store, sound, say])
   const openSpecies = (key: string) => {
     const i = SPECIES.findIndex((x) => x.id === key)
     if (i < 0) return
@@ -336,6 +370,15 @@ export default function App() {
         e.preventDefault()
         return goBack()
       }
+      // Ctrl+Z / Cmd+Z = UNDO the last saved change. Inside a text box it stays the box's own undo.
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'z') {
+        const t = e.target as HTMLElement | null
+        const typing = !!t && (t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && !(t as HTMLInputElement).closest('.prompt')) || t.isContentEditable)
+        const promptHasText = !!t && t.tagName === 'INPUT' && !!(t as HTMLInputElement).value
+        if (typing || promptHasText) return
+        e.preventDefault()
+        return undoNow()
+      }
       const m = /^F([1-8])$/.exec(e.key)
       if (!m) return
       e.preventDefault()
@@ -361,10 +404,15 @@ export default function App() {
     const [cmd, ...rest] = raw.trim().toUpperCase().split(/\s+/)
     const arg = rest.join(' ')
     const num = Number(cmd)
-    if (Number.isInteger(num) && num >= 1 && num <= MODULES.length) {
-      setSelected(num - 1)
-      return go({ name: 'module', idx: num - 1 })
+    const byNum = Number.isInteger(num) ? MODULES.findIndex((m) => m.num === num) : -1
+    if (byNum >= 0) {
+      setSelected(byNum)
+      return go({ name: 'module', idx: byNum })
     }
+    // Undo, edit history and sync.
+    if (cmd === 'UNDO') return undoNow()
+    if (['HISTORY', 'EDITS', 'CHANGES', 'LOG'].includes(cmd)) return openHistory({ tab: 'EDITS' })
+    if (['SYNC', 'OFFLINE', 'CONFLICTS'].includes(cmd)) return openHistory({ tab: 'SYNC' })
     const mod = MODULES.findIndex((m) => m.key === cmd || m.name === raw.trim().toUpperCase() || m.name.startsWith(cmd + ' '))
     if (mod >= 0) {
       setSelected(mod)
@@ -736,12 +784,14 @@ export default function App() {
           />
         )
       else if (view.idx === MISSION_IDX) content = <Mission x={mission} set={setMission} say={say} />
+      else if (view.idx === HISTORY_IDX) content = <History x={hist} set={setHist} say={say} />
       else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} onOpenPrices={() => openLedger({ sel: 'settings' })} />
       else if (view.idx === MANUAL_IDX) content = <Manual loc={manualLoc} onOpen={openManual} />
       else content = <Pending mod={MODULES[view.idx]} />
       break
   }
 
+  store.screen = title || null
   if (view.name === 'module' && view.idx === VITALS_IDX)
     hints.module = 'TAP A BREAKER TO FLIP IT // TYPE A TAG (S4) OR GEN, UTILITY, HEATER A/B // F2 MENU'
   if (view.name === 'module' && view.idx === DECK_IDX)
@@ -766,6 +816,8 @@ export default function App() {
     hints.module = 'NEW SALE: KG, TAP CHANNEL, SAVE // TYPE TOTALS, BUYERS OR LOG // MARGIN USES LEDGER COST // F2 MENU'
   if (view.name === 'module' && view.idx === MISSION_IDX)
     hints.module = 'BOARD SHOWS EVERY ACTIVE LOT // TYPE TODAY, HARVEST OR LOT // KG LOGGED FEEDS LEDGER AND TRADE // F2 MENU'
+  if (view.name === 'module' && view.idx === HISTORY_IDX)
+    hints.module = 'TAP A CHANGE TO SEE THAT RECORD // UNDO OR CTRL+Z REVERSES THE LAST CHANGE // TYPE SYNC FOR SAVING STATUS // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
     hints.module = 'PICK A CHAPTER OR SECTION FROM THE CONTENTS // TAP A LINK TO JUMP // BACK RETURNS TO WHERE YOU WERE // F2 MENU'
 
@@ -777,6 +829,7 @@ export default function App() {
 
   return (
     <ManualLinksContext.Provider value={links}>
+    <HistoryNavContext.Provider value={openRecordHistory}>
     <Crt alert={alert}>
       {stage === 'login' ? (
         <div className="shell" style={{ gridTemplateRows: 'auto minmax(0,1fr)' }}>
@@ -817,6 +870,8 @@ export default function App() {
                             ? <TradeIndex x={trade} set={setTrade} />
                           : view.name === 'module' && view.idx === MISSION_IDX
                             ? <MissionIndex x={mission} set={setMission} />
+                          : view.name === 'module' && view.idx === HISTORY_IDX
+                            ? <HistoryIndex x={hist} set={setHist} />
                           : moduleIndex
             }
             keys={keys}
@@ -828,7 +883,9 @@ export default function App() {
             }}
             focusToken={focusToken}
             onBack={histLen > 0 ? goBack : undefined}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX) ? ' view-ledger' : ''}`}
+            lamp={<SyncLamp onOpen={() => openHistory({ tab: 'SYNC' })} />}
+            undo={<UndoButton say={say} />}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX) ? ' view-ledger' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>
@@ -846,6 +903,7 @@ export default function App() {
         </>
       )}
     </Crt>
+    </HistoryNavContext.Provider>
     </ManualLinksContext.Provider>
   )
 }

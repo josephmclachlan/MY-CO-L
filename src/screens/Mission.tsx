@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { HistoryButton } from './History'
 import { PickInput } from '../components/PickInput'
 import { useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
@@ -62,9 +63,10 @@ function useMission() {
 
 function useRun(say: Say) {
   const { sound } = useApp()
+  const store = useStore()
   return async (fn: () => Promise<unknown>, ok: string) => {
     try {
-      await fn()
+      await store.action(ok, fn)
       sound.confirm()
       say(ok)
       return true
@@ -182,6 +184,7 @@ function LotCard({ r, m, say }: { r: BoardRow; m: M; say: Say }) {
         {l.status === 'incubating' && <button type="button" className={`btn ${r.move === 'DUE' || r.move === 'LATE' ? 'on' : ''}`} onClick={() => void move()}>MOVE TO FRUITING</button>}
         <Confirm label="SPENT" onYes={() => void spent()} />
         <button type="button" className="btn hazard" onClick={() => setLostOpen(!lostOpen)}>LOST...</button>
+        <HistoryButton table="block_lots" id={l.id} />
       </div>
       {lostOpen && (
         <div className="ck-fields">
