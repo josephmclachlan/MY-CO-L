@@ -127,3 +127,9 @@ Screen `src/screens/Propulsion.tsx` (parts in `CookParts.tsx`), logic `src/lib/c
   pure maths reads through `rates()`). `src/store/useRates.ts` loads row `rates` of `app_settings` (migration 0007) and
   updates the live copy; App calls it once so every screen's maths sees changes. Cook runs are re-priced from their kWh
   at the current rate. The CARGO exchange rate reads and writes the same record.
+- Exchange rate by day: `src/lib/fx.ts` + `src/store/useFx.ts`, table `fx_rates` (one row per day, migration 0008).
+  Amounts are stored in colones only; US$ is shown at the record's own day (sale day, price day, lot knock day, bill
+  month end, labour day). Today's rate is fetched once a day when online (fawazahmed0 currency-api on jsDelivr, mirror
+  on pages.dev, then open.er-api.com); past days that records need are back-filled from the same dated feed. A typed
+  rate (MANUAL) is never overwritten. With no rate on or before a day: the first later rate, then the fallback in
+  PRICES + COSTS. Aggregates carry `usd` (sum of each part at its own rate), shown via an effective rate.

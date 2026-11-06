@@ -6,6 +6,10 @@ import { DEFAULT_ICE, DEFAULT_RATES, builtInPrice, estimateMid, iceBill, type Ic
 import { fmtCrc, fmtUsd, priceHistory, type Item, type Price } from '../lib/cargo'
 import { addPrice } from '../lib/cargoActions'
 import { Confirm, Field, Guess } from './CookParts'
+import { PickInput } from '../components/PickInput'
+import { useState } from 'react'
+import { useFx } from '../store/useFx'
+import { clearRate, setManualRate } from '../lib/fx'
 
 // PRICES + COSTS: every price and cost the app uses, in one place. Blank = the built-in figure.
 // Saved in the shared settings record, so phone and laptop agree once Supabase is linked.
@@ -23,7 +27,7 @@ export function Prices({ say, onOpenCargo }: { say: Say; onOpenCargo: () => void
   const [r, save] = useRatesEditor()
   const items = useTable<Item>('items')
   const prices = useTable<Price>('item_prices')
-  const fx = r.fx
+  const fx = useFx().today.rate
 
   const put = (patch: Partial<Rates>, what: string) =>
     save(patch).then(
@@ -152,22 +156,73 @@ export function Prices({ say, onOpenCargo }: { say: Say; onOpenCargo: () => void
         </div>
       </div>
 
-      <div className="ck-box">
-        <div className="section-title">EXCHANGE RATE</div>
-        <div className="ck-fields">
-          <Field label="₡ PER US$ (CARGO USES IT TOO)" value={show(r.fx)} inputMode="decimal" placeholder={String(DEFAULT_RATES.fx)} onSave={(v) => { const n = num(v); if (n !== null && n <= 0) return say('TYPE A RATE ABOVE ZERO.', true); void put({ fx: n ?? DEFAULT_RATES.fx }, 'EXCHANGE RATE') }} />
-        </div>
-      </div>
+      <ExchangeRates say={say} fallback={r.fx} onFallback={(n) => void put({ fx: n }, 'FALLBACK RATE')} />
 
       <div className="ck-box">
         <div className="section-title">START AGAIN</div>
-        <div className="dim tiny">PUTS SALE PRICES, ELECTRICITY, LABOUR, WEAR AND THE EXCHANGE RATE BACK TO THE BUILT-IN FIGURES. SUPPLY PRICES IN CARGO STAY.</div>
+        <div className="dim tiny">PUTS SALE PRICES, ELECTRICITY, LABOUR, WEAR AND THE FALLBACK EXCHANGE RATE BACK TO THE BUILT-IN FIGURES. SUPPLY PRICES IN CARGO AND THE DAILY EXCHANGE RATES STAY.</div>
         <div className="ck-btns"><Confirm label="RESET TO BUILT-IN" onYes={() => void put(DEFAULT_RATES, 'BUILT-IN FIGURES')} /></div>
       </div>
 
       <div className="ck-box">
         <div className="section-title">BEST GUESSES WAITING FOR JOSEPH <Guess /></div>
         <ul className="ck-guesses">{[...LEDGER_GUESSES, ...TRADE_GUESSES].map((g) => <li key={g}>{g}</li>)}</ul>
+      </div>
+    </div>
+  )
+}
+
+/** Colones per dollar by day: fetched once a day, or typed. Every US$ on screen uses its own day's rate. */
+function ExchangeRates({ say, fallback, onFallback }: { say: Say; fallback: number; onFallback: (n: number) => void }) {
+  const store = useStore()
+  const fx = useFx()
+  const [day, setDay] = useState(fx.todayDay)
+  const [val, setVal] = useState('')
+  const t = fx.today
+  const recent = [...fx.rows].reverse().slice(0, 20)
+  const save = () => {
+    const n = num(val)
+    if (n === null || n < 100 || n > 5000) return say('TYPE COLONES PER DOLLAR, E.G. 505.', true)
+    void setManualRate(store, day, n).then(
+      () => (setVal(''), say(`₡${n} PER US$ SAVED FOR ${day}`)),
+      (e: Error) => say(e.message.toUpperCase(), true),
+    )
+  }
+  return (
+    <div className="ck-box">
+      <div className="section-title">EXCHANGE RATE // ₡ PER US$ BY DAY</div>
+      <div className="lg-check">
+        TODAY ₡{t.rate}{' '}
+        {t.source === 'FALLBACK' ? '(NO DAILY RATE YET: USING THE FALLBACK BELOW. IT IS FETCHED WHEN THE APP IS ONLINE.)' : t.source === 'MANUAL' ? `(TYPED FOR ${t.day})` : `(FETCHED, RATE OF ${t.day})`}
+      </div>
+      <div className="dim tiny">
+        EVERY AMOUNT IS SAVED IN COLONES. DOLLARS ARE ONLY SHOWN, AND ALWAYS AT THE RATE OF THE RECORD'S OWN DAY (A SALE'S DAY, A PRICE'S DAY, A LOT'S KNOCK DAY, A BILL'S MONTH END), SO OLD EARNINGS AND COSTS NEVER CHANGE WHEN THE RATE MOVES.
+        THE APP FETCHES TODAY'S MARKET RATE ONCE A DAY WHEN ONLINE, AND FILLS IN PAST DAYS YOUR RECORDS NEED. A RATE YOU TYPE FOR A DAY WINS OVER THE FETCHED ONE (USE IT FOR THE RATE YOUR BANK ACTUALLY GAVE).
+      </div>
+      <div className="ck-fields">
+        <label className="ck-field"><span>DAY</span><PickInput type="date" value={day} onChange={(e) => setDay(e.target.value)} /></label>
+        <label className="ck-field"><span>₡ PER US$</span><input inputMode="decimal" value={val} placeholder={String(fx.rate(day))} onChange={(e) => setVal(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && save()} /></label>
+      </div>
+      <div className="ck-btns"><button type="button" className="btn on" onClick={save}>SAVE RATE FOR THAT DAY</button></div>
+      {recent.length > 0 && (
+        <div className="ck-scroll">
+          <table className="lg-table">
+            <thead><tr><th>DAY</th><th>₡ PER US$</th><th>FROM</th><th /></tr></thead>
+            <tbody>
+              {recent.map((x) => (
+                <tr key={x.id}>
+                  <td>{x.day}</td>
+                  <td>{x.crc_per_usd}</td>
+                  <td>{x.source === 'MANUAL' ? 'TYPED' : 'FETCHED'}</td>
+                  <td>{x.source === 'MANUAL' && <Confirm label="USE FETCHED" onYes={() => void clearRate(store, x.day).then(() => say(`TYPED RATE FOR ${x.day} REMOVED`))} />}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <div className="ck-fields">
+        <Field label="FALLBACK ₡ PER US$ (ONLY BEFORE ANY DAILY RATE EXISTS)" value={show(fallback)} inputMode="decimal" placeholder={String(DEFAULT_RATES.fx)} onSave={(v) => { const n = num(v); if (n === null || n <= 0) return say('TYPE A RATE ABOVE ZERO.', true); onFallback(n) }} />
       </div>
     </div>
   )

@@ -13,7 +13,7 @@ power panel, rooms, stock, cultures, cooks, costs and sales. It works offline on
 - CRT glass: phosphor glow, scanlines, a real convex bulge, edge colour fringing, glare, grain and flicker,
   all on one strength slider, plus CLEAN mode for sunlight.
 - Sound made in code (Web Audio). Every sound is tied to something appearing on screen. See `docs/DESIGN.md`.
-- Supabase database schema for the whole data model (`supabase/migrations/0001_initial_schema.sql`, then `0002_cargo_and_owner_lock.sql` for CARGO and owner-only security, then `0003_genetics.sql` for XENOGENETICS, `0004_hazard_links.sql` for the HAZARD INDEX, `0005_cook_log.sql` for PROPULSION, `0006_ledger_trade.sql` for LEDGER and TRADE, `0007_app_settings.sql` for PRICES + COSTS) and email login.
+- Supabase database schema for the whole data model (`supabase/migrations/0001_initial_schema.sql`, then `0002_cargo_and_owner_lock.sql` for CARGO and owner-only security, then `0003_genetics.sql` for XENOGENETICS, `0004_hazard_links.sql` for the HAZARD INDEX, `0005_cook_log.sql` for PROPULSION, `0006_ledger_trade.sql` for LEDGER and TRADE, `0007_app_settings.sql` for PRICES + COSTS, `0008_fx_rates.sql` for the daily exchange rate) and email login.
 - Installable, offline-capable web app (PWA).
 - Deploys to GitHub Pages now and Cloudflare Pages at launch.
 
@@ -66,7 +66,7 @@ Modules 1 and 4-9 show "NOT YET INSTALLED" until their build threads land.
   margin against LEDGER's cost per kg, a buyer list and the sales log.
 - **PRICES + COSTS** (LEDGER, or type `PRICES`): every price and cost in one place. Sale price per species, fresh
   and dried; supply prices (added to CARGO's price history); the ICE tariff and the monthly estimate; labour rate and
-  wear; ₡ per US$. Blank = the built-in figure. Saved for the whole farm (`app_settings`), so devices agree.
+  wear; ₡ per US$ by day. Blank = the built-in figure. Saved for the whole farm (`app_settings`), so devices agree.
 - Typed commands: `LEDGER`, `COST`, `BILLS`, `LABOUR`, `PRICES`, `TRADE`, `SALE`, `TOTALS`, `BUYERS`.
 - Best guesses show GUESS - REVIEW on screen and are listed under SWITCHES + GUESSES (LEDGER) and GUESSES (TRADE).
 
