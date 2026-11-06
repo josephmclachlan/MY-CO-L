@@ -42,6 +42,22 @@ export interface RunOptions {
   /** Share of the dry mix that is soy hulls. Default 0.4, capped at 0.5. */
   soyShare?: number
   form?: SubstrateForm
+  /** The week's blocks by species. With it, every species gets its own master and G2 line (t09 Our farm):
+   *  G2 = blocks / 20 rounded up, masters = G2 / 12 rounded up, at least one. Without it, one pooled line. */
+  split?: { key: string; bags: number }[]
+  /** Extra masters a week (practice setting). */
+  spareMasters?: number
+}
+
+/** Whole spawn bags for the week, one master and G2 line per species (t09-our-week: 3/3/1/1 G2 + 4 masters). */
+export function speciesSpawnBags(split: { key: string; bags: number }[], spareMasters = 0): { g2: number; g1: number; lines: { key: string; g2: number; g1: number }[] } {
+  const lines = split
+    .filter((s) => s.bags > 0)
+    .map((s) => {
+      const g2 = Math.ceil((s.bags * PLAN.spawnLbPerBag) / PLAN.g2Lb - 1e-9)
+      return { key: s.key, g2, g1: g2 > 0 ? Math.max(1, Math.ceil(g2 / PLAN.g2PerG1)) : 0 }
+    })
+  return { g2: lines.reduce((n, l) => n + l.g2, 0), g1: lines.reduce((n, l) => n + l.g1, 0) + Math.max(0, Math.floor(spareMasters)), lines }
 }
 
 /** What `bags` blocks of 10 lb use: substrate, grain, grow bags and spawn bags. */
@@ -82,9 +98,11 @@ export function runLines(bags: number, opts: RunOptions = {}): UseLine[] {
   }
 
   // Spawn: G2 at 0.3 lb per block, G1 masters to make the G2.
-  const g2Lb = n * p.spawnLbPerBag
-  const g2Bags = g2Lb / p.g2Lb
-  const g1Bags = g2Bags / p.g2PerG1
+  // With a species split, whole bags per species line (t09 Our farm); otherwise one pooled line.
+  const per = opts.split?.length ? speciesSpawnBags(opts.split, opts.spareMasters) : null
+  const g2Bags = per ? per.g2 : (n * p.spawnLbPerBag) / p.g2Lb
+  const g1Bags = per ? per.g1 : g2Bags / p.g2PerG1
+  const g2Lb = g2Bags * p.g2Lb
   const hydratedLb = g2Lb + g1Bags * p.g1Lb
   const dryGrainLb = (hydratedLb * (1 - p.grainHydratedMoisture)) / (1 - p.grainIncomingMoisture)
   const grainKg = dryGrainLb * LB_TO_KG
@@ -93,14 +111,16 @@ export function runLines(bags: number, opts: RunOptions = {}): UseLine[] {
     qty: grainKg,
     book: round1(grainKg),
     unit: 'kg',
-    basis: `${p.spawnLbPerBag} lb G2 spawn per block (F05-0014) plus the G1 masters behind it (1 per ${p.g2PerG1} G2, F05-0013), dry grain at ${Math.round(p.grainIncomingMoisture * 100)}% in and ${Math.round(p.grainHydratedMoisture * 100)}% out (F05-0050, F05-0064)`,
+    basis: `${per ? `${per.g2} G2 bags x ${p.g2Lb} lb + ${per.g1} masters x ${p.g1Lb} lb, one master and G2 line per species (t09 Our farm)` : `${p.spawnLbPerBag} lb G2 spawn per block (F05-0014) plus the G1 masters behind it (1 per ${p.g2PerG1} G2, F05-0013)`}, dry grain at ${Math.round(p.grainIncomingMoisture * 100)}% in and ${Math.round(p.grainHydratedMoisture * 100)}% out (F05-0050, F05-0064)`,
   })
   lines.push({
     code: 'SPAWN-BAG',
     qty: g2Bags + g1Bags,
     book: Math.ceil(g2Bags) + Math.ceil(g1Bags),
     unit: 'bags',
-    basis: `${round1(g2Bags)} G2 bags (${p.g2Lb} lb) plus ${round1(g1Bags)} G1 masters (${p.g1Lb} lb), rounded up to whole bags`,
+    basis: per
+      ? `${per.lines.map((l) => `${l.g2}`).join('/')} G2 bags (${p.g2Lb} lb) plus ${per.g1} masters (${p.g1Lb} lb): one line per species`
+      : `${round1(g2Bags)} G2 bags (${p.g2Lb} lb) plus ${round1(g1Bags)} G1 masters (${p.g1Lb} lb), rounded up to whole bags`,
   })
   lines.push({ code: 'BAG-10', qty: n, book: n, unit: 'bags', basis: 'one 10 lb filter bag per block' })
   return lines

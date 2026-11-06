@@ -2,6 +2,9 @@ import { useMemo } from 'react'
 import { useCargoPrefs, useStore, useTable } from './StoreContext'
 import { WEEKLY_BAGS } from '../data/species'
 import { weeklyPlanUse, type UseLine } from '../lib/stockplan'
+import { usePlan, weekSplit } from '../data/cropplan'
+import { nextKnockDay, todayIso } from '../lib/xeno'
+import { usePractice } from './usePractice'
 import { CATEGORIES } from '../data/cargo'
 import {
   onHandMap,
@@ -35,7 +38,13 @@ export function useCargo() {
   const moves = useTable<Move>('stock_moves')
   const [prefs, setPrefs] = useCargoPrefs()
 
-  const plan = useMemo(() => weeklyPlanUse(WEEKLY_BAGS, { form: prefs.form, soyShare: prefs.soyShare }), [prefs.form, prefs.soyShare])
+  const crop = usePlan()
+  const practice = usePractice()
+  // One master and G2 line per species, from next knock day's split (t09 Our farm).
+  const plan = useMemo(
+    () => weeklyPlanUse(WEEKLY_BAGS, { form: prefs.form, soyShare: prefs.soyShare, split: weekSplit(nextKnockDay(todayIso()), crop), spareMasters: practice.spareMasters }),
+    [prefs.form, prefs.soyShare, crop, practice.spareMasters],
+  )
 
   const rows = useMemo<CargoRow[]>(() => {
     const hand = onHandMap(moves)

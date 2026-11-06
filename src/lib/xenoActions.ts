@@ -2,6 +2,7 @@
 
 import { uuid, type Store } from './store'
 import type { HazardLog, LotLoss } from './hazard'
+import { bankBatch, decideTest, logCheck, startTest } from './bankActions'
 import {
   childP,
   cultureLabel,
@@ -262,6 +263,14 @@ export async function loadDemo(store: Store, have: Strain[]): Promise<void> {
   await store.put('cultures', { ...p2[0], status: 'used_up' })
   const p3 = await addCultures(store, { strain: s, parent: p2[3], kind: 'plate', count: 2, made_on: d(9), existing: all })
   all.push(...p3)
+  // Culture bank (G3): a batch from the P1 plate, one water-tube check and a passed T/E test.
+  const tubes = await bankBatch(store, { strain: s, from: p1, slants: 4, water: 4, offsiteSlants: 1, offsiteWater: 1, on: d(35), existing: all })
+  all.push(...tubes)
+  const w1 = tubes.find((t) => t.kind === 'water')!
+  await logCheck(store, { tube: w1, on: d(20), days_to_cover: 9, appearance: 'EVEN AND WHITE', contamination: null, result: 'pass', notes: 'EXAMPLE' })
+  const test = await startTest(store, { strain: s, tube: tubes[0], reason: 'intake', on: d(33), existing: all })
+  all.push(...store.rows<Culture>('cultures').filter((c) => c.id === test.t_plate_id || c.id === test.e_plate_id))
+  await decideTest(store, test, { result: 'pass', on: d(3), days_to_colonize: 14, days_to_pin: 18, kg_per_block: 0.9, form: 'TRUE TO TYPE' }, all)
   const runs: GrainRun[] = []
   const g1 = await addGrainRun(store, { strain: s, generation: 'G1', parentCulture: p2[0], parentRun: null, bags: 2, inoculated_on: d(28), existing: runs })
   runs.push(g1)
@@ -279,6 +288,9 @@ export async function removeDemo(store: Store, strains: Strain[], cultures: Cult
   await Promise.all([store.ensure('hazard_logs'), store.ensure('lot_losses')])
   await store.del('hazard_logs', store.rows<HazardLog>('hazard_logs').filter((h) => h.strain_id === s.id).map((h) => h.id))
   await store.del('lot_losses', store.rows<LotLoss>('lot_losses').filter((h) => lotIds.has(h.block_lot_id)).map((h) => h.id))
+  await Promise.all([store.ensure('bank_tests'), store.ensure('viability_checks')])
+  await store.del('viability_checks', store.rows('viability_checks').filter((h) => h.strain_id === s.id).map((h) => h.id))
+  await store.del('bank_tests', store.rows('bank_tests').filter((h) => h.strain_id === s.id).map((h) => h.id))
   await store.del('block_lots', lots.filter((l) => l.strain_id === s.id || (l.grain_run_id && gIds.has(l.grain_run_id))).map((l) => l.id))
   // Children before parents, for the database's foreign keys.
   const gs = runs.filter((g) => g.strain_id === s.id).sort((a, b) => (a.generation === b.generation ? 0 : a.generation === 'G2' ? -1 : 1))

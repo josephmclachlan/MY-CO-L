@@ -289,7 +289,9 @@ export function buildLedger(inp: LedgerInput, speciesName: (key: string) => stri
     } else {
       let crc = 0
       let missing = 0
-      for (const line of runLines(weekBags(w))) {
+      const bySp = new Map<string, number>()
+      for (const l of byWeek.get(w) ?? []) bySp.set(l.species_key, (bySp.get(l.species_key) ?? 0) + Number(l.bag_count))
+      for (const line of runLines(weekBags(w), { split: [...bySp].map(([key, bags]) => ({ key, bags })) })) {
         const id = codeToId.get(line.code)
         const p = id ? price.get(id) : undefined
         if (p === undefined) missing++

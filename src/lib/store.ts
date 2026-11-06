@@ -21,6 +21,7 @@ export const BACKUP_TABLES = [
   'species', 'strains', 'cultures', 'rooms', 'circuits', 'equipment', 'cook_runs', 'cook_readings',
   'grain_runs', 'block_lots', 'contaminants', 'lot_losses', 'hazard_logs', 'harvests', 'sales', 'sale_lots',
   'items', 'item_prices', 'stock_moves', 'energy_bills', 'labour_entries', 'reference_entries', 'app_settings', 'fx_rates',
+  'bank_tests', 'viability_checks',
   'edit_log',
 ] as const
 
@@ -402,9 +403,13 @@ export class Store {
       }
       for (const c of list) {
         const op = changeOp(c).op
-        rows.push(entry(a, who, table, (c.after ?? c.before)!.id, op, op === 'delete' ? [] : diffRow(c.before, c.after), op === 'delete' ? c.before : null))
+        const diff = op === 'delete' ? [] : diffRow(c.before, c.after)
+        // A write that changed nothing (re-importing the same backup) leaves no history line.
+        if (op === 'update' && !diff.length) continue
+        rows.push(entry(a, who, table, (c.after ?? c.before)!.id, op, diff, op === 'delete' ? c.before : null))
       }
     }
+    if (!rows.length) return
     // Keep the screen's copy current if the HISTORY screen has it open; then save.
     await this.loading.get(EDIT_LOG)?.catch(() => undefined)
     const have = this.data.get(EDIT_LOG)

@@ -441,6 +441,7 @@ export default function App() {
       return sound.chirp()
     }
     if (cmd === 'GENETICS' || cmd === 'LAB' || cmd === 'STRAINS' || cmd === 'LABELS') return openXeno(cmd === 'LABELS' ? { tab: 'LABELS' } : cmd === 'STRAINS' ? { tab: 'STRAINS' } : {})
+    if (cmd === 'BANK' || cmd === 'CULTURE BANK' || cmd === 'SLANTS' || cmd === 'TUBES') return openXeno({ tab: 'BANK' })
     // Contaminants: type a name (TRICHODERMA, BLOTCH), DIAGNOSE, or on the HAZARD INDEX a tab name (CAUSE).
     const hzTab = HAZARD_TABS.find((t) => t === cmd)
     if (hzTab && view.name === 'module' && view.idx === HAZARD_IDX) {
