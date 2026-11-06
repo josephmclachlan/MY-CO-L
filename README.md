@@ -87,6 +87,19 @@ Modules 1 and 4-9 show "NOT YET INSTALLED" until their build threads land.
   the frame, menu, help, the new screens, LOG HARVEST and HARVEST SESSION; the other screens stay English for now.
   The Spanish was written by Claude and needs a native reader (`src/lib/es.ts`; a test fails if a string has no entry).
 
+## What's in the farm assistant build (ASK THE LATTICE, module 22)
+
+- Type a question or a command in plain words, on the ASK screen or at the `>` prompt on any screen
+  (start with ASK, end with ?, or begin with HOW / WHO / LOG / SHOW ...). Examples: "how many LM blocks are
+  fruiting", "who owes money", "log 4.2 kg from B1020", "power is out", "show the power cut log".
+- It knows ONLY this app's records and screens. Every answer names the screen it came from, with a button to open it.
+- Saves (harvest, power cut, climate reading, lot status, stock in/out, buyer paid) are shown first and wait for
+  CONFIRM (or typing YES). Each save is one UNDO step and goes in the edit history marked ASSISTANT.
+- STAFF never get money answers: the money tools are not offered to them, and a refusal comes back instead.
+- Brains: a rule parser that needs nothing (always on), plus an optional LOCAL model (Ollama or llama.cpp on the
+  farm PC) set on ASK > ENGINE. No cloud model, no API key. Details and model sizes: [docs/ASSISTANT.md](docs/ASSISTANT.md).
+- Migration `0017` lets the edit history record the ASSISTANT source.
+
 ## Setting it up
 
 Step-by-step, no git commands needed: **[docs/SETUP.md](docs/SETUP.md)**.

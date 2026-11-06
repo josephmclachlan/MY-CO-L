@@ -57,6 +57,7 @@ function used(): Set<string> {
     ['screens/MissionBulk.tsx', /MODE_LABEL: Record<BulkMode, string> = \{([\s\S]*?)\}/],
     ['screens/Search.tsx', /TAB_LABEL: Record<SearchTab, string> = \{([\s\S]*?)\}/],
     ['screens/Data.tsx', /TAB_LABEL: Record<DataTab, string> = \{([\s\S]*?)\}/],
+    ['screens/Ask.tsx', /TAB_LABEL: Record<AskTab, string> = \{([\s\S]*?)\}/],
   ]
   for (const [f, re] of labels) {
     const m = re.exec(code(join(ROOT, f)))
@@ -69,6 +70,8 @@ function used(): Set<string> {
   for (const m of code(join(ROOT, 'lib/dataExport.ts')).matchAll(/'((?:NO BACKUP|BACKED UP|LAST BACKUP)[^']*)'/g)) add(m[1])
   // reasons that reach t() through a variable (bulkEdit skipped[].why)
   for (const m of code(join(ROOT, 'lib/bulkEdit.ts')).matchAll(/why: '([^']*)'/g)) add(m[1])
+  // ASK: engine buttons and example group titles reach t() through a variable
+  for (const m of code(join(ROOT, 'screens/Ask.tsx')).matchAll(/(?:label|title): '([^']*)'/g)) add(m[1])
   return keys
 }
 
