@@ -83,6 +83,13 @@ export interface BlockLot extends Row {
   knock_date: string
   status: LotStatus
   notes: string | null
+  /** Production records (G4). All optional: older lots simply lack them. */
+  cart?: string | null // the cart the blocks sit on, e.g. C-07
+  room?: string | null // room id the lot is in now (incubation, fruiting ...)
+  knocked_by?: string | null // initials of whoever inoculated the blocks
+  parent_lot_id?: string | null // set when this lot was split off another
+  trial_id?: string | null // strain trial this lot belongs to
+  dry_kg_per_block?: number | null // overrides the 4 lb dry recipe for BE%
   created_at?: string
   updated_at?: string
 }

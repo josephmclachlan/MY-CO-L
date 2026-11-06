@@ -34,6 +34,8 @@ export interface EditEntry extends Row {
 
 /** Fields that change on every save and say nothing useful in a history list. */
 const QUIET = new Set(['id', 'updated_at', 'created_at'])
+/** Fields too big to copy into every history line. */
+const BIG = new Set(['data_url'])
 
 /** Same value? Treats missing and null as the same, and compares objects by content. */
 export function same(a: unknown, b: unknown): boolean {
@@ -51,7 +53,10 @@ export function diffRow(before: Row | null, after: Row | null): FieldChange[] {
     if (QUIET.has(f)) continue
     const o = before ? before[f] : null
     const n = after ? after[f] : null
-    if (!same(o, n)) out.push({ f, old: o ?? null, new: n ?? null })
+    if (same(o, n)) continue
+    // A photo is thousands of characters: the history says THAT it changed, and keeps the picture only in a delete's copy.
+    if (BIG.has(f)) out.push({ f, old: o ? '[PHOTO]' : null, new: n ? '[PHOTO]' : null })
+    else out.push({ f, old: o ?? null, new: n ?? null })
   }
   return out
 }
@@ -84,6 +89,9 @@ export const TABLE_NAMES: Record<string, [string, string]> = {
   fx_rates: ['EXCHANGE RATE', 'EXCHANGE RATES'],
   bank_tests: ['T/E TEST', 'T/E TESTS'],
   viability_checks: ['TUBE CHECK', 'TUBE CHECKS'],
+  strain_trials: ['STRAIN TRIAL', 'STRAIN TRIALS'],
+  flush_log: ['FLUSH PIN DAY', 'FLUSH PIN DAYS'],
+  photos: ['PHOTO', 'PHOTOS'],
   sensor_readings: ['SENSOR READING', 'SENSOR READINGS'],
 }
 
@@ -97,6 +105,9 @@ export const TABLE_SCREEN: Record<string, string> = {
   block_lots: 'MISSION CONTROL',
   harvests: 'MISSION CONTROL',
   lot_losses: 'MISSION CONTROL',
+  strain_trials: 'PRODUCTION RECORDS',
+  flush_log: 'PRODUCTION RECORDS',
+  photos: 'MISSION CONTROL',
   hazard_logs: 'HAZARD INDEX',
   cook_runs: 'PROPULSION',
   cook_readings: 'PROPULSION',
@@ -164,6 +175,8 @@ export function rowName(table: string, r: Row | null | undefined): string {
     const v = r[k]
     if (typeof v === 'string' && v.trim()) return k === 'moved_at' ? v.slice(0, 10) : v.toUpperCase()
   }
+  if (table === 'photos') return `PHOTO ${typeof r.caption === 'string' && r.caption ? r.caption.toUpperCase() : String(r.taken_at ?? '').slice(0, 10)}`
+  if (table === 'flush_log') return `FLUSH ${String(r.flush)} PINS ${String(r.pinned_on ?? '')}`
   if (table === 'app_settings') return String(r.id).toUpperCase()
   return `#${String(r.id).slice(0, 8)}`
 }

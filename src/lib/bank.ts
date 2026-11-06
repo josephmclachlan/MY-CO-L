@@ -279,7 +279,7 @@ export function bankAge(c: Culture, all: Culture[], checks: ViabilityCheck[], te
   if (now >= suspectOn && !provenAfter(suspectOn))
     return { state: 'over', days: age, due: suspectOn, watch: true, limit: LIM('A tube more than 2 years from banking is suspect until a test fruiting proves it.', p.suspectDays, p.suspectDays), text: `${age} D OLD: T/E TEST BEFORE USE` }
 
-  if (last?.result === 'watch') return { state: 'warn', days: age, due: null, watch: true, limit: LIM('Slower than the baseline or showing signs of senescence: run the test-and-expand line before using it again.', 0, 0), text: 'WATCH: T/E TEST BEFORE USE' }
+  if (last?.result === 'watch') return { state: 'warn', days: age, due: null, watch: true, limit: LIM('Slower than the baseline or showing signs of senescence: do a T/E test from this tube before you use it.', 0, 0), text: 'WATCH: T/E TEST BEFORE USE' }
 
   if (c.kind === 'slant') {
     const due = addDays(c.made_on, p.slantReplaceDays)

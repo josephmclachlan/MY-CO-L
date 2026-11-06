@@ -18,16 +18,26 @@ import type { Harvest } from '../lib/ledger'
 import type { CookRun } from '../lib/cook'
 import { board, expectFor, nextFlush, suggestCode, todayList, type BoardRow } from '../lib/mission'
 import { Confirm, Guess } from './CookParts'
+import { Bulk, type BulkMode } from './MissionBulk'
+import { ScanTab } from './MissionScan'
+import { PhotoStrip } from '../components/PhotoStrip'
+import { SplitForm } from './MissionBulk'
+import { ROOM_CHOICES, roomName } from '../lib/records'
+import { setLotPlace } from '../lib/recordsActions'
+import { useRecords } from '../store/useRecords'
 
 // MISSION CONTROL: every active block lot on one board, the harvest log and the TODAY list.
 
-export type MissionTab = 'BOARD' | 'TODAY' | 'HARVEST' | 'NEWLOT' | 'GUESSES'
-export const MISSION_TABS: MissionTab[] = ['BOARD', 'TODAY', 'HARVEST', 'NEWLOT', 'GUESSES']
-const TAB_LABEL: Record<MissionTab, string> = { BOARD: 'BOARD', TODAY: 'TODAY', HARVEST: 'LOG HARVEST', NEWLOT: 'NEW BLOCK LOT', GUESSES: 'GUESSES' }
+export type MissionTab = 'BOARD' | 'TODAY' | 'HARVEST' | 'NEWLOT' | 'BULK' | 'SCAN' | 'GUESSES'
+export const MISSION_TABS: MissionTab[] = ['BOARD', 'TODAY', 'HARVEST', 'NEWLOT', 'BULK', 'SCAN', 'GUESSES']
+const TAB_LABEL: Record<MissionTab, string> = { BOARD: 'BOARD', TODAY: 'TODAY', HARVEST: 'LOG HARVEST', NEWLOT: 'NEW BLOCK LOT', BULK: 'BULK ACTIONS', SCAN: 'SCAN A LABEL', GUESSES: 'GUESSES' }
 export interface MissionState {
   tab: MissionTab
+  bulk: BulkMode
+  /** A code or label address to read as soon as SCAN opens (a cart tag opened the app). */
+  scan: string | null
 }
-export const MISSION_START: MissionState = { tab: 'BOARD' }
+export const MISSION_START: MissionState = { tab: 'BOARD', bulk: 'HARVEST', scan: null }
 type SetMission = (p: Partial<MissionState>) => void
 type Say = (t: string, warn?: boolean) => void
 
@@ -103,7 +113,7 @@ export function MissionIndex({ x, set }: { x: MissionState; set: SetMission }) {
   )
 }
 
-export function Mission({ x, set, say }: { x: MissionState; set: SetMission; say: Say }) {
+export function Mission({ x, set, say, openRecord }: { x: MissionState; set: SetMission; say: Say; openRecord: (key: string, strainId: string | null) => void }) {
   const { sound } = useApp()
   const m = useMission()
   return (
@@ -118,6 +128,8 @@ export function Mission({ x, set, say }: { x: MissionState; set: SetMission; say
       {x.tab === 'TODAY' && <Today m={m} />}
       {x.tab === 'HARVEST' && <HarvestForm m={m} say={say} />}
       {x.tab === 'NEWLOT' && <NewLot m={m} say={say} done={() => set({ tab: 'BOARD' })} />}
+      {x.tab === 'BULK' && <Bulk m={m} mode={x.bulk} setMode={(b) => set({ bulk: b })} say={say} />}
+      {x.tab === 'SCAN' && <ScanTab say={say} openRecord={openRecord} initial={x.scan} clearInitial={() => set({ scan: null })} />}
       {x.tab === 'GUESSES' && <Guesses />}
     </div>
   )
@@ -149,9 +161,10 @@ function LotCard({ r, m, say }: { r: BoardRow; m: M; say: Say }) {
   const [lostOpen, setLostOpen] = useState(false)
   const [haz, setHaz] = useState('')
   const [n, setN] = useState('')
+  const [more, setMore] = useState(false)
   const l = r.lot
   const ex = r.ex
-  const move = () => run(() => store.put('block_lots', { ...l, status: 'fruiting', to_fruiting_on: todayIso() }), `${l.lot_code} MOVED TO FRUITING`)
+  const move = () => run(() => store.put('block_lots', { ...l, status: 'fruiting', to_fruiting_on: todayIso(), room: 'fruiting' }), `${l.lot_code} MOVED TO FRUITING`)
   const spent = () => run(() => setLotStatus(store, l, 'spent'), `${l.lot_code} MARKED SPENT`)
   const lost = async () => {
     const blocks = num(n) ?? r.blocks
@@ -184,8 +197,11 @@ function LotCard({ r, m, say }: { r: BoardRow; m: M; say: Say }) {
         {l.status === 'incubating' && <button type="button" className={`btn ${r.move === 'DUE' || r.move === 'LATE' ? 'on' : ''}`} onClick={() => void move()}>MOVE TO FRUITING</button>}
         <Confirm label="SPENT" onYes={() => void spent()} />
         <button type="button" className="btn hazard" onClick={() => setLostOpen(!lostOpen)}>LOST...</button>
+        <button type="button" className={`btn ${more ? 'on' : ''}`} onClick={() => setMore(!more)}>{more ? 'LESS' : 'PLACE, SPLIT, PHOTOS'}</button>
         <HistoryButton table="block_lots" id={l.id} />
       </div>
+      <div className="dim tiny">CART {l.cart ?? 'NOT SET'} // ROOM {roomName(l.room)}{l.knocked_by ? ` // KNOCKED BY ${l.knocked_by}` : ''}{l.parent_lot_id ? ' // SPLIT FROM ANOTHER LOT' : ''}</div>
+      {more && <LotMore l={l} m={m} say={say} />}
       {lostOpen && (
         <div className="ck-fields">
           <label className="ck-field"><span>BLOCKS LOST (BLANK = ALL {r.blocks})</span><input inputMode="numeric" value={n} onChange={(e) => setN(e.target.value)} placeholder={String(r.blocks)} /></label>
@@ -197,7 +213,42 @@ function LotCard({ r, m, say }: { r: BoardRow; m: M; say: Say }) {
   )
 }
 
+function LotMore({ l, m, say }: { l: BlockLot; m: M; say: Say }) {
+  const store = useStore()
+  const run = useRun(say)
+  const [cart, setCart] = useState(l.cart ?? '')
+  const [room, setRoom] = useState(l.room ?? '')
+  const [by, setBy] = useState(l.knocked_by ?? '')
+  const [dry, setDry] = useState(l.dry_kg_per_block ? String(l.dry_kg_per_block) : '')
+  const save = () => {
+    const d = dry.trim() ? num(dry) : null
+    if (dry.trim() && d === null) return say('DRY KG PER BLOCK MUST BE A NUMBER.', true)
+    return void run(() => setLotPlace(store, l, { cart: cart || null, room: room || null, knocked_by: by || null, dry_kg_per_block: d }), `${l.lot_code} PLACE SAVED`)
+  }
+  return (
+    <div className="rc-more">
+      <div className="ck-fields">
+        <label className="ck-field"><span>CART</span><input value={cart} maxLength={20} onChange={(e) => setCart(e.target.value.toUpperCase())} /></label>
+        <label className="ck-field">
+          <span>ROOM</span>
+          <Select value={room} onChange={(e) => setRoom(e.target.value)}>
+            <option value="">NOT SET</option>
+            {ROOM_CHOICES.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
+          </Select>
+        </label>
+        <label className="ck-field"><span>KNOCKED BY (INITIALS)</span><input value={by} maxLength={4} onChange={(e) => setBy(e.target.value.toUpperCase())} /></label>
+        <label className="ck-field"><span>DRY KG PER BLOCK (BLANK = 4 LB)</span><input inputMode="decimal" value={dry} placeholder="1.81" onChange={(e) => setDry(e.target.value)} /></label>
+      </div>
+      <div className="lg-btns"><button type="button" className="btn on" onClick={save}>SAVE PLACE</button></div>
+      <SplitForm m={m} lot={l} say={say} />
+      <PhotoStrip table="block_lots" id={l.id} say={say} />
+    </div>
+  )
+}
+
 function Today({ m }: { m: M }) {
+  const rec = useRecords()
+  const fading = rec.fading.filter((f) => f.fading)
   const groups: { kind: 'MOVE' | 'HARVEST' | 'CULTURE' | 'REORDER'; title: string; empty: string }[] = [
     { kind: 'MOVE', title: 'LOTS TO MOVE TO FRUITING', empty: 'NONE DUE' },
     { kind: 'HARVEST', title: 'LOTS DUE TO HARVEST', empty: 'NONE DUE' },
@@ -221,9 +272,20 @@ function Today({ m }: { m: M }) {
           </div>
         )
       })}
+      <div className="ck-box">
+        <div className="section-title">FADING STRAINS (PRODUCTION RECORDS) // {fading.length}</div>
+        {fading.length ? (
+          <ul className="ck-guesses">
+            {fading.map((f) => <li key={f.strain.id} className="lg-warn-text">{f.strain.code}: BE% DOWN {f.dropPct.toFixed(0)}% ({pctText(f.recentBe)} NOW, {pctText(f.earlierBe)} BEFORE). START A FRESH PLATE FROM THE BANK.</li>)}
+          </ul>
+        ) : (
+          <div className="dim">NONE FADING</div>
+        )}
+      </div>
     </div>
   )
 }
+const pctText = (n: number) => `${n.toFixed(1)}%`
 
 function HarvestForm({ m, say }: { m: M; say: Say }) {
   const store = useStore()
@@ -246,7 +308,7 @@ function HarvestForm({ m, say }: { m: M; say: Say }) {
     if (!initials.trim()) return say('TYPE YOUR INITIALS.', true)
     if (fl < 1 || fl > 9) return say('FLUSH MUST BE 1 TO 9.', true)
     try {
-      if (row.lot.status === 'incubating') await store.put('block_lots', { ...row.lot, status: 'fruiting', to_fruiting_on: row.lot.to_fruiting_on ?? day })
+      if (row.lot.status === 'incubating') await store.put('block_lots', { ...row.lot, status: 'fruiting', to_fruiting_on: row.lot.to_fruiting_on ?? day, room: 'fruiting' })
       await store.put('harvests', { id: uuid(), block_lot_id: row.lot.id, harvested_on: day, flush: Math.floor(fl), kg: k, grade, initials: initials.trim().toUpperCase(), notes: null, created_at: new Date().toISOString() })
       try {
         localStorage.setItem(INITIALS_KEY, initials.trim().toUpperCase())
@@ -334,6 +396,8 @@ function NewLot({ m, say, done }: { m: M; say: Say; done: () => void }) {
   const [blocks, setBlocks] = useState('')
   const [code, setCode] = useState('')
   const [notes, setNotes] = useState('')
+  const [cart, setCart] = useState('')
+  const [by, setBy] = useState(getInitials)
   const autoCode = suggestCode(sp, knock, m.lots)
   const n = num(blocks) ?? planned ?? 0
   const strains = m.strains.filter((s) => s.species_key === sp && s.active !== false)
@@ -361,6 +425,9 @@ function NewLot({ m, say, done }: { m: M; say: Say; done: () => void }) {
       knock_date: knock,
       status: 'incubating',
       notes: notes.trim() || null,
+      cart: cart.trim() ? cart.trim().toUpperCase() : null,
+      room: 'incubation',
+      knocked_by: by.trim() ? by.trim().toUpperCase().slice(0, 4) : null,
       created_at: now,
       updated_at: now,
     }
@@ -422,7 +489,11 @@ function NewLot({ m, say, done }: { m: M; say: Say; done: () => void }) {
             </Select>
           </label>
         </div>
-        <label className="ck-field"><span>NOTES</span><input value={notes} onChange={(e) => setNotes(e.target.value)} /></label>
+        <div className="ck-fields">
+          <label className="ck-field"><span>CART (OPTIONAL)</span><input value={cart} maxLength={20} placeholder="C-07" onChange={(e) => setCart(e.target.value.toUpperCase())} /></label>
+          <label className="ck-field"><span>KNOCKED BY (INITIALS)</span><input value={by} maxLength={4} onChange={(e) => setBy(e.target.value.toUpperCase())} /></label>
+          <label className="ck-field"><span>NOTES</span><input value={notes} onChange={(e) => setNotes(e.target.value)} /></label>
+        </div>
         <div className="dim">
           EXPECT MOVE FROM {addDays(knock, ex.moveOpen)}{ex.moveGuess ? ' (GUESS)' : ''}, FIRST HARVEST {ex.firstDays === null ? 'NO DATA' : addDays(knock, ex.firstDays)}.
         </div>
@@ -440,6 +511,11 @@ const GUESS_LIST = [
   'Lot-code letters other than B are first guesses (LOT_LETTER). A second lot of the same species on one day gets -2.',
   'A harvest logged on a lot still marked incubating moves it to fruiting automatically.',
   'Block count prefilled from the species share of the 130-bag week; the split itself is still unconfirmed.',
+  'A new lot starts in the INCUBATION room; moving it to fruiting (or its first pick) sets the room to FRUITING. Change either in PLACE, SPLIT, PHOTOS.',
+  'Bulk actions: a harvest session uses ONE grade for all its lots; CHANGE MANY LOTS > MARK LOST logs every live block of each ticked lot as lost; every bulk button is ONE undo step.',
+  'Split a lot: only before its first pick, never all the blocks. The new lot is named with -S1, -S2 ... and keeps the same knock day, strain, grain run and steam run.',
+  'Photos are shrunk to 960 px (JPEG) and kept inside the app data, so they travel with backups. 24 photos per record.',
+  'Cart tags: a cart is just a name on the lots (C-07). Scanning the tag lists the lots that are still incubating or fruiting.',
 ]
 function Guesses() {
   return (
