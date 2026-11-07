@@ -632,6 +632,7 @@ export default function App() {
     if (['BACKUP', 'ZIP', 'SAVEDATA'].includes(cmd)) return openData({ tab: 'BACKUP' })
     if (cmd === 'EXPORT') return openData({ tab: 'EXPORT' })
     if (cmd === 'RESTORE') return openData({ tab: 'RESTORE' })
+    if (['SHEET', 'SHEETS', 'GOOGLE'].includes(cmd)) return openData({ tab: 'SHEET' })
     // Glove mode and language.
     if (['GLOVE', 'GLOVES'].includes(cmd)) {
       const on = arg === 'ON' ? true : arg === 'OFF' ? false : !settings.glove

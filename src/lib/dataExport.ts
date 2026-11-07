@@ -12,7 +12,7 @@ export const EXPORT_TABLES: string[] = [...BACKUP_TABLES.filter((t) => t !== 'ed
 
 /** Columns that are only a code or a name for a record another column points at, added to the end of the CSV
  *  so a spreadsheet reader does not have to match long ids by eye. [pointer column, table it points at, field to copy, new column] */
-const LINKS: Record<string, [string, string, string, string][]> = {
+export const LINKS: Record<string, [string, string, string, string][]> = {
   cultures: [['strain_id', 'strains', 'code', 'strain_code']],
   grain_runs: [['strain_id', 'strains', 'code', 'strain_code']],
   block_lots: [['strain_id', 'strains', 'code', 'strain_code']],
