@@ -79,7 +79,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => () => (store?.backend as { stop?: () => void } | undefined)?.stop?.(), [store])
 
   // Until the backend opens, screens get an empty memory store so hooks never see null.
-  const idle = useMemo(() => new Store(new MemoryBackend('memory')), [])
+  const idle = useMemo(() => {
+    const s = new Store(new MemoryBackend('memory'))
+    s.placeholder = true
+    return s
+  }, [])
   return <Ctx.Provider value={store ?? idle}>{children}</Ctx.Provider>
 }
 

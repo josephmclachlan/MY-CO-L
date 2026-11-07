@@ -774,6 +774,7 @@ Type a name under YOUR NAME FOR THE HISTORY so your changes are labelled with it
 
 - **EXPORT SPREADSHEETS**: One table as a CSV file you can open in a spreadsheet.
 - **RESTORE**: Put a backup back.
+- **GOOGLE SHEET**: Every record mirrored into one Google Sheet. Edits typed in the sheet come back into the app.
 - **GUESSES**: The stale-backup rule and other guessed numbers.
 
 ### RESTORE A BACKUP
@@ -784,9 +785,26 @@ Type a name under YOUR NAME FOR THE HISTORY so your changes are labelled with it
 4. Press it. It asks SURE? TAP AGAIN: press it a second time to really restore.
 5. Everything restored is one UNDO step.
 
+### LINK THE GOOGLE SHEET (ONCE)
+
+1. Open GOOGLE SHEET and press SHEETS.NEW to make an empty Google Sheet.
+2. In the sheet open Extensions > Apps Script. Delete what is there. Press COPY SCRIPT in the app and paste it in. Press Save.
+3. Press Deploy > New deployment > Web app. Execute as: Me. Who has access: Anyone. Press Deploy, then Allow.
+4. Copy the Web app URL (it ends in /exec), paste it into SHEET ADDRESS and press SAVE.
+5. Press SYNC NOW. The first sync makes a READ ME tab and one tab per record type.
+
+### EDIT IN THE SHEET
+
+1. Change any white cell. The app picks it up within 5 minutes, or press SYNC NOW.
+2. Add a record by typing in the first empty row. Type a strain code or lot code in the look-up column and the app finds the record.
+3. Delete a record by typing DELETE in its _action cell. Deleting the whole row does not delete it: the app puts it back.
+4. Each sync is one UNDO step, signed GOOGLE SHEET in HISTORY.
+
 ### GOOD TO KNOW
 
 Restoring needs the file from the same app. A file from anywhere else is refused. Owner only.
+
+In the sheet, grey cells and grey tabs (exchange rates, edit history, sensor readings) are read only. A value that does not fit is refused and listed under LISTED BY THE SYNC; the app value goes back into the sheet.
 
 ## STAFF (21)
 

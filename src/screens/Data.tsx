@@ -9,12 +9,13 @@ import { EXPORT_TABLES, backupNag, buildExportZip, markBackup, readBackupFile, s
 import { canShareFile, downloadFile, shareFile } from '../lib/download'
 import { tableName } from '../lib/history'
 import type { BackupPreview } from '../lib/store'
+import { SheetTab } from './DataSheet'
 
 // DATA (build G9): export everything, back up, restore.
 // Local mode keeps every record in this one browser, so a backup file is the only copy that survives a lost phone.
 
-export type DataTab = 'BACKUP' | 'EXPORT' | 'RESTORE' | 'GUESSES'
-export const DATA_TABS: DataTab[] = ['BACKUP', 'EXPORT', 'RESTORE', 'GUESSES']
+export type DataTab = 'BACKUP' | 'EXPORT' | 'RESTORE' | 'SHEET' | 'GUESSES'
+export const DATA_TABS: DataTab[] = ['BACKUP', 'EXPORT', 'RESTORE', 'SHEET', 'GUESSES']
 export interface DataState {
   tab: DataTab
 }
@@ -26,10 +27,14 @@ export const DATA_GUESSES = [
   'RESTORE ADDS AND CHANGES records by their id. The exact copy mode also removes records that are not in the file. The edit history is never removed.',
   'The ZIP holds backup.json (restorable), one CSV per table and a README. sensor_readings is in the CSV folder but not in backup.json: it grows without limit.',
   'CSV dates are yyyy-mm-dd and times are UTC (the farm clock is UTC-6). Money is in colones as stored.',
+  'GOOGLE SHEET: syncs every 5 minutes while the app is open, plus SYNC NOW. A full check of every row runs at least once an hour.',
+  'GOOGLE SHEET: when the same field was changed in the app and in the sheet, the later change wins and is listed. A record deleted in the app stays deleted even if the sheet edited it (HISTORY > RESTORE brings it back).',
+  'GOOGLE SHEET: deleting a whole row in the sheet does not delete the record; the app puts the row back. Type DELETE in the _action cell instead.',
+  'GOOGLE SHEET: exchange rates, the edit history and sensor readings are read-only tabs. Sensor readings are off by default (last 14 days when on); the edit history shows the newest 5,000 lines.',
   'The save-to-phone button uses the phone\'s share sheet where the browser has one (iPhone Safari and Android Chrome do): send the ZIP to Drive, WhatsApp or e-mail. Desktop browsers just download the file.',
 ]
 
-const TAB_LABEL: Record<DataTab, string> = { BACKUP: 'BACK UP', EXPORT: 'EXPORT SPREADSHEETS', RESTORE: 'RESTORE', GUESSES: 'GUESSES' }
+const TAB_LABEL: Record<DataTab, string> = { BACKUP: 'BACK UP', EXPORT: 'EXPORT SPREADSHEETS', RESTORE: 'RESTORE', SHEET: 'GOOGLE SHEET', GUESSES: 'GUESSES' }
 
 export function DataIndex({ x, set }: { x: DataState; set: SetData }) {
   const { sound } = useApp()
@@ -77,6 +82,7 @@ export function Data({ x, set, say }: { x: DataState; set: SetData; say: Say }) 
       {x.tab === 'BACKUP' && <BackupTab say={say} />}
       {x.tab === 'EXPORT' && <ExportTab say={say} />}
       {x.tab === 'RESTORE' && <RestoreTab say={say} />}
+      {x.tab === 'SHEET' && <SheetTab say={say} />}
       {x.tab === 'GUESSES' && (
         <div className="ck-box">
           <div className="section-title">{t('BEST GUESSES WAITING FOR JOSEPH')} <Guess /></div>

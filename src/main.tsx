@@ -27,6 +27,7 @@ import { RoleProvider } from './settings/RoleContext'
 import './styles/shell.css'
 import { PowerProvider } from './power/PowerContext'
 import { StoreProvider } from './store/StoreContext'
+import { SheetAutoSync } from './store/useSheetSync'
 import App from './App'
 
 createRoot(document.getElementById('root')!).render(
@@ -36,6 +37,7 @@ createRoot(document.getElementById('root')!).render(
         <PowerProvider>
           <StoreProvider>
             <App />
+            <SheetAutoSync />
           </StoreProvider>
         </PowerProvider>
       </RoleProvider>
