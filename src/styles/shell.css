@@ -130,3 +130,9 @@ html[lang='es'] .fkey .flabel { font-size: 0.56em; }
 .gd-hit { display: grid; gap: 2px; text-align: left; font: inherit; color: var(--fg); background: transparent; border: 0; border-left: 2px solid var(--fg-dim); padding: 4px 8px; cursor: pointer; min-height: 40px; overflow-wrap: anywhere; }
 .gd-hit span { color: var(--fg-dim); font-size: 0.9em; }
 .gd-hit:hover, .gd-hit:focus-visible { background: var(--bg-hi); outline: none; }
+/* DATA > GOOGLE SHEET: the web app address is case sensitive, so it is shown as typed. */
+.dt .sr-input.dt-url { text-transform: none; }
+.dt-steps { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+.dt-steps > li { display: grid; grid-template-columns: 2.2em 1fr; align-items: baseline; }
+.dt-steps > li > b { color: var(--fg); font-weight: normal; }
+.dt-steps a.btn { display: inline-block; text-decoration: none; margin-left: 4px; min-height: 0; padding: 1px 10px; vertical-align: baseline; }
