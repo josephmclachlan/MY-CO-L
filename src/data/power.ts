@@ -162,7 +162,7 @@ export const MAIN: Circuit[] = [
   b('zvs', '5', 'L1', 'int', false, 'LAB OUTLET: 12 V ZVS INDUCTION STERILIZER', 'ZVS STERILIZER', 'Shares breaker 5 with the stir plates. About 280 W from the wall (est). Bench use, seconds at a time.', [it('zvs', '12 V ZVS induction loop sterilizer + power supply', 1, 280, 'lab')]),
   b('seal', '6', 'L1', 'int', false, 'AIE-405HIM 16" IMPULSE SEALER', 'IMPULSE SEALER', 'In the lab. About 800 W (est); draws only for seconds per seal.' + SIZE_NOTE, [it('sealer', 'AIE-405HIM 16" hand impulse sealer', 1, 800, 'lab')]),
   b('s1', '7', 'L2', 'base', true, 'FRONT FANS + S10: 2 CLOUDLINE S8, S10, PACKING + INCUBATION CO2 METERS, INKBIRD, TAC FOGGER', 'CLIMATE LINE', 'Joseph, 8 Nov 2026: the 2 S8s, the S10, the packing and incubation CO2 meters, the Inkbird and the TAC fogger are all on breaker 7. About 1,000 W = 8.4 A. One trip stops the fruiting exhaust, the packing intake and the fogger together.' + SIZE_NOTE, [
-    it('s8', 'AC Infinity Cloudline S8 (fruiting CO2 exhaust)', 2, 360, 'fruiting', false),
+    it('s8', 'AC Infinity Cloudline S8 (fruiting front fans, on the Inkbird)', 2, 360, 'fruiting', false),
     it('s10', 'AC Infinity Cloudline S10 (packing fresh-air intake)', 1, 255, 'packing', false),
     it('co2-pack', 'CO2 meter (packing intake)', 1, 3.3, 'packing'),
     it('co2-inc', 'CO2 meter (incubation)', 1, 3.3, 'incubation'),

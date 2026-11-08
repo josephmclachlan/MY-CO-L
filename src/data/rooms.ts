@@ -123,7 +123,7 @@ export const ROOMS: Room[] = [
       { label: 'AIR', value: '16 C (14-17, MAX 18)' },
       { label: 'RH', value: '80-90%' },
       { label: 'BACK FANS', value: '2 HURRICANE 8" ON THE CO2 METER (BREAKER 12), ON 900 / OFF 600 PPM' },
-      { label: 'FRONT FANS', value: '2 CLOUDLINE S8 ON BREAKER 7 (INKBIRD?)' },
+      { label: 'FRONT FANS', value: '2 CLOUDLINE S8 ON THE INKBIRD (BREAKER 7)' },
       { label: 'PRESSURE', value: 'SLIGHTLY NEGATIVE, SEALED FROM PACKING' },
       { label: 'ALARM', value: '19 C AIR, HIGH RH' },
     ],
