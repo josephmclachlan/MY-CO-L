@@ -789,7 +789,7 @@ Type a name under YOUR NAME FOR THE HISTORY so your changes are labelled with it
 
 1. Open GOOGLE SHEET and press SHEETS.NEW to make an empty Google Sheet.
 2. In the sheet open Extensions > Apps Script. Delete what is there. Press COPY SCRIPT in the app and paste it in. Press Save.
-3. Press Deploy > New deployment > Web app. Execute as: Me. Who has access: Anyone. Press Deploy, then Allow.
+3. Press Deploy > New deployment > Web app. Execute as: Me. Who has access: Anyone (not Anyone with Google account). Press Deploy, then Allow.
 4. Copy the Web app URL (it ends in /exec), paste it into SHEET ADDRESS and press SAVE.
 5. Press SYNC NOW. The first sync makes a READ ME tab and one tab per record type.
 

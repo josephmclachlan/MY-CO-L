@@ -95,7 +95,7 @@ export function SheetTab({ say }: { say: Say }) {
         <ol className="dt-steps">
           <li><b>1.</b><span>{t('MAKE A NEW GOOGLE SHEET:')} <a className="btn" href="https://sheets.new" target="_blank" rel="noreferrer">SHEETS.NEW</a></span></li>
           <li><b>2.</b><span>{t('IN THE SHEET: EXTENSIONS > APPS SCRIPT. DELETE WHAT IS THERE, PRESS COPY SCRIPT HERE, PASTE IT IN, PRESS SAVE.')}</span></li>
-          <li><b>3.</b><span>{t('DEPLOY > NEW DEPLOYMENT > WEB APP. EXECUTE AS: ME. WHO HAS ACCESS: ANYONE. PRESS DEPLOY, THEN ALLOW (ADVANCED > GO TO PROJECT IF GOOGLE WARNS YOU: IT IS YOUR OWN SCRIPT).')}</span></li>
+          <li><b>3.</b><span>{t('DEPLOY > NEW DEPLOYMENT > WEB APP. EXECUTE AS: ME. WHO HAS ACCESS: ANYONE (NOT ANYONE WITH GOOGLE ACCOUNT). PRESS DEPLOY, THEN ALLOW (ADVANCED > GO TO PROJECT IF GOOGLE WARNS YOU: IT IS YOUR OWN SCRIPT).')}</span></li>
           <li><b>4.</b><span>{t('COPY THE WEB APP URL (IT ENDS IN /exec), PASTE IT BELOW AND PRESS SAVE.')}</span></li>
           <li><b>5.</b><span>{t('PRESS SYNC NOW. THE FIRST SYNC MAKES EVERY TAB.')}</span></li>
         </ol>

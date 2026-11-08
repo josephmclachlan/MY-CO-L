@@ -8,7 +8,7 @@ You need only your own Google account. No Google Cloud project, no paid service.
 
 1. In the app open **DATA > GOOGLE SHEET** (or type `SHEET` at the prompt). Press **SHEETS.NEW** to make an empty Google Sheet. Name it what you like, for example "MY/CO/L farm records".
 2. In the sheet: **Extensions > Apps Script**. Delete what is there. In the app press **COPY SCRIPT**, paste it in, press **Save** (the disk icon).
-3. Press **Deploy > New deployment**. Click the gear and pick **Web app**. Set **Execute as: Me** and **Who has access: Anyone**. Press **Deploy**.
+3. Press **Deploy > New deployment**. Click the gear and pick **Web app**. Set **Execute as: Me** and **Who has access: Anyone** (not "Anyone with Google account": that sends the app to a sign-in page and the sync fails). Press **Deploy**.
 4. Google asks you to allow it. Press **Authorize access**, pick your account. If it says "Google hasn't verified this app", press **Advanced > Go to project (unsafe)**: it is your own script. It asks only to "see, edit, create and delete this spreadsheet" (the script cannot open anything else in your Drive).
 5. Copy the **Web app URL** (it ends in `/exec`). In the app paste it into **SHEET ADDRESS** and press **SAVE**. The title changes to the sheet's name when the link works.
 6. Press **SYNC NOW**. The first sync makes a READ ME tab and one tab for every record type.
@@ -24,6 +24,10 @@ After that the app syncs by itself every 5 minutes while it is open, and when th
 - Choice fields have a dropdown taken from the database rules. Yes/no fields are tick boxes.
 - Dates are `yyyy-mm-dd`. Times are UTC (the farm clock is UTC-6). Money is in colones as stored.
 - Photos show their details only. The picture stays in the app.
+
+## If it says the sheet did not let the app in
+
+Open the web app address in a new browser tab. It should say "MY/CO/L sheet link is running". If Google asks you to sign in, or says you need access, the deployment's access is wrong: in Apps Script press **Deploy > Manage deployments**, the pencil, set **Execute as: Me** and **Who has access: Anyone**, then **Deploy**. The address stays the same.
 
 ## Editing rules
 
