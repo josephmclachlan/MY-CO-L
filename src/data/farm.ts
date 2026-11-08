@@ -20,7 +20,7 @@ export const BREAKERS = Array.from({ length: 18 }, (_, i) => `S${i + 1}`)
 
 export const SELF_TEST: [string, string][] = [
   ['MAINS 120/240V 60HZ SPLIT PHASE', 'OK'],
-  ['ICE SERVICE 125A / MAIN 200A', 'OK'],
+  ['ICE METER 200A / FEEDER 3/0 AL 155A', 'LIMIT 155A'],
   ['FEEDER 3/0 AL 115M', 'OK'],
   ['BOX EATON CH 225A MLO', '32 SLOTS'],
   ['BASELINE L1 58.9A  L2 58.0A', '47%'],

@@ -128,9 +128,8 @@ export const ROOMS: Room[] = [
       { label: 'ALARM', value: '19 C AIR, HIGH RH' },
     ],
     critical: [
-      { ids: ['s1'], text: 'CO2 EXHAUST OFF. CO2 WILL BUILD.' },
+      { ids: ['s1'], text: 'BREAKER 7 OFF: CO2 EXHAUST, INKBIRD AND FOGGER ALL STOPPED.' },
       { ids: ['s2'], text: 'TEMPERATURE FANS OFF. ROOM WILL WARM.' },
-      { ids: ['s3'], text: 'FOGGER OFF. RH WILL DROP.' },
     ],
   },
   {

@@ -280,7 +280,7 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
         <div className="dim tiny">
           {gen
             ? `${GENERATOR.model} // ${GENERATOR.outlet} // ${GENERATOR.connection} // NEUTRAL MUST BE UN-BONDED`
-            : `125 A METER > 3/0 AL 115 M (155 A) > 200 A MAIN (WHERE? THE BOX IS MAIN-LUG ONLY) > EATON CH 225 A BOX // LABEL: ${SERVICE.label}`}
+            : `200 A METER > 3/0 AL 115 M (155 A, THE LIMIT) > 200 A MAIN (WHERE? THE BOX IS MAIN-LUG ONLY) > EATON CH 225 A BOX // LABEL: ${SERVICE.label}`}
           {SUB.length > 0 && ` // SUB-PANEL FEED L1 ${fmtA(r.subL1)} L2 ${fmtA(r.subL2)} OF ${SERVICE.subFeedA} A`}
         </div>
       </section>

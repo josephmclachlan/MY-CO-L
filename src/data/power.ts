@@ -49,7 +49,7 @@ export interface Circuit {
 // ---------------------------------------------------------------- service
 
 export const SERVICE = {
-  meterA: 125, // ICE meter, unchanged. The working ceiling.
+  meterA: 200, // ICE street meter, now 200 A (Joseph, 8 Nov 2026). Was 125 A.
   feeder: '3/0 AWG AL',
   feederLengthM: 115, // owner measured 110-115 m; 115 used (conservative)
   feederCmil: 167_800,
@@ -61,7 +61,7 @@ export const SERVICE = {
   label: 'ACOMETIDA 3/0 AL - MAX. 150 A',
 } as const
 
-/** min(meter 125, cable 155, breaker 200) = 125 A per leg. */
+/** min(meter 200, cable 155, breaker 200) = 155 A per leg: the 3/0 Al feeder is now the limit. */
 export const CEILING_A = Math.min(SERVICE.meterA, SERVICE.feederAmpacity75C, SERVICE.mainBreakerA)
 
 /** Amber above this share of the limit, red above 100%. */
@@ -161,10 +161,13 @@ export const MAIN: Circuit[] = [
   b('stir', '5', 'L1', 'base', false, 'LAB OUTLET: 4 STIR PLATES', 'STIR PLATES', 'Shares breaker 5 with the ZVS sterilizer. Stir plates (no heat) about 25 W each (est).' + SIZE_NOTE, [it('stir', 'Magnetic stir plate (no heat)', 4, 100, 'lab')]),
   b('zvs', '5', 'L1', 'int', false, 'LAB OUTLET: 12 V ZVS INDUCTION STERILIZER', 'ZVS STERILIZER', 'Shares breaker 5 with the stir plates. About 280 W from the wall (est). Bench use, seconds at a time.', [it('zvs', '12 V ZVS induction loop sterilizer + power supply', 1, 280, 'lab')]),
   b('seal', '6', 'L1', 'int', false, 'AIE-405HIM 16" IMPULSE SEALER', 'IMPULSE SEALER', 'In the lab. About 800 W (est); draws only for seconds per seal.' + SIZE_NOTE, [it('sealer', 'AIE-405HIM 16" hand impulse sealer', 1, 800, 'lab')]),
-  b('s1', '7', 'L2', 'base', true, 'CO2 FANS: 2 CLOUDLINE S8 (FRUITING) + CLOUDLINE S10 (PACKING)', 'S8 + S10 FANS', 'S8 180 W max each, S10 255 W max. One breaker feeds the fruiting exhaust AND the packing intake, so one trip stops both. Packing CO2 meter assumed here (S10 plugs into it).' + SIZE_NOTE, [
+  b('s1', '7', 'L2', 'base', true, 'FRONT FANS + S10: CLOUDLINE S8 x2, S10, 3 CO2 METERS SIDE, INKBIRD, TAC FOGGER', 'CLIMATE LINE', 'Joseph, 8 Nov 2026: the 2 S8s, the S10, the packing and incubation CO2 meters, the Inkbird and the TAC fogger are all on breaker 7. About 1,000 W = 8.4 A. One trip stops the fruiting exhaust, the packing intake and the fogger together.' + SIZE_NOTE, [
     it('s8', 'AC Infinity Cloudline S8 (fruiting CO2 exhaust)', 2, 360, 'fruiting', false),
     it('s10', 'AC Infinity Cloudline S10 (packing fresh-air intake)', 1, 255, 'packing', false),
-    it('co2-pack', 'CO2 meter (packing intake) - circuit is a guess', 1, 3.3, 'packing'),
+    it('co2-pack', 'CO2 meter (packing intake)', 1, 3.3, 'packing'),
+    it('co2-inc', 'CO2 meter (incubation)', 1, 3.3, 'incubation'),
+    it('inkbird', 'Inkbird temperature controller', 1, 2, 'fruiting'),
+    it('tac', 'TAC Misting XL ultrasonic fogger', 1, 380, 'fruiting', false),
   ]),
   b('lab4', '8', 'L2', 'base', false, 'LAB CLOUDLINE S4', 'LAB S4 FAN', 'S4 28 W max.' + SIZE_NOTE, [it('s4-lab', 'AC Infinity Cloudline S4 (lab air)', 1, 28, 'lab', false)]),
   b('bag', '9', 'L1', 'int', false, 'THOR BAGGER + CRESTWAVE PUMP', 'BAGGER + PUMP', 'Shares breaker 9 with the wall FFU. Bagger 600 W and pump 600 W (both est) run together on bag day: 10 A, plus the FFU 1.7 A.' + SIZE_NOTE, [
@@ -174,16 +177,14 @@ export const MAIN: Circuit[] = [
   b('ffuw', '9', 'L1', 'base', false, 'CRI HEPA FAN FILTER UNIT IN THE LAB / PACKING WALL', 'WALL FFU', 'Shares breaker 9 with the bagger and pump. If the bagger trips breaker 9, this HEPA unit stops too.', [it('ffu-wall', 'CRI 2x4 HEPA fan filter unit (in the wall)', 1, 208, 'lab')]),
   b('m2', '10', 'L1', 'int', false, 'MEGACHEF 12 QT PRESSURE COOKER 2', 'MEGACHEF 2', 'Runs with the other three. Slot 10 is on L1, the same leg as MegaChefs 1 and 3.', [it('mega2', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)]),
   b('s9', '11', 'L2', 'base', true, 'INCUBATION FLOOR FANS (4)', 'INCU FLOOR FANS', 'Rotating floor fans, 60 W each (est).' + SIZE_NOTE, [it('floorfan', 'Rotating floor fan', 4, 240, 'incubation')]),
-  b('s2', '12', 'L2', 'base', true, 'FRUITING: 2 HURRICANE 8" + CO2 METER (+ INKBIRD)', 'HURRICANES + METER', 'Hurricane 198 W each. The Inkbird is assumed on this breaker too (the Hurricanes plug into it).' + SIZE_NOTE, [
+  b('s2', '12', 'L2', 'base', true, 'FRUITING BACK FANS: 2 HURRICANE 8" + CO2 METER', 'HURRICANES + METER', 'Hurricane 198 W each. The Inkbird that switches them is on breaker 7.' + SIZE_NOTE, [
     it('hurricane', 'Hurricane 8" inline fan (temperature air)', 2, 396, 'fruiting', false),
     it('co2-fruit', 'CO2 meter (fruiting)', 1, 3.4, 'fruiting'),
-    it('inkbird', 'Inkbird temperature controller - circuit is a guess', 1, 2, 'fruiting'),
   ]),
   b('s7', '13', 'L1', 'base', false, '16 ACTIVE GROW T5 4 FT LED LAMPS', 'FRUITING LIGHTS', '25 W each, about 12 h a day.' + SIZE_NOTE, [it('t5', 'Active Grow T5 4 ft mushroom LED', 16, 400, 'fruiting', false)]),
   b('x75', '14', 'L1', 'int', false, 'ALL AMERICAN 75X ELECTRIC STERILIZER', '75X STERILIZER', '1,650 W / 13.75 A nameplate, 60 min timer. Needs its own 20 A breaker (13.75 A is over the 12 A a 15 A breaker should carry for an hour). Never runs with the MegaChefs or the steam heater.', [it('aa75x', 'All American 75X electric sterilizer (110 V, timer)', 1, 1650, 'lab', false)]),
-  b('incs4', '15', 'L2', 'base', true, 'INCUBATION CLOUDLINE S4 (+ CO2 METER)', 'INCU S4 + METER', 'S4 28 W max. The incubation CO2 meter is assumed here (the S4 plugs into it).' + SIZE_NOTE, [
+  b('incs4', '15', 'L2', 'base', true, 'INCUBATION BACK FAN: CLOUDLINE S4', 'INCU S4', 'S4 28 W max. The incubation CO2 meter is on breaker 7.' + SIZE_NOTE, [
     it('s4-inc', 'AC Infinity Cloudline S4 (CO2 exhaust)', 1, 28, 'incubation', false),
-    it('co2-inc', 'CO2 meter (incubation) - circuit is a guess', 1, 3.3, 'incubation'),
   ]),
   b('f1', '16', 'L2', 'base', true, 'LEFT FOGEL 3-DOOR REACH-IN FRIDGE', 'FOGEL LEFT', 'Outdoors under the roof, against the fruiting wall left of the back door. Compressor, 800 W (est). Outdoor-rated voltage protector with a delay.' + SIZE_NOTE, [it('fogel1', 'Fogel commercial 3-door reach-in fridge (left)', 1, 800, 'outside')]),
   b('m3', '17', 'L1', 'int', false, 'MEGACHEF 12 QT PRESSURE COOKER 3', 'MEGACHEF 3', 'Runs with the other three. Slot 17 is on L1 too.', [it('mega3', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)]),
@@ -213,12 +214,6 @@ export const MAIN: Circuit[] = [
     name: 'LENNOX 36K BTU MINI-SPLIT #2 (PACKING)', short: 'LENNOX 36K #2',
     note: 'Same as #1. Stagger compressor starts.',
     items: [it('lennox36b', 'Lennox 36k BTU mini-split #2', 1, 3600, 'packing')],
-  },
-  {
-    id: 's3', tag: 'TAC?', panel: 'main', leg: 'L1', v: 120, breaker: '?', wire: '#12 CU', cls: 'base', em: true,
-    name: 'TAC MISTING XL FOGGER - NOT ON THE BOX LIST', short: 'FOGGER',
-    note: '380 W. Joseph\'s slot list does not say which breaker feeds it, so the leg (L1) is a guess. Keep it apart from the CO2 meters.',
-    items: [it('tac', 'TAC Misting XL ultrasonic fogger', 1, 380, 'fruiting', false)],
   },
 ]
 
@@ -253,9 +248,9 @@ export function allCircuits(opt: HeaterOption): Circuit[] {
 // ---------------------------------------------------------------- groups and links
 
 /** Continuous loads: every fan, light, fridge and FFU, and the four mini-splits. */
-export const BASE = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's9', 'stir', 'lab4', 'ffuw', 'incs4', 'f1', 'f2', 'c34', 'c56', 'c78', 'c910']
-/** Generator emergency list: breakers 4, 7, 11, 12, 15, 16, 18 and the fogger. */
-export const EMERG = ['s1', 's2', 's3', 's6', 's9', 'incs4', 'f1', 'f2']
+export const BASE = ['s1', 's2', 's4', 's5', 's6', 's7', 's9', 'stir', 'lab4', 'ffuw', 'incs4', 'f1', 'f2', 'c34', 'c56', 'c78', 'c910']
+/** Generator emergency list: breakers 4, 7 (fans, meters, Inkbird, fogger), 11, 12, 15, 16, 18. */
+export const EMERG = ['s1', 's2', 's6', 's9', 'incs4', 'f1', 'f2']
 export const MEGACHEFS = ['m1', 'm2', 'm3', 'm4']
 export const HEATER_IDS = ['c12', 'c12b']
 export const AC_IDS = ['c34', 'c56', 'c78', 'c910']

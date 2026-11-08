@@ -124,23 +124,23 @@ describe('on-screen scenario presets', () => {
       const r = compute(new Set(scenarioIds(s, opt)), { heater: opt, source: s.source, fuel: 'propane', genW: 11400, overrides: {} })
       expect(r1(r.worst)).toBe(String(worst))
     }
-    check('base', '2x4500', 60.7)
-    check('heatfull', '2x4500', 98.2)
-    check('heatfull', '6500', 87.8)
-    check('heatstage', '2x4500', 79.5)
-    check('mega', '2x4500', 96.2)
-    check('bag', '2x4500', 66.2)
-    check('labbench', '2x4500', 78.9)
-    check('bad', '2x4500', 133.7)
-    check('all', '2x4500', 166.4)
-    check('all', '6500', 156)
-    check('gmax', '6500', 60.8)
+    check('base', '2x4500', 63.9)
+    check('heatfull', '2x4500', 101.4)
+    check('heatfull', '6500', 91)
+    check('heatstage', '2x4500', 82.6)
+    check('mega', '2x4500', 93)
+    check('bag', '2x4500', 63.9)
+    check('labbench', '2x4500', 75.8)
+    check('bad', '2x4500', 130.5)
+    check('all', '2x4500', 163.2)
+    check('all', '6500', 152.8)
+    check('gmax', '6500', 63.9)
   })
 
   it('every circuit watt total matches the 8 Nov 2026 spec-sheet figures', () => {
-    // Hand-worked per box slot (8 Nov 2026): 2 = 7 x 36; 3 = 2 x 208; 7 = 2 x 180 + 255 + 3.3 meter; 9 = 600 + 600
-    // bagger and pump, plus the 208 W wall FFU; 11 = 4 x 60; 12 = 2 x 198 + 3.4 + 2; 13 = 16 x 25; 15 = 28 + 3.3.
-    const want: Record<string, number> = { s5: 252, s4: 416, s6: 150, stir: 100, zvs: 280, seal: 800, s1: 618.3, lab4: 28, bag: 1200, ffuw: 208, s9: 240, s2: 401.4, s7: 400, x75: 1650, incs4: 31.3, f1: 800, f2: 800, m1: 1600, s3: 380, c34: 3600, c78: 1000 }
+    // Hand-worked per box slot (8 Nov 2026): 2 = 7 x 36; 3 = 2 x 208; 7 = 2 x 180 + 255 + 3.3 + 3.3 meters + 2 Inkbird + 380 TAC; 9 = 600 + 600
+    // bagger and pump, plus the 208 W wall FFU; 11 = 4 x 60; 12 = 2 x 198 + 3.4; 13 = 16 x 25; 15 = 28.
+    const want: Record<string, number> = { s5: 252, s4: 416, s6: 150, stir: 100, zvs: 280, seal: 800, s1: 1003.6, lab4: 28, bag: 1200, ffuw: 208, s9: 240, s2: 399.4, s7: 400, x75: 1650, incs4: 28, f1: 800, f2: 800, m1: 1600, c34: 3600, c78: 1000 }
     for (const c of allCircuits('2x4500')) {
       if (want[c.id] !== undefined) expect(Math.round(c.items.reduce((n, i) => n + i.w, 0) * 1000) / 1000).toBe(want[c.id])
     }
@@ -198,6 +198,10 @@ describe('breaker box as wired (Joseph, 8 Nov 2026)', () => {
       expect(new Set([legOf(a), legOf(b)])).toEqual(new Set(['L1', 'L2']))
     }
   })
+  it('puts the climate line on breaker 7 (Joseph, 8 Nov 2026)', () => {
+    expect(cs.find((c) => c.id === 's1')!.items.map((i) => i.id).sort()).toEqual(['co2-inc', 'co2-pack', 'inkbird', 's10', 's8', 'tac'])
+    expect(cs.some((c) => c.tag === 'TAC?')).toBe(false)
+  })
   it('matches the slot list', () => {
     expect([slot('1'), slot('5'), slot('9'), slot('10'), slot('14'), slot('16'), slot('17'), slot('18'), slot('19'), slot('20')]).toEqual([
       ['m1'], ['stir', 'zvs'], ['bag', 'ffuw'], ['m2'], ['x75'], ['f1'], ['m3'], ['f2'], ['m4'], ['o1'],
@@ -214,6 +218,14 @@ describe('breaker box as wired (Joseph, 8 Nov 2026)', () => {
     const run = (on: Set<string>) => warnings(on, cfgU, compute(on, cfgU), peakState(new Date('2026-11-05T21:00:00Z'))).map((w) => w.id)
     expect(run(ids('base'))).not.toContain('imbalance')
     expect(run(ids('mega'))).toContain('imbalance')
+  })
+  it('flags a generator leg over half the generator even when the total fits', () => {
+    const cfgG = { heater: '2x4500' as const, source: 'generator' as const, fuel: 'propane' as const, genW: 11400, overrides: {} }
+    const on = new Set([...EMERG, 'c34', 'c78', 's7', 's5', 's4', 'm4'])
+    const r = compute(on, cfgG)
+    expect(r.watts).toBeLessThan(11400)
+    expect(Math.max(r.l1, r.l2)).toBeGreaterThan(47.5)
+    expect(warnings(on, cfgG, r, peakState(new Date('2026-11-05T21:00:00Z'))).map((w) => w.id)).toContain('genleg')
   })
   it('keeps nothing marked as a room guess', () => {
     expect(items.filter((i) => i.roomGuess)).toEqual([])
@@ -250,9 +262,10 @@ describe('operating rules', () => {
   })
   it('estimated wattage overrides change the load', () => {
     const on = ids('base')
-    // Both 36k units at their 24 A peak (5,760 W) instead of 3,600 W: +18 A per leg (L1 baseline 56.2).
+    // Both 36k units at their 24 A peak (5,760 W) instead of 3,600 W: +18 A per leg .
+    const base = compute(on, cfg('utility'))
     const r = compute(on, { ...cfg('utility'), overrides: { lennox36a: 5760, lennox36b: 5760 } })
-    expect(r.l1 - 56.2).toBeGreaterThan(17.9)
-    expect(r.l1 - 56.2).toBeLessThan(18.1)
+    expect(r.l1 - base.l1).toBeGreaterThan(17.9)
+    expect(r.l1 - base.l1).toBeLessThan(18.1)
   })
 })

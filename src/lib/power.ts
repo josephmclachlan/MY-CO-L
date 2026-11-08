@@ -1,7 +1,7 @@
 // Load arithmetic and operating rules for VITALS and DECK PLAN.
 // Same maths as Joseph's planner (project_data.py legs() and feeder_drop_V()):
 //   240 V circuit: W/240 added to both legs.  120 V circuit: W/120 on its own leg.
-//   worst leg = max(L1, L2).  Utility % = worst / 125 A.  Generator % = total W / generator running W.
+//   worst leg = max(L1, L2).  Utility % = worst / 155 A (the 3/0 Al feeder; the meter is 200 A).  Generator % = total W / generator running W.
 //   Feeder drop V = 2 x 21.2 x worst A x (115 m x 3.28084 ft/m) / 167,800 cmil.
 
 import {
@@ -42,7 +42,7 @@ export interface Reading {
   l2: number
   worst: number
   watts: number
-  /** Share of the active limit (amps vs 125 A on utility, watts vs generator on generator). */
+  /** Share of the active limit (amps vs the 155 A feeder on utility, watts vs generator on generator). */
   share: number
   level: Level
   status: string
@@ -74,7 +74,7 @@ export function feederDropV(amps: number): number {
 
 export function utilityStatus(worst: number): { level: Level; status: string } {
   if (worst > SERVICE.feederAmpacity75C) return { level: 'over', status: 'Over cable rating' }
-  if (worst > CEILING_A) return { level: 'over', status: 'Over 125 A meter' }
+  if (worst > CEILING_A) return { level: 'over', status: 'Over meter' }
   if (worst > NEAR_LIMIT * CEILING_A) return { level: 'near', status: 'Near ceiling' }
   return { level: 'ok', status: 'OK' }
 }
@@ -251,6 +251,12 @@ export function warnings(on: Set<string>, cfg: PowerConfig, r: Reading, peak: Pe
     } else if (r.level === 'near') {
       out.push({ id: 'gennear', level: 'warn', text: `NO SURGE HEADROOM: GENERATOR AT ${Math.round(pct)}%. COMPRESSOR STARTS MAY STALL IT.`, rooms: [] })
     }
+    // Each 120 V leg of the generator carries half its rating (11,400 W / 240 V = 47.5 A).
+    const legMax = cfg.genW / 240
+    const worstLeg = Math.max(r.l1, r.l2)
+    if (r.level !== 'over' && worstLeg > legMax) {
+      out.push({ id: 'genleg', level: 'warn', text: `GENERATOR LEG OVERLOAD: ${worstLeg.toFixed(1)} A ON ${r.l1 > r.l2 ? 'L1' : 'L2'}, EACH LEG GIVES ${legMax.toFixed(1)} A.`, rooms: [] })
+    }
     // Rule 6: never heater + AC on the generator.
     if (heat && ac) {
       out.push({ id: 'genheatac', level: 'warn', text: 'NEVER RUN THE STEAM HEATER AND AIR CONDITIONING TOGETHER ON THE GENERATOR.', rooms: roomsOf(cfg.heater, [...heatOn, ...AC_IDS.filter((i) => on.has(i))]) })
@@ -268,7 +274,7 @@ export function warnings(on: Set<string>, cfg: PowerConfig, r: Reading, peak: Pe
     }
   }
 
-  // Leg balance: 120 V loads on one leg only. Flag a gap of 20 A or more.
+  // Leg balance: 120 V loads on one leg only. Flag a gap of 15 A or more.
   const gap = Math.abs(r.l1 - r.l2)
   if (gap >= IMBALANCE_A) {
     const heavy = r.l1 > r.l2 ? 'L1' : 'L2'
@@ -284,7 +290,7 @@ export function warnings(on: Set<string>, cfg: PowerConfig, r: Reading, peak: Pe
 }
 
 /** A leg gap at or above this many amps is flagged. */
-export const IMBALANCE_A = 20
+export const IMBALANCE_A = 15
 
 /** Generator share against the owned unit on both fuels, as the package CSV prints it. */
 export function ownedGeneratorShare(watts: number): { propane: number; gasoline: number } {
