@@ -474,6 +474,24 @@
 .deck-note.end {
   text-anchor: end;
 }
+/* Small labels inside the plan (store bays, the steam cart, the side view). */
+.deck-tag {
+  fill: var(--fg-dim);
+  font-size: 9px;
+  text-anchor: middle;
+  pointer-events: none;
+}
+.deck-tag.start {
+  text-anchor: start;
+}
+.deck-side rect,
+.deck-side path {
+  stroke-dasharray: none;
+}
+.glyph.light {
+  fill: var(--fg-dim);
+  fill-opacity: 0.4;
+}
 .glyph,
 .glyph * {
   fill: none;
@@ -590,6 +608,9 @@ rect.glyph.lit {
   }
   .deck-kw {
     font-size: 22px;
+  }
+  .deck-tag {
+    font-size: 12px;
   }
   .deck-room .deck-kw {
     transform: translateY(10px);

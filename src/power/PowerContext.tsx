@@ -34,7 +34,7 @@ const KEY = 'mycol.power.v1'
 
 const DEFAULTS: Saved = {
   on: [...BASE],
-  heater: '2x4500', // Joseph's planner opens on this; the choice is still open
+  heater: '2x4500', // Joseph chose option A (2 x 4,500 W), 6 Nov 2026; option B kept for comparison
   source: 'utility',
   fuel: 'propane',
   genW: GENERATOR.running.propane,

@@ -11,52 +11,64 @@ import { fmtQty } from '../lib/cargo'
 import { BreakerBox, fmtW } from './Vitals'
 
 // Equipment glyphs on the plan. Each lights up when its breaker is on.
-// Positions are drawn from Joseph's floor plan; ones marked UNCONFIRMED in the
-// data are guesses until he says where they live.
-type Glyph = { item: string; kind: 'box' | 'disc' | 'fan' | 'ac'; x: number; y: number; w?: number; h?: number; r?: number }
+// Positions follow Joseph's room-by-room list of 8 Nov 2026 (see data/rooms.ts
+// for the container layout and scale).
+type Glyph = { item: string; kind: 'box' | 'disc' | 'fan' | 'ac' | 'light' | 'meter'; x: number; y: number; w?: number; h?: number; r?: number }
+
+const T5_ROW = (y: number): Glyph[] => Array.from({ length: 8 }, (_, i) => ({ item: 't5', kind: 'light' as const, x: 290 + i * 46, y, w: 36, h: 3 }))
 
 const GLYPHS: Glyph[] = [
-  // lab
-  { item: 'ffu', kind: 'box', x: 68, y: 200, w: 50, h: 24 },
-  { item: 'ffu', kind: 'box', x: 68, y: 228, w: 50, h: 24 },
-  { item: 'ffu', kind: 'box', x: 68, y: 256, w: 50, h: 24 },
-  { item: 'chest', kind: 'box', x: 68, y: 92, w: 40, h: 34 },
-  { item: 'aa75x', kind: 'disc', x: 160, y: 60, r: 13 },
-  { item: 'stir', kind: 'disc', x: 150, y: 150, r: 6 },
-  { item: 'stir', kind: 'disc', x: 166, y: 150, r: 6 },
-  { item: 'stir', kind: 'disc', x: 150, y: 166, r: 6 },
-  { item: 'stir', kind: 'disc', x: 166, y: 166, r: 6 },
-  { item: 'sealer', kind: 'box', x: 135, y: 230, w: 44, h: 14 },
-  // packing
-  { item: 'lennox36a', kind: 'ac', x: 68, y: 350, w: 40, h: 40 },
-  { item: 'lennox36b', kind: 'ac', x: 68, y: 400, w: 40, h: 40 },
-  { item: 'fogel1', kind: 'box', x: 140, y: 350, w: 40, h: 60 },
-  { item: 'fogel2', kind: 'box', x: 140, y: 414, w: 40, h: 60 },
-  { item: 's10', kind: 'fan', x: 125, y: 607, r: 10 },
-  { item: 's4-pack', kind: 'fan', x: 72, y: 607, r: 7 },
-  // boiling room
-  { item: 'heat-c12', kind: 'box', x: 210, y: 110, w: 70, h: 40 },
-  { item: 'heat-c12b', kind: 'box', x: 210, y: 154, w: 70, h: 40 },
-  { item: 'mega1', kind: 'disc', x: 320, y: 120, r: 14 },
-  { item: 'mega2', kind: 'disc', x: 354, y: 120, r: 14 },
-  { item: 'mega3', kind: 'disc', x: 320, y: 154, r: 14 },
-  { item: 'mega4', kind: 'disc', x: 354, y: 154, r: 14 },
-  { item: 'thor', kind: 'box', x: 300, y: 270, w: 60, h: 34 },
-  { item: 'pump', kind: 'disc', x: 385, y: 287, r: 10 },
-  // incubation
-  { item: 'lennox12a', kind: 'ac', x: 330, y: 386, w: 50, h: 14 },
-  { item: 'lennox12b', kind: 'ac', x: 560, y: 386, w: 50, h: 14 },
-  { item: 'floorfan', kind: 'fan', x: 230, y: 440, r: 9 },
-  { item: 'floorfan', kind: 'fan', x: 400, y: 440, r: 9 },
-  { item: 'floorfan', kind: 'fan', x: 560, y: 440, r: 9 },
-  { item: 'floorfan', kind: 'fan', x: 710, y: 440, r: 9 },
-  { item: 's4-inc', kind: 'fan', x: 738, y: 400, r: 8 },
-  // fruiting
-  { item: 's8', kind: 'fan', x: 204, y: 520, r: 9 },
-  { item: 's8', kind: 'fan', x: 204, y: 600, r: 9 },
-  { item: 'hurricane', kind: 'fan', x: 735, y: 520, r: 10 },
-  { item: 'hurricane', kind: 'fan', x: 735, y: 600, r: 10 },
-  { item: 'tac', kind: 'box', x: 222, y: 550, w: 22, h: 20 },
+  // lab: two FFUs on the back-left table, one in the wall to packing
+  { item: 'ffu', kind: 'box', x: 68, y: 52, w: 26, h: 56 },
+  { item: 'ffu', kind: 'box', x: 98, y: 52, w: 26, h: 56 },
+  { item: 'ffu', kind: 'box', x: 104, y: 313, w: 56, h: 14 },
+  { item: 'aa75x', kind: 'disc', x: 150, y: 70, r: 13 },
+  { item: 'stir', kind: 'disc', x: 141, y: 151, r: 6 },
+  { item: 'stir', kind: 'disc', x: 157, y: 151, r: 6 },
+  { item: 'stir', kind: 'disc', x: 141, y: 167, r: 6 },
+  { item: 'stir', kind: 'disc', x: 157, y: 167, r: 6 },
+  { item: 'zvs', kind: 'box', x: 136, y: 190, w: 18, h: 10 },
+  { item: 'chest', kind: 'box', x: 128, y: 250, w: 36, h: 30 },
+  { item: 's4-lab', kind: 'fan', x: 76, y: 296, r: 7 },
+  { item: 'led-lab', kind: 'light', x: 70, y: 150, w: 40, h: 5 },
+  { item: 'led-lab', kind: 'light', x: 70, y: 245, w: 40, h: 5 },
+  // packing: two 36k units, storage, bagger, intake
+  { item: 'lennox36a', kind: 'ac', x: 68, y: 330, w: 40, h: 40 },
+  { item: 'lennox36b', kind: 'ac', x: 68, y: 380, w: 40, h: 40 },
+  { item: 'led-pack', kind: 'light', x: 68, y: 440, w: 40, h: 5 },
+  { item: 'led-pack', kind: 'light', x: 68, y: 455, w: 40, h: 5 },
+  { item: 'thor', kind: 'box', x: 70, y: 522, w: 44, h: 30 },
+  { item: 'co2-pack', kind: 'meter', x: 150, y: 560, w: 8, h: 8 },
+  { item: 's10', kind: 'fan', x: 150, y: 586, r: 10 },
+  // cook room: boiler with two elements, steam box cart, four MegaChefs
+  { item: 'heat-c12', kind: 'box', x: 180, y: 58, w: 44, h: 30 },
+  { item: 'heat-c12b', kind: 'box', x: 180, y: 92, w: 44, h: 30 },
+  { item: 'mega1', kind: 'disc', x: 199, y: 200, r: 13 },
+  { item: 'mega2', kind: 'disc', x: 233, y: 200, r: 13 },
+  { item: 'mega3', kind: 'disc', x: 199, y: 234, r: 13 },
+  { item: 'mega4', kind: 'disc', x: 233, y: 234, r: 13 },
+  // incubation (lower container)
+  { item: 'lennox12a', kind: 'ac', x: 330, y: 492, w: 50, h: 14 },
+  { item: 'lennox12b', kind: 'ac', x: 560, y: 492, w: 50, h: 14 },
+  { item: 'co2-inc', kind: 'meter', x: 186, y: 498, w: 8, h: 8 },
+  { item: 's4-inc', kind: 'fan', x: 720, y: 506, r: 8 },
+  { item: 'led-inc', kind: 'light', x: 300, y: 540, w: 40, h: 5 },
+  { item: 'led-inc', kind: 'light', x: 450, y: 540, w: 40, h: 5 },
+  { item: 'led-inc', kind: 'light', x: 600, y: 540, w: 40, h: 5 },
+  { item: 'floorfan', kind: 'fan', x: 236, y: 588, r: 9 },
+  { item: 'floorfan', kind: 'fan', x: 400, y: 588, r: 9 },
+  { item: 'floorfan', kind: 'fan', x: 560, y: 588, r: 9 },
+  { item: 'floorfan', kind: 'fan', x: 716, y: 588, r: 9 },
+  // fruiting (upper container)
+  { item: 'co2-fruit', kind: 'meter', x: 250, y: 356, w: 8, h: 8 },
+  { item: 's8', kind: 'fan', x: 228, y: 376, r: 9 },
+  { item: 's8', kind: 'fan', x: 228, y: 438, r: 9 },
+  { item: 'tac', kind: 'box', x: 246, y: 396, w: 22, h: 20 },
+  { item: 'inkbird', kind: 'meter', x: 744, y: 354, w: 8, h: 8 },
+  { item: 'hurricane', kind: 'fan', x: 757, y: 376, r: 10 },
+  { item: 'hurricane', kind: 'fan', x: 757, y: 438, r: 10 },
+  ...T5_ROW(398),
+  ...T5_ROW(406),
 ]
 
 function rackRows(x0: number, y0: number, count: number, rows: number[], w: number, h: number) {
@@ -115,26 +127,55 @@ function Plan() {
 
   return (
     <div className={`deck-frame ${gen ? 'hazard-box' : ''}`}>
-      <svg viewBox="40 14 740 630" className="deck-svg" role="img" aria-label="Plan of the farm with live load by room">
+      <svg viewBox="40 20 760 604" className="deck-svg" role="img" aria-label="Plan of the farm with live load by room">
         <g className="deck-detail">
-          {/* sallyports and the corridor between the boiling room and incubation */}
-          <path d="M60 330H190" className="deck-inner" pathLength={1} />
-          <path d="M190 340V380M420 340L420 380" className="deck-inner faint" pathLength={1} />
-          {/* lab benches */}
-          <rect x={130} y={140} width={52} height={40} className="deck-rack" />
-          <rect x={130} y={280} width={52} height={40} className="deck-rack" />
-          {/* packing work table */}
-          <rect x={130} y={500} width={50} height={90} className="deck-rack" />
-          {/* boiling room: steam box cart and its door */}
-          <rect x={210} y={220} width={70} height={100} className="deck-rack" />
-          {/* incubation shelving and fruiting racks (14 rolling racks) */}
-          {rackRows(250, 380, 8, [30, 70], 50, 26)}
-          {rackRows(260, 500, 7, [30, 70], 56, 24)}
-          {/* the outside heat exchanger by packing */}
-          <rect x={86} y={624} width={40} height={12} className="deck-rack faint" />
-          <text x={140} y={634} className="deck-note">
-            HX
+          {/* lab: back-left table under two FFUs, stir-plate bench */}
+          <rect x={64} y={48} width={64} height={64} className="deck-rack" />
+          <rect x={132} y={140} width={36} height={38} className="deck-rack" />
+          {/* packing: material store (soy, sawdust, grain, fruit bags) */}
+          {['SOY', 'SAWDUST', 'GRAIN', 'BAGS'].map((t, i) => (
+            <g key={t}>
+              <rect x={122} y={330 + i * 36} width={44} height={30} className="deck-rack" />
+              <text x={144} y={349 + i * 36} className="deck-tag">
+                {t}
+              </text>
+            </g>
+          ))}
+          {/* cook room: steam box cart */}
+          <rect x={232} y={58} width={44} height={92} className="deck-rack" />
+          <text x={254} y={108} className="deck-tag">
+            CART
           </text>
+          {/* incubation shelving (lower) and fruiting racks (upper) */}
+          {rackRows(250, 488, 8, [24, 64], 50, 22)}
+          {rackRows(300, 350, 7, [14, 64], 48, 26)}
+          {/* the upper container sits on the lower one: corner lines */}
+          <path d="M172 488L212 462M732 488L772 462M172 600L212 574M732 600L772 574" className="deck-inner faint dash" />
+          <text x={452} y={479} className="deck-tag">
+            FRUITING SITS ON TOP OF INCUBATION
+          </text>
+          {/* side view, looking north */}
+          <g className="deck-side">
+            <text x={320} y={70} className="deck-note">
+              SIDE VIEW // STACK
+            </text>
+            <path d="M310 270H780" className="deck-inner" />
+            <rect x={320} y={210} width={50} height={60} className="deck-inner" />
+            <text x={345} y={244} className="deck-tag">
+              LAB/PACK
+            </text>
+            <rect x={370} y={210} width={400} height={60} className="deck-inner" />
+            <text x={570} y={244} className="deck-tag">
+              INCUBATION // LOWER 40 FT
+            </text>
+            <rect x={370} y={150} width={400} height={60} className="deck-inner" />
+            <text x={570} y={184} className="deck-tag">
+              FRUITING // UPPER 40 FT
+            </text>
+            <text x={320} y={292} className="deck-tag start">
+              COOK ROOM (20 FT) IS BESIDE THE LAB END
+            </text>
+          </g>
         </g>
         {ROOMS.map((room) => (
           <RoomOutline
@@ -160,6 +201,15 @@ function Plan() {
                   <path d={`M${g.x - g.r!} ${g.y}H${g.x + g.r!}M${g.x} ${g.y - g.r!}V${g.y + g.r!}`} />
                 </g>
               )
+            if (g.kind === 'light')
+              return <rect key={i} x={g.x} y={g.y} width={g.w} height={g.h} className={`${cls} light`} />
+            if (g.kind === 'meter')
+              return (
+                <g key={i} className={cls}>
+                  <rect x={g.x} y={g.y} width={g.w} height={g.h} />
+                  <circle cx={g.x + g.w! / 2} cy={g.y + g.h! / 2} r={1.5} />
+                </g>
+              )
             if (g.kind === 'ac')
               return (
                 <g key={i} className={cls}>
@@ -170,10 +220,10 @@ function Plan() {
             return <rect key={i} x={g.x} y={g.y} width={g.w} height={g.h} className={cls} />
           })}
         </g>
-        <text x={770} y={40} className="deck-note end">
+        <text x={790} y={330} className="deck-note end">
           N ^
         </text>
-        <text x={770} y={360} className="deck-note end">
+        <text x={790} y={616} className="deck-note end">
           {gen ? 'GENERATOR // EMERGENCY POWER' : 'ICE UTILITY'}
         </text>
       </svg>
@@ -199,7 +249,7 @@ function RoomReadout({ onOpenVitals, onOpenCargo }: { onOpenVitals: () => void; 
         group={3}
         lines={[
           { text: `${room.name}${room.nameGuess ? '  [NAME UNCONFIRMED]' : ''}`, cls: 'rr-name' },
-          ...(room.alt ? [{ text: `ELECTRICAL PACKAGE: ${room.alt}`, cls: 'dim' }] : [{ text: 'NOT IN THE ELECTRICAL PACKAGE', cls: 'dim' }]),
+          ...(room.alt ? [{ text: `CONTAINER: ${room.alt}`, cls: 'dim' }] : []),
           alarms.length
             ? { text: `STATUS: ALARM // ${alarms[0]}`, cls: 'warn' }
             : { text: `STATUS: NOMINAL${gen ? ' // ON GENERATOR' : ''}`, cls: '' },
@@ -291,13 +341,13 @@ export function DeckPlan({ onOpenVitals, onOpenCargo }: { onOpenVitals: () => vo
         <RoomReadout onOpenVitals={onOpenVitals} onOpenCargo={onOpenCargo} />
       </div>
       <div className="dim tiny" style={{ marginTop: 8 }}>
-        LAYOUT FROM YOUR FLOOR PLAN. ROOM NAMES AND WHERE EACH MACHINE SITS ARE MARKED UNCONFIRMED UNTIL YOU CHECK THEM.
+        LAYOUT AND EQUIPMENT FROM YOUR ROOM LIST OF 8 NOV 2026. FRUITING IS DRAWN LIFTED UP AND RIGHT BECAUSE IT SITS ON TOP OF INCUBATION. WATTS MARKED EST ARE STILL ESTIMATES.
       </div>
     </div>
   )
 }
 
-/** Right-hand index for DECK PLAN: every room with its live load and alarm state. */
+/** Index for DECK PLAN (left column): every room with its live load and alarm state. */
 export function DeckIndex() {
   const { reading, on, selectedRoom, setSelectedRoom, warns } = usePower()
   const { sound } = useApp()

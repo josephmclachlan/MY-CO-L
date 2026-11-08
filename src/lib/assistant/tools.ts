@@ -156,7 +156,7 @@ const countLots: Tool = {
   params: {
     species: { type: 'string', desc: 'species name, e.g. lions mane, blue oyster. Leave out for all.' },
     status: { type: 'string', desc: 'incubating, fruiting, active (both), spent, lost or all', enum: LOT_STATUS_WORDS },
-    room: { type: 'string', desc: 'room: lab, incubation, fruiting, packing, boiling' },
+    room: { type: 'string', desc: 'room: lab, incubation, fruiting, packing, boiling (the cook room)' },
   },
   async run(ctx, a) {
     const lots = await rows<BlockLot>(ctx, 'block_lots')

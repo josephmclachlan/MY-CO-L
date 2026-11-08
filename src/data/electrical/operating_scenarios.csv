@@ -1,31 +1,31 @@
 ﻿Heater option,Source,Scenario,Total W,L1 A,L2 A,Worst leg A,"% of limit (125 A meter, or generator)","Feeder drop % (3/0 Al, 115 m)",Volts at panel,Status
-2x4500,Utility,Baseline (continuous loads),12826,53.8,53.1,53.8,43%,2.14%,234.9,OK
-2x4500,Utility,"Baseline + heater, full",21826,91.3,90.6,91.3,73%,3.63%,231.3,OK
-2x4500,Utility,"Baseline + heater, staged hold (element 2 off)",17326,72.5,71.8,72.5,58%,2.88%,233.1,OK
-2x4500,Utility,Baseline + 4 MegaChefs,17626,73.8,73.1,73.8,59%,2.93%,233.0,OK
-2x4500,Utility,Baseline + All American 75X,14476,67.5,53.1,67.5,54%,2.68%,233.6,OK
-2x4500,Utility,Baseline + bagger & pump,14026,58.8,58.1,58.8,47%,2.34%,234.4,OK
-2x4500,Utility,"Baseline + bagger, pump & sealer (sealer worst case)",14826,58.8,64.8,64.8,52%,2.57%,233.8,OK
-2x4500,Utility,RULE BROKEN: heater full + 4 MegaChefs,26626,111.3,110.6,111.3,89%,4.42%,229.4,Near ceiling
-2x4500,Utility,THEORETICAL: everything on at once,30426,131.3,122.3,131.3,105%,5.22%,227.5,Over 125 A meter
-2x4500,"Generator (propane 11,400 W)",Emergency baseline,2782,11.8,11.4,11.8,24% LP / 23% gas,,,OK
-2x4500,"Generator (propane 11,400 W)",Emergency + 36k mini-split #1,5982,25.2,24.7,25.2,52% LP / 50% gas,,,OK
-2x4500,"Generator (propane 11,400 W)",Emergency + 36k + 12k,6982,29.3,28.9,29.3,61% LP / 58% gas,,,OK
-2x4500,"Generator (propane 11,400 W)",Emergency + heater (1 element),7282,30.6,30.1,30.6,64% LP / 61% gas,,,OK
-2x4500,"Generator (propane 11,400 W)",Emergency + BOTH heater elements,11782,49.3,48.8,49.3,103% LP / 98% gas,,,Overload
-2x4500,"Generator (propane 11,400 W)",Emergency + bagger & pump,3982,16.8,16.4,16.8,35% LP / 33% gas,,,OK
-2x4500,"Generator (propane 11,400 W)",Emergency + heater + 36k,10482,43.9,43.4,43.9,92% LP / 87% gas,,,No surge headroom
-6500,Utility,Baseline (continuous loads),12826,53.8,53.1,53.8,43%,2.14%,234.9,OK
-6500,Utility,"Baseline + heater, full",19326,80.9,80.2,80.9,65%,3.21%,232.3,OK
-6500,Utility,Baseline + 4 MegaChefs,17626,73.8,73.1,73.8,59%,2.93%,233.0,OK
-6500,Utility,Baseline + All American 75X,14476,67.5,53.1,67.5,54%,2.68%,233.6,OK
-6500,Utility,Baseline + bagger & pump,14026,58.8,58.1,58.8,47%,2.34%,234.4,OK
-6500,Utility,"Baseline + bagger, pump & sealer (sealer worst case)",14826,58.8,64.8,64.8,52%,2.57%,233.8,OK
-6500,Utility,RULE BROKEN: heater full + 4 MegaChefs,24126,100.9,100.2,100.9,81%,4.01%,230.4,OK
-6500,Utility,THEORETICAL: everything on at once,27926,120.9,111.9,120.9,97%,4.80%,228.5,Near ceiling
-6500,"Generator (propane 11,400 W)",Emergency baseline,2782,11.8,11.4,11.8,24% LP / 23% gas,,,OK
-6500,"Generator (propane 11,400 W)",Emergency + 36k mini-split #1,5982,25.2,24.7,25.2,52% LP / 50% gas,,,OK
-6500,"Generator (propane 11,400 W)",Emergency + 36k + 12k,6982,29.3,28.9,29.3,61% LP / 58% gas,,,OK
-6500,"Generator (propane 11,400 W)","Emergency + 6,500 W heater",9282,38.9,38.4,38.9,81% LP / 77% gas,,,OK
-6500,"Generator (propane 11,400 W)",Emergency + bagger & pump,3982,16.8,16.4,16.8,35% LP / 33% gas,,,OK
-6500,"Generator (propane 11,400 W)",Emergency + heater + 36k,12482,52.2,51.8,52.2,109% LP / 104% gas,,,Overload
+2x4500,Utility,Baseline (continuous loads),12425,52.2,51.3,52.2,42%,2.07%,235.0,OK
+2x4500,Utility,"Baseline + heater, full",21425,89.7,88.8,89.7,72%,3.56%,231.4,OK
+2x4500,Utility,"Baseline + heater, staged hold (element 2 off)",16925,71.0,70.1,71.0,57%,2.82%,233.2,OK
+2x4500,Utility,Baseline + 4 MegaChefs,18825,78.9,78.0,78.9,63%,3.13%,232.5,OK
+2x4500,Utility,Baseline + All American 75X,14075,66.0,51.3,66.0,53%,2.62%,233.7,OK
+2x4500,Utility,Baseline + Thor bagger,13025,57.2,51.3,57.2,46%,2.27%,234.5,OK
+2x4500,Utility,Baseline + 75X + ZVS sterilizer (lab bench),14355,66.0,53.7,66.0,53%,2.62%,233.7,OK
+2x4500,Utility,RULE BROKEN: heater full + 4 MegaChefs,27825,116.4,115.5,116.4,93%,4.62%,228.9,Near ceiling
+2x4500,Utility,THEORETICAL: everything on at once,30355,135.1,117.8,135.1,108%,5.37%,227.1,Over 125 A meter
+2x4500,"Generator (propane 11,400 W)",Emergency baseline,1821,8.5,6.7,8.5,16% LP / 15% gas,,,OK
+2x4500,"Generator (propane 11,400 W)",Emergency + 36k mini-split #1,5421,23.5,21.7,23.5,48% LP / 45% gas,,,OK
+2x4500,"Generator (propane 11,400 W)",Emergency + 36k + 12k,6421,27.6,25.9,27.6,56% LP / 54% gas,,,OK
+2x4500,"Generator (propane 11,400 W)",Emergency + heater (1 element),6321,27.2,25.5,27.2,55% LP / 53% gas,,,OK
+2x4500,"Generator (propane 11,400 W)",Emergency + BOTH heater elements,10821,46.0,44.2,46.0,95% LP / 90% gas,,,No surge headroom
+2x4500,"Generator (propane 11,400 W)",Emergency + Thor bagger,2421,13.5,6.7,13.5,21% LP / 20% gas,,,OK
+2x4500,"Generator (propane 11,400 W)",Emergency + heater + 36k,9921,42.2,40.5,42.2,87% LP / 83% gas,,,No surge headroom
+6500,Utility,Baseline (continuous loads),12425,52.2,51.3,52.2,42%,2.07%,235.0,OK
+6500,Utility,"Baseline + heater, full",18925,79.3,78.4,79.3,63%,3.15%,232.4,OK
+6500,Utility,Baseline + 4 MegaChefs,18825,78.9,78.0,78.9,63%,3.13%,232.5,OK
+6500,Utility,Baseline + All American 75X,14075,66.0,51.3,66.0,53%,2.62%,233.7,OK
+6500,Utility,Baseline + Thor bagger,13025,57.2,51.3,57.2,46%,2.27%,234.5,OK
+6500,Utility,Baseline + 75X + ZVS sterilizer (lab bench),14355,66.0,53.7,66.0,53%,2.62%,233.7,OK
+6500,Utility,RULE BROKEN: heater full + 4 MegaChefs,25325,106.0,105.1,106.0,85%,4.21%,229.9,OK
+6500,Utility,THEORETICAL: everything on at once,27855,124.7,107.4,124.7,100%,4.95%,228.1,Near ceiling
+6500,"Generator (propane 11,400 W)",Emergency baseline,1821,8.5,6.7,8.5,16% LP / 15% gas,,,OK
+6500,"Generator (propane 11,400 W)",Emergency + 36k mini-split #1,5421,23.5,21.7,23.5,48% LP / 45% gas,,,OK
+6500,"Generator (propane 11,400 W)",Emergency + 36k + 12k,6421,27.6,25.9,27.6,56% LP / 54% gas,,,OK
+6500,"Generator (propane 11,400 W)","Emergency + 6,500 W heater",8321,35.5,33.8,35.5,73% LP / 69% gas,,,OK
+6500,"Generator (propane 11,400 W)",Emergency + Thor bagger,2421,13.5,6.7,13.5,21% LP / 20% gas,,,OK
+6500,"Generator (propane 11,400 W)",Emergency + heater + 36k,11921,50.5,48.8,50.5,105% LP / 99% gas,,,Overload

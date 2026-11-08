@@ -144,7 +144,7 @@ const ROOM_WORDS: [string, string[]][] = [
   ['incubation', ['incubation', 'incubator', 'incubating room', 'spawn room', 'incubacion']],
   ['fruiting', ['fruiting', 'fruit room', 'fruiting room', 'grow room', 'fructificacion']],
   ['packing', ['packing', 'pack room', 'packing room', 'empaque']],
-  ['boiling', ['boiling', 'boiler', 'boiling room', 'steam room', 'caldera']],
+  ['boiling', ['cook room', 'cooking room', 'boiling', 'boiler', 'boiling room', 'steam room', 'caldera']],
 ]
 /** A DECK PLAN room id (where lots sit) from words. */
 export function resolveRoom(v: unknown): string | null {
@@ -163,7 +163,7 @@ const PLACE_WORDS: [PlaceId, string[]][] = [
   ['incubation', ['incubation', 'incubator', 'spawn room']],
   ['fruiting', ['fruiting', 'fruit room', 'grow room']],
   ['packing', ['packing', 'plenum', 'pack room']],
-  ['boiling', ['boiling', 'boiler']],
+  ['boiling', ['cook room', 'cook', 'boiling', 'boiler']],
 ]
 /** A climate-sensor place from words. */
 export function resolvePlace(v: unknown): PlaceId | null {

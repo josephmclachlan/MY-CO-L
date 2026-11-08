@@ -780,7 +780,7 @@ export default function App() {
       if (!(view.name === 'module' && view.idx === DECK_IDX)) go({ name: 'module', idx: DECK_IDX })
       else sound.chirp()
     }
-    const room = ROOMS.find((r) => r.id === cmd.toLowerCase() || r.name === raw.trim().toUpperCase())
+    const room = ROOMS.find((r) => r.id === cmd.toLowerCase() || r.name === raw.trim().toUpperCase() || r.short === cmd)
     if (room) return openRoom(room.id)
     const brk = allCircuits(power.state.heater).find((c) => c.tag === cmd || c.tag.replace('-', '') === cmd)
     if (brk && !/^[1-9]$/.test(cmd)) {
@@ -788,7 +788,7 @@ export default function App() {
       power.toggle(brk.id)
       power.setSelectedCircuit(brk.id)
       openVitals()
-      return say(`${brk.tag} ${brk.short} ${was ? 'OFF' : 'ON'}${brk.id === 'bag' || brk.id === 'pump' ? ' (BAGGER AND PUMP LINKED)' : ''}`)
+      return say(`${brk.tag} ${brk.short} ${was ? 'OFF' : 'ON'}`)
     }
     switch (cmd) {
       case 'UTILITY':
@@ -1115,7 +1115,7 @@ export default function App() {
   if (view.name === 'module' && view.idx === VITALS_IDX)
     hints.module = 'TAP A BREAKER TO FLIP IT // TYPE A TAG (S4) OR GEN, UTILITY, HEATER A/B // F2 MENU'
   if (view.name === 'module' && view.idx === DECK_IDX)
-    hints.module = 'TAP A ROOM, ITS DETAIL IS BELOW THE PLAN // TYPE LAB, PACKING, INCUBATION, FRUITING OR BOILING'
+    hints.module = 'TAP A ROOM, ITS DETAIL IS BELOW THE PLAN // TYPE LAB, PACKING, INCUBATION, FRUITING OR COOK ROOM'
 
   if (view.name === 'module' && view.idx === SPEC_IDX)
     hints.module = 'TAP A SPECIES IN THE LIST // LEFT/RIGHT ARROWS OR TYPE A TAB (CLIMATE) // WHY? SHOWS THE SOURCE // F2 MENU'
