@@ -16,11 +16,15 @@ export function checkUrl(url: string): string | null {
   return null
 }
 
+export const BLOCKED =
+  'THE GOOGLE SHEET DID NOT LET THE APP IN. OPEN THE SHEET ADDRESS IN A NEW TAB: IT SHOULD SAY "MY/CO/L sheet link is running". IF GOOGLE ASKS YOU TO SIGN IN OR SAYS YOU NEED ACCESS, OPEN APPS SCRIPT > DEPLOY > MANAGE DEPLOYMENTS > EDIT (PENCIL) AND SET EXECUTE AS: ME, WHO HAS ACCESS: ANYONE, THEN DEPLOY.'
+
 export class AppsScriptClient implements SheetClient {
   constructor(
     readonly url: string,
     private key: string,
     private fetcher: Fetcher = (u, i) => fetch(u, i),
+    private online: () => boolean = () => globalThis.navigator?.onLine !== false,
   ) {}
 
   private async call<T>(op: string, body: Record<string, unknown> = {}): Promise<T> {
@@ -28,7 +32,10 @@ export class AppsScriptClient implements SheetClient {
     try {
       res = await this.fetcher(this.url, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ key: this.key, op, ...body }) })
     } catch {
-      throw new NetError('NO SIGNAL: THE GOOGLE SHEET COULD NOT BE REACHED. IT WILL TRY AGAIN.')
+      // With signal, a refused call almost always means Google sent the app to a sign-in page
+      // (the deployment's "Who has access" is not "Anyone"), which the browser reports as a failed fetch.
+      if (!this.online()) throw new NetError('NO SIGNAL: THE GOOGLE SHEET COULD NOT BE REACHED. IT WILL TRY AGAIN.')
+      throw new NetError(BLOCKED)
     }
     const text = await res.text()
     if (!res.ok) throw new Error(`THE GOOGLE SHEET ANSWERED ${res.status}. CHECK THE WEB APP ADDRESS AND THAT WHO HAS ACCESS IS SET TO ANYONE.`)

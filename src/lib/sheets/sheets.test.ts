@@ -163,10 +163,14 @@ describe('web client', () => {
     await expect(html.hello()).rejects.toThrow(/ANYONE/)
     const bad = new AppsScriptClient('u', 'k', async () => ({ ok: true, status: 200, text: async () => '{"error":"WRONG KEY."}' }))
     await expect(bad.hello()).rejects.toThrow('GOOGLE SHEET: WRONG KEY.')
-    const off = new AppsScriptClient('u', 'k', async () => {
+    const fail = async () => {
       throw new TypeError('Failed to fetch')
-    })
+    }
+    const off = new AppsScriptClient('u', 'k', fail, () => false)
     await expect(off.hello()).rejects.toThrow(/NO SIGNAL/)
+    // With signal, a refused call is Google's sign-in page (access not set to Anyone): say how to fix it.
+    const blocked = new AppsScriptClient('u', 'k', fail, () => true)
+    await expect(blocked.hello()).rejects.toThrow(/WHO HAS ACCESS: ANYONE/)
   })
 
   it('the script refuses a wrong key and a script with no key', () => {
@@ -454,8 +458,8 @@ describe('mock trial: a week of farm records in the sheet', () => {
   it('history and readings tabs are windows, read only', async () => {
     const f = await farm({ readings: true, readingDays: 1, historyMax: 3 })
     await f.st.put('sensor_readings', [
-      { id: 'r-old', room_id: 'fruiting', place: 'fruiting', taken_at: '2026-11-01T00:00:00.000Z', temp_c: 16 },
-      { id: 'r-new', room_id: 'fruiting', place: 'fruiting', taken_at: '2026-11-07T11:00:00.000Z', temp_c: 16.4 },
+      { id: 'r-old', room_id: 'fruiting', place: 'fruiting', taken_at: new Date(f.clock().getTime() - 3 * 86400000).toISOString(), temp_c: 16 },
+      { id: 'r-new', room_id: 'fruiting', place: 'fruiting', taken_at: new Date(f.clock().getTime() - 3600000).toISOString(), temp_c: 16.4 },
     ])
     await f.sync.run()
     expect(f.ss.tab('Sensor readings').dataRows()).toBe(1)
