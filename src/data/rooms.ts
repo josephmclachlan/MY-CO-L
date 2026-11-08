@@ -122,13 +122,13 @@ export const ROOMS: Room[] = [
     setPoints: [
       { label: 'AIR', value: '16 C (14-17, MAX 18)' },
       { label: 'RH', value: '80-90%' },
-      { label: 'CO2 EXHAUST', value: '2 S8 ON THE CO2 METER, ON 900 / OFF 600 PPM' },
-      { label: 'TEMP AIR', value: '2 HURRICANE 8" ON THE INKBIRD' },
+      { label: 'BACK FANS', value: '2 HURRICANE 8" ON THE CO2 METER (BREAKER 12), ON 900 / OFF 600 PPM' },
+      { label: 'FRONT FANS', value: '2 CLOUDLINE S8 ON BREAKER 7 (INKBIRD?)' },
       { label: 'PRESSURE', value: 'SLIGHTLY NEGATIVE, SEALED FROM PACKING' },
       { label: 'ALARM', value: '19 C AIR, HIGH RH' },
     ],
     critical: [
-      { ids: ['s1'], text: 'BREAKER 7 OFF: CO2 EXHAUST, INKBIRD AND FOGGER ALL STOPPED.' },
+      { ids: ['s1'], text: 'BREAKER 7 OFF: FRONT S8 FANS, INKBIRD AND FOGGER ALL STOPPED.' },
       { ids: ['s2'], text: 'TEMPERATURE FANS OFF. ROOM WILL WARM.' },
     ],
   },

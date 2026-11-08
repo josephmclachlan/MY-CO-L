@@ -161,7 +161,7 @@ export const MAIN: Circuit[] = [
   b('stir', '5', 'L1', 'base', false, 'LAB OUTLET: 4 STIR PLATES', 'STIR PLATES', 'Shares breaker 5 with the ZVS sterilizer. Stir plates (no heat) about 25 W each (est).' + SIZE_NOTE, [it('stir', 'Magnetic stir plate (no heat)', 4, 100, 'lab')]),
   b('zvs', '5', 'L1', 'int', false, 'LAB OUTLET: 12 V ZVS INDUCTION STERILIZER', 'ZVS STERILIZER', 'Shares breaker 5 with the stir plates. About 280 W from the wall (est). Bench use, seconds at a time.', [it('zvs', '12 V ZVS induction loop sterilizer + power supply', 1, 280, 'lab')]),
   b('seal', '6', 'L1', 'int', false, 'AIE-405HIM 16" IMPULSE SEALER', 'IMPULSE SEALER', 'In the lab. About 800 W (est); draws only for seconds per seal.' + SIZE_NOTE, [it('sealer', 'AIE-405HIM 16" hand impulse sealer', 1, 800, 'lab')]),
-  b('s1', '7', 'L2', 'base', true, 'FRONT FANS + S10: CLOUDLINE S8 x2, S10, 3 CO2 METERS SIDE, INKBIRD, TAC FOGGER', 'CLIMATE LINE', 'Joseph, 8 Nov 2026: the 2 S8s, the S10, the packing and incubation CO2 meters, the Inkbird and the TAC fogger are all on breaker 7. About 1,000 W = 8.4 A. One trip stops the fruiting exhaust, the packing intake and the fogger together.' + SIZE_NOTE, [
+  b('s1', '7', 'L2', 'base', true, 'FRONT FANS + S10: 2 CLOUDLINE S8, S10, PACKING + INCUBATION CO2 METERS, INKBIRD, TAC FOGGER', 'CLIMATE LINE', 'Joseph, 8 Nov 2026: the 2 S8s, the S10, the packing and incubation CO2 meters, the Inkbird and the TAC fogger are all on breaker 7. About 1,000 W = 8.4 A. One trip stops the fruiting exhaust, the packing intake and the fogger together.' + SIZE_NOTE, [
     it('s8', 'AC Infinity Cloudline S8 (fruiting CO2 exhaust)', 2, 360, 'fruiting', false),
     it('s10', 'AC Infinity Cloudline S10 (packing fresh-air intake)', 1, 255, 'packing', false),
     it('co2-pack', 'CO2 meter (packing intake)', 1, 3.3, 'packing'),
@@ -177,7 +177,7 @@ export const MAIN: Circuit[] = [
   b('ffuw', '9', 'L1', 'base', false, 'CRI HEPA FAN FILTER UNIT IN THE LAB / PACKING WALL', 'WALL FFU', 'Shares breaker 9 with the bagger and pump. If the bagger trips breaker 9, this HEPA unit stops too.', [it('ffu-wall', 'CRI 2x4 HEPA fan filter unit (in the wall)', 1, 208, 'lab')]),
   b('m2', '10', 'L1', 'int', false, 'MEGACHEF 12 QT PRESSURE COOKER 2', 'MEGACHEF 2', 'Runs with the other three. Slot 10 is on L1, the same leg as MegaChefs 1 and 3.', [it('mega2', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)]),
   b('s9', '11', 'L2', 'base', true, 'INCUBATION FLOOR FANS (4)', 'INCU FLOOR FANS', 'Rotating floor fans, 60 W each (est).' + SIZE_NOTE, [it('floorfan', 'Rotating floor fan', 4, 240, 'incubation')]),
-  b('s2', '12', 'L2', 'base', true, 'FRUITING BACK FANS: 2 HURRICANE 8" + CO2 METER', 'HURRICANES + METER', 'Hurricane 198 W each. The Inkbird that switches them is on breaker 7.' + SIZE_NOTE, [
+  b('s2', '12', 'L2', 'base', true, 'FRUITING BACK FANS: 2 HURRICANE 8" + CO2 METER', 'HURRICANES + METER', 'Hurricane 198 W each, plugged into the fruiting CO2 meter (Joseph, 8 Nov 2026).' + SIZE_NOTE, [
     it('hurricane', 'Hurricane 8" inline fan (temperature air)', 2, 396, 'fruiting', false),
     it('co2-fruit', 'CO2 meter (fruiting)', 1, 3.4, 'fruiting'),
   ]),
