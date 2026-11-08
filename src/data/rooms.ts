@@ -132,6 +132,22 @@ export const ROOMS: Room[] = [
       { ids: ['s3'], text: 'FOGGER OFF. RH WILL DROP.' },
     ],
   },
+  {
+    id: 'outside',
+    name: 'OUTSIDE (UNDER ROOF)',
+    short: 'OUT',
+    alt: 'OUTDOORS UNDER A ROOF, AGAINST THE FRUITING LONG WALL, LEFT OF THE BACK DOOR',
+    nameGuess: false,
+    rect: { x: 380, y: 298, w: 346, h: 52 },
+    label: { x: 436, y: 328 },
+    setPoints: [
+      { label: 'FOGEL REACH-INS', value: '2 X COMMERCIAL 3-DOOR, 1-4 C' },
+      { label: 'WHERE', value: 'LEFT OF THE FRUITING BACK DOOR, ~1 M FROM THE BACK END' },
+      { label: 'POWER', value: 'OWN 120 V CIRCUITS S19 AND S20, ON THE GENERATOR LIST' },
+      { label: 'WEATHER', value: 'KEEP THE ROOF OVER THEM AND THE PLUGS DRY' },
+    ],
+    critical: [{ ids: ['f1', 'f2'], text: 'BOTH FOGEL REACH-INS OFF. STOCK WILL WARM.' }],
+  },
 ]
 
 export const roomById = (id: RoomId) => ROOMS.find((r) => r.id === id)

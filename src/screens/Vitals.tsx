@@ -357,7 +357,7 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
       </section>
 
       <section className="box" id="v-sub">
-        <div className="section-title">SUB-PANEL // S1-S18 // 60 A FEED</div>
+        <div className="section-title">SUB-PANEL // S1-S21 // 60 A FEED</div>
         <div className="brk-grid">
           {sub.map((c) => (
             <BreakerBox key={c.id} c={c} flashDelay={flash[c.id]} />

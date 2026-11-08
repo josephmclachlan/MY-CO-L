@@ -28,6 +28,7 @@ const GLYPHS: Glyph[] = [
   { item: 'stir', kind: 'disc', x: 141, y: 167, r: 6 },
   { item: 'stir', kind: 'disc', x: 157, y: 167, r: 6 },
   { item: 'zvs', kind: 'box', x: 136, y: 190, w: 18, h: 10 },
+  { item: 'sealer', kind: 'box', x: 68, y: 200, w: 40, h: 10 },
   { item: 'chest', kind: 'box', x: 128, y: 250, w: 36, h: 30 },
   { item: 's4-lab', kind: 'fan', x: 76, y: 296, r: 7 },
   { item: 'led-lab', kind: 'light', x: 70, y: 150, w: 40, h: 5 },
@@ -38,6 +39,7 @@ const GLYPHS: Glyph[] = [
   { item: 'led-pack', kind: 'light', x: 68, y: 440, w: 40, h: 5 },
   { item: 'led-pack', kind: 'light', x: 68, y: 455, w: 40, h: 5 },
   { item: 'thor', kind: 'box', x: 70, y: 522, w: 44, h: 30 },
+  { item: 'pump', kind: 'disc', x: 128, y: 537, r: 8 },
   { item: 'co2-pack', kind: 'meter', x: 150, y: 560, w: 8, h: 8 },
   { item: 's10', kind: 'fan', x: 150, y: 586, r: 10 },
   // cook room: boiler with two elements, steam box cart, four MegaChefs
@@ -69,6 +71,10 @@ const GLYPHS: Glyph[] = [
   { item: 'hurricane', kind: 'fan', x: 757, y: 438, r: 10 },
   ...T5_ROW(398),
   ...T5_ROW(406),
+  // outside under the roof: two Fogel 3-door reach-ins against the fruiting
+  // long wall, left of the back door (door about 1 m from the back end)
+  { item: 'fogel1', kind: 'box', x: 496, y: 312, w: 90, h: 34 },
+  { item: 'fogel2', kind: 'box', x: 590, y: 312, w: 90, h: 34 },
 ]
 
 function rackRows(x0: number, y0: number, count: number, rows: number[], w: number, h: number) {
@@ -95,7 +101,7 @@ function RoomOutline({ room, selected, alarm, onClick, watts }: { room: Room; se
   const lx = room.label?.x ?? x + w / 2
   const ly = room.label?.y ?? y + h / 2
   return (
-    <g className={`deck-room ${selected ? 'sel' : ''} ${alarm ? 'alarm' : ''}`} onClick={onClick} role="button" tabIndex={0} aria-label={room.name} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onClick()}>
+    <g className={`deck-room ${room.id === 'outside' ? 'open' : ''} ${selected ? 'sel' : ''} ${alarm ? 'alarm' : ''}`} onClick={onClick} role="button" tabIndex={0} aria-label={room.name} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onClick()}>
       <rect x={x} y={y} width={w} height={h} className="deck-hit" />
       <path d={`M${x} ${y}H${x + w}V${y + h}H${x}Z`} pathLength={1} className="deck-wall" />
       {alarm && <rect x={x + 4} y={y + 4} width={w - 8} height={h - 8} className="deck-alarm" />}
@@ -149,6 +155,15 @@ function Plan() {
           {/* incubation shelving (lower) and fruiting racks (upper) */}
           {rackRows(250, 488, 8, [24, 64], 50, 22)}
           {rackRows(300, 350, 7, [14, 64], 48, 26)}
+          {/* fruiting back door, opening out to the roofed area */}
+          <path d="M686 350H726" className="deck-door" />
+          <path d="M726 350V312A38 38 0 0 0 688 350" className="deck-inner" />
+          <text x={749} y={330} className="deck-tag">
+            BACK
+          </text>
+          <text x={749} y={342} className="deck-tag">
+            DOOR
+          </text>
           {/* the upper container sits on the lower one: corner lines */}
           <path d="M172 488L212 462M732 488L772 462M172 600L212 574M732 600L772 574" className="deck-inner faint dash" />
           <text x={452} y={479} className="deck-tag">

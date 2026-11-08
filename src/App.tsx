@@ -788,7 +788,7 @@ export default function App() {
       power.toggle(brk.id)
       power.setSelectedCircuit(brk.id)
       openVitals()
-      return say(`${brk.tag} ${brk.short} ${was ? 'OFF' : 'ON'}`)
+      return say(`${brk.tag} ${brk.short} ${was ? 'OFF' : 'ON'}${brk.id === 'bag' || brk.id === 'pump' ? ' (BAGGER AND PUMP LINKED)' : ''}`)
     }
     switch (cmd) {
       case 'UTILITY':

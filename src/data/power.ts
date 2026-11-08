@@ -121,9 +121,11 @@ export const HEATER_OPTIONS: Record<HeaterOption, { label: string; short: string
 // re-checked against maker spec sheets that day (see the 8 Nov revision box in
 // knowledge/electrical-project/01_PROJECT_BRIEF.md). `est` marks the figures
 // that are still a class estimate, not a nameplate or spec sheet.
-// Taken out because they are not on the 8 Nov list: 2 Fogel cold rooms,
-// CrestWave pump (ckt 18 now spare), impulse sealer, BactiZapper (the ZVS
-// induction sterilizer replaces it), reach-in fridges.
+// Follow-up the same day: the 2 Fogel "cold rooms" are commercial 3-door
+// reach-in fridges outdoors under a roof, against the fruiting container's
+// long wall left of its back door; the CrestWave pump sits in packing by the
+// Thor; the impulse sealer is in the lab. The BactiZapper is replaced by the
+// ZVS induction sterilizer. The 36k units are on 40 A breakers.
 
 const it = (id: string, name: string, qty: number, w: number, room: RoomId, est = true, roomGuess = false): Item => ({
   id,
@@ -137,15 +139,15 @@ const it = (id: string, name: string, qty: number, w: number, room: RoomId, est 
 
 export const MAIN: Circuit[] = [
   {
-    id: 'c34', tag: '5-6', panel: 'main', leg: 'B', v: 240, breaker: '25 A 2-POLE', wire: '#10 CU', cls: 'base', em: false,
+    id: 'c34', tag: '5-6', panel: 'main', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
     name: 'LENNOX 36K BTU MINI-SPLIT #1 (PACKING)', short: 'LENNOX 36K #1',
-    note: 'Inverter. 3,600 W = 15 A typical cooling on the Lennox 36k submittal; it can peak near 24 A. CHECK THE OUTDOOR-UNIT NAMEPLATE: US Lennox 36k units ask for about 36 A minimum circuit and a 40 A breaker, more than this 25 A breaker and #10 wire.',
+    note: 'Inverter. 3,600 W = 15 A typical cooling on the Lennox 36k submittal; it can peak near 24 A. 40 A breaker (Joseph, 8 Nov 2026), so #8 wire and a 40 A voltage protector.',
     items: [it('lennox36a', 'Lennox 36k BTU mini-split #1', 1, 3600, 'packing')],
   },
   {
-    id: 'c56', tag: '7-8', panel: 'main', leg: 'B', v: 240, breaker: '25 A 2-POLE', wire: '#10 CU', cls: 'base', em: false,
+    id: 'c56', tag: '7-8', panel: 'main', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
     name: 'LENNOX 36K BTU MINI-SPLIT #2 (PACKING)', short: 'LENNOX 36K #2',
-    note: 'Same as #1, same nameplate check. Stagger compressor starts.',
+    note: 'Same as #1. Stagger compressor starts.',
     items: [it('lennox36b', 'Lennox 36k BTU mini-split #2', 1, 3600, 'packing')],
   },
   {
@@ -163,7 +165,7 @@ export const MAIN: Circuit[] = [
   {
     id: 'm1', tag: '13', panel: 'main', leg: 'L1', v: 120, breaker: '20 A 1-POLE', wire: '#12 CU', cls: 'int', em: false,
     name: 'MEGACHEF 12 QT PRESSURE COOKER 1', short: 'MEGACHEF 1',
-    note: '1,600 W / 120 V on the retailer spec sheet (was 1,200 W). Read the label on yours. The four MegaChefs run together as one batch.',
+    note: '1,600 W / 120 V (was 1,200 W). The four MegaChefs run together as one batch.',
     items: [it('mega1', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)],
   },
   {
@@ -186,6 +188,12 @@ export const MAIN: Circuit[] = [
     name: 'ALL AMERICAN 75X ELECTRIC STERILIZER', short: '75X STERILIZER',
     note: '1,650 W / 13.75 A nameplate, 60 min timer. Never runs with the MegaChefs or the steam heater. The one load that unbalances the legs (+13.8 A on L1).',
     items: [it('aa75x', 'All American 75X electric sterilizer (110 V, timer)', 1, 1650, 'lab', false)],
+  },
+  {
+    id: 'pump', tag: '18', panel: 'main', leg: 'L2', v: 120, breaker: '20 A 1-POLE', wire: '#12 CU', cls: 'int', em: false,
+    name: 'CREST WAVE WATER PUMP 7 GPM / 70 PSI', short: 'WATER PUMP',
+    note: 'In packing beside the Thor. Runs whenever the bagger runs; switching one switches both. 600 W is an estimate (5 A class).',
+    items: [it('pump', 'CrestWave fresh-water pump 7 GPM / 70 PSI', 1, 600, 'packing')],
   },
 ]
 
@@ -294,6 +302,21 @@ export const SUB: Circuit[] = [
     id: 'o6', tag: 'S18', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A GFCI', wire: '#12 CU', cls: 'out', em: false,
     name: 'COOK ROOM GFCI (2)', short: 'COOK GFCI', note: 'Receptacles in the 20 ft cook container, no fixed load.', items: [],
   },
+  {
+    id: 'f1', tag: 'S19', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
+    name: 'FOGEL 3-DOOR REACH-IN FRIDGE 1', short: 'FOGEL 1', note: 'Outdoors under the roof, against the fruiting wall left of the back door. Compressor, 800 W (est). Outdoor-rated voltage protector with a delay.',
+    items: [it('fogel1', 'Fogel commercial 3-door reach-in fridge 1', 1, 800, 'outside')],
+  },
+  {
+    id: 'f2', tag: 'S20', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
+    name: 'FOGEL 3-DOOR REACH-IN FRIDGE 2', short: 'FOGEL 2', note: 'Beside fridge 1. Start 5-10 s after fridge 1.',
+    items: [it('fogel2', 'Fogel commercial 3-door reach-in fridge 2', 1, 800, 'outside')],
+  },
+  {
+    id: 'seal', tag: 'S21', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'int', em: false,
+    name: 'AIE-405HIM 16" IMPULSE SEALER', short: 'IMPULSE SEALER', note: 'In the lab. About 800 W (est); draws only for seconds per seal.',
+    items: [it('sealer', 'AIE-405HIM 16" hand impulse sealer', 1, 800, 'lab')],
+  },
 ]
 
 /** Which room each receptacle circuit serves (they have no items to carry a room). */
@@ -324,17 +347,17 @@ export function allCircuits(opt: HeaterOption): Circuit[] {
 
 // ---------------------------------------------------------------- groups and links
 
-/** Continuous loads: S1-S10 plus the four mini-splits. */
-export const BASE = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10', 'c34', 'c56', 'c78', 'c910']
-/** Generator emergency list: fruiting fans, fogger, chest fridge, packing CO2 intake, incubation air. */
-export const EMERG = ['s1', 's2', 's3', 's6', 's8', 's9']
+/** Continuous loads: S1-S10, the two Fogels and the four mini-splits. */
+export const BASE = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10', 'f1', 'f2', 'c34', 'c56', 'c78', 'c910']
+/** Generator emergency list: fruiting fans, fogger, chest fridge, packing CO2 intake, incubation air, Fogels. */
+export const EMERG = ['s1', 's2', 's3', 's6', 's8', 's9', 'f1', 'f2']
 export const MEGACHEFS = ['m1', 'm2', 'm3', 'm4']
 export const HEATER_IDS = ['c12', 'c12b']
 export const AC_IDS = ['c34', 'c56', 'c78', 'c910']
 /** Compressor loads, for the stagger-starts reminder. */
-export const COMPRESSORS = ['c34', 'c56', 'c78', 'c910', 's6']
+export const COMPRESSORS = ['c34', 'c56', 'c78', 'c910', 's6', 'f1', 'f2']
 /** Switching one of these switches the other. */
-export const LINKED: Record<string, string> = {}
+export const LINKED: Record<string, string> = { bag: 'pump', pump: 'bag' }
 
 // ---------------------------------------------------------------- ICE tariff
 
@@ -368,8 +391,8 @@ export const SCENARIOS: Scenario[] = [
   { key: 'heatstage', label: '+ HEATER STAGED HOLD', source: 'utility', only: '2x4500', on: [...BASE, 'heatOne'] },
   { key: 'mega', label: '+ 4 MEGACHEFS', source: 'utility', on: [...BASE, ...MEGACHEFS] },
   { key: 'x75', label: '+ 75X', source: 'utility', on: [...BASE, 'x75'] },
-  { key: 'bag', label: '+ THOR BAGGER', source: 'utility', on: [...BASE, 'bag'] },
-  { key: 'labbench', label: '+ 75X + ZVS', source: 'utility', on: [...BASE, 'x75', 'zvs'] },
+  { key: 'bag', label: '+ BAGGER & PUMP', source: 'utility', on: [...BASE, 'bag', 'pump'] },
+  { key: 'labbench', label: '+ 75X, ZVS & SEALER', source: 'utility', on: [...BASE, 'x75', 'zvs', 'seal'] },
   { key: 'bad', label: 'HEATER + MEGACHEFS', source: 'utility', danger: true, on: [...BASE, 'heatAll', ...MEGACHEFS] },
   { key: 'all', label: 'EVERYTHING ON', source: 'utility', danger: true, on: ['everything'] },
   { key: 'goff', label: 'ALL OFF', source: 'generator', on: [] },
@@ -378,7 +401,7 @@ export const SCENARIOS: Scenario[] = [
   { key: 'gboth', label: '+ 36K + 12K', source: 'generator', on: [...EMERG, 'c34', 'c78'] },
   { key: 'gboil', label: '+ HEATER (1 ELEMENT)', label6: '+ 6.5 KW HEATER', source: 'generator', on: [...EMERG, 'heatOne'] },
   { key: 'gboilall', label: '+ BOTH ELEMENTS', source: 'generator', only: '2x4500', danger: true, on: [...EMERG, 'heatAll'] },
-  { key: 'gbag', label: '+ THOR BAGGER', source: 'generator', on: [...EMERG, 'bag'] },
+  { key: 'gbag', label: '+ BAGGER & PUMP', source: 'generator', on: [...EMERG, 'bag', 'pump'] },
   { key: 'gmax', label: '+ HEATER + 36K', source: 'generator', danger: true, on: [...EMERG, 'heatOne', 'c34'] },
 ]
 

@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest'
 import { BASE, EMERG, MEGACHEFS, allCircuits, HEATER_OPTIONS, type HeaterOption } from '../data/power'
 import { CEILING_A } from '../data/power'
 import { feederDropV, generatorStatus, legs, ownedGeneratorShare, utilityStatus, compute, peakState, warnings } from './power'
-import { SCENARIOS, scenarioIds } from '../data/power'
+import { LINKED, SCENARIOS, scenarioIds } from '../data/power'
 
 const csvPath = join(__dirname, '..', 'data', 'electrical', 'operating_scenarios.csv')
 
@@ -46,8 +46,8 @@ function idsFor(opt: HeaterOption, source: string, name: string): string[] | nul
       'Baseline + heater, staged hold (element 2 off)': [...BASE, ...heatOne],
       'Baseline + 4 MegaChefs': [...BASE, ...MEGACHEFS],
       'Baseline + All American 75X': [...BASE, 'x75'],
-      'Baseline + Thor bagger': [...BASE, 'bag'],
-      'Baseline + 75X + ZVS sterilizer (lab bench)': [...BASE, 'x75', 'zvs'],
+      'Baseline + Thor bagger & pump': [...BASE, 'bag', 'pump'],
+      'Baseline + 75X, ZVS & sealer (lab bench)': [...BASE, 'x75', 'zvs', 'seal'],
       'RULE BROKEN: heater full + 4 MegaChefs': [...BASE, ...heatAll, ...MEGACHEFS],
       'THEORETICAL: everything on at once': allCircuits(opt).map((c) => c.id),
     }
@@ -60,7 +60,7 @@ function idsFor(opt: HeaterOption, source: string, name: string): string[] | nul
     'Emergency + heater (1 element)': [...EMERG, ...heatOne],
     'Emergency + 6,500 W heater': [...EMERG, ...heatOne],
     'Emergency + BOTH heater elements': [...EMERG, ...heatAll],
-    'Emergency + Thor bagger': [...EMERG, 'bag'],
+    'Emergency + Thor bagger & pump': [...EMERG, 'bag', 'pump'],
     'Emergency + heater + 36k': [...EMERG, ...heatOne, 'c34'],
   }
   return map[name] ?? null
@@ -113,21 +113,23 @@ describe('on-screen scenario presets', () => {
       const r = compute(new Set(scenarioIds(s, opt)), { heater: opt, source: s.source, fuel: 'propane', genW: 11400, overrides: {} })
       expect(r1(r.worst)).toBe(String(worst))
     }
-    check('base', '2x4500', 52.2)
-    check('heatfull', '2x4500', 89.7)
-    check('heatfull', '6500', 79.3)
-    check('heatstage', '2x4500', 71)
-    check('mega', '2x4500', 78.9)
-    check('bad', '2x4500', 116.4)
-    check('all', '2x4500', 135.1)
-    check('all', '6500', 124.7)
-    check('gmax', '6500', 50.5)
+    check('base', '2x4500', 58.9)
+    check('heatfull', '2x4500', 96.4)
+    check('heatfull', '6500', 86)
+    check('heatstage', '2x4500', 77.6)
+    check('mega', '2x4500', 85.6)
+    check('bag', '2x4500', 63.9)
+    check('labbench', '2x4500', 79.3)
+    check('bad', '2x4500', 123.1)
+    check('all', '2x4500', 148.5)
+    check('all', '6500', 138.1)
+    check('gmax', '6500', 57.2)
   })
 
   it('every circuit watt total matches the 8 Nov 2026 spec-sheet figures', () => {
     // Hand-worked from the 8 Nov 2026 spec sheets: S1 3.4 + 2 x 180, S2 2 + 2 x 198, S4 3 x 208, S5 7 x 36,
-    // S7 16 x 25, S8 3.3 + 255, S9 3.3 + 28 + 4 x 60, S10 4 x 25 + 28.
-    const want: Record<string, number> = { s1: 363.4, s2: 398, s3: 380, s4: 624, s5: 252, s6: 150, s7: 400, s8: 258.3, s9: 271.3, s10: 128, c34: 3600, m1: 1600, x75: 1650, zvs: 280 }
+    // S7 16 x 25, S8 3.3 + 255, S9 3.3 + 28 + 4 x 60, S10 4 x 25 + 28; Fogels and sealer 800 each, CrestWave pump 600.
+    const want: Record<string, number> = { s1: 363.4, s2: 398, s3: 380, s4: 624, s5: 252, s6: 150, s7: 400, s8: 258.3, s9: 271.3, s10: 128, c34: 3600, m1: 1600, x75: 1650, zvs: 280, f1: 800, f2: 800, seal: 800, pump: 600 }
     for (const c of allCircuits('2x4500')) {
       if (want[c.id] !== undefined) expect(Math.round(c.items.reduce((n, i) => n + i.w, 0) * 1000) / 1000).toBe(want[c.id])
     }
@@ -137,9 +139,10 @@ describe('on-screen scenario presets', () => {
 describe('8 Nov 2026 room list', () => {
   const ROOMS_WANT: Record<string, string[]> = {
     incubation: ['lennox12a', 'lennox12b', 'led-inc', 'floorfan', 's4-inc', 'co2-inc'],
-    packing: ['lennox36a', 'lennox36b', 'thor', 'led-pack', 's10', 'co2-pack'],
+    packing: ['lennox36a', 'lennox36b', 'thor', 'pump', 'led-pack', 's10', 'co2-pack'],
     fruiting: ['s8', 'inkbird', 't5', 'tac', 'hurricane', 'co2-fruit'],
-    lab: ['ffu', 'aa75x', 'stir', 'zvs', 's4-lab', 'chest', 'led-lab'],
+    lab: ['ffu', 'aa75x', 'stir', 'zvs', 'sealer', 's4-lab', 'chest', 'led-lab'],
+    outside: ['fogel1', 'fogel2'],
     boiling: ['mega1', 'mega2', 'mega3', 'mega4', 'heat-c12', 'heat-c12b'],
   }
   const items = allCircuits('2x4500').flatMap((c) => c.items)
@@ -153,8 +156,19 @@ describe('8 Nov 2026 room list', () => {
     expect(q('led-inc') + q('led-pack') + q('led-lab')).toBe(7)
     expect([q('floorfan'), q('t5'), q('s8'), q('hurricane'), q('ffu'), q('stir')]).toEqual([4, 16, 2, 2, 3, 4])
   })
-  it('drops equipment that is not on the list', () => {
-    for (const gone of ['fogel1', 'fogel2', 'pump', 'sealer', 'bactizap']) expect(items.some((i) => i.id === gone)).toBe(false)
+  it('drops the BactiZapper (replaced by the ZVS induction sterilizer)', () => {
+    expect(items.some((i) => i.id === 'bactizap')).toBe(false)
+  })
+  it('puts both 36k units on 40 A breakers with #8 wire', () => {
+    for (const id of ['c34', 'c56']) {
+      const c = allCircuits('2x4500').find((x) => x.id === id)!
+      expect([c.breaker, c.wire]).toEqual(['40 A 2-POLE', '#8 CU'])
+    }
+  })
+  it('keeps the bagger and pump linked and both Fogels on the generator list', () => {
+    expect(LINKED.bag).toBe('pump')
+    expect(LINKED.pump).toBe('bag')
+    expect(EMERG).toEqual(expect.arrayContaining(['f1', 'f2']))
   })
   it('keeps nothing marked as a room guess', () => {
     expect(items.filter((i) => i.roomGuess)).toEqual([])
@@ -193,7 +207,7 @@ describe('operating rules', () => {
     const on = ids('base')
     // Both 36k units at their 24 A peak (5,760 W) instead of 3,600 W: +18 A per leg.
     const r = compute(on, { ...cfg('utility'), overrides: { lennox36a: 5760, lennox36b: 5760 } })
-    expect(r.l1 - 52.2).toBeGreaterThan(17.9)
-    expect(r.l1 - 52.2).toBeLessThan(18.1)
+    expect(r.l1 - 58.9).toBeGreaterThan(17.9)
+    expect(r.l1 - 58.9).toBeLessThan(18.1)
   })
 })

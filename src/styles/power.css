@@ -616,3 +616,14 @@ rect.glyph.lit {
     transform: translateY(10px);
   }
 }
+/* The roofed outdoor area (Fogel reach-ins) is not a container: thinner wall. */
+.deck-room.open .deck-wall {
+  stroke-width: 1;
+  opacity: 0.6;
+}
+/* A door gap in a container wall. */
+.deck-door {
+  fill: none;
+  stroke: var(--bg, #000);
+  stroke-width: 4;
+}
