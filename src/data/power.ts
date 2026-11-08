@@ -57,7 +57,7 @@ export const SERVICE = {
   mainBreakerA: 200,
   nominalV: 240,
   kAluminum: 21.2, // ohm-cmil/ft
-  subFeedA: 60, // sub-panel feed, 60 A 2-pole (ckt 19-20)
+  subFeedA: 60, // the package planned a 60 A sub-panel; the box as wired has none
   label: 'ACOMETIDA 3/0 AL - MAX. 150 A',
 } as const
 
@@ -104,15 +104,15 @@ export const HEATER_OPTIONS: Record<HeaterOption, { label: string; short: string
     short: '2 x 4.5 KW',
     steamLph: 14,
     elements: [
-      { id: 'c12', tag: '1-2', w: 4500, breaker: '30 A 2-POLE', wire: '#10 CU', name: 'HEATER ELEMENT 1 (PID STAGE 1)' },
-      { id: 'c12b', tag: '3-4', w: 4500, breaker: '30 A 2-POLE', wire: '#10 CU', name: 'HEATER ELEMENT 2 (STAGE 2, SHED ON GENERATOR)' },
+      { id: 'c12', tag: '29-31', w: 4500, breaker: '30 A 2-POLE', wire: '#10 CU', name: 'HEATER ELEMENT 1 (PID STAGE 1)' },
+      { id: 'c12b', tag: '30-32', w: 4500, breaker: '30 A 2-POLE', wire: '#10 CU', name: 'HEATER ELEMENT 2 (STAGE 2, SHED ON GENERATOR)' },
     ],
   },
   '6500': {
     label: '1 x 6,500 W ELEMENT (SINGLE STAGE)',
     short: '1 x 6.5 KW',
     steamLph: 10,
-    elements: [{ id: 'c12', tag: '1-2', w: 6500, breaker: '40 A 2-POLE', wire: '#8 CU', name: 'HEATER ELEMENT 6,500 W' }],
+    elements: [{ id: 'c12', tag: '29-31', w: 6500, breaker: '40 A 2-POLE', wire: '#8 CU', name: 'HEATER ELEMENT 6,500 W' }],
   },
 }
 
@@ -137,190 +137,95 @@ const it = (id: string, name: string, qty: number, w: number, room: RoomId, est 
   roomGuess,
 })
 
+// The breaker box as the electrician wired it (Joseph's slot list, 8 Nov 2026).
+// One square box on the outside back wall behind incubation; no sub-panel.
+// Tags are the slot numbers. Leg follows the standard split-phase layout:
+// slots 1-2 on L1, 3-4 on L2, and so on by row (row = slot / 2 rounded up,
+// odd rows L1). Two loads can share one breaker (slots 5 and 9); they are
+// listed apart so the board can show what runs all the time and what is used
+// only now and then, but flipping the real breaker cuts both.
+const b = (id: string, tag: string, leg: Leg, cls: LoadClass, em: boolean, name: string, short: string, note: string, items: Item[], breaker = '20 A 1-POLE', wire = '#12 CU'): Circuit => ({
+  id, tag, panel: 'main', leg, v: 120, breaker, wire, cls, em, name, short, note, items,
+})
+const SIZE_NOTE = ' Breaker size not given yet; 20 A assumed.'
+
 export const MAIN: Circuit[] = [
+  b('m1', '1', 'L1', 'int', false, 'MEGACHEF 12 QT PRESSURE COOKER 1', 'MEGACHEF 1', '1,600 W / 120 V = 13.3 A. The four MegaChefs run together as one batch.', [it('mega1', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)]),
+  b('s5', '2', 'L1', 'base', false, '7 SYLVANIA 2X18 W LED FIXTURES (ALL LIGHTS BUT THE ACTIVEGROWS)', 'WORK LIGHTS', 'Sylvania 705 ECO-48, two 18 W tubes = 36 W each: 3 incubation, 2 packing, 2 lab.' + SIZE_NOTE, [
+    it('led-inc', 'Sylvania 705 ECO-48 2x18 W LED fixture', 3, 108, 'incubation', false),
+    it('led-pack', 'Sylvania 705 ECO-48 2x18 W LED fixture', 2, 72, 'packing', false),
+    it('led-lab', 'Sylvania 705 ECO-48 2x18 W LED fixture', 2, 72, 'lab', false),
+  ]),
+  b('s4', '3', 'L2', 'base', false, '2 CRI HEPA FAN FILTER UNITS (BACK-LEFT TABLE)', 'LAB FFU x2', '208 W each, a 2x4 FFU class figure. Read the CRI label.' + SIZE_NOTE, [it('ffu', 'CRI 2x4 HEPA fan filter unit', 2, 416, 'lab')]),
+  b('s6', '4', 'L2', 'base', true, 'LAB CHEST FRIDGE', 'CHEST FRIDGE', 'Small chest fridge, 150 W (est). Compressor: voltage protector with a delay.' + SIZE_NOTE, [it('chest', 'Small chest fridge (cultures)', 1, 150, 'lab')]),
+  b('stir', '5', 'L1', 'base', false, 'LAB OUTLET: 4 STIR PLATES', 'STIR PLATES', 'Shares breaker 5 with the ZVS sterilizer. Stir plates (no heat) about 25 W each (est).' + SIZE_NOTE, [it('stir', 'Magnetic stir plate (no heat)', 4, 100, 'lab')]),
+  b('zvs', '5', 'L1', 'int', false, 'LAB OUTLET: 12 V ZVS INDUCTION STERILIZER', 'ZVS STERILIZER', 'Shares breaker 5 with the stir plates. About 280 W from the wall (est). Bench use, seconds at a time.', [it('zvs', '12 V ZVS induction loop sterilizer + power supply', 1, 280, 'lab')]),
+  b('seal', '6', 'L1', 'int', false, 'AIE-405HIM 16" IMPULSE SEALER', 'IMPULSE SEALER', 'In the lab. About 800 W (est); draws only for seconds per seal.' + SIZE_NOTE, [it('sealer', 'AIE-405HIM 16" hand impulse sealer', 1, 800, 'lab')]),
+  b('s1', '7', 'L2', 'base', true, 'CO2 FANS: 2 CLOUDLINE S8 (FRUITING) + CLOUDLINE S10 (PACKING)', 'S8 + S10 FANS', 'S8 180 W max each, S10 255 W max. One breaker feeds the fruiting exhaust AND the packing intake, so one trip stops both. Packing CO2 meter assumed here (S10 plugs into it).' + SIZE_NOTE, [
+    it('s8', 'AC Infinity Cloudline S8 (fruiting CO2 exhaust)', 2, 360, 'fruiting', false),
+    it('s10', 'AC Infinity Cloudline S10 (packing fresh-air intake)', 1, 255, 'packing', false),
+    it('co2-pack', 'CO2 meter (packing intake) - circuit is a guess', 1, 3.3, 'packing'),
+  ]),
+  b('lab4', '8', 'L2', 'base', false, 'LAB CLOUDLINE S4', 'LAB S4 FAN', 'S4 28 W max.' + SIZE_NOTE, [it('s4-lab', 'AC Infinity Cloudline S4 (lab air)', 1, 28, 'lab', false)]),
+  b('bag', '9', 'L1', 'int', false, 'THOR BAGGER + CRESTWAVE PUMP', 'BAGGER + PUMP', 'Shares breaker 9 with the wall FFU. Bagger 600 W and pump 600 W (both est) run together on bag day: 10 A, plus the FFU 1.7 A.' + SIZE_NOTE, [
+    it('thor', 'Thor bagger', 1, 600, 'packing'),
+    it('pump', 'CrestWave fresh-water pump 7 GPM / 70 PSI', 1, 600, 'packing'),
+  ]),
+  b('ffuw', '9', 'L1', 'base', false, 'CRI HEPA FAN FILTER UNIT IN THE LAB / PACKING WALL', 'WALL FFU', 'Shares breaker 9 with the bagger and pump. If the bagger trips breaker 9, this HEPA unit stops too.', [it('ffu-wall', 'CRI 2x4 HEPA fan filter unit (in the wall)', 1, 208, 'lab')]),
+  b('m2', '10', 'L1', 'int', false, 'MEGACHEF 12 QT PRESSURE COOKER 2', 'MEGACHEF 2', 'Runs with the other three. Slot 10 is on L1, the same leg as MegaChefs 1 and 3.', [it('mega2', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)]),
+  b('s9', '11', 'L2', 'base', true, 'INCUBATION FLOOR FANS (4)', 'INCU FLOOR FANS', 'Rotating floor fans, 60 W each (est).' + SIZE_NOTE, [it('floorfan', 'Rotating floor fan', 4, 240, 'incubation')]),
+  b('s2', '12', 'L2', 'base', true, 'FRUITING: 2 HURRICANE 8" + CO2 METER (+ INKBIRD)', 'HURRICANES + METER', 'Hurricane 198 W each. The Inkbird is assumed on this breaker too (the Hurricanes plug into it).' + SIZE_NOTE, [
+    it('hurricane', 'Hurricane 8" inline fan (temperature air)', 2, 396, 'fruiting', false),
+    it('co2-fruit', 'CO2 meter (fruiting)', 1, 3.4, 'fruiting'),
+    it('inkbird', 'Inkbird temperature controller - circuit is a guess', 1, 2, 'fruiting'),
+  ]),
+  b('s7', '13', 'L1', 'base', false, '16 ACTIVE GROW T5 4 FT LED LAMPS', 'FRUITING LIGHTS', '25 W each, about 12 h a day.' + SIZE_NOTE, [it('t5', 'Active Grow T5 4 ft mushroom LED', 16, 400, 'fruiting', false)]),
+  b('x75', '14', 'L1', 'int', false, 'ALL AMERICAN 75X ELECTRIC STERILIZER', '75X STERILIZER', '1,650 W / 13.75 A nameplate, 60 min timer. Needs its own 20 A breaker (13.75 A is over the 12 A a 15 A breaker should carry for an hour). Never runs with the MegaChefs or the steam heater.', [it('aa75x', 'All American 75X electric sterilizer (110 V, timer)', 1, 1650, 'lab', false)]),
+  b('incs4', '15', 'L2', 'base', true, 'INCUBATION CLOUDLINE S4 (+ CO2 METER)', 'INCU S4 + METER', 'S4 28 W max. The incubation CO2 meter is assumed here (the S4 plugs into it).' + SIZE_NOTE, [
+    it('s4-inc', 'AC Infinity Cloudline S4 (CO2 exhaust)', 1, 28, 'incubation', false),
+    it('co2-inc', 'CO2 meter (incubation) - circuit is a guess', 1, 3.3, 'incubation'),
+  ]),
+  b('f1', '16', 'L2', 'base', true, 'LEFT FOGEL 3-DOOR REACH-IN FRIDGE', 'FOGEL LEFT', 'Outdoors under the roof, against the fruiting wall left of the back door. Compressor, 800 W (est). Outdoor-rated voltage protector with a delay.' + SIZE_NOTE, [it('fogel1', 'Fogel commercial 3-door reach-in fridge (left)', 1, 800, 'outside')]),
+  b('m3', '17', 'L1', 'int', false, 'MEGACHEF 12 QT PRESSURE COOKER 3', 'MEGACHEF 3', 'Runs with the other three. Slot 17 is on L1 too.', [it('mega3', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)]),
+  b('f2', '18', 'L1', 'base', true, 'RIGHT FOGEL 3-DOOR REACH-IN FRIDGE', 'FOGEL RIGHT', 'Beside the left one. Start 5-10 s after it.' + SIZE_NOTE, [it('fogel2', 'Fogel commercial 3-door reach-in fridge (right)', 1, 800, 'outside')]),
+  b('m4', '19', 'L2', 'int', false, 'MEGACHEF 12 QT PRESSURE COOKER 4', 'MEGACHEF 4', 'Runs with the other three. The only MegaChef on L2.', [it('mega4', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)]),
+  b('o1', '20', 'L2', 'out', false, 'LAB OUTLET', 'LAB OUTLET', 'Receptacle, no fixed load.', []),
   {
-    id: 'c34', tag: '5-6', panel: 'main', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
-    name: 'LENNOX 36K BTU MINI-SPLIT #1 (PACKING)', short: 'LENNOX 36K #1',
-    note: 'Inverter. 3,600 W = 15 A typical cooling on the Lennox 36k submittal; it can peak near 24 A. 40 A breaker (Joseph, 8 Nov 2026), so #8 wire and a 40 A voltage protector.',
-    items: [it('lennox36a', 'Lennox 36k BTU mini-split #1', 1, 3600, 'packing')],
-  },
-  {
-    id: 'c56', tag: '7-8', panel: 'main', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
-    name: 'LENNOX 36K BTU MINI-SPLIT #2 (PACKING)', short: 'LENNOX 36K #2',
-    note: 'Same as #1. Stagger compressor starts.',
-    items: [it('lennox36b', 'Lennox 36k BTU mini-split #2', 1, 3600, 'packing')],
-  },
-  {
-    id: 'c78', tag: '9-10', panel: 'main', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
+    id: 'c78', tag: '21-23', panel: 'main', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
     name: 'LENNOX 12K BTU MINI-SPLIT #1 (INCUBATION)', short: 'LENNOX 12K #1',
     note: 'Indoor 37A88, outdoor 379A1. Lennox 12k submittals list 3.7 A typical (about 850 W), 6.3 A max and a 15 A max breaker. 1,000 W kept as the running figure.',
     items: [it('lennox12a', 'Lennox 12k BTU mini-split #1 (37A88 / 379A1)', 1, 1000, 'incubation')],
   },
   {
-    id: 'c910', tag: '11-12', panel: 'main', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
+    id: 'c910', tag: '22-24', panel: 'main', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
     name: 'LENNOX 12K BTU MINI-SPLIT #2 (INCUBATION)', short: 'LENNOX 12K #2',
     note: 'Same as #1.',
     items: [it('lennox12b', 'Lennox 12k BTU mini-split #2 (37A88 / 379A1)', 1, 1000, 'incubation')],
   },
   {
-    id: 'm1', tag: '13', panel: 'main', leg: 'L1', v: 120, breaker: '20 A 1-POLE', wire: '#12 CU', cls: 'int', em: false,
-    name: 'MEGACHEF 12 QT PRESSURE COOKER 1', short: 'MEGACHEF 1',
-    note: '1,600 W / 120 V (was 1,200 W). The four MegaChefs run together as one batch.',
-    items: [it('mega1', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)],
+    id: 'c34', tag: '25-27', panel: 'main', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
+    name: 'LENNOX 36K BTU MINI-SPLIT #1 (PACKING)', short: 'LENNOX 36K #1',
+    note: 'Inverter. 3,600 W = 15 A typical cooling on the Lennox 36k submittal; it can peak near 24 A. 40 A breaker (Joseph, 8 Nov 2026), so #8 wire and a 40 A voltage protector.',
+    items: [it('lennox36a', 'Lennox 36k BTU mini-split #1', 1, 3600, 'packing')],
   },
   {
-    id: 'm2', tag: '14', panel: 'main', leg: 'L2', v: 120, breaker: '20 A 1-POLE', wire: '#12 CU', cls: 'int', em: false,
-    name: 'MEGACHEF 12 QT PRESSURE COOKER 2', short: 'MEGACHEF 2', note: 'Runs with the other three.',
-    items: [it('mega2', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)],
+    id: 'c56', tag: '26-28', panel: 'main', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
+    name: 'LENNOX 36K BTU MINI-SPLIT #2 (PACKING)', short: 'LENNOX 36K #2',
+    note: 'Same as #1. Stagger compressor starts.',
+    items: [it('lennox36b', 'Lennox 36k BTU mini-split #2', 1, 3600, 'packing')],
   },
   {
-    id: 'm3', tag: '15', panel: 'main', leg: 'L1', v: 120, breaker: '20 A 1-POLE', wire: '#12 CU', cls: 'int', em: false,
-    name: 'MEGACHEF 12 QT PRESSURE COOKER 3', short: 'MEGACHEF 3', note: 'Runs with the other three.',
-    items: [it('mega3', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)],
-  },
-  {
-    id: 'm4', tag: '16', panel: 'main', leg: 'L2', v: 120, breaker: '20 A 1-POLE', wire: '#12 CU', cls: 'int', em: false,
-    name: 'MEGACHEF 12 QT PRESSURE COOKER 4', short: 'MEGACHEF 4', note: 'Runs with the other three.',
-    items: [it('mega4', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)],
-  },
-  {
-    id: 'x75', tag: '17', panel: 'main', leg: 'L1', v: 120, breaker: '20 A 1-POLE', wire: '#12 CU', cls: 'int', em: false,
-    name: 'ALL AMERICAN 75X ELECTRIC STERILIZER', short: '75X STERILIZER',
-    note: '1,650 W / 13.75 A nameplate, 60 min timer. Never runs with the MegaChefs or the steam heater. The one load that unbalances the legs (+13.8 A on L1).',
-    items: [it('aa75x', 'All American 75X electric sterilizer (110 V, timer)', 1, 1650, 'lab', false)],
-  },
-  {
-    id: 'pump', tag: '18', panel: 'main', leg: 'L2', v: 120, breaker: '20 A 1-POLE', wire: '#12 CU', cls: 'int', em: false,
-    name: 'CREST WAVE WATER PUMP 7 GPM / 70 PSI', short: 'WATER PUMP',
-    note: 'In packing beside the Thor. Runs whenever the bagger runs; switching one switches both. 600 W is an estimate (5 A class).',
-    items: [it('pump', 'CrestWave fresh-water pump 7 GPM / 70 PSI', 1, 600, 'packing')],
-  },
-]
-
-export const SUB: Circuit[] = [
-  {
-    id: 's1', tag: 'S1', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'FRUITING CO2 EXHAUST: CO2 METER + 2 CLOUDLINE S8', short: 'FRUIT CO2 FANS', note: 'S8 180 W max each (AC Infinity spec, 2.3 A; about 78 W average). The fans plug into the meter.',
-    items: [
-      it('co2-fruit', 'CO2 meter (fruiting exhaust)', 1, 3.4, 'fruiting'),
-      it('s8', 'AC Infinity Cloudline S8 (CO2 exhaust)', 2, 360, 'fruiting', false),
-    ],
-  },
-  {
-    id: 's2', tag: 'S2', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'FRUITING TEMPERATURE AIR: INKBIRD + 2 HURRICANE 8"', short: 'FRUIT TEMP FANS', note: 'Hurricane 198 W / 1.7 A each (Hydrofarm spec sheet). The fans plug into the Inkbird.',
-    items: [
-      it('inkbird', 'Inkbird temperature controller', 1, 2, 'fruiting'),
-      it('hurricane', 'Hurricane 8" inline fan (temperature air)', 2, 396, 'fruiting', false),
-    ],
-  },
-  {
-    id: 's3', tag: 'S3', panel: 'sub', leg: 'L1', v: 120, breaker: '15 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'TAC MISTING XL FOGGER', short: 'FOGGER', note: '380 W. Own circuit, apart from the CO2 meters.',
+    id: 's3', tag: 'TAC?', panel: 'main', leg: 'L1', v: 120, breaker: '?', wire: '#12 CU', cls: 'base', em: true,
+    name: 'TAC MISTING XL FOGGER - NOT ON THE BOX LIST', short: 'FOGGER',
+    note: '380 W. Joseph\'s slot list does not say which breaker feeds it, so the leg (L1) is a guess. Keep it apart from the CO2 meters.',
     items: [it('tac', 'TAC Misting XL ultrasonic fogger', 1, 380, 'fruiting', false)],
   },
-  {
-    id: 's4', tag: 'S4', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: false,
-    name: '3 CRI HEPA FAN FILTER UNITS 2X4', short: 'HEPA FFU x3', note: '208 W each, a 2x4 FFU class figure (was 150 W). Two over the back-left table, one in the wall. Read the CRI label.',
-    items: [it('ffu', 'CRI 2x4 HEPA fan filter unit', 3, 624, 'lab')],
-  },
-  {
-    id: 's5', tag: 'S5', panel: 'sub', leg: 'L1', v: 120, breaker: '15 A', wire: '#12 CU', cls: 'base', em: false,
-    name: '7 SYLVANIA 2X18 W LED FIXTURES', short: 'WORK LIGHTS', note: 'Sylvania 705 ECO-48, two 18 W LED tubes = 36 W each.',
-    items: [
-      it('led-inc', 'Sylvania 705 ECO-48 2x18 W LED fixture', 3, 108, 'incubation', false),
-      it('led-pack', 'Sylvania 705 ECO-48 2x18 W LED fixture', 2, 72, 'packing', false),
-      it('led-lab', 'Sylvania 705 ECO-48 2x18 W LED fixture', 2, 72, 'lab', false),
-    ],
-  },
-  {
-    id: 's6', tag: 'S6', panel: 'sub', leg: 'L2', v: 120, breaker: '15 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'LAB CHEST FRIDGE', short: 'CHEST FRIDGE', note: 'Small chest fridge, 150 W (est). Compressor: voltage protector with a delay.',
-    items: [it('chest', 'Small chest fridge (cultures)', 1, 150, 'lab')],
-  },
-  {
-    id: 's7', tag: 'S7', panel: 'sub', leg: 'L1', v: 120, breaker: '15 A', wire: '#12 CU', cls: 'base', em: false,
-    name: '16 ACTIVE GROW T5 4 FT LED LAMPS', short: 'FRUITING LIGHTS', note: '25 W each (Active Grow T5 HO spec sheet), about 12 h a day.',
-    items: [it('t5', 'Active Grow T5 4 ft mushroom LED', 16, 400, 'fruiting', false)],
-  },
-  {
-    id: 's8', tag: 'S8', panel: 'sub', leg: 'L2', v: 120, breaker: '15 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'PACKING CO2 INTAKE: CO2 METER + CLOUDLINE S10', short: 'PACK CO2 FAN', note: 'S10 255 W max (2.7 A). The fan plugs into the meter.',
-    items: [
-      it('co2-pack', 'CO2 meter (packing intake)', 1, 3.3, 'packing'),
-      it('s10', 'AC Infinity Cloudline S10 (fresh-air intake)', 1, 255, 'packing', false),
-    ],
-  },
-  {
-    id: 's9', tag: 'S9', panel: 'sub', leg: 'L1', v: 120, breaker: '15 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'INCUBATION AIR: CO2 METER + CLOUDLINE S4 + 4 FLOOR FANS', short: 'INCU AIR', note: 'S4 28 W max; floor fans 60 W each (est).',
-    items: [
-      it('co2-inc', 'CO2 meter (incubation exhaust)', 1, 3.3, 'incubation'),
-      it('s4-inc', 'AC Infinity Cloudline S4 (CO2 exhaust)', 1, 28, 'incubation', false),
-      it('floorfan', 'Rotating floor fan', 4, 240, 'incubation'),
-    ],
-  },
-  {
-    id: 's10', tag: 'S10', panel: 'sub', leg: 'L2', v: 120, breaker: '15 A', wire: '#12 CU', cls: 'base', em: false,
-    name: 'LAB BENCH: 4 STIR PLATES + CLOUDLINE S4', short: 'LAB BENCH', note: 'Stir plates (no heat) about 25 W each (est); S4 28 W max.',
-    items: [
-      it('stir', 'Magnetic stir plate (no heat)', 4, 100, 'lab'),
-      it('s4-lab', 'AC Infinity Cloudline S4 (lab air)', 1, 28, 'lab', false),
-    ],
-  },
-  {
-    id: 'bag', tag: 'S11', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'int', em: false,
-    name: 'THOR BAGGER', short: 'BAGGER', note: 'Weekly bag run in packing. 110 V; the maker publishes no wattage, so 600 W is kept as a safe figure.',
-    items: [it('thor', 'Thor bagger', 1, 600, 'packing')],
-  },
-  {
-    id: 'zvs', tag: 'S12', panel: 'sub', leg: 'L2', v: 120, breaker: '15 A', wire: '#12 CU', cls: 'int', em: false,
-    name: '12 V ZVS INDUCTION STERILIZER', short: 'ZVS STERILIZER', note: 'ZVS boards draw up to 20 A at 12 V (240 W), about 280 W from the wall with the power supply. Read the supply label. Bench use, seconds at a time.',
-    items: [it('zvs', '12 V ZVS induction loop sterilizer + power supply', 1, 280, 'lab')],
-  },
-  {
-    id: 'o1', tag: 'S13', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'out', em: false,
-    name: 'LAB GENERAL OUTLETS (4)', short: 'LAB OUTLETS', note: 'Receptacles, no fixed load.', items: [],
-  },
-  {
-    id: 'o2', tag: 'S14', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A GFCI', wire: '#12 CU', cls: 'out', em: false,
-    name: 'OUTDOOR OUTLETS (4)', short: 'OUTDOOR GFCI', note: 'Receptacles, no fixed load.', items: [],
-  },
-  {
-    id: 'o3', tag: 'S15', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A GFCI', wire: '#12 CU', cls: 'out', em: false,
-    name: 'INCUBATION CONTAINER GFCI (2)', short: 'INCUBATION GFCI', note: 'Receptacles, no fixed load.', items: [],
-  },
-  {
-    id: 'o4', tag: 'S16', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A GFCI', wire: '#12 CU', cls: 'out', em: false,
-    name: 'LAB / PACKING CONTAINER GFCI (2)', short: 'LAB GFCI', note: 'Receptacles, no fixed load.', items: [],
-  },
-  {
-    id: 'o5', tag: 'S17', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A GFCI', wire: '#12 CU', cls: 'out', em: false,
-    name: 'FRUITING CONTAINER GFCI (2)', short: 'FRUITING GFCI', note: 'Receptacles, no fixed load.', items: [],
-  },
-  {
-    id: 'o6', tag: 'S18', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A GFCI', wire: '#12 CU', cls: 'out', em: false,
-    name: 'COOK ROOM GFCI (2)', short: 'COOK GFCI', note: 'Receptacles in the 20 ft cook container, no fixed load.', items: [],
-  },
-  {
-    id: 'f1', tag: 'S19', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'FOGEL 3-DOOR REACH-IN FRIDGE 1', short: 'FOGEL 1', note: 'Outdoors under the roof, against the fruiting wall left of the back door. Compressor, 800 W (est). Outdoor-rated voltage protector with a delay.',
-    items: [it('fogel1', 'Fogel commercial 3-door reach-in fridge 1', 1, 800, 'outside')],
-  },
-  {
-    id: 'f2', tag: 'S20', panel: 'sub', leg: 'L2', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'base', em: true,
-    name: 'FOGEL 3-DOOR REACH-IN FRIDGE 2', short: 'FOGEL 2', note: 'Beside fridge 1. Start 5-10 s after fridge 1.',
-    items: [it('fogel2', 'Fogel commercial 3-door reach-in fridge 2', 1, 800, 'outside')],
-  },
-  {
-    id: 'seal', tag: 'S21', panel: 'sub', leg: 'L1', v: 120, breaker: '20 A', wire: '#12 CU', cls: 'int', em: false,
-    name: 'AIE-405HIM 16" IMPULSE SEALER', short: 'IMPULSE SEALER', note: 'In the lab. About 800 W (est); draws only for seconds per seal.',
-    items: [it('sealer', 'AIE-405HIM 16" hand impulse sealer', 1, 800, 'lab')],
-  },
 ]
 
+export const SUB: Circuit[] = []
+
 /** Which room each receptacle circuit serves (they have no items to carry a room). */
-export const OUTLET_ROOM: Record<string, RoomId> = { o1: 'lab', o2: 'outside', o3: 'incubation', o4: 'lab', o5: 'fruiting', o6: 'boiling' }
+export const OUTLET_ROOM: Record<string, RoomId> = { o1: 'lab' }
 
 /** The heater circuits for an option, in the same shape as the others. */
 export function heaterCircuits(opt: HeaterOption): Circuit[] {
@@ -347,17 +252,17 @@ export function allCircuits(opt: HeaterOption): Circuit[] {
 
 // ---------------------------------------------------------------- groups and links
 
-/** Continuous loads: S1-S10, the two Fogels and the four mini-splits. */
-export const BASE = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10', 'f1', 'f2', 'c34', 'c56', 'c78', 'c910']
-/** Generator emergency list: fruiting fans, fogger, chest fridge, packing CO2 intake, incubation air, Fogels. */
-export const EMERG = ['s1', 's2', 's3', 's6', 's8', 's9', 'f1', 'f2']
+/** Continuous loads: every fan, light, fridge and FFU, and the four mini-splits. */
+export const BASE = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's9', 'stir', 'lab4', 'ffuw', 'incs4', 'f1', 'f2', 'c34', 'c56', 'c78', 'c910']
+/** Generator emergency list: breakers 4, 7, 11, 12, 15, 16, 18 and the fogger. */
+export const EMERG = ['s1', 's2', 's3', 's6', 's9', 'incs4', 'f1', 'f2']
 export const MEGACHEFS = ['m1', 'm2', 'm3', 'm4']
 export const HEATER_IDS = ['c12', 'c12b']
 export const AC_IDS = ['c34', 'c56', 'c78', 'c910']
 /** Compressor loads, for the stagger-starts reminder. */
 export const COMPRESSORS = ['c34', 'c56', 'c78', 'c910', 's6', 'f1', 'f2']
-/** Switching one of these switches the other. */
-export const LINKED: Record<string, string> = { bag: 'pump', pump: 'bag' }
+/** Switching one of these switches the other. (The pump is now part of the bagger load on breaker 9.) */
+export const LINKED: Record<string, string> = {}
 
 // ---------------------------------------------------------------- ICE tariff
 
@@ -391,7 +296,7 @@ export const SCENARIOS: Scenario[] = [
   { key: 'heatstage', label: '+ HEATER STAGED HOLD', source: 'utility', only: '2x4500', on: [...BASE, 'heatOne'] },
   { key: 'mega', label: '+ 4 MEGACHEFS', source: 'utility', on: [...BASE, ...MEGACHEFS] },
   { key: 'x75', label: '+ 75X', source: 'utility', on: [...BASE, 'x75'] },
-  { key: 'bag', label: '+ BAGGER & PUMP', source: 'utility', on: [...BASE, 'bag', 'pump'] },
+  { key: 'bag', label: '+ BAGGER & PUMP', source: 'utility', on: [...BASE, 'bag'] },
   { key: 'labbench', label: '+ 75X, ZVS & SEALER', source: 'utility', on: [...BASE, 'x75', 'zvs', 'seal'] },
   { key: 'bad', label: 'HEATER + MEGACHEFS', source: 'utility', danger: true, on: [...BASE, 'heatAll', ...MEGACHEFS] },
   { key: 'all', label: 'EVERYTHING ON', source: 'utility', danger: true, on: ['everything'] },
@@ -401,7 +306,7 @@ export const SCENARIOS: Scenario[] = [
   { key: 'gboth', label: '+ 36K + 12K', source: 'generator', on: [...EMERG, 'c34', 'c78'] },
   { key: 'gboil', label: '+ HEATER (1 ELEMENT)', label6: '+ 6.5 KW HEATER', source: 'generator', on: [...EMERG, 'heatOne'] },
   { key: 'gboilall', label: '+ BOTH ELEMENTS', source: 'generator', only: '2x4500', danger: true, on: [...EMERG, 'heatAll'] },
-  { key: 'gbag', label: '+ BAGGER & PUMP', source: 'generator', on: [...EMERG, 'bag', 'pump'] },
+  { key: 'gbag', label: '+ BAGGER & PUMP', source: 'generator', on: [...EMERG, 'bag'] },
   { key: 'gmax', label: '+ HEATER + 36K', source: 'generator', danger: true, on: [...EMERG, 'heatOne', 'c34'] },
 ]
 

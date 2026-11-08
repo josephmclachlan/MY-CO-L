@@ -539,7 +539,7 @@ Targets marked GUESS - REVIEW are the app's guesses. Check them against your own
 - **POWER CUTS**: Buttons for a cut in progress. Same as FACILITY LOGS.
 - **RULES**: Things the board checks, like linked breakers.
 - **PRESETS**: One-tap sets of breakers.
-- **MAIN PANEL, SUB-PANEL**: The two panels with every breaker.
+- **BREAKER BOX**: Every breaker by its slot number in the box behind incubation.
 - **DETAIL**: The breaker you picked: its load and room.
 
 ### GOOD TO KNOW

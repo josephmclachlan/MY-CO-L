@@ -21,7 +21,7 @@ const GLYPHS: Glyph[] = [
   // lab: two FFUs on the back-left table, one in the wall to packing
   { item: 'ffu', kind: 'box', x: 68, y: 52, w: 26, h: 56 },
   { item: 'ffu', kind: 'box', x: 98, y: 52, w: 26, h: 56 },
-  { item: 'ffu', kind: 'box', x: 104, y: 313, w: 56, h: 14 },
+  { item: 'ffu-wall', kind: 'box', x: 104, y: 313, w: 56, h: 14 },
   { item: 'aa75x', kind: 'disc', x: 150, y: 70, r: 13 },
   { item: 'stir', kind: 'disc', x: 141, y: 151, r: 6 },
   { item: 'stir', kind: 'disc', x: 157, y: 151, r: 6 },
@@ -163,6 +163,15 @@ function Plan() {
           </text>
           <text x={749} y={342} className="deck-tag">
             DOOR
+          </text>
+          {/* the breaker box: square Eaton CH box on the outside back wall behind incubation */}
+          <rect x={735} y={530} width={14} height={22} className="deck-inner" />
+          <path d="M738 536H746M738 541H746M738 546H746" className="deck-inner faint" />
+          <text x={760} y={566} className="deck-tag">
+            BREAKER
+          </text>
+          <text x={760} y={577} className="deck-tag">
+            BOX
           </text>
           {/* the upper container sits on the lower one: corner lines */}
           <path d="M172 488L212 462M732 488L772 462M172 600L212 574M732 600L772 574" className="deck-inner faint dash" />

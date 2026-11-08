@@ -782,13 +782,13 @@ export default function App() {
     }
     const room = ROOMS.find((r) => r.id === cmd.toLowerCase() || r.name === raw.trim().toUpperCase() || r.short === cmd)
     if (room) return openRoom(room.id)
-    const brk = allCircuits(power.state.heater).find((c) => c.tag === cmd || c.tag.replace('-', '') === cmd)
+    const brk = allCircuits(power.state.heater).find((c) => c.tag === cmd || c.tag.replace('-', '') === cmd || c.tag.split('-').includes(cmd))
     if (brk && !/^[1-9]$/.test(cmd)) {
       const was = power.on.has(brk.id)
       power.toggle(brk.id)
       power.setSelectedCircuit(brk.id)
       openVitals()
-      return say(`${brk.tag} ${brk.short} ${was ? 'OFF' : 'ON'}${brk.id === 'bag' || brk.id === 'pump' ? ' (BAGGER AND PUMP LINKED)' : ''}`)
+      return say(`${brk.tag} ${brk.short} ${was ? 'OFF' : 'ON'}${allCircuits(power.state.heater).some((o) => o.id !== brk.id && o.tag === brk.tag) ? ' (SHARES THE BREAKER)' : ''}`)
     }
     switch (cmd) {
       case 'UTILITY':
@@ -1113,7 +1113,7 @@ export default function App() {
 
   store.screen = title || null
   if (view.name === 'module' && view.idx === VITALS_IDX)
-    hints.module = 'TAP A BREAKER TO FLIP IT // TYPE A TAG (S4) OR GEN, UTILITY, HEATER A/B // F2 MENU'
+    hints.module = 'TAP A BREAKER TO FLIP IT // TYPE A SLOT (14) OR GEN, UTILITY, HEATER A/B // F2 MENU'
   if (view.name === 'module' && view.idx === DECK_IDX)
     hints.module = 'TAP A ROOM, ITS DETAIL IS BELOW THE PLAN // TYPE LAB, PACKING, INCUBATION, FRUITING OR COOK ROOM'
 

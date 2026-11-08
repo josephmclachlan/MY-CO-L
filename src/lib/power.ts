@@ -264,8 +264,15 @@ export function warnings(on: Set<string>, cfg: PowerConfig, r: Reading, peak: Pe
     }
     const missing = EMERG.filter((i) => !on.has(i))
     if (missing.length && on.size > 0) {
-      out.push({ id: 'emerg', level: 'note', text: `EMERGENCY LIST NOT ALL ON: ${missing.map((m) => m.toUpperCase()).join(', ')} OFF.`, rooms: [] })
+      out.push({ id: 'emerg', level: 'note', text: `EMERGENCY LIST NOT ALL ON: BREAKER ${missing.map((m) => allCircuits(cfg.heater).find((c) => c.id === m)?.tag ?? m.toUpperCase()).join(', ')} OFF.`, rooms: [] })
     }
+  }
+
+  // Leg balance: 120 V loads on one leg only. Flag a gap of 20 A or more.
+  const gap = Math.abs(r.l1 - r.l2)
+  if (gap >= IMBALANCE_A) {
+    const heavy = r.l1 > r.l2 ? 'L1' : 'L2'
+    out.push({ id: 'imbalance', level: 'note', text: `LEGS UNEVEN BY ${gap.toFixed(1)} A (${heavy} HEAVY). MOVE A 120 V LOAD TO THE OTHER LEG IF THIS IS A NORMAL RUN.`, rooms: [] })
   }
 
   // Sub-panel feed (60 A 2-pole), only if a separate sub-panel is kept.
@@ -275,6 +282,9 @@ export function warnings(on: Set<string>, cfg: PowerConfig, r: Reading, peak: Pe
   }
   return out
 }
+
+/** A leg gap at or above this many amps is flagged. */
+export const IMBALANCE_A = 20
 
 /** Generator share against the owned unit on both fuels, as the package CSV prints it. */
 export function ownedGeneratorShare(watts: number): { propane: number; gasoline: number } {

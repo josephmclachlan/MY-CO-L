@@ -11,6 +11,7 @@ import {
   HEATER_OPTIONS,
   SCENARIOS,
   SERVICE,
+  SUB,
   type Circuit,
   type HeaterOption,
   type RoomId,
@@ -279,8 +280,8 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
         <div className="dim tiny">
           {gen
             ? `${GENERATOR.model} // ${GENERATOR.outlet} // ${GENERATOR.connection} // NEUTRAL MUST BE UN-BONDED`
-            : `125 A METER > 3/0 AL 115 M (155 A) > 200 A MAIN // LABEL: ${SERVICE.label}`}
-          {` // SUB-PANEL FEED L1 ${fmtA(r.subL1)} L2 ${fmtA(r.subL2)} OF ${SERVICE.subFeedA} A`}
+            : `125 A METER > 3/0 AL 115 M (155 A) > 200 A MAIN (WHERE? THE BOX IS MAIN-LUG ONLY) > EATON CH 225 A BOX // LABEL: ${SERVICE.label}`}
+          {SUB.length > 0 && ` // SUB-PANEL FEED L1 ${fmtA(r.subL1)} L2 ${fmtA(r.subL2)} OF ${SERVICE.subFeedA} A`}
         </div>
       </section>
 
@@ -348,7 +349,7 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
       </section>
 
       <section className="box" id="v-main">
-        <div className="section-title">MAIN PANEL // 200 A</div>
+        <div className="section-title">BREAKER BOX // EATON CH 225 A // OUTSIDE BACK WALL BEHIND INCUBATION</div>
         <div className="brk-grid">
           {main.map((c) => (
             <BreakerBox key={c.id} c={c} flashDelay={flash[c.id]} />
@@ -356,14 +357,16 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
         </div>
       </section>
 
-      <section className="box" id="v-sub">
-        <div className="section-title">SUB-PANEL // S1-S21 // 60 A FEED</div>
-        <div className="brk-grid">
-          {sub.map((c) => (
-            <BreakerBox key={c.id} c={c} flashDelay={flash[c.id]} />
-          ))}
-        </div>
-      </section>
+      {sub.length > 0 && (
+        <section className="box" id="v-sub">
+          <div className="section-title">SUB-PANEL // 60 A FEED</div>
+          <div className="brk-grid">
+            {sub.map((c) => (
+              <BreakerBox key={c.id} c={c} flashDelay={flash[c.id]} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="box" id="v-detail">
         <div className="section-title">BREAKER DETAIL</div>
@@ -388,8 +391,8 @@ export function VitalsIndex() {
           ['POWER CUTS', 'v-cuts-box'],
           ['RULES', 'v-rules'],
           ['PRESETS', 'v-presets'],
-          ['MAIN PANEL', 'v-main'],
-          ['SUB-PANEL', 'v-sub'],
+          ['BREAKER BOX', 'v-main'],
+          ...(SUB.length ? [['SUB-PANEL', 'v-sub']] : []),
           ['DETAIL', 'v-detail'],
         ].map(([label, id]) => (
           <li tabIndex={0} key={id} onClick={() => jump(id)}>

@@ -51,7 +51,7 @@ export const ROOMS: Room[] = [
       { label: 'RETURN', value: 'ABOUT 20% BELOW SUPPLY' },
       { label: 'CHEST FRIDGE', value: '1-4 C' },
     ],
-    critical: [{ ids: ['s4'], text: 'HEPA UNITS OFF. LAB NOT POSITIVE.' }],
+    critical: [{ ids: ['s4', 'ffuw'], text: 'HEPA UNITS OFF. LAB NOT POSITIVE.' }],
   },
   {
     id: 'packing',
@@ -70,7 +70,7 @@ export const ROOMS: Room[] = [
     ],
     critical: [
       { ids: ['c34', 'c56'], text: 'PACKING AC OFF. FRUITING SUPPLY WILL WARM.' },
-      { ids: ['s8'], text: 'FRESH-AIR INTAKE OFF. CO2 WILL BUILD.' },
+      { ids: ['s1'], text: 'FRESH-AIR INTAKE OFF (BREAKER 7). CO2 WILL BUILD.' },
     ],
   },
   {
@@ -107,7 +107,8 @@ export const ROOMS: Room[] = [
     ],
     critical: [
       { ids: ['c78', 'c910'], text: 'INCUBATION AC OFF. BLOCKS WILL HEAT.' },
-      { ids: ['s9'], text: 'INCUBATION AIR OFF. CO2 WILL BUILD.' },
+      { ids: ['incs4'], text: 'INCUBATION EXHAUST OFF. CO2 WILL BUILD.' },
+      { ids: ['s9'], text: 'FLOOR FANS OFF. HOT SPOTS WILL FORM.' },
     ],
   },
   {
@@ -143,7 +144,7 @@ export const ROOMS: Room[] = [
     setPoints: [
       { label: 'FOGEL REACH-INS', value: '2 X COMMERCIAL 3-DOOR, 1-4 C' },
       { label: 'WHERE', value: 'LEFT OF THE FRUITING BACK DOOR, ~1 M FROM THE BACK END' },
-      { label: 'POWER', value: 'OWN 120 V CIRCUITS S19 AND S20, ON THE GENERATOR LIST' },
+      { label: 'POWER', value: 'LEFT ON BREAKER 16, RIGHT ON 18. BOTH ON THE GENERATOR LIST' },
       { label: 'WEATHER', value: 'KEEP THE ROOF OVER THEM AND THE PLUGS DRY' },
     ],
     critical: [{ ids: ['f1', 'f2'], text: 'BOTH FOGEL REACH-INS OFF. STOCK WILL WARM.' }],

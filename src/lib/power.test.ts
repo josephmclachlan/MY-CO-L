@@ -46,7 +46,7 @@ function idsFor(opt: HeaterOption, source: string, name: string): string[] | nul
       'Baseline + heater, staged hold (element 2 off)': [...BASE, ...heatOne],
       'Baseline + 4 MegaChefs': [...BASE, ...MEGACHEFS],
       'Baseline + All American 75X': [...BASE, 'x75'],
-      'Baseline + Thor bagger & pump': [...BASE, 'bag', 'pump'],
+      'Baseline + Thor bagger & pump': [...BASE, 'bag'],
       'Baseline + 75X, ZVS & sealer (lab bench)': [...BASE, 'x75', 'zvs', 'seal'],
       'RULE BROKEN: heater full + 4 MegaChefs': [...BASE, ...heatAll, ...MEGACHEFS],
       'THEORETICAL: everything on at once': allCircuits(opt).map((c) => c.id),
@@ -60,14 +60,25 @@ function idsFor(opt: HeaterOption, source: string, name: string): string[] | nul
     'Emergency + heater (1 element)': [...EMERG, ...heatOne],
     'Emergency + 6,500 W heater': [...EMERG, ...heatOne],
     'Emergency + BOTH heater elements': [...EMERG, ...heatAll],
-    'Emergency + Thor bagger & pump': [...EMERG, 'bag', 'pump'],
+    'Emergency + Thor bagger & pump': [...EMERG, 'bag'],
     'Emergency + heater + 36k': [...EMERG, ...heatOne, 'c34'],
   }
   return map[name] ?? null
 }
 
-// toFixed rounds the exact stored value, like Python's round(), so 71.85 (stored as 71.8499...) gives 71.8.
-const r1 = (n: number) => String(Number(n.toFixed(1)))
+// Python's round(x, 1): rounds the exact stored value (71.85 is stored as 71.8499... so gives 71.8),
+// and an exact tie such as 83.25 goes to the even digit (83.2). toFixed matches except on exact ties.
+const r1 = (n: number) => {
+  const exact = Math.abs(n).toFixed(30)
+  const [, frac] = exact.split('.')
+  if (/^\d50*$/.test(frac)) {
+    const down = Math.trunc(Math.abs(n) * 10) / 10
+    const lastEven = Math.round(down * 10) % 2 === 0
+    const v = lastEven ? down : down + 0.1
+    return String(Number((Math.sign(n) * v).toFixed(1)))
+  }
+  return String(Number(n.toFixed(1)))
+}
 const pct0 = (n: number) => `${n.toFixed(0)}%`
 
 describe('operating_scenarios.csv', () => {
@@ -113,23 +124,23 @@ describe('on-screen scenario presets', () => {
       const r = compute(new Set(scenarioIds(s, opt)), { heater: opt, source: s.source, fuel: 'propane', genW: 11400, overrides: {} })
       expect(r1(r.worst)).toBe(String(worst))
     }
-    check('base', '2x4500', 58.9)
-    check('heatfull', '2x4500', 96.4)
-    check('heatfull', '6500', 86)
-    check('heatstage', '2x4500', 77.6)
-    check('mega', '2x4500', 85.6)
-    check('bag', '2x4500', 63.9)
-    check('labbench', '2x4500', 79.3)
-    check('bad', '2x4500', 123.1)
-    check('all', '2x4500', 148.5)
-    check('all', '6500', 138.1)
-    check('gmax', '6500', 57.2)
+    check('base', '2x4500', 60.7)
+    check('heatfull', '2x4500', 98.2)
+    check('heatfull', '6500', 87.8)
+    check('heatstage', '2x4500', 79.5)
+    check('mega', '2x4500', 96.2)
+    check('bag', '2x4500', 66.2)
+    check('labbench', '2x4500', 78.9)
+    check('bad', '2x4500', 133.7)
+    check('all', '2x4500', 166.4)
+    check('all', '6500', 156)
+    check('gmax', '6500', 60.8)
   })
 
   it('every circuit watt total matches the 8 Nov 2026 spec-sheet figures', () => {
-    // Hand-worked from the 8 Nov 2026 spec sheets: S1 3.4 + 2 x 180, S2 2 + 2 x 198, S4 3 x 208, S5 7 x 36,
-    // S7 16 x 25, S8 3.3 + 255, S9 3.3 + 28 + 4 x 60, S10 4 x 25 + 28; Fogels and sealer 800 each, CrestWave pump 600.
-    const want: Record<string, number> = { s1: 363.4, s2: 398, s3: 380, s4: 624, s5: 252, s6: 150, s7: 400, s8: 258.3, s9: 271.3, s10: 128, c34: 3600, m1: 1600, x75: 1650, zvs: 280, f1: 800, f2: 800, seal: 800, pump: 600 }
+    // Hand-worked per box slot (8 Nov 2026): 2 = 7 x 36; 3 = 2 x 208; 7 = 2 x 180 + 255 + 3.3 meter; 9 = 600 + 600
+    // bagger and pump, plus the 208 W wall FFU; 11 = 4 x 60; 12 = 2 x 198 + 3.4 + 2; 13 = 16 x 25; 15 = 28 + 3.3.
+    const want: Record<string, number> = { s5: 252, s4: 416, s6: 150, stir: 100, zvs: 280, seal: 800, s1: 618.3, lab4: 28, bag: 1200, ffuw: 208, s9: 240, s2: 401.4, s7: 400, x75: 1650, incs4: 31.3, f1: 800, f2: 800, m1: 1600, s3: 380, c34: 3600, c78: 1000 }
     for (const c of allCircuits('2x4500')) {
       if (want[c.id] !== undefined) expect(Math.round(c.items.reduce((n, i) => n + i.w, 0) * 1000) / 1000).toBe(want[c.id])
     }
@@ -141,7 +152,7 @@ describe('8 Nov 2026 room list', () => {
     incubation: ['lennox12a', 'lennox12b', 'led-inc', 'floorfan', 's4-inc', 'co2-inc'],
     packing: ['lennox36a', 'lennox36b', 'thor', 'pump', 'led-pack', 's10', 'co2-pack'],
     fruiting: ['s8', 'inkbird', 't5', 'tac', 'hurricane', 'co2-fruit'],
-    lab: ['ffu', 'aa75x', 'stir', 'zvs', 'sealer', 's4-lab', 'chest', 'led-lab'],
+    lab: ['ffu', 'ffu-wall', 'aa75x', 'stir', 'zvs', 'sealer', 's4-lab', 'chest', 'led-lab'],
     outside: ['fogel1', 'fogel2'],
     boiling: ['mega1', 'mega2', 'mega3', 'mega4', 'heat-c12', 'heat-c12b'],
   }
@@ -154,7 +165,7 @@ describe('8 Nov 2026 room list', () => {
   it('has the quantities Joseph listed', () => {
     const q = (id: string) => items.find((i) => i.id === id)!.qty
     expect(q('led-inc') + q('led-pack') + q('led-lab')).toBe(7)
-    expect([q('floorfan'), q('t5'), q('s8'), q('hurricane'), q('ffu'), q('stir')]).toEqual([4, 16, 2, 2, 3, 4])
+    expect([q('floorfan'), q('t5'), q('s8'), q('hurricane'), q('ffu') + q('ffu-wall'), q('stir')]).toEqual([4, 16, 2, 2, 3, 4])
   })
   it('drops the BactiZapper (replaced by the ZVS induction sterilizer)', () => {
     expect(items.some((i) => i.id === 'bactizap')).toBe(false)
@@ -165,10 +176,44 @@ describe('8 Nov 2026 room list', () => {
       expect([c.breaker, c.wire]).toEqual(['40 A 2-POLE', '#8 CU'])
     }
   })
-  it('keeps the bagger and pump linked and both Fogels on the generator list', () => {
-    expect(LINKED.bag).toBe('pump')
-    expect(LINKED.pump).toBe('bag')
+  it('keeps the pump with the bagger and both Fogels on the generator list', () => {
+    expect(LINKED).toEqual({})
+    expect(allCircuits('2x4500').find((c) => c.id === 'bag')!.items.map((i) => i.id)).toEqual(['thor', 'pump'])
     expect(EMERG).toEqual(expect.arrayContaining(['f1', 'f2']))
+  })
+})
+
+describe('breaker box as wired (Joseph, 8 Nov 2026)', () => {
+  const cs = allCircuits('2x4500')
+  const items = cs.flatMap((c) => c.items)
+  const slot = (tag: string) => cs.filter((c) => c.tag === tag).map((c) => c.id)
+  // Standard split-phase panel: row = ceil(slot / 2); odd rows on L1, even rows on L2.
+  const legOf = (n: number) => (Math.ceil(n / 2) % 2 === 1 ? 'L1' : 'L2')
+  it('every 120 V slot sits on the leg its position gives', () => {
+    for (const c of cs.filter((x) => /^\d+$/.test(x.tag))) expect(c.leg, c.tag).toBe(legOf(Number(c.tag)))
+  })
+  it('every 2-pole load spans one L1 slot and one L2 slot', () => {
+    for (const c of cs.filter((x) => x.leg === 'B')) {
+      const [a, b] = c.tag.split('-').map(Number)
+      expect(new Set([legOf(a), legOf(b)])).toEqual(new Set(['L1', 'L2']))
+    }
+  })
+  it('matches the slot list', () => {
+    expect([slot('1'), slot('5'), slot('9'), slot('10'), slot('14'), slot('16'), slot('17'), slot('18'), slot('19'), slot('20')]).toEqual([
+      ['m1'], ['stir', 'zvs'], ['bag', 'ffuw'], ['m2'], ['x75'], ['f1'], ['m3'], ['f2'], ['m4'], ['o1'],
+    ])
+    expect([slot('21-23'), slot('22-24'), slot('25-27'), slot('26-28'), slot('29-31'), slot('30-32')]).toEqual([['c78'], ['c910'], ['c34'], ['c56'], ['c12'], ['c12b']])
+  })
+  it('shows the MegaChef imbalance: three on L1, one on L2', () => {
+    const legs = ['m1', 'm2', 'm3', 'm4'].map((id) => cs.find((c) => c.id === id)!.leg)
+    expect(legs).toEqual(['L1', 'L1', 'L1', 'L2'])
+  })
+  it('flags uneven legs on a MegaChef batch but not on the baseline', () => {
+    const cfgU = { heater: '2x4500' as const, source: 'utility' as const, fuel: 'propane' as const, genW: 11400, overrides: {} }
+    const ids = (key: string) => new Set(scenarioIds(SCENARIOS.find((s) => s.key === key)!, '2x4500'))
+    const run = (on: Set<string>) => warnings(on, cfgU, compute(on, cfgU), peakState(new Date('2026-11-05T21:00:00Z'))).map((w) => w.id)
+    expect(run(ids('base'))).not.toContain('imbalance')
+    expect(run(ids('mega'))).toContain('imbalance')
   })
   it('keeps nothing marked as a room guess', () => {
     expect(items.filter((i) => i.roomGuess)).toEqual([])
@@ -205,9 +250,9 @@ describe('operating rules', () => {
   })
   it('estimated wattage overrides change the load', () => {
     const on = ids('base')
-    // Both 36k units at their 24 A peak (5,760 W) instead of 3,600 W: +18 A per leg.
+    // Both 36k units at their 24 A peak (5,760 W) instead of 3,600 W: +18 A per leg (L1 baseline 56.2).
     const r = compute(on, { ...cfg('utility'), overrides: { lennox36a: 5760, lennox36b: 5760 } })
-    expect(r.l1 - 58.9).toBeGreaterThan(17.9)
-    expect(r.l1 - 58.9).toBeLessThan(18.1)
+    expect(r.l1 - 56.2).toBeGreaterThan(17.9)
+    expect(r.l1 - 56.2).toBeLessThan(18.1)
   })
 })

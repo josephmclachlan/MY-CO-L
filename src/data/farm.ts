@@ -22,7 +22,7 @@ export const SELF_TEST: [string, string][] = [
   ['MAINS 120/240V 60HZ SPLIT PHASE', 'OK'],
   ['ICE SERVICE 125A / MAIN 200A', 'OK'],
   ['FEEDER 3/0 AL 115M', 'OK'],
-  ['SUBPANEL S1-S21 60A 2P', '21 CKT'],
+  ['BOX EATON CH 225A MLO', '32 SLOTS'],
   ['BASELINE L1 58.9A  L2 58.0A', '47%'],
   ['HVAC 2x36K + 2x12K INVERTER', 'NOMINAL'],
   ['HEPA FFU x3', 'NOMINAL'],
