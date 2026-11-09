@@ -29,6 +29,9 @@ export const YIELD_LB: Record<string, { lb: number; guess?: boolean; note: strin
   'pink-oyster': { lb: 1.44, note: 'CATAWBA RECORDS' },
   chestnut: { lb: 1.41, note: 'CATAWBA RECORDS' },
   pioppino: { lb: 0.86, note: 'CATAWBA RECORDS' },
+  'black-pearl': { lb: 1.15, note: 'CATAWBA RECORDS' },
+  'king-oyster': { lb: 0.86, note: 'CATAWBA RECORDS' },
+  maitake: { lb: 0.67, note: 'CATAWBA RECORDS' },
 }
 
 /** Days a block sits in the rooms, knock to last pick. Knock to first harvest is from the farm facts;
@@ -42,6 +45,9 @@ export const ROOM_DAYS: Record<string, { first: number; pick: number }> = {
   'pink-oyster': { first: 18, pick: 7 },
   chestnut: { first: 65, pick: 7 },
   pioppino: { first: 34, pick: 7 },
+  'black-pearl': { first: 32, pick: 7 },
+  'king-oyster': { first: 36, pick: 7 },
+  maitake: { first: 59, pick: 7 },
 }
 export const ROOM_DAYS_OTHER = { first: 30, pick: 14 } // GUESS for species with no figure
 export const roomDays = (key: string) => {

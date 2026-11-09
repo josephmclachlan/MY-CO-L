@@ -336,12 +336,12 @@ describe('energy and peaks', () => {
     expect(p.hits[0].label).toBe('10:00-12:30')
     expect(p.hits[0].kwh).toBeCloseTo(9 * 2.5, 6) // come-up runs to 13:30, so the whole 2.5 h window is at full 9 kW
   })
-  it('a MegaChef batch of 4 draws 4.8 kW', () => {
+  it('a MegaChef batch of 4 draws 6.4 kW', () => {
     const r = run({ kind: 'megachef', pots: 4, come_up_minutes: 11, cook_minutes: 14, ended_at: null })
     const a = analyseRun(r, [])
     const e = energyFor(r, a)
-    expect(e.watts).toBe(4800)
-    expect(e.kwh).toBeCloseTo(4.8 * (25 / 60), 4)
+    expect(e.watts).toBe(6400)
+    expect(e.kwh).toBeCloseTo(6.4 * (25 / 60), 4)
   })
 })
 

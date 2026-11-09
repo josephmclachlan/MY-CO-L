@@ -1,7 +1,7 @@
 // STANDING ORDERS and HARVEST FORECAST (build G5). Pure functions: no React, no store. Screens hand in rows.
 //
 // Rules from Joseph (6 Nov 2026): every buyer pays cash on delivery (no credit terms, so there is no terms field);
-// one buyer should not be more than 30% of the week's orders (30% is unconfirmed, a setting); money is kept in
+// one buyer should not be more than 30% of the week's orders (Joseph confirmed 30%, 6 Nov 2026; a setting); money is kept in
 // colones and US$ is shown at the day's own rate; the spare-block buffer is kept back from what is promised.
 //
 // Where the forecast numbers come from (shown on screen):
