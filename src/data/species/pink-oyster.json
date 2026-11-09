@@ -86,16 +86,35 @@
    ]
   }
  ],
- "fruitC": null,
+ "fruitC": {
+  "range": [
+   [
+    13,
+    18
+   ]
+  ]
+ },
  "climate": [
   {
    "k": "Incubation temp",
-   "f": "nodata"
+   "v": "Same as the other oysters: about 19 °C (66 °F) for blocks, about 18 °C (65 °F) for grain. Catawba incubates every species at about 18 °C (65 °F).",
+   "f": "ctx",
+   "s": [
+    "F18-0090"
+   ],
+   "n": "Joseph, 9 Nov 2026: use the same figures as the other oysters unless Catawba has data."
   },
   {
    "k": "Fruiting temp",
-   "f": "nodata",
-   "n": "Pink, golden and phoenix temperatures are not in the sources."
+   "v": "Same as the other oysters: 13-18 °C (55-65 °F). Catawba fruits it in rooms at 14-17 °C (58-62 °F).",
+   "f": "ctx",
+   "s": [
+    "F18-0094"
+   ],
+   "w": [
+    "01-fruit-room-design 0:14:18"
+   ],
+   "n": "Joseph, 9 Nov 2026: use the same figures as the other oysters unless Catawba has data."
   },
   {
    "k": "Fruiting RH",
@@ -103,11 +122,24 @@
   },
   {
    "k": "CO2",
-   "f": "nodata"
+   "v": "Same as the other oysters: keep low. High CO2 gives long stems with no caps.",
+   "f": "ctx",
+   "s": [
+    "F18-0096"
+   ],
+   "w": [
+    "01-fruit-room-design 0:41:08"
+   ],
+   "n": "Joseph, 9 Nov 2026: use the same figures as the other oysters unless Catawba has data."
   },
   {
    "k": "Light",
-   "f": "nodata"
+   "v": "Same as the other oysters: none needed in incubation.",
+   "f": "ctx",
+   "s": [
+    "F18-0097"
+   ],
+   "n": "Joseph, 9 Nov 2026: use the same figures as the other oysters unless Catawba has data."
   }
  ],
  "yield_": [

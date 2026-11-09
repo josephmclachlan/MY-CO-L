@@ -1,7 +1,15 @@
 // Mock trials and unit tests for G5 (standing orders, harvest forecast, pick list, WhatsApp text).
 // Joseph's rule (6 Nov 2026): realistic farm data end to end, outputs checked against hand-worked numbers, every write
 // in the edit history, old records surviving price changes / reloads / backup, then stress (orders.stress.test.ts).
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+// The hand-worked forecasts below were worked out with picking windows of 7 days (21 for lion's mane).
+// They test the arithmetic, so they keep those windows; the real Catawba windows are checked in their own test.
+vi.mock('../data/ledger', async (importOriginal) => {
+  const real = await importOriginal<typeof import('../data/ledger')>()
+  const ROOM_DAYS = Object.fromEntries(Object.entries(real.ROOM_DAYS).map(([k, v]) => [k, { ...v, pick: k === 'lions-mane' ? 21 : 7 }]))
+  return { ...real, ROOM_DAYS, ROOM_DAYS_OTHER: { first: 30, pick: 14 } }
+})
 import { EDIT_LOG, MemoryBackend, Store, type Row } from './store'
 import type { EditEntry } from './history'
 import type { BlockLot } from './xeno'
@@ -694,5 +702,16 @@ describe('data kept in the backup list', () => {
     const json = JSON.parse(await st.exportJson()) as { tables: Record<string, Row[]> }
     expect(Object.keys(json.tables)).toEqual(expect.arrayContaining(['standing_orders', 'order_weeks']))
     expect(json.tables.order_weeks[0].id).toBe(`${a.id}:2026-11-09`)
+  })
+})
+
+describe("Catawba's picking windows (Joseph, 9 Nov 2026: Catawba is the baseline)", () => {
+  it('the real data uses the 90th percentile first-to-last pick from the 2026 harvest log', async () => {
+    const real = await vi.importActual<typeof import('../data/ledger')>('../data/ledger')
+    expect(real.ROOM_DAYS['blue-oyster']).toEqual({ first: 23, pick: 3 })
+    expect(real.ROOM_DAYS['lions-mane']).toEqual({ first: 24, pick: 4 })
+    expect(real.ROOM_DAYS['comb-tooth']).toEqual({ first: 31, pick: 3 })
+    expect(real.ROOM_DAYS['golden-oyster']).toEqual({ first: 26.5, pick: 6 })
+    expect(real.ROOM_DAYS_OTHER.pick).toBe(5)
   })
 })

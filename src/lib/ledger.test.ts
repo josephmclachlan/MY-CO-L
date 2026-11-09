@@ -62,7 +62,8 @@ describe('ledger', () => {
   it('room energy with a real bill is the bill less cook runs, shared by bag-days', () => {
     const cook = { id: 'c1', kind: 'steam_box', started_at: '2026-11-02T14:00:00Z', cost_crc: 1000 } as unknown as CookRun
     const bills = [{ id: 'e1', month: '2026-11-01', kwh: 4000, billed_kw: 12, total_crc: 300000, notes: null }]
-    const l = buildLedger(empty([lot({ id: 'a' }), lot({ id: 'b', knock_date: '2026-11-10' })], { bills, cooks: [cook] }))
+    // Knocked 6 and 10 Nov: with Catawba's blue room days (23 + 3) both lots run into December.
+    const l = buildLedger(empty([lot({ id: 'a', knock_date: '2026-11-06' }), lot({ id: 'b', knock_date: '2026-11-10' })], { bills, cooks: [cook] }))
     const nov = l.months.find((m) => m.month === '2026-11')!
     expect(nov.billBasis).toBe('ACTUAL')
     expect(nov.room).toBeCloseTo(300000 - 1160)

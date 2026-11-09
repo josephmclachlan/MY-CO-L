@@ -7,7 +7,7 @@
 // Where the forecast numbers come from (shown on screen):
 //  - kg per block and days from knock to first pick: the farm's own finished lots once there are 3 or more of that
 //    species (OWN), else Catawba's real picks (CATAWBA).
-//  - days of picking after the first pick: LEDGER's picking days (7 for most, 21 for lion's mane), a GUESS.
+//  - days of picking after the first pick: LEDGER's picking days, from Catawba's harvest log (a GUESS only for species it lacks).
 //  - kg still to come = expected kg of the lot minus what was already picked, spread evenly over the pick window.
 
 import type { Row } from './store'
@@ -207,7 +207,7 @@ export interface Figures {
   firstDays: number
   pickDays: number
   src: 'OWN' | 'CATAWBA' | 'NONE'
-  /** The picking days are a guess either way. */
+  /** True when the species has no Catawba picking days (the fallback is used). */
   pickGuess: boolean
 }
 
@@ -225,7 +225,7 @@ export function figuresFor(species: string, finished: LotRecord[]): Figures {
       firstDays: Math.round(first ?? ex.firstDays ?? ROOM_DAYS_OTHER.first),
       pickDays,
       src: 'OWN',
-      pickGuess: true,
+      pickGuess: !known,
     }
   }
   return {
@@ -233,7 +233,7 @@ export function figuresFor(species: string, finished: LotRecord[]): Figures {
     firstDays: Math.round(ex.firstDays ?? (known ?? ROOM_DAYS_OTHER).first),
     pickDays,
     src: ex.kgPerBlock === null ? 'NONE' : 'CATAWBA',
-    pickGuess: true,
+    pickGuess: !known,
   }
 }
 
