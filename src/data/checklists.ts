@@ -88,7 +88,7 @@ export const CHECKLISTS: CheckTemplate[] = [
       { id: 'log', text: 'Press POWER WENT OUT in the POWER CUTS log so the start time is recorded.', why: 'The log works out the hours without power from this time.' },
       { id: 'stop', text: 'Switch the heavy loads off at the panel: steam heater, MegaChefs, 75X, packing air conditioners.' },
       { id: 'gen', text: 'Generator started outside, away from doors and intakes. Interlock moved over. Log GENERATOR STARTED.', why: 'Never run it inside or near an air intake.' },
-      { id: 'list', text: 'Only the emergency circuits are on: fruiting fans and fogger, culture fridge, both Fogel reach-ins outside the fruiting back door, packing intake, incubation air. No heater and AC together.' },
+      { id: 'list', text: 'Only the emergency breakers are on (3, 4, 7, 9, 11, 12, 15, 16, 18): lab HEPA units, fruiting fans and fogger, culture fridge, both Fogel reach-ins outside the fruiting back door, packing intake, incubation air. No heater and AC together.' },
       { id: 'doors', text: 'Fridge doors kept shut, the chest fridge and both Fogels. Fruiting and incubation doors kept shut to hold temperature.' },
       { id: 'temps', text: 'Room temperatures written down at the start and every hour.' },
       { id: 'fuel', text: 'Fuel checked every 2 hours. Refuel only with the generator stopped and cool.' },

@@ -156,7 +156,7 @@ export const MAIN: Circuit[] = [
     it('led-pack', 'Sylvania 705 ECO-48 2x18 W LED fixture', 2, 72, 'packing', false),
     it('led-lab', 'Sylvania 705 ECO-48 2x18 W LED fixture', 2, 72, 'lab', false),
   ]),
-  b('s4', '3', 'L2', 'base', false, '2 CRI HEPA FAN FILTER UNITS (BACK-LEFT TABLE)', 'LAB FFU x2', '208 W each, a 2x4 FFU class figure. Read the CRI label.' + SIZE_NOTE, [it('ffu', 'CRI 2x4 HEPA fan filter unit', 2, 416, 'lab')]),
+  b('s4', '3', 'L2', 'base', true, '2 CRI HEPA FAN FILTER UNITS (BACK-LEFT TABLE)', 'LAB FFU x2', '208 W each, a 2x4 FFU class figure. Read the CRI label.' + SIZE_NOTE, [it('ffu', 'CRI 2x4 HEPA fan filter unit', 2, 416, 'lab')]),
   b('s6', '4', 'L2', 'base', true, 'LAB CHEST FRIDGE', 'CHEST FRIDGE', 'Small chest fridge, 150 W (est). Compressor: voltage protector with a delay.' + SIZE_NOTE, [it('chest', 'Small chest fridge (cultures)', 1, 150, 'lab')]),
   b('stir', '5', 'L1', 'base', false, 'LAB OUTLET: 4 STIR PLATES', 'STIR PLATES', 'Shares breaker 5 with the ZVS sterilizer. Stir plates (no heat) about 25 W each (est).' + SIZE_NOTE, [it('stir', 'Magnetic stir plate (no heat)', 4, 100, 'lab')]),
   b('zvs', '5', 'L1', 'int', false, 'LAB OUTLET: 12 V ZVS INDUCTION STERILIZER', 'ZVS STERILIZER', 'Shares breaker 5 with the stir plates. About 280 W from the wall (est). Bench use, seconds at a time.', [it('zvs', '12 V ZVS induction loop sterilizer + power supply', 1, 280, 'lab')]),
@@ -174,7 +174,7 @@ export const MAIN: Circuit[] = [
     it('thor', 'Thor bagger', 1, 600, 'packing'),
     it('pump', 'CrestWave fresh-water pump 7 GPM / 70 PSI', 1, 600, 'packing'),
   ]),
-  b('ffuw', '9', 'L1', 'base', false, 'CRI HEPA FAN FILTER UNIT IN THE LAB / PACKING WALL', 'WALL FFU', 'Shares breaker 9 with the bagger and pump. If the bagger trips breaker 9, this HEPA unit stops too.', [it('ffu-wall', 'CRI 2x4 HEPA fan filter unit (in the wall)', 1, 208, 'lab')]),
+  b('ffuw', '9', 'L1', 'base', true, 'CRI HEPA FAN FILTER UNIT IN THE LAB / PACKING WALL', 'WALL FFU', 'Shares breaker 9 with the bagger and pump. If the bagger trips breaker 9, this HEPA unit stops too.', [it('ffu-wall', 'CRI 2x4 HEPA fan filter unit (in the wall)', 1, 208, 'lab')]),
   b('m2', '10', 'L1', 'int', false, 'MEGACHEF 12 QT PRESSURE COOKER 2', 'MEGACHEF 2', 'Runs with the other three. Slot 10 is on L1, the same leg as MegaChefs 1 and 3.', [it('mega2', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)]),
   b('s9', '11', 'L2', 'base', true, 'INCUBATION FLOOR FANS (4)', 'INCU FLOOR FANS', 'Rotating floor fans, 60 W each (est).' + SIZE_NOTE, [it('floorfan', 'Rotating floor fan', 4, 240, 'incubation')]),
   b('s2', '12', 'L2', 'base', true, 'FRUITING BACK FANS: 2 HURRICANE 8" + CO2 METER', 'HURRICANES + METER', 'Hurricane 198 W each, plugged into the fruiting CO2 meter (Joseph, 8 Nov 2026).' + SIZE_NOTE, [
@@ -249,8 +249,8 @@ export function allCircuits(opt: HeaterOption): Circuit[] {
 
 /** Continuous loads: every fan, light, fridge and FFU, and the four mini-splits. */
 export const BASE = ['s1', 's2', 's4', 's5', 's6', 's7', 's9', 'stir', 'lab4', 'ffuw', 'incs4', 'f1', 'f2', 'c34', 'c56', 'c78', 'c910']
-/** Generator emergency list: breakers 4, 7 (fans, meters, Inkbird, fogger), 11, 12, 15, 16, 18. */
-export const EMERG = ['s1', 's2', 's6', 's9', 'incs4', 'f1', 'f2']
+/** Generator emergency list: breakers 3 and 9 (lab HEPA, Joseph 6 Nov 2026), 4, 7 (fans, meters, Inkbird, fogger), 11, 12, 15, 16, 18. */
+export const EMERG = ['s1', 's2', 's4', 'ffuw', 's6', 's9', 'incs4', 'f1', 'f2']
 export const MEGACHEFS = ['m1', 'm2', 'm3', 'm4']
 export const HEATER_IDS = ['c12', 'c12b']
 export const AC_IDS = ['c34', 'c56', 'c78', 'c910']

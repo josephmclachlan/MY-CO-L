@@ -79,7 +79,15 @@ const r1 = (n: number) => {
   }
   return String(Number(n.toFixed(1)))
 }
-const pct0 = (n: number) => `${n.toFixed(0)}%`
+// Python's f"{x:.0f}" also rounds an exact tie to even (92.5 -> 92).
+const pct0 = (n: number) => {
+  const [, frac = ''] = Math.abs(n).toFixed(30).split('.')
+  if (/^50*$/.test(frac)) {
+    const down = Math.trunc(n)
+    return `${down % 2 === 0 ? down : down + Math.sign(n)}%`
+  }
+  return `${n.toFixed(0)}%`
+}
 
 describe('operating_scenarios.csv', () => {
   it('has 30 rows', () => {
@@ -134,7 +142,7 @@ describe('on-screen scenario presets', () => {
     check('bad', '2x4500', 130.5)
     check('all', '2x4500', 163.2)
     check('all', '6500', 152.8)
-    check('gmax', '6500', 63.9)
+    check('gmax', '6500', 67.4)
   })
 
   it('every circuit watt total matches the 8 Nov 2026 spec-sheet figures', () => {
@@ -179,7 +187,7 @@ describe('8 Nov 2026 room list', () => {
   it('keeps the pump with the bagger and both Fogels on the generator list', () => {
     expect(LINKED).toEqual({})
     expect(allCircuits('2x4500').find((c) => c.id === 'bag')!.items.map((i) => i.id)).toEqual(['thor', 'pump'])
-    expect(EMERG).toEqual(expect.arrayContaining(['f1', 'f2']))
+    expect(EMERG).toEqual(expect.arrayContaining(['f1', 'f2', 's4', 'ffuw'])) // lab HEPA on the generator (Joseph, 6 Nov 2026)
   })
 })
 
