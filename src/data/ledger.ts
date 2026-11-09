@@ -69,23 +69,21 @@ export const FORMS: { id: Form; label: string }[] = [
   { id: 'other', label: 'OTHER' },
 ]
 
-/** GUESS - REVIEW: grade names. */
-export const GRADES = ['A', 'B', 'SECONDS'] as const
+/** Grades (Joseph, 6 Nov 2026): A or SECONDS only. Old records graded B still show as B. */
+export const GRADES = ['A', 'SECONDS'] as const
 
 /** Species offered on the sale form: the crop plan first, then the rest that have a lot letter. */
 export const SALE_SPECIES = ['blue-oyster', 'lions-mane', 'comb-tooth', 'golden-oyster', 'phoenix-oyster', 'pink-oyster', 'black-pearl', 'king-oyster', 'chestnut', 'pioppino', 'shiitake', 'maitake', 'reishi', 'cordyceps']
 
-/** Fresh price per kg. Oysters ₡10,000-13,000 (Joseph). Lion's mane and coral +20% is a GUESS. Dried has no default. */
-export const OYSTER_PRICE: [number, number] = [10000, 13000]
-export const PREMIUM = 1.2
-export const PREMIUM_SPECIES = new Set(['lions-mane', 'comb-tooth'])
+/** Fresh price per kg for EVERY species: ₡13,000 (Joseph, 6 Nov 2026). Dried has no default. */
+export const FRESH_PRICE = 13000
 // The price used on the sale form: salePrice() in src/lib/rates.ts (your price, else this default).
 
 // ---------- the guesses, listed on screen ----------
 
 export const LEDGER_GUESSES = [
-  'LABOUR IS PART OF THE COST WHEN THE SWITCH IS ON (DEFAULT ON). THE HOURLY RATE STARTS BLANK, SO LABOUR SHOWS HOURS BUT ₡0 UNTIL YOU TYPE ONE.',
-  'EQUIPMENT WEAR IS OFF BY DEFAULT. TURN IT ON AND TYPE ₡ PER BLOCK.',
+  'LABOUR IS NOT PART OF THE COST (YOUR CALL, 6 NOV 2026). HOURS ARE STILL LOGGED FOR EFFICIENCY. THE SWITCH CAN TURN IT ON.',
+  'EQUIPMENT WEAR IS ON (YOUR CALL, 6 NOV 2026). IT COUNTS ₡0 UNTIL YOU TYPE ₡ PER BLOCK.',
   'ROOM ENERGY: THE BILL LESS THE COOK RUNS, SHARED BY BAG-DAYS IN THE ROOMS. A MONTH WITH NO BILL USES THE PACKAGE ESTIMATE SHARED OVER A FULL 130-BAG FARM.',
   'DAYS IN THE ROOMS = KNOCK TO FIRST HARVEST (FARM FACTS) PLUS 7 PICKING DAYS (21 FOR LION\'S MANE, TWO FLUSHES).',
   'CONSUMABLES AND COOK ENERGY OF A WEEK ARE SHARED EQUALLY PER BLOCK ACROSS THAT WEEK\'S LOTS (SPAWN IS NOT TRACKED BY SPECIES YET).',
@@ -93,7 +91,7 @@ export const LEDGER_GUESSES = [
 
 export const TRADE_GUESSES = [
   'CHANNELS: MARKET, RESTAURANT, SHOP, DIRECT, DELIVERY (PLUS OTHER).',
-  'DEFAULT FRESH PRICE: OYSTERS ₡11,500/KG (MIDDLE OF YOUR ₡10,000-13,000). LION\'S MANE AND CORAL +20% = ₡13,800/KG.',
-  'GRADES: A, B, SECONDS.',
+  'DEFAULT FRESH PRICE: ₡13,000/KG FOR EVERY MUSHROOM (YOUR PRICE, 6 NOV 2026).',
+  'GRADES: A OR SECONDS (YOUR CALL, 6 NOV 2026).',
   'DRIED HAS NO DEFAULT PRICE. TYPE THE ₡ AMOUNT.',
 ]

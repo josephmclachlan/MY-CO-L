@@ -87,7 +87,7 @@ describe('ledger', () => {
     const noRate = buildLedger(empty([lot({ id: 'a' })], { labour }))
     expect(noRate.weeks[0].all.hours).toBe(10)
     expect(noRate.weeks[0].all.parts.labour.crc).toBe(0)
-    const rate = buildLedger(empty([lot({ id: 'a' })], { labour, prefs: { ...DEFAULT_LEDGER_PREFS, rate: 2000 } }))
+    const rate = buildLedger(empty([lot({ id: 'a' })], { labour, prefs: { ...DEFAULT_LEDGER_PREFS, rate: 2000, labourOn: true } }))
     expect(rate.weeks[0].all.parts.labour.crc).toBe(20000)
     const off = buildLedger(empty([lot({ id: 'a' })], { labour, prefs: { ...DEFAULT_LEDGER_PREFS, rate: 2000, labourOn: false } }))
     expect(off.weeks[0].all.parts.labour.crc).toBe(0)
@@ -111,9 +111,10 @@ describe('ledger', () => {
 })
 
 describe('prices and costs', () => {
-  it('oysters ₡11,500, lion\'s mane +20%, no dried default', () => {
-    expect(salePrice('blue-oyster', 'fresh', DEFAULT_RATES)).toEqual({ price: 11500, mine: false })
-    expect(salePrice('lions-mane', 'fresh', DEFAULT_RATES).price).toBe(13800)
+  it('every mushroom ₡13,000 fresh (Joseph 6 Nov 2026), no dried default', () => {
+    expect(salePrice('blue-oyster', 'fresh', DEFAULT_RATES)).toEqual({ price: 13000, mine: false })
+    expect(salePrice('lions-mane', 'fresh', DEFAULT_RATES).price).toBe(13000)
+    expect(salePrice('shiitake', 'fresh', DEFAULT_RATES).price).toBe(13000)
     expect(salePrice('blue-oyster', 'dried', DEFAULT_RATES).price).toBeNull()
   })
   it('your price wins over the built-in one', () => {

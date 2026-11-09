@@ -53,8 +53,8 @@ export function parseLots(text: string): string[] {
   return out
 }
 
-/** A lot code looks like a species letter and a knock MMDD (B1020). */
-export const lotLooksRight = (code: string) => /^[A-Z]\d{4}$/.test(code)
+/** A lot code looks like species letters and a knock MMDD (B1020, CT1103, PK0915-2, B1020-S1). */
+export const lotLooksRight = (code: string) => /^[A-Z]{1,2}\d{4}(-S?\d+)?$/.test(code)
 
 /** Colones per dollar on a day. Each sale converts at its own day's rate. */
 export type Rate = (day: string) => number

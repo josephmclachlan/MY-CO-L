@@ -41,7 +41,7 @@ import { guideSectionFor } from './guide/content'
 import { GlovePad } from './components/GlovePad'
 import { useT } from './settings/useT'
 import { useRole } from './settings/RoleContext'
-import { ES_COMMANDS, LANG_NAME, tr, trf } from './lib/i18n'
+import { ES_COMMANDS, LANG_NAME, tr, trf, SPANISH_ON } from './lib/i18n'
 import { backupNag } from './lib/dataExport'
 import { search as runSearch, type Doc as SearchDoc } from './lib/search'
 import { useSearchIndex } from './store/useSearchIndex'
@@ -50,6 +50,7 @@ import { findHazard } from './lib/hazard'
 import { keyFromHash, type Strain } from './lib/xeno'
 import { cartFromHash } from './lib/scan'
 import { useStore, useStoreStatus, useTable } from './store/StoreContext'
+import { usePractice } from './store/usePractice'
 import { useRates } from './store/useRates'
 import { useFxSync } from './store/useFx'
 import { SPECIES } from './data/species'
@@ -188,6 +189,7 @@ export default function App() {
   const store = useStore()
   const strains = useTable<Strain>('strains')
   useFxSync() // today's colones per dollar, once a day when online
+  usePractice() // keeps the committed flush counts (FLUSH TEST) live for every screen's maths
   useRates() // keeps the prices and costs from PRICES + COSTS live for every screen's maths
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
@@ -640,6 +642,7 @@ export default function App() {
       return say(tr(lang, on ? 'GLOVE MODE ON: BIG BUTTONS AND THE NUMBER PAD' : 'GLOVE MODE OFF'))
     }
     if (['SPANISH', 'ES', 'ENGLISH', 'EN', 'LANG', 'LANGUAGE'].includes(cmd)) {
+      if (!SPANISH_ON) return say('THE APP IS ENGLISH ONLY FOR NOW. SPANISH IS SWITCHED OFF.')
       const next = cmd === 'SPANISH' || cmd === 'ES' || arg.startsWith('ES') || arg.startsWith('SPAN') ? 'ES' : cmd === 'ENGLISH' || cmd === 'EN' || arg.startsWith('EN') ? 'EN' : lang === 'ES' ? 'EN' : 'ES'
       update((x) => ({ ...x, lang: next }))
       return say(`${next === 'ES' ? 'IDIOMA' : 'LANGUAGE'} ${LANG_NAME[next]}`)

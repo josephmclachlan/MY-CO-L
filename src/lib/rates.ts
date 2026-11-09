@@ -2,7 +2,7 @@
 // Saved in the app_settings table (row id 'rates'), so phone and laptop agree once Supabase is linked.
 // Values left blank fall back to the defaults below, which name their source.
 
-import { OYSTER_PRICE, PREMIUM, PREMIUM_SPECIES, type Form } from '../data/ledger'
+import { FRESH_PRICE, type Form } from '../data/ledger'
 
 export interface IceRates {
   energyCrcPerKwh: number
@@ -40,22 +40,18 @@ export const DEFAULT_ICE: IceRates = {
 export const DEFAULT_RATES: Rates = {
   fx: 510,
   ice: DEFAULT_ICE,
-  labourOn: true,
+  labourOn: false, // Joseph 6 Nov 2026: labour not in costs, hours tracked for efficiency
   labourRate: null,
-  wearOn: false,
+  wearOn: true, // Joseph 6 Nov 2026: count equipment wear
   wearPerBlock: null,
   sale: {},
 }
 
 export const RATES_ID = 'rates'
 
-/** Built-in fresh price per kg (oysters ₡10,000-13,000 from Joseph, lion's mane and coral +20% GUESS). */
-export function builtInPrice(key: string, form: Form): number | null {
-  if (form !== 'fresh') return null
-  const prem = PREMIUM_SPECIES.has(key)
-  const oyster = key.endsWith('-oyster') || key === 'black-pearl'
-  if (!prem && !oyster) return null
-  return ((OYSTER_PRICE[0] + OYSTER_PRICE[1]) / 2) * (prem ? PREMIUM : 1)
+/** Built-in fresh price per kg: ₡13,000 for every mushroom (Joseph, 6 Nov 2026). */
+export function builtInPrice(_key: string, form: Form): number | null {
+  return form === 'fresh' ? FRESH_PRICE : null
 }
 
 const pos = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null)

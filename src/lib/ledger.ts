@@ -60,7 +60,7 @@ export interface LedgerPrefs {
   wearOn: boolean
   wearPerBlock: number | null
 }
-export const DEFAULT_LEDGER_PREFS: LedgerPrefs = { labourOn: true, rate: null, wearOn: false, wearPerBlock: null }
+export const DEFAULT_LEDGER_PREFS: LedgerPrefs = { labourOn: false, rate: null, wearOn: true, wearPerBlock: null }
 
 export type Basis = 'ACTUAL' | 'ESTIMATE' | 'MIXED' | 'NONE'
 export interface Part {

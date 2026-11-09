@@ -327,8 +327,8 @@ describe('maintenance and equipment register', () => {
     expect(b.map((x) => x.item.name)).toEqual(['A LATE', 'B OK'])
   })
   it('the standard schedule has 17 jobs, all with a name, an interval and unique names', () => {
-    expect(STANDARD_MAINT.length).toBe(17)
-    expect(new Set(STANDARD_MAINT.map((s) => s.name)).size).toBe(17)
+    expect(STANDARD_MAINT.length).toBe(22)
+    expect(new Set(STANDARD_MAINT.map((s) => s.name)).size).toBe(22)
     for (const s of STANDARD_MAINT) expect(s.days || s.hours).toBeTruthy()
   })
 })
@@ -339,7 +339,7 @@ describe('cleaning and checklists', () => {
     const rows = cleanDue([e('1', 'lab', '2026-11-03'), e('2', 'lab', '2026-11-04'), e('3', 'fruiting', '2026-10-25')], '2026-11-06')
     const by = (r: string) => rows.find((x) => x.room === r)!
     expect(by('lab')).toMatchObject({ dueOn: '2026-11-06', state: 'due' }) // 4 Nov + 2 days
-    expect(by('fruiting')).toMatchObject({ dueOn: '2026-11-01', left: -5, state: 'late' }) // 25 Oct + 7
+    expect(by('fruiting')).toMatchObject({ dueOn: '2026-10-26', left: -11, state: 'late' }) // 25 Oct + 1 (daily, approved 6 Nov 2026)
     expect(by('packing').state).toBe('never')
     expect(by('lab').last?.id).toBe('2')
   })
@@ -357,6 +357,12 @@ describe('cleaning and checklists', () => {
     const cook = CHECKLISTS.find((c) => c.key === 'cook')!
     expect(cook.steps.map((s) => s.text).join(' ')).toContain('93 C')
     expect(cook.steps.map((s) => s.text).join(' ')).toContain('4 hours')
+    // Approved 6 Nov 2026: unload within 3 h and cool in front of the lab HEPA; blow down; knock below 32 C, never above 38 C.
+    expect(cook.steps.map((s) => s.text).join(' ')).toMatch(/within 3 hours.*lab.*HEPA/)
+    expect(cook.steps.some((s) => s.id === 'blow')).toBe(true)
+    expect(CHECKLISTS.find((c) => c.key === 'knock')!.steps[0].text).toMatch(/below 32 C, never above 38 C/)
+    expect(CHECKLISTS.find((c) => c.key === 'power')!.steps.find((s) => s.id === 'list')!.text).toContain('lab HEPA units')
+    expect(CHECKLISTS.find((c) => c.key === 'fruit')?.every).toBe(7)
   })
   it('sign-off due dates', () => {
     const run = (day: string): ChecklistRun => ({ id: day, template: 'lab', done_on: day, finished_at: `${day}T20:00:00Z`, who: 'JM', items: [], note: null })
@@ -533,7 +539,7 @@ describe('mock trial: November on the farm', () => {
 
     // 8. Upkeep: add the schedule, do the generator oil with 5.75 h of logged running before it.
     const added = await act('SEED', () => seedMaint(st, '2026-11-01'))
-    expect(added).toBe(17)
+    expect(added).toBe(22)
     expect(await act('SEED AGAIN', () => seedMaint(st, '2026-11-01'))).toBe(0)
     const oil = st.rows<MaintItem>('maint_items').find((m) => m.name === 'GENERATOR OIL CHANGE')!
     near(maintStatus(oil, st.rows<PowerCut>('power_cuts'), '2026-11-30', end).hoursSince as number, 2.25 + 25 / 60)
@@ -549,7 +555,7 @@ describe('mock trial: November on the farm', () => {
     await act('DEL DONE', () => deleteMaintLog(st, newest.id))
     expect(st.rows<MaintItem>('maint_items').find((m) => m.id === oil.id)!.last_done_on).toBe('2026-11-10')
     await act('REMOVE', () => setMaintActive(st, oil.id, false))
-    expect(maintBoard(st.rows<MaintItem>('maint_items'), [], '2026-11-30', end).length).toBe(16)
+    expect(maintBoard(st.rows<MaintItem>('maint_items'), [], '2026-11-30', end).length).toBe(21)
     await act('NEW ITEM', () => saveMaint(st, null, { name: 'walk-in door seal', category: 'cold', room: 'packing', make: 'FOGEL', serial: 'F-123', installed: '2026-10-01', everyDays: 90, everyHours: null, startedOn: '2026-11-01', notes: null }))
     await expect(saveMaint(st, null, { name: 'WALK-IN DOOR SEAL', category: 'cold', room: null, make: null, serial: null, installed: null, everyDays: 90, everyHours: null, startedOn: '2026-11-01' })).rejects.toThrow(/ALREADY ON THE LIST/)
     await expect(saveMaint(st, null, { name: 'X', category: 'cold', room: null, make: null, serial: null, installed: null, everyDays: 0, everyHours: null, startedOn: '2026-11-01' })).rejects.toThrow(/WHOLE NUMBER/)

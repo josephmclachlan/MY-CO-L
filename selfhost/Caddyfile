@@ -65,6 +65,18 @@
 		respond "Not here." 404
 	}
 
+	# ---- the textbook (MANUAL screen) ----
+	# Never in the download. ./mycol.sh manual FILE copies it into ./manual on this computer. Only a logged-in
+	# user gets it: the login server checks the request's own login token first (401 otherwise).
+	handle /manual/* {
+		forward_auth auth:9999 {
+			uri /user
+		}
+		header Cache-Control "private, no-store"
+		root * /srv
+		file_server
+	}
+
 	# ---- the app itself ----
 	handle {
 		root * /srv/app

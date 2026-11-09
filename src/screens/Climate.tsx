@@ -175,7 +175,7 @@ function PlaceCard({ p, d, onOpen }: { p: PlaceNow; d: SensorData; onOpen: () =>
 function NowTab({ d, set, say }: { d: SensorData; set: SetAt; say: Say }) {
   const { sound } = useApp()
   const live = d.alarms.filter((a) => !a.acked)
-  const shown = d.board.filter((p) => p.last !== null || PLACES.find((x) => x.id === p.place)!.room !== 'outside' && p.place !== 'boiling')
+  const shown = d.board.filter((p) => p.last !== null || p.place !== 'outside' && p.place !== 'boiling')
   return (
     <div className="lg-stack">
       {live.length > 0 && (

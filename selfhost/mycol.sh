@@ -13,6 +13,7 @@
 #   restore FILE        puts a backup back (asks first; makes a safety backup before)
 #   restore-test        checks the newest backup really restores, without touching live data
 #   update [FILE]       gets the newest app from GitHub (or from FILE), backs up, swaps it in
+#   manual FILE         puts the textbook (manual.json) on this box for the MANUAL screen (logged-in users only)
 #   sql                 opens the database prompt (for STAFF screen SQL)
 #   install-timers      nightly backup 02:30 and a weekly restore check (Sunday 04:00), farm clock
 #   logs [NAME]         shows recent messages (db, auth, rest, web, ollama, bridge)
@@ -107,6 +108,7 @@ wait_web() {
 cmd_start() {
   load_env
   [ -f app/index.html ] || die "No app files yet. Run ./mycol.sh update first (or unpack the app download into ./app)."
+  mkdir -p manual
   dc up -d --remove-orphans
   wait_web
   local users; users=$(psql_q -tAc "select count(*) from auth.users" 2>/dev/null || echo 0)
@@ -266,6 +268,16 @@ cmd_update() {
   if [ -n "$(docker compose ps -q db 2>/dev/null)" ]; then dc up -d --remove-orphans; cmd_migrate; fi
 }
 
+cmd_manual() {
+  [ -n "${1:-}" ] || die "Say which file: ./mycol.sh manual manual.json (it is in the project files, farm-box folder)."
+  [ -f "$1" ] || die "No file $1"
+  grep -q '"chapters":\[{' "$1" || die "$1 does not look like the textbook file (manual.json). Nothing changed."
+  mkdir -p manual
+  cp "$1" manual/manual.json.new && mv -f manual/manual.json.new manual/manual.json
+  chmod 644 manual/manual.json
+  say "Textbook in place ($(du -h manual/manual.json | cut -f1)). Open MANUAL in the app; it asks you to log in first."
+}
+
 cmd_install_timers() {
   local me; me="$HERE/mycol.sh"
   ( crontab -l 2>/dev/null | grep -v 'mycol.sh' || true
@@ -292,8 +304,9 @@ case "${1:-help}" in
   restore) shift; cmd_restore "$@" ;;
   restore-test) cmd_restore_test ;;
   update) shift; cmd_update "$@" ;;
+  manual) shift; cmd_manual "$@" ;;
   sql) cmd_sql ;;
   install-timers) cmd_install_timers ;;
   logs) shift; cmd_logs "$@" ;;
-  *) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//' ;;
 esac

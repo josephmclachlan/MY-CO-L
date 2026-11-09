@@ -115,7 +115,7 @@ export const BASICS: GSection[] = [
       {
         h: 'LANGUAGE',
         text: [
-          'Type SPANISH or ESPANOL for Spanish screens, ENGLISH to come back. This guide and the tips are in English. The Spanish screen text was written by Claude and should be read by a native speaker.',
+          'The app is English only for now. Spanish screens are switched off and can be turned back on later.',
         ],
       },
     ],
@@ -149,7 +149,7 @@ export const BASICS: GSection[] = [
           ['UNDO, HISTORY, SYNC', 'Undo, the change history, the saving status.'],
           ['BACKUP, EXPORT, RESTORE', 'Data safety.'],
           ['ASK words', 'Ask the farm assistant. Anything ending in ? also goes to it.'],
-          ['GLOVE, SPANISH, ENGLISH', 'Glove mode and screen language.'],
+          ['GLOVE', 'Glove mode: big buttons and a number pad.'],
           ['THEME name, CLEAN, MUTE', 'Look and sound.'],
         ],
       },
@@ -261,7 +261,7 @@ export const BASICS: GSection[] = [
         items: [
           ['LOOK', 'Theme colour, glass strength (curve, grain, scanlines, glow), CLEAN mode for sunlight.'],
           ['SOUND', 'Sound on or off, the typing sound, chatter or tick mode, volume. TEST buttons play each sound so you can hear it. Sound only plays when something appears on screen.'],
-          ['LANGUAGE AND GLOVES', 'English or Spanish, and glove mode.'],
+          ['LANGUAGE AND GLOVES', 'Glove mode (the language row is hidden while the app is English only).'],
           ['SYSTEM', 'Replay the boot, test the alarm.'],
         ],
       },

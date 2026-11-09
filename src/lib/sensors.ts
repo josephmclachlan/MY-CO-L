@@ -26,7 +26,7 @@ export const PLACES: Place[] = [
   { id: 'lab', label: 'LAB', long: 'LAB AIR', room: 'lab' },
   { id: 'fridge', label: 'CULTURE FRIDGE', long: 'CULTURE FRIDGE (LAB CHEST FRIDGE)', room: 'lab' },
   { id: 'packing', label: 'PACKING', long: 'PACKING / FRUITING SUPPLY PLENUM', room: 'packing' },
-  { id: 'coldroom', label: 'COLD ROOMS', long: 'COLD ROOMS (PACKING)', room: 'packing' },
+  { id: 'coldroom', label: 'COLD ROOMS', long: 'COLD ROOMS (OUTSIDE, BY THE FRUITING DOOR)', room: 'outside' },
   { id: 'incubation', label: 'INCUBATION', long: 'INCUBATION AIR', room: 'incubation' },
   { id: 'fruiting', label: 'FRUITING', long: 'FRUITING AIR', room: 'fruiting' },
   { id: 'boiling', label: 'BOILING ROOM', long: 'BOILING ROOM', room: 'boiling' },
@@ -58,17 +58,17 @@ export interface Band {
 export type PlaceBands = Partial<Record<Measure, Band>>
 
 /**
- * Alarm bands per place. The limits that are written in the farm's HVAC plan are used as they are
- * (fridge and cold rooms 1-4 C, incubation alarm at 21 C air, fruiting alarm at 19 C air, fruiting RH 80%).
- * The rest are working numbers: GUESS - REVIEW (listed in SENSOR_GUESSES).
+ * Alarm bands per place (Joseph, 6 Nov 2026): every growing room alarms below 13 C and above 20 C (68 F);
+ * CO2 ceilings packing 600, incubation 4,000, fruiting 1,000 ppm. Fridges and cold rooms 1-4 C (HVAC plan),
+ * fruiting RH 80-96%. Every band can be changed on SET POINTS.
  */
 export const DEFAULT_BANDS: Record<PlaceId, PlaceBands> = {
-  lab: { temp: { lo: 16, hi: 21 } },
+  lab: { temp: { lo: 13, hi: 20 } },
   fridge: { temp: { lo: 1, hi: 4 } },
-  packing: { temp: { lo: 10, hi: 16 }, co2: { lo: null, hi: 600 } },
+  packing: { temp: { lo: 13, hi: 20 }, co2: { lo: null, hi: 600 } },
   coldroom: { temp: { lo: 1, hi: 4 } },
-  incubation: { temp: { lo: 15, hi: 21 }, co2: { lo: null, hi: 4000 } },
-  fruiting: { temp: { lo: 13, hi: 19 }, rh: { lo: 80, hi: 96 }, co2: { lo: null, hi: 1200 } },
+  incubation: { temp: { lo: 13, hi: 20 }, co2: { lo: null, hi: 4000 } },
+  fruiting: { temp: { lo: 13, hi: 20 }, rh: { lo: 80, hi: 96 }, co2: { lo: null, hi: 1000 } },
   boiling: {},
   outside: {},
 }
@@ -102,7 +102,7 @@ export interface SensorSettings {
 
 export const DEFAULT_SENSOR_SETTINGS: SensorSettings = {
   bands: {},
-  delayMin: { lab: 15, fridge: 30, packing: 15, coldroom: 30, incubation: 20, fruiting: 15, boiling: 15, outside: 15 },
+  delayMin: { lab: 10, fridge: 10, packing: 10, coldroom: 10, incubation: 10, fruiting: 10, boiling: 10, outside: 10 }, // Joseph 6 Nov 2026: wait 10 minutes
   silentMin: 30,
   staleHours: 12,
   acks: {},
@@ -1018,8 +1018,8 @@ export function climateLine(list: Alarm[], placesWithData: number): { label: str
 }
 
 export const SENSOR_GUESSES = [
-  'Alarm bands. Taken from the farm\'s HVAC plan as written: culture fridge and cold rooms 1-4 C, incubation alarm at 21 C air, fruiting alarm at 19 C air, fruiting RH floor 80%. Working numbers (not in Joseph\'s files): lab 16-21 C, packing plenum 10-16 C, incubation floor 15 C, fruiting floor 13 C, fruiting RH ceiling 96%, CO2 ceilings packing 600, incubation 4,000, fruiting 1,200 ppm (the exhaust fans should hold 450, 3,000 and 900). Change them on SET POINTS.',
-  'Alarm delay: a place must stay outside its band for 15 minutes (fridge and cold rooms 30, incubation 20) before it alarms, so a door opening does not ring. A reading typed by hand alarms at once: it is a spot check.',
+  'Alarm bands (your call, 6 Nov 2026): lab, packing, incubation and fruiting alarm below 13 C and above 20 C (68 F). CO2 ceilings packing 600, incubation 4,000, fruiting 1,000 ppm. Fridges and cold rooms 1-4 C and fruiting RH 80-96% are from the HVAC plan. Change any of them on SET POINTS.',
+  'Alarm delay (your call, 6 Nov 2026): a place must stay outside its band for 10 minutes before it alarms, so a door opening does not ring. A reading typed by hand alarms at once: it is a spot check.',
   'Readings older than 12 hours are shown with their age but do not raise an alarm. An automatic sensor that sends nothing for 30 minutes is SILENT. If every automatic sensor goes silent at once, the alarm says power or internet may be down.',
   'The Govee cloud reports temperature in Fahrenheit (its own sample reads 79.52 next to 61.2% RH). The app turns it into Celsius. If the first real readings look wrong, switch the unit on FEEDS.',
   'Govee CSV dates: 03/04/2026 is read month first (as the Govee app writes), unless the file shows a day over 12 first. Times are taken as the farm clock.',
