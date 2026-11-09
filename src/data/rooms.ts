@@ -1,9 +1,10 @@
 // Rooms for the DECK PLAN. Layout from Joseph's room list of 8 Nov 2026:
 // the lab + packing container runs north-south (lab north, packing south); the
-// cook room is a 20 ft standard container right against the lab end of it; the
-// two insulated 40 ft containers are stacked off the packing end, incubation
-// the LOWER one and fruiting the UPPER one. The plan draws the upper container
-// lifted up and to the right (dashed corner lines) so both levels show.
+// cook room is a 20 ft standard container (6.06 x 2.44 m) with its long side
+// against the lab/packing container and its south end against incubation, as
+// Joseph drew it on 9 Nov 2026. The two insulated 40 ft containers run east
+// off packing; they are stacked (incubation LOWER, fruiting UPPER), and the plan
+// draws fruiting beside incubation, as Joseph's own plan does, so both show.
 // Scale: 46 plan units per metre (40 ft = 12.19 m = 560, 20 ft = 6.06 m = 279,
 // container width 2.44 m = 112). Set points come from the HVAC plan and farm notes.
 
@@ -77,10 +78,10 @@ export const ROOMS: Room[] = [
     id: 'boiling',
     name: 'COOK ROOM',
     short: 'COOK',
-    alt: '20 FT STANDARD CONTAINER, AGAINST THE LAB END',
+    alt: '20 FT STANDARD CONTAINER (6.06 X 2.44 M), AGAINST THE LAB, SOUTH END ON INCUBATION',
     nameGuess: false,
-    rect: { x: 172, y: 40, w: 112, h: 279 },
-    label: { x: 228, y: 282 },
+    rect: { x: 172, y: 97, w: 112, h: 279 },
+    label: { x: 228, y: 339 },
     setPoints: [
       { label: 'STEAM CORE', value: '93 C' },
       { label: 'HOLD', value: '4 H ONCE THE COLDEST CORE PASSES 93 C' },
@@ -96,8 +97,8 @@ export const ROOMS: Room[] = [
     short: 'INCU',
     alt: 'LOWER 40 FT INSULATED CONTAINER',
     nameGuess: false,
-    rect: { x: 172, y: 488, w: 560, h: 112 },
-    label: { x: 210, y: 548 },
+    rect: { x: 172, y: 376, w: 560, h: 112 },
+    label: { x: 210, y: 436 },
     setPoints: [
       { label: 'AIR', value: '~18 C' },
       { label: 'BLOCK CORES', value: 'AT OR BELOW 21-22 C' },
@@ -117,8 +118,8 @@ export const ROOMS: Room[] = [
     short: 'FRUIT',
     alt: 'UPPER 40 FT INSULATED CONTAINER, ON TOP OF INCUBATION',
     nameGuess: false,
-    rect: { x: 212, y: 350, w: 560, h: 112 },
-    label: { x: 708, y: 404 },
+    rect: { x: 172, y: 488, w: 560, h: 112 },
+    label: { x: 640, y: 518 },
     setPoints: [
       { label: 'AIR', value: '16 C (14-17, MAX 18)' },
       { label: 'RH', value: '80-90%' },
@@ -138,11 +139,11 @@ export const ROOMS: Room[] = [
     short: 'OUT',
     alt: 'OUTDOORS UNDER A ROOF, AGAINST THE FRUITING LONG WALL, LEFT OF THE BACK DOOR',
     nameGuess: false,
-    rect: { x: 380, y: 298, w: 346, h: 52 },
-    label: { x: 436, y: 328 },
+    rect: { x: 340, y: 600, w: 346, h: 52 },
+    label: { x: 396, y: 630 },
     setPoints: [
       { label: 'FOGEL REACH-INS', value: '2 X COMMERCIAL 3-DOOR, 1-4 C' },
-      { label: 'WHERE', value: 'LEFT OF THE FRUITING BACK DOOR, ~1 M FROM THE BACK END' },
+      { label: 'WHERE', value: 'LEFT OF THE FRUITING BACK DOOR (OUTER LONG WALL), ~1 M FROM THE BACK END' },
       { label: 'POWER', value: 'LEFT ON BREAKER 16, RIGHT ON 18. BOTH ON THE GENERATOR LIST' },
       { label: 'WEATHER', value: 'KEEP THE ROOF OVER THEM AND THE PLUGS DRY' },
     ],

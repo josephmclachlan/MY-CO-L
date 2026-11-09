@@ -15,7 +15,7 @@ import { BreakerBox, fmtW } from './Vitals'
 // for the container layout and scale).
 type Glyph = { item: string; kind: 'box' | 'disc' | 'fan' | 'ac' | 'light' | 'meter'; x: number; y: number; w?: number; h?: number; r?: number }
 
-const T5_ROW = (y: number): Glyph[] => Array.from({ length: 8 }, (_, i) => ({ item: 't5', kind: 'light' as const, x: 290 + i * 46, y, w: 36, h: 3 }))
+const T5_ROW = (y: number): Glyph[] => Array.from({ length: 8 }, (_, i) => ({ item: 't5', kind: 'light' as const, x: 250 + i * 46, y, w: 36, h: 3 }))
 
 const GLYPHS: Glyph[] = [
   // lab: two FFUs on the back-left table, one in the wall to packing
@@ -43,38 +43,38 @@ const GLYPHS: Glyph[] = [
   { item: 'co2-pack', kind: 'meter', x: 150, y: 560, w: 8, h: 8 },
   { item: 's10', kind: 'fan', x: 150, y: 586, r: 10 },
   // cook room: boiler with two elements, steam box cart, four MegaChefs
-  { item: 'heat-c12', kind: 'box', x: 180, y: 58, w: 44, h: 30 },
-  { item: 'heat-c12b', kind: 'box', x: 180, y: 92, w: 44, h: 30 },
-  { item: 'mega1', kind: 'disc', x: 199, y: 200, r: 13 },
-  { item: 'mega2', kind: 'disc', x: 233, y: 200, r: 13 },
-  { item: 'mega3', kind: 'disc', x: 199, y: 234, r: 13 },
-  { item: 'mega4', kind: 'disc', x: 233, y: 234, r: 13 },
+  { item: 'heat-c12', kind: 'box', x: 180, y: 115, w: 44, h: 30 },
+  { item: 'heat-c12b', kind: 'box', x: 180, y: 149, w: 44, h: 30 },
+  { item: 'mega1', kind: 'disc', x: 199, y: 257, r: 13 },
+  { item: 'mega2', kind: 'disc', x: 233, y: 257, r: 13 },
+  { item: 'mega3', kind: 'disc', x: 199, y: 291, r: 13 },
+  { item: 'mega4', kind: 'disc', x: 233, y: 291, r: 13 },
   // incubation (lower container)
-  { item: 'lennox12a', kind: 'ac', x: 330, y: 492, w: 50, h: 14 },
-  { item: 'lennox12b', kind: 'ac', x: 560, y: 492, w: 50, h: 14 },
-  { item: 'co2-inc', kind: 'meter', x: 186, y: 498, w: 8, h: 8 },
-  { item: 's4-inc', kind: 'fan', x: 720, y: 506, r: 8 },
-  { item: 'led-inc', kind: 'light', x: 300, y: 540, w: 40, h: 5 },
-  { item: 'led-inc', kind: 'light', x: 450, y: 540, w: 40, h: 5 },
-  { item: 'led-inc', kind: 'light', x: 600, y: 540, w: 40, h: 5 },
-  { item: 'floorfan', kind: 'fan', x: 236, y: 588, r: 9 },
-  { item: 'floorfan', kind: 'fan', x: 400, y: 588, r: 9 },
-  { item: 'floorfan', kind: 'fan', x: 560, y: 588, r: 9 },
-  { item: 'floorfan', kind: 'fan', x: 716, y: 588, r: 9 },
+  { item: 'lennox12a', kind: 'ac', x: 330, y: 380, w: 50, h: 14 },
+  { item: 'lennox12b', kind: 'ac', x: 560, y: 380, w: 50, h: 14 },
+  { item: 'co2-inc', kind: 'meter', x: 186, y: 386, w: 8, h: 8 },
+  { item: 's4-inc', kind: 'fan', x: 720, y: 394, r: 8 },
+  { item: 'led-inc', kind: 'light', x: 300, y: 428, w: 40, h: 5 },
+  { item: 'led-inc', kind: 'light', x: 450, y: 428, w: 40, h: 5 },
+  { item: 'led-inc', kind: 'light', x: 600, y: 428, w: 40, h: 5 },
+  { item: 'floorfan', kind: 'fan', x: 236, y: 476, r: 9 },
+  { item: 'floorfan', kind: 'fan', x: 400, y: 476, r: 9 },
+  { item: 'floorfan', kind: 'fan', x: 560, y: 476, r: 9 },
+  { item: 'floorfan', kind: 'fan', x: 716, y: 476, r: 9 },
   // fruiting (upper container)
-  { item: 'co2-fruit', kind: 'meter', x: 250, y: 356, w: 8, h: 8 },
-  { item: 's8', kind: 'fan', x: 228, y: 376, r: 9 },
-  { item: 's8', kind: 'fan', x: 228, y: 438, r: 9 },
-  { item: 'tac', kind: 'box', x: 246, y: 396, w: 22, h: 20 },
-  { item: 'inkbird', kind: 'meter', x: 744, y: 354, w: 8, h: 8 },
-  { item: 'hurricane', kind: 'fan', x: 757, y: 376, r: 10 },
-  { item: 'hurricane', kind: 'fan', x: 757, y: 438, r: 10 },
-  ...T5_ROW(398),
-  ...T5_ROW(406),
+  { item: 'co2-fruit', kind: 'meter', x: 210, y: 494, w: 8, h: 8 },
+  { item: 's8', kind: 'fan', x: 188, y: 514, r: 9 },
+  { item: 's8', kind: 'fan', x: 188, y: 576, r: 9 },
+  { item: 'tac', kind: 'box', x: 206, y: 534, w: 22, h: 20 },
+  { item: 'inkbird', kind: 'meter', x: 704, y: 492, w: 8, h: 8 },
+  { item: 'hurricane', kind: 'fan', x: 717, y: 514, r: 10 },
+  { item: 'hurricane', kind: 'fan', x: 717, y: 576, r: 10 },
+  ...T5_ROW(536),
+  ...T5_ROW(544),
   // outside under the roof: two Fogel 3-door reach-ins against the fruiting
   // long wall, left of the back door (door about 1 m from the back end)
-  { item: 'fogel1', kind: 'box', x: 496, y: 312, w: 90, h: 34 },
-  { item: 'fogel2', kind: 'box', x: 590, y: 312, w: 90, h: 34 },
+  { item: 'fogel1', kind: 'box', x: 456, y: 604, w: 90, h: 34 },
+  { item: 'fogel2', kind: 'box', x: 550, y: 604, w: 90, h: 34 },
 ]
 
 function rackRows(x0: number, y0: number, count: number, rows: number[], w: number, h: number) {
@@ -133,7 +133,7 @@ function Plan() {
 
   return (
     <div className={`deck-frame ${gen ? 'hazard-box' : ''}`}>
-      <svg viewBox="40 20 760 604" className="deck-svg" role="img" aria-label="Plan of the farm with live load by room">
+      <svg viewBox="40 20 760 650" className="deck-svg" role="img" aria-label="Plan of the farm with live load by room">
         <g className="deck-detail">
           {/* lab: back-left table under two FFUs, stir-plate bench */}
           <rect x={64} y={48} width={64} height={64} className="deck-rack" />
@@ -148,56 +148,55 @@ function Plan() {
             </g>
           ))}
           {/* cook room: steam box cart */}
-          <rect x={232} y={58} width={44} height={92} className="deck-rack" />
-          <text x={254} y={108} className="deck-tag">
+          <rect x={232} y={115} width={44} height={92} className="deck-rack" />
+          <text x={254} y={165} className="deck-tag">
             CART
           </text>
           {/* incubation shelving (lower) and fruiting racks (upper) */}
-          {rackRows(250, 488, 8, [24, 64], 50, 22)}
-          {rackRows(300, 350, 7, [14, 64], 48, 26)}
-          {/* fruiting back door, opening out to the roofed area */}
-          <path d="M686 350H726" className="deck-door" />
-          <path d="M726 350V312A38 38 0 0 0 688 350" className="deck-inner" />
-          <text x={749} y={330} className="deck-tag">
+          {rackRows(250, 376, 8, [24, 64], 50, 22)}
+          {rackRows(260, 488, 7, [14, 64], 48, 26)}
+          {/* fruiting back door on its outer long wall, about 1 m from the back end, opening out to the roofed area */}
+          <path d="M646 600H686" className="deck-door" />
+          <path d="M686 600V638A38 38 0 0 1 648 600" className="deck-inner" />
+          <text x={709} y={620} className="deck-tag">
             BACK
           </text>
-          <text x={749} y={342} className="deck-tag">
+          <text x={709} y={632} className="deck-tag">
             DOOR
           </text>
           {/* the breaker box: square Eaton CH box on the outside back wall behind incubation */}
-          <rect x={735} y={530} width={14} height={22} className="deck-inner" />
-          <path d="M738 536H746M738 541H746M738 546H746" className="deck-inner faint" />
-          <text x={760} y={566} className="deck-tag">
+          <rect x={735} y={418} width={14} height={22} className="deck-inner" />
+          <path d="M738 424H746M738 429H746M738 434H746" className="deck-inner faint" />
+          <text x={762} y={454} className="deck-tag">
             BREAKER
           </text>
-          <text x={760} y={577} className="deck-tag">
+          <text x={762} y={465} className="deck-tag">
             BOX
           </text>
-          {/* the upper container sits on the lower one: corner lines */}
-          <path d="M172 488L212 462M732 488L772 462M172 600L212 574M732 600L772 574" className="deck-inner faint dash" />
-          <text x={452} y={479} className="deck-tag">
-            FRUITING SITS ON TOP OF INCUBATION
+          {/* fruiting is really stacked on top of incubation; the plan draws it beside, as Joseph's own plan does */}
+          <text x={450} y={594} className="deck-tag">
+            UPPER LEVEL, ON TOP OF INCUBATION
           </text>
           {/* side view, looking north */}
           <g className="deck-side">
-            <text x={320} y={70} className="deck-note">
+            <text x={290} y={70} className="deck-note">
               SIDE VIEW // STACK
             </text>
-            <path d="M310 270H780" className="deck-inner" />
-            <rect x={320} y={210} width={50} height={60} className="deck-inner" />
-            <text x={345} y={244} className="deck-tag">
+            <path d="M280 270H780" className="deck-inner" />
+            <rect x={290} y={185} width={80} height={85} className="deck-inner" />
+            <text x={330} y={231} className="deck-tag">
               LAB/PACK
             </text>
-            <rect x={370} y={210} width={400} height={60} className="deck-inner" />
-            <text x={570} y={244} className="deck-tag">
+            <rect x={370} y={185} width={400} height={85} className="deck-inner" />
+            <text x={570} y={231} className="deck-tag">
               INCUBATION // LOWER 40 FT
             </text>
-            <rect x={370} y={150} width={400} height={60} className="deck-inner" />
-            <text x={570} y={184} className="deck-tag">
+            <rect x={370} y={100} width={400} height={85} className="deck-inner" />
+            <text x={570} y={146} className="deck-tag">
               FRUITING // UPPER 40 FT
             </text>
-            <text x={320} y={292} className="deck-tag start">
-              COOK ROOM (20 FT) IS BESIDE THE LAB END
+            <text x={290} y={292} className="deck-tag start">
+              COOK ROOM (20 FT) IS BESIDE THE LAB, NORTH OF INCUBATION
             </text>
           </g>
         </g>
@@ -247,7 +246,7 @@ function Plan() {
         <text x={790} y={330} className="deck-note end">
           N ^
         </text>
-        <text x={790} y={616} className="deck-note end">
+        <text x={790} y={662} className="deck-note end">
           {gen ? 'GENERATOR // EMERGENCY POWER' : 'ICE UTILITY'}
         </text>
       </svg>
