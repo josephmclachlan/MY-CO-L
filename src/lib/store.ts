@@ -103,6 +103,8 @@ export class Store {
   who = 'OWNER'
   /** The screen on show, for the history. */
   screen: string | null = null
+  /** The empty stand-in screens get while the real data opens. Background jobs (the sheet sync) must not run on it. */
+  placeholder = false
 
   /** Tables this person may not read or write (STAFF and the money tables). They read as empty and refuse writes. */
   private denied: ReadonlySet<string> = new Set()

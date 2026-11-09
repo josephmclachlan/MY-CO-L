@@ -7,8 +7,8 @@
 import type { Row } from './store'
 
 export type EditOp = 'create' | 'update' | 'delete'
-/** Why the write happened: a normal edit, an UNDO, a RESTORE from history, an import, or the app itself (starter list). */
-export type EditVia = 'edit' | 'undo' | 'restore' | 'import' | 'system' | 'assistant'
+/** Why the write happened: a normal edit, an UNDO, a RESTORE from history, an import, the app itself (starter list), the assistant, or an edit typed in the Google Sheet. */
+export type EditVia = 'edit' | 'undo' | 'restore' | 'import' | 'system' | 'assistant' | 'sheet'
 
 export interface FieldChange {
   f: string

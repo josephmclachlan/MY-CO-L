@@ -13,7 +13,7 @@
     "build:selfhost": "node scripts/build-selfhost.mjs",
     "build:bridge": "vite build --config selfhost/bridge/vite.config.ts",
     "test": "vitest run",
-    "test:stress": "STRESS_SEEDS=200 vitest run src/lib/stress.test.ts --pool=threads && STRESS_SEEDS=40 vitest run src/lib/bank.test.ts && STRESS_SEEDS=12 STRESS_STEPS=2500 vitest run src/lib/records.stress.test.ts && STRESS_SEEDS=30 STRESS_STEPS=2000 vitest run src/lib/orders.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=1200 vitest run src/lib/money.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=1200 vitest run src/lib/facility.stress.test.ts && STRESS_SEEDS=10 STRESS_STEPS=500 vitest run src/lib/sensors.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=600 vitest run src/lib/shell.stress.test.ts && STRESS_SEEDS=10 vitest run src/lib/assistant/assistant.stress.test.ts",
+    "test:stress": "STRESS_SEEDS=200 vitest run src/lib/stress.test.ts --pool=threads && STRESS_SEEDS=40 vitest run src/lib/bank.test.ts && STRESS_SEEDS=12 STRESS_STEPS=2500 vitest run src/lib/records.stress.test.ts && STRESS_SEEDS=30 STRESS_STEPS=2000 vitest run src/lib/orders.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=1200 vitest run src/lib/money.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=1200 vitest run src/lib/facility.stress.test.ts && STRESS_SEEDS=10 STRESS_STEPS=500 vitest run src/lib/sensors.stress.test.ts && STRESS_SEEDS=12 STRESS_STEPS=600 vitest run src/lib/shell.stress.test.ts && STRESS_SEEDS=10 vitest run src/lib/assistant/assistant.stress.test.ts && STRESS_SEEDS=60 STRESS_STEPS=300 vitest run src/lib/sheets/sheets.test.ts",
     "docs:guide": "vite-node scripts/guide-doc.ts"
   },
   "dependencies": {
