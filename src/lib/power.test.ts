@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { BASE, PACKAGE_EMERG as EMERG, MEGACHEFS, allCircuits, HEATER_OPTIONS, type HeaterOption } from '../data/power'
+import { BASE, EMERG, MEGACHEFS, allCircuits, HEATER_OPTIONS, type HeaterOption } from '../data/power'
 import { CEILING_A } from '../data/power'
 import { feederDropV, generatorStatus, legs, ownedGeneratorShare, utilityStatus, compute, peakState, warnings } from './power'
 import { SCENARIOS, scenarioIds } from '../data/power'
@@ -119,8 +119,7 @@ describe('on-screen scenario presets', () => {
     check('bad', '2x4500', 111.3)
     check('all', '2x4500', 131.3)
     check('all', '6500', 120.9)
-    // The app's generator list adds the lab HEPA (S4, 450 W on L2) to the package list (Joseph, 6 Nov 2026): 52.2 A in the package.
-    check('gmax', '6500', 55.5)
+    check('gmax', '6500', 52.2)
   })
 
   it('every circuit watt total matches the package', () => {

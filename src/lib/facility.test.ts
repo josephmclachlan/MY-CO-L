@@ -361,7 +361,7 @@ describe('cleaning and checklists', () => {
     expect(cook.steps.map((s) => s.text).join(' ')).toMatch(/within 3 hours.*lab.*HEPA/)
     expect(cook.steps.some((s) => s.id === 'blow')).toBe(true)
     expect(CHECKLISTS.find((c) => c.key === 'knock')!.steps[0].text).toMatch(/below 32 C, never above 38 C/)
-    expect(CHECKLISTS.find((c) => c.key === 'power')!.steps.find((s) => s.id === 'list')!.text).toContain('lab HEPA (S4)')
+    expect(CHECKLISTS.find((c) => c.key === 'power')!.steps.find((s) => s.id === 'list')!.text).toContain('lab HEPA units')
     expect(CHECKLISTS.find((c) => c.key === 'fruit')?.every).toBe(7)
   })
   it('sign-off due dates', () => {
