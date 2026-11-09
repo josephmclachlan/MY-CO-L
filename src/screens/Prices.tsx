@@ -76,7 +76,7 @@ export function Prices({ say, onOpenCargo }: { say: Say; onOpenCargo: () => void
 
       <div className="ck-box">
         <div className="section-title">SALE PRICES // ₡ PER KG</div>
-        <div className="dim tiny">THE SALE FORM IN TRADE STARTS FROM THESE. BUILT-IN: OYSTERS ₡11,500 (MIDDLE OF YOUR ₡10,000-13,000), LION'S MANE AND CORAL +20% <Guess />. DRIED HAS NO BUILT-IN PRICE.</div>
+        <div className="dim tiny">THE SALE FORM IN TRADE STARTS FROM THESE. BUILT-IN: ₡13,000 PER KG FOR EVERY MUSHROOM (YOUR PRICE, 6 NOV 2026). DRIED HAS NO BUILT-IN PRICE.</div>
         <div className="ck-scroll">
           <table className="lg-table lg-edit">
             <thead><tr><th>SPECIES</th><th>FRESH ₡/KG</th><th>DRIED ₡/KG</th></tr></thead>

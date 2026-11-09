@@ -60,7 +60,7 @@ export const ROOMS: Room[] = [
     rect: { x: 60, y: 330, w: 130, h: 290 },
     label: { x: 96, y: 500 },
     setPoints: [
-      { label: 'PLENUM AIR', value: '12-14 C' },
+      { label: 'PLENUM AIR', value: '16 C (LOWEST THE ACS GO)' },
       { label: 'RH', value: 'DO NOT HUMIDIFY' },
       { label: 'CO2', value: 'AT OR BELOW ~450 PPM' },
       { label: 'INTAKE', value: 'RUNS WITH FRUITING EXHAUSTS' },

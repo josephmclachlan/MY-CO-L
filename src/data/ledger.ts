@@ -29,21 +29,28 @@ export const YIELD_LB: Record<string, { lb: number; guess?: boolean; note: strin
   'pink-oyster': { lb: 1.44, note: 'CATAWBA RECORDS' },
   chestnut: { lb: 1.41, note: 'CATAWBA RECORDS' },
   pioppino: { lb: 0.86, note: 'CATAWBA RECORDS' },
+  'black-pearl': { lb: 1.15, note: 'CATAWBA RECORDS' },
+  'king-oyster': { lb: 0.86, note: 'CATAWBA RECORDS' },
+  maitake: { lb: 0.67, note: 'CATAWBA RECORDS' },
 }
 
-/** Days a block sits in the rooms, knock to last pick. Knock to first harvest is from the farm facts;
- *  the picking days after it are a GUESS (one flush for oysters about a week; lion's mane two flushes). */
+/** Days a block sits in the rooms, knock to last pick. Both numbers are Catawba's 2026 harvest log (Joseph, 9 Nov 2026:
+ *  Catawba is the baseline for all growth and harvest planning). first = median knock to first harvest;
+ *  pick = days from first to last pick of a lot, 90th percentile (most lots are picked in 0-3 days, one flush). */
 export const ROOM_DAYS: Record<string, { first: number; pick: number }> = {
-  'blue-oyster': { first: 23, pick: 7 },
-  'lions-mane': { first: 24, pick: 21 },
-  'comb-tooth': { first: 31, pick: 7 },
-  'golden-oyster': { first: 26.5, pick: 7 },
-  'phoenix-oyster': { first: 21, pick: 7 },
-  'pink-oyster': { first: 18, pick: 7 },
-  chestnut: { first: 65, pick: 7 },
-  pioppino: { first: 34, pick: 7 },
+  'blue-oyster': { first: 23, pick: 3 },
+  'lions-mane': { first: 24, pick: 4 },
+  'comb-tooth': { first: 31, pick: 3 },
+  'golden-oyster': { first: 26.5, pick: 6 },
+  'phoenix-oyster': { first: 21, pick: 3 }, // Catawba's Italian oyster as the stand-in
+  'pink-oyster': { first: 18, pick: 4 },
+  chestnut: { first: 65, pick: 6 },
+  pioppino: { first: 34, pick: 6 },
+  'black-pearl': { first: 32, pick: 5 },
+  'king-oyster': { first: 36, pick: 7 },
+  maitake: { first: 59, pick: 8 },
 }
-export const ROOM_DAYS_OTHER = { first: 30, pick: 14 } // GUESS for species with no figure
+export const ROOM_DAYS_OTHER = { first: 30, pick: 5 } // GUESS for species with no Catawba figure (pick = Catawba's typical 90th percentile)
 export const roomDays = (key: string) => {
   const d = ROOM_DAYS[key] ?? ROOM_DAYS_OTHER
   return d.first + d.pick
@@ -87,7 +94,7 @@ export const LEDGER_GUESSES = [
   'LABOUR IS PART OF THE COST WHEN THE SWITCH IS ON (DEFAULT ON). THE HOURLY RATE STARTS BLANK, SO LABOUR SHOWS HOURS BUT ₡0 UNTIL YOU TYPE ONE.',
   'EQUIPMENT WEAR IS OFF BY DEFAULT. TURN IT ON AND TYPE ₡ PER BLOCK.',
   'ROOM ENERGY: THE BILL LESS THE COOK RUNS, SHARED BY BAG-DAYS IN THE ROOMS. A MONTH WITH NO BILL USES THE PACKAGE ESTIMATE SHARED OVER A FULL 130-BAG FARM.',
-  'DAYS IN THE ROOMS = KNOCK TO FIRST HARVEST (FARM FACTS) PLUS 7 PICKING DAYS (21 FOR LION\'S MANE, TWO FLUSHES).',
+  'DAYS IN THE ROOMS = KNOCK TO FIRST HARVEST PLUS PICKING DAYS, BOTH FROM CATAWBA\'S 2026 HARVEST LOG (YOUR CALL, 9 NOV 2026). PICKING DAYS = FIRST TO LAST PICK OF A LOT, 90TH PERCENTILE: 3-4 FOR BLUE, LION\'S MANE, COMB TOOTH, PINK; 6 FOR GOLDEN.',
   'CONSUMABLES AND COOK ENERGY OF A WEEK ARE SHARED EQUALLY PER BLOCK ACROSS THAT WEEK\'S LOTS (SPAWN IS NOT TRACKED BY SPECIES YET).',
 ]
 

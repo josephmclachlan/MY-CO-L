@@ -8,7 +8,7 @@
 //   - every amount is stored in colones; US$ is worked out at the record's OWN day's rate, never today's;
 //   - every buyer pays cash on delivery, no credit terms. A sale not paid on delivery is an exception:
 //     it shows as OWED, and that buyer is ON HOLD (no more deliveries) until it is paid;
-//   - mark any buyer whose share of sales passes the cap (Practice buyerCapPct, 30% unconfirmed).
+//   - mark any buyer whose share of sales passes the cap (Practice buyerCapPct, 30%: Joseph confirmed 6 Nov 2026).
 
 import type { Row } from './store'
 import type { Sale } from './trade'

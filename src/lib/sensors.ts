@@ -77,7 +77,7 @@ export const DEFAULT_BANDS: Record<PlaceId, PlaceBands> = {
 export const TARGETS: Record<PlaceId, string> = {
   lab: 'AIR 18-19 C, POSITIVE PRESSURE',
   fridge: '1-4 C',
-  packing: 'PLENUM AIR 12-14 C, DO NOT HUMIDIFY, CO2 AT OR BELOW ~450 PPM',
+  packing: 'PLENUM AIR 16 C (THE LOWEST THE PACKING ACS GO; JOSEPH 9 NOV 2026), DO NOT HUMIDIFY, CO2 AT OR BELOW ~450 PPM',
   coldroom: '1-4 C',
   incubation: 'AIR ~18 C, BLOCK CORES AT OR BELOW 21-22 C, CO2 EXHAUST ON AT 3,000 PPM',
   fruiting: 'AIR 16 C (14-17, MAX 18), RH 80-90%, CO2 EXHAUST ON 900 / OFF 600 PPM',

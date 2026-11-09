@@ -11,9 +11,10 @@ export const STATION = {
   build: '0.3.0',
 }
 
-// Species letters used in lot codes (species letter + knock date MMDD, e.g. B1020).
-// Letters other than B are a first guess; correct them here if yours differ.
-export const SPECIES_LETTERS = ['B', 'L', 'C', 'G', 'P'] as const
+// Species letters used in the decorative lot codes (letters + knock date MMDD, e.g. B1020).
+// Catawba's letters for the crop plan (Joseph, 6 Nov 2026): blue B, lion's mane L, comb tooth CT,
+// golden Y, phoenix X (Catawba's Italian stand-in), pink PK. The real map is LOT_LETTER in src/lib/xeno.ts.
+export const SPECIES_LETTERS = ['B', 'L', 'CT', 'Y', 'X', 'PK'] as const
 
 // Breaker tags on the 18-circuit sub-panel.
 export const BREAKERS = Array.from({ length: 18 }, (_, i) => `S${i + 1}`)

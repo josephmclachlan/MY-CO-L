@@ -39,7 +39,7 @@ export const ICE_TAX = 1.16
 export const ICE_RATE_SOURCE = 'ELECTRICAL: ICE BINOMIC ₡59.67/KWH (4 NOV 2026). BEFORE 16% TAXES AND THE DEMAND CHARGE.'
 
 // ---------- power while a run is going ----------
-export const MEGACHEF_W = 1200 // each of 4 (ELECTRICAL)
+export const MEGACHEF_W = 1600 // each of 4: 1,600 W / 120 V nameplate (ELECTRICAL equipment list, 8 Nov 2026 spec sheets)
 export const X75_W = 1650 // electric, 110 V (ELECTRICAL)
 /** Average steam box power during the hold. FAB REV D sizing notes: "holding only needs to cover the losses (1 to 2 kW)". */
 export const STEAM_HOLD_KW = 1.5
