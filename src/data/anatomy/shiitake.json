@@ -1,0 +1,183 @@
+{
+  "id": "shiitake",
+  "stages": [
+    {
+      "id": "browned",
+      "k": "STRIPPED",
+      "a": "A browned block, bag stripped and flipped, a rim of bag left at the bottom.",
+      "v": "Fruit at 75-80% brown or more. Rinse, strip the bag leaving a rim to catch exudate, and flip the block so the wetter bottom is on top.",
+      "s": [
+        "F17-0321",
+        "F17-0328"
+      ]
+    },
+    {
+      "id": "bumps",
+      "k": "WHITE BUMPS",
+      "a": "White bumps rise through the brown skin.",
+      "v": "Pins come in stages: white bumps, then brown dots, then separating stems. Expect pins within about 2 days.",
+      "s": [
+        "F17-0324"
+      ]
+    },
+    {
+      "id": "dots",
+      "k": "BROWN DOTS",
+      "a": "Each bump caps over in brown: a tiny cap on a short stem.",
+      "v": "Brown dots follow the white bumps.",
+      "s": [
+        "F17-0324"
+      ]
+    },
+    {
+      "id": "stems",
+      "k": "STEMS SEPARATE",
+      "a": "Stems lift the caps clear of the block. A thin veil joins each cap rim to its stem.",
+      "v": "Bursting at 5-7 days. Shiitake is fast in the fruit room: keep it low on the racks, never above lion's mane.",
+      "s": [
+        "F17-0324",
+        "F17-0329"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "The cap rim is still curled under, and the veil is just cracking.",
+      "v": "Pick while the cap rim is still curled, about 6-8 days after stripping.",
+      "s": [
+        "F17-0333",
+        "F13-0018",
+        "F17-0324"
+      ]
+    },
+    {
+      "id": "late",
+      "k": "TOO LATE",
+      "a": "The caps open flat into broad saucers.",
+      "v": "Picking too late is the most common mistake: flat, broad caps add weight but collapse quality and shelf life.",
+      "s": [
+        "F17-0333"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "block",
+      "k": "BROWN SKIN",
+      "a": "The brown, leathery skin of the block.",
+      "v": "Buckling forms a protective skin, brown only on the outside. It lets shiitake fruit from all over the block.",
+      "s": [
+        "F17-0315"
+      ],
+      "on": [
+        "browned",
+        "bumps"
+      ]
+    },
+    {
+      "id": "rim",
+      "k": "BAG RIM",
+      "a": "A rim of bag left at the bottom.",
+      "v": "When the bag is stripped, a rim of bag is left at the bottom to catch the exudate.",
+      "s": [
+        "F17-0328"
+      ],
+      "on": [
+        "browned"
+      ]
+    },
+    {
+      "id": "bumps",
+      "k": "WHITE BUMPS",
+      "a": "White pins breaking through the skin.",
+      "v": "The first stage of pinning.",
+      "s": [
+        "F17-0324"
+      ],
+      "on": [
+        "bumps",
+        "dots"
+      ],
+      "part": "bumps"
+    },
+    {
+      "id": "cap",
+      "k": "BROWN CAP",
+      "a": "A small brown cap on a short stem.",
+      "on": [
+        "dots",
+        "stems"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "stem",
+      "k": "STEM",
+      "a": "A short, stout stem.",
+      "on": [
+        "stems"
+      ],
+      "part": "stem"
+    },
+    {
+      "id": "flecks",
+      "k": "WHITE FLECKS",
+      "a": "Pale flecks and scales on the cap top.",
+      "on": [
+        "stems",
+        "pick"
+      ],
+      "part": "scales"
+    },
+    {
+      "id": "veil",
+      "k": "VEIL",
+      "a": "A thin veil joins the cap rim to the stem.",
+      "v": "Pick when the veil is just cracking.",
+      "s": [
+        "F13-0018"
+      ],
+      "on": [
+        "stems",
+        "pick"
+      ],
+      "part": "veil"
+    },
+    {
+      "id": "margin",
+      "k": "CURLED RIM",
+      "a": "The cap rim still curls in toward the stem.",
+      "v": "Pick while the cap rim is still curled.",
+      "s": [
+        "F17-0333"
+      ],
+      "on": [
+        "pick"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "gills",
+      "k": "GILLS",
+      "a": "Pale gills under the cap.",
+      "on": [
+        "late"
+      ],
+      "part": "gills"
+    },
+    {
+      "id": "flat",
+      "at": "margin",
+      "k": "BROAD SAUCER",
+      "a": "The cap opens flat and thin.",
+      "v": "Flat, saucer-shaped caps with very thin skin soak up water and rot quickly.",
+      "s": [
+        "F13-0018"
+      ],
+      "on": [
+        "late"
+      ],
+      "part": "cap"
+    }
+  ]
+}

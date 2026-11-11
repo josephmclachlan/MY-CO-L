@@ -247,12 +247,14 @@ export const FARM: GSection[] = [
         h: 'HOW TO USE IT',
         steps: [
           'Tap a species in the list (on a phone use the strip at the top).',
+          'Watch the model grow from the cut to picking, one stage at a time. PAUSE stops it and PLAY starts it again. The stage keys under it jump to a stage, and the growth bar scrubs through it.',
+          'Tap a label on the model to light up that part and read about it under the model. LABELS hides them.',
           'Read the tabs: OVERVIEW, CULTIVATION, TIMELINE, CLIMATE, YIELD, HAZARDS, NOTES, SOURCES.',
           'Tap WHY? beside a number to see where it came from.',
           'On OVERVIEW the file shows the strains you hold and the contaminants to watch, each tappable.',
         ],
       },
-      { h: 'GOOD TO KNOW', text: ['The model turns slowly on purpose. Numbers marked as context come from other conditions than your farm. Where sources differ the standard figure is given first.'] },
+      { h: 'GOOD TO KNOW', text: ['The model turns slowly on purpose. Drag it to turn it yourself. A dashed label line means that part is on the far side. With reduced motion on, it stays still on the picking picture until you press PLAY. Numbers marked as context come from other conditions than your farm. Where sources differ the standard figure is given first.'] },
     ],
   },
   {

@@ -1,0 +1,152 @@
+{
+  "id": "king-oyster",
+  "stages": [
+    {
+      "id": "collar",
+      "k": "COLLAR",
+      "a": "The bag top is cut off, leaving a plastic collar above the block. Water beads inside it.",
+      "v": "One common opening: cut the top off after pins form, leaving a collar. Condensation runs down the collar into the pins and floods them.",
+      "s": [
+        "F17-0148",
+        "F17-0149"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "PINS",
+      "a": "Pins rise from the top centre of the block.",
+      "v": "Fruit from the top centre; side growth is unwanted. Strongly light-triggered: bright, deep, even light.",
+      "s": [
+        "F17-0151",
+        "F17-0153"
+      ]
+    },
+    {
+      "id": "stems",
+      "k": "STEMS SWELL",
+      "a": "Thick white stems swell and stretch upward with small caps on top.",
+      "v": "Run the exhaust in cycles from a CO2 controller. Bleached, crusty, flat beige caps mean too much CO2 and too little light.",
+      "s": [
+        "F17-0155"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK",
+      "a": "Fat stems; the caps are open and rounded.",
+      "v": "Even, intense light gives uniform round caps; uneven light gives fluted, sideways caps. Kings keep very well.",
+      "s": [
+        "F17-0153",
+        "F17-0164"
+      ]
+    },
+    {
+      "id": "late",
+      "k": "CAPS OPEN",
+      "a": "The caps flatten and their edges turn up.",
+      "v": "Fruit cold (10-16 °C). Above 16 °C expect blotch and humidity trouble.",
+      "s": [
+        "F17-0152"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "collar",
+      "k": "COLLAR",
+      "a": "The plastic collar left when the bag top is cut off.",
+      "v": "The collar is the hardest method, though many think it the safest.",
+      "s": [
+        "F17-0150"
+      ],
+      "on": [
+        "collar",
+        "pins"
+      ]
+    },
+    {
+      "id": "wet",
+      "k": "CONDENSATION",
+      "a": "Water beading on the inside of the collar.",
+      "v": "Warm substrate meets cooler incoming air and the water runs down into the pins. Small slits before opening help.",
+      "s": [
+        "F17-0149",
+        "F17-0150"
+      ],
+      "on": [
+        "collar",
+        "pins"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "TOP-CENTRE PINS",
+      "a": "Pins rising from the top centre.",
+      "v": "Fruit from the top centre; side growth is unwanted.",
+      "s": [
+        "F17-0151"
+      ],
+      "on": [
+        "pins",
+        "stems"
+      ],
+      "part": "pins"
+    },
+    {
+      "id": "stem",
+      "k": "THICK STEM",
+      "a": "The fat white stem: the part people buy.",
+      "on": [
+        "stems",
+        "pick"
+      ],
+      "part": "stem"
+    },
+    {
+      "id": "cap",
+      "k": "SMALL CAP",
+      "a": "A small cap on top of the stem.",
+      "v": "Bleached, crusty, flat beige caps mean too much CO2 and too little light.",
+      "s": [
+        "F17-0155"
+      ],
+      "on": [
+        "stems"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "margin",
+      "k": "ROUND CAP",
+      "a": "An even, rounded cap.",
+      "v": "Even, intense light gives uniform round caps.",
+      "s": [
+        "F17-0153"
+      ],
+      "on": [
+        "pick"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "gills",
+      "k": "GILLS",
+      "a": "Gills run down the top of the stem.",
+      "on": [
+        "pick",
+        "late"
+      ],
+      "part": "gills"
+    },
+    {
+      "id": "flat",
+      "at": "margin",
+      "k": "EDGES TURN UP",
+      "a": "The cap flattens and its edge turns up.",
+      "on": [
+        "late"
+      ],
+      "part": "cap"
+    }
+  ]
+}

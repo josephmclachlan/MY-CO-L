@@ -1,0 +1,138 @@
+{
+  "id": "comb-tooth",
+  "stages": [
+    {
+      "id": "cut",
+      "k": "FOLD AND CUT",
+      "a": "The bag is folded over the block and cut.",
+      "v": "Handled like lion's mane: fold the bag over and cut an X, a straight slit or an H.",
+      "s": [
+        "F17-0267"
+      ]
+    },
+    {
+      "id": "column",
+      "k": "COLUMN",
+      "a": "A short, thick column grows out of the cut.",
+      "v": "It grows out as a column, then branches. Slow to start, then it combs out fast.",
+      "s": [
+        "F17-0252",
+        "F17-0267"
+      ]
+    },
+    {
+      "id": "branching",
+      "k": "BRANCHING",
+      "a": "The column splits again and again, like Romanesco cauliflower.",
+      "v": "The branching phase (\"fractalization\") lasts about 5-7 days. It browns in too much air and goes popcorny in stagnant air.",
+      "s": [
+        "F17-0269",
+        "F17-0273"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "A dense, cloud-like head with teeth hanging under every branch.",
+      "v": "Pick at the end of the branching phase, when the branching has finished. It prefers 19-21 °C.",
+      "s": [
+        "F13-0022",
+        "F17-0268"
+      ]
+    },
+    {
+      "id": "late",
+      "k": "TOO LATE",
+      "a": "The branches droop and the head goes soft.",
+      "v": "Mature fruit droops and turns spongy and cauliflower-like, so pick before that.",
+      "s": [
+        "F17-0269",
+        "F13-0022"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "cut",
+      "k": "X CUT",
+      "a": "The cut in the folded bag.",
+      "v": "An X, a straight slit or an H.",
+      "s": [
+        "F17-0267"
+      ],
+      "on": [
+        "cut",
+        "column"
+      ]
+    },
+    {
+      "id": "column",
+      "k": "TRUNK",
+      "a": "The thick column it grows from.",
+      "v": "Comb tooth holds on to the cut with a big trunk.",
+      "s": [
+        "F17-8011"
+      ],
+      "on": [
+        "column",
+        "branching"
+      ],
+      "part": "column"
+    },
+    {
+      "id": "branches",
+      "k": "BRANCHES",
+      "a": "Branches split again and again.",
+      "v": "It branches repeatedly like Romanesco cauliflower.",
+      "s": [
+        "F17-0252"
+      ],
+      "on": [
+        "branching",
+        "pick"
+      ],
+      "part": "branches"
+    },
+    {
+      "id": "teeth",
+      "k": "TEETH",
+      "a": "Short teeth hang in rows under the branches.",
+      "v": "Spinier and less \"tentacled\" than lion's mane.",
+      "s": [
+        "F17-0252"
+      ],
+      "on": [
+        "pick"
+      ],
+      "part": "teeth"
+    },
+    {
+      "id": "droop",
+      "at": "branches",
+      "k": "DROOPING",
+      "a": "The branch tips sag.",
+      "v": "Mature fruit droops: pick before that.",
+      "s": [
+        "F17-0269"
+      ],
+      "on": [
+        "late"
+      ],
+      "part": "branches"
+    },
+    {
+      "id": "spongy",
+      "at": "teeth",
+      "k": "SPONGY",
+      "a": "The teeth swell and the head goes soft.",
+      "v": "Spongy and cauliflower-like when mature.",
+      "s": [
+        "F13-0022"
+      ],
+      "on": [
+        "late"
+      ],
+      "part": "teeth"
+    }
+  ]
+}

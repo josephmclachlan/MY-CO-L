@@ -1,0 +1,150 @@
+{
+  "id": "golden-oyster",
+  "stages": [
+    {
+      "id": "cut",
+      "k": "SIDE CUT",
+      "a": "A colonized block, opened on its side.",
+      "v": "Golden oyster is side-fruited at Catawba Mushrooms.",
+      "s": [
+        "F17-0183"
+      ]
+    },
+    {
+      "id": "coral",
+      "k": "CORAL PINS",
+      "a": "The pins branch like coral before any caps form.",
+      "v": "Golden primordia look coral-like on the blocks.",
+      "s": [
+        "F17-0178"
+      ]
+    },
+    {
+      "id": "young",
+      "k": "YOUNG CAPS",
+      "a": "Small caps open on slender stems, each one a shallow funnel.",
+      "v": "Goldens respond more to light than other oysters: they go toward the top of the rack.",
+      "s": [
+        "F17-0177"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "The caps open into thin funnels with wavy edges.",
+      "v": "Treat goldens like other oysters: pick before the caps flatten.",
+      "s": [
+        "F17-0173",
+        "F13-0132"
+      ]
+    },
+    {
+      "id": "flat",
+      "k": "CAPS FLATTEN",
+      "a": "The funnels open out flat and the edges thin and wave.",
+      "v": "Goldens look pretty but do not hold up in the pan. Shelf life is the drawback.",
+      "s": [
+        "F17-8008"
+      ]
+    },
+    {
+      "id": "late",
+      "k": "TOO LATE",
+      "a": "The edges split and turn up.",
+      "v": "Golden oyster is invasive in places; low-spore strains are planned.",
+      "s": [
+        "F17-0179"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "cut",
+      "k": "SIDE CUT",
+      "a": "The cut on the side of the bag.",
+      "v": "Side-fruited at Catawba Mushrooms.",
+      "s": [
+        "F17-0183"
+      ],
+      "on": [
+        "cut"
+      ]
+    },
+    {
+      "id": "coral",
+      "k": "CORAL PINS",
+      "a": "Branching, coral-like primordia.",
+      "v": "Golden primordia look coral-like on the blocks.",
+      "s": [
+        "F17-0178"
+      ],
+      "on": [
+        "coral",
+        "young"
+      ]
+    },
+    {
+      "id": "stem",
+      "k": "SLENDER STEMS",
+      "a": "Thin stems that branch from a shared base.",
+      "on": [
+        "coral",
+        "young"
+      ],
+      "part": "stem"
+    },
+    {
+      "id": "funnel",
+      "k": "FUNNEL CAP",
+      "a": "Each cap dips in the middle like a funnel.",
+      "on": [
+        "young",
+        "pick"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "margin",
+      "k": "WAVY EDGE",
+      "a": "The thin cap edge waves and ruffles.",
+      "on": [
+        "pick"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "gills",
+      "k": "GILLS",
+      "a": "Gills run down from the cap onto the stem.",
+      "on": [
+        "pick",
+        "flat"
+      ],
+      "part": "gills"
+    },
+    {
+      "id": "flat",
+      "at": "margin",
+      "k": "CAPS FLATTEN",
+      "a": "The funnel opens out flat.",
+      "v": "Pick before the caps flatten.",
+      "s": [
+        "F13-0132"
+      ],
+      "on": [
+        "flat"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "curl",
+      "at": "margin",
+      "k": "EDGES TURN UP",
+      "a": "The edge splits and curls up as the cap ages.",
+      "on": [
+        "late"
+      ],
+      "part": "cap"
+    }
+  ]
+}

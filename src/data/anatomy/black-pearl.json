@@ -1,0 +1,182 @@
+{
+  "id": "black-pearl",
+  "stages": [
+    {
+      "id": "cut",
+      "k": "SLIT CUT",
+      "a": "A slit cut across the long face of the block.",
+      "v": "Cut a slit or cross about 6 mm deep on the long face for a dense, large cluster.",
+      "s": [
+        "F17-0106"
+      ]
+    },
+    {
+      "id": "fluff",
+      "k": "COBWEB FLUFF",
+      "a": "Cobweb-like mycelium puffs out of the cut, beaded with amber droplets.",
+      "v": "Cobweb fluff from the cut, amber droplets at about 5-7 days, then primordia. It is slower to pin than most oysters.",
+      "s": [
+        "F17-0108"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "PINS",
+      "a": "Pins form on the puff at the cut.",
+      "v": "Black oysters can form puffs or mounds at cut sites with pins on them. Ideal 13-16 °C; above about 18 °C pinning drops steeply.",
+      "s": [
+        "F17-0105",
+        "F17-0109"
+      ]
+    },
+    {
+      "id": "young",
+      "k": "YOUNG CLUSTER",
+      "a": "Thick white stems rise in a tight cluster, carrying small dark caps.",
+      "v": "Cold-grown fruit look king-like, with thick stems, but clustered. Warm-grown fruit look more like blue oyster.",
+      "s": [
+        "F17-0110"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "The caps open dark and rounded, the edges still turned down.",
+      "v": "Pick before the caps flatten or over-expand: about 10-14 days from pins.",
+      "s": [
+        "F13-0019",
+        "F17-0116"
+      ]
+    },
+    {
+      "id": "late",
+      "k": "A DAY LATE",
+      "a": "The caps turn up and drop spores.",
+      "v": "A day late (caps upturning, spores dropping) visibly costs weight. Treat it as a one-flush strain.",
+      "s": [
+        "F17-0119",
+        "F17-8001"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "cut",
+      "k": "SLIT CUT",
+      "a": "The slit on the long face of the block.",
+      "v": "About 6 mm deep on the long face.",
+      "s": [
+        "F17-0106"
+      ],
+      "on": [
+        "cut",
+        "fluff"
+      ]
+    },
+    {
+      "id": "fluff",
+      "k": "COBWEB FLUFF",
+      "a": "Aerial mycelium puffing out of the cut.",
+      "v": "Cobweb-like fluff comes first, then droplets, then primordia.",
+      "s": [
+        "F17-0108"
+      ],
+      "on": [
+        "fluff",
+        "pins"
+      ]
+    },
+    {
+      "id": "drops",
+      "k": "AMBER DROPS",
+      "a": "Amber droplets beading on the fluff.",
+      "v": "Amber droplets appear at about 5-7 days.",
+      "s": [
+        "F17-0108"
+      ],
+      "on": [
+        "fluff"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "PINS",
+      "a": "Pins on the mound at the cut.",
+      "v": "Puffs or mounds at the cut, with pins on them.",
+      "s": [
+        "F17-0105"
+      ],
+      "on": [
+        "pins",
+        "young"
+      ]
+    },
+    {
+      "id": "stem",
+      "k": "THICK STEMS",
+      "a": "Thick white stems, king-like but clustered.",
+      "v": "Exhaust at about 800-900 ppm CO2 keeps the stems from stretching.",
+      "s": [
+        "F17-0112"
+      ],
+      "on": [
+        "young",
+        "pick"
+      ],
+      "part": "stem"
+    },
+    {
+      "id": "margin",
+      "k": "ROLLED EDGE",
+      "a": "A young cap keeps its edge turned down.",
+      "on": [
+        "young"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "cap",
+      "k": "DARK CAP",
+      "a": "A dark, rounded cap.",
+      "v": "Fairly good shelf life if picked before the caps flatten.",
+      "s": [
+        "F17-0120"
+      ],
+      "on": [
+        "pick"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "gills",
+      "k": "GILLS",
+      "a": "Gills run down from the cap onto the stem.",
+      "on": [
+        "pick"
+      ],
+      "part": "gills"
+    },
+    {
+      "id": "curl",
+      "at": "margin",
+      "k": "CAPS TURN UP",
+      "a": "The cap edge turns up: a day late.",
+      "v": "Upturning caps and dropping spores visibly cost weight.",
+      "s": [
+        "F17-0119"
+      ],
+      "on": [
+        "late"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "spores",
+      "k": "SPORES DROP",
+      "a": "Spores drift down from the gills.",
+      "on": [
+        "late"
+      ]
+    }
+  ]
+}
