@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
 import { useStore, useTable } from '../store/StoreContext'
 import { speciesName, useLedger } from '../store/useLedger'
-import { CHANNELS, FORMS, GRADES, SALE_SPECIES, TRADE_GUESSES, type Channel, type Form } from '../data/ledger'
+import { CHANNELS, FORMS, GRADES, SALE_SPECIES, TRADE_GUESSES, formAfterPick, type Channel, type Form } from '../data/ledger'
 import { addDays, costPerKg, weekOf, type Basis } from '../lib/ledger'
 import { between, buyers, byChannel, byProduct, lastSaleTo, lotLooksRight, margin, newSale, parseLots, usdOf, weekly, type Rate, type Sale, type Total } from '../lib/trade'
 
@@ -210,7 +210,7 @@ function SaleForm({ sales, rate, say, cost, lotCodes, onOpenPrices }: { sales: S
         <div className="ck-field"><span>CHANNEL <Guess /></span><Buttons value={channel} options={CHANNELS} onPick={setChannel} /></div>
         <label className="ck-field">
           <span>SPECIES</span>
-          <Select value={sp} onChange={(e) => (setSp(e.target.value), setPrice(''))}>
+          <Select value={sp} onChange={(e) => (setForm(formAfterPick(sp, e.target.value, form)), setSp(e.target.value), setPrice(''))}>
             {SALE_SPECIES.map((s) => <option key={s} value={s}>{speciesName(s)}</option>)}
           </Select>
         </label>

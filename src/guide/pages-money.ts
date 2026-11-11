@@ -52,7 +52,7 @@ export const MONEY: GSection[] = [
         h: 'RECORD A SALE',
         steps: [
           'Open NEW SALE (5.1).',
-          'Pick or type the BUYER, the channel (MARKET, RESTAURANT, SHOP, DIRECT, DELIVERY, OTHER), the species and FRESH or DRIED.',
+          'Pick or type the BUYER, the channel (MARKET, RESTAURANT, SHOP, DIRECT, DELIVERY, OTHER), the species and FRESH or DRIED. Turkey tail is sold dried, so picking it switches to DRIED.',
           'Type the weight in KG and the grade. The price per kg box may be empty and show BUILT-IN with a price: leave it for that price, or type your own if this sale differs. Set the built-in prices in PRICE BOOK.',
           'Optionally type the lot codes (B1020 L1022). They are what lets TRACE find who got a lot.',
           'Choose PAID ON DELIVERY or NOT PAID YET.',

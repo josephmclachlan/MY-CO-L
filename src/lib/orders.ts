@@ -525,6 +525,7 @@ export const NAME_ES: Record<string, string> = {
   pioppino: 'Pioppino',
   reishi: 'Reishi',
   cordyceps: 'Cordyceps',
+  'turkey-tail': 'Cola de pavo',
 }
 const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const MONTHS_ES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']

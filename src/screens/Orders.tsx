@@ -10,7 +10,7 @@ import { PracticeFields } from './XenoBank'
 import { speciesName } from '../store/useLedger'
 import { useOrders, type OrdersData } from '../store/useOrders'
 import { useFx } from '../store/useFx'
-import { CHANNELS, SALE_SPECIES, type Channel } from '../data/ledger'
+import { CHANNELS, SALE_SPECIES, formAfterPick, type Channel } from '../data/ledger'
 import { STATION } from '../data/farm'
 import { fmtCrc, fmtUsd } from '../lib/cargo'
 import { salePrice } from '../lib/rates'
@@ -474,7 +474,7 @@ function NewOrder({ d, say, rate, onMade }: { d: OrdersData; say: Say; rate: (da
       <div className="ck-fields">
         <label className="ck-field">
           <span>SPECIES</span>
-          <Select aria-label="Species" value={species} onChange={(e) => (setSpecies(e.target.value), setPrice(''))}>
+          <Select aria-label="Species" value={species} onChange={(e) => (setForm(formAfterPick(species, e.target.value, form)), setSpecies(e.target.value), setPrice(''))}>
             {SALE_SPECIES.map((s) => <option key={s} value={s}>{sp(s)}</option>)}
           </Select>
         </label>

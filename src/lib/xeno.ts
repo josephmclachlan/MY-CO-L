@@ -149,6 +149,9 @@ export function nextKnockDay(from: string): string {
 
 // ---------- species codes ----------
 
+/** Strains Joseph keeps, all from Cap n Stem: 17 (5 Nov 2026) plus turkey tail (11 Nov 2026). */
+export const STRAINS_ON_FILE = 18
+
 /** Two-letter strain code prefix per species. Joseph's own codes replace these if he has them. */
 export const STRAIN_PREFIX: Record<string, string> = {
   'blue-oyster': 'BO',
