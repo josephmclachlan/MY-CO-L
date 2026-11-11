@@ -165,6 +165,7 @@ export const STRAIN_PREFIX: Record<string, string> = {
   maitake: 'MT',
   reishi: 'RS',
   cordyceps: 'CM',
+  'turkey-tail': 'TT',
 }
 
 /** Lot code letter (species letter + knock MMDD). B is Catawba's; the rest are a first guess, editable on each lot. */
@@ -183,6 +184,7 @@ export const LOT_LETTER: Record<string, string> = {
   maitake: 'M',
   reishi: 'R',
   cordyceps: 'Y',
+  'turkey-tail': 'T',
 }
 
 export const speciesOf = (key: string): Species | undefined => SPECIES.find((s) => s.id === key)

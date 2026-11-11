@@ -11,6 +11,7 @@ import { combTooth, lionsMane } from './forms/hericium'
 import { maitake } from './forms/maitake'
 import { reishi } from './forms/reishi'
 import { cordyceps } from './forms/cordyceps'
+import { turkeyTail } from './forms/turkeytail'
 
 export const MODELS: Record<string, SpecimenModel> = {
   chestnut,
@@ -27,4 +28,5 @@ export const MODELS: Record<string, SpecimenModel> = {
   maitake,
   reishi,
   cordyceps,
+  'turkey-tail': turkeyTail,
 }
