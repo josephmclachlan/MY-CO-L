@@ -139,7 +139,7 @@ export const TOOLS: GSection[] = [
   },
   {
     key: 'ASK',
-    title: 'ASK THE LATTICE (22)',
+    title: 'ASK MY/CO/L (22)',
     group: 'TOOLS',
     module: 'ASK',
     what: 'The farm assistant: ask in plain words, or tell it something to save.',

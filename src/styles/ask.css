@@ -1,4 +1,4 @@
-/* ASK THE LATTICE (G10): the farm assistant screen. */
+/* ASK MY/CO/L (G10): the farm assistant screen. */
 
 .ask .ask-row { display: flex; gap: 8px; align-items: center; min-width: 0; }
 .ask .ask-row .sr-input { flex: 1 1 auto; min-width: 0; text-transform: none; }

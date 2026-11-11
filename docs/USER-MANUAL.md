@@ -52,7 +52,7 @@
 **TOOLS**
 
 - [SEARCH (19)](#search-19)
-- [ASK THE LATTICE (22)](#ask-the-lattice-22)
+- [ASK MY/CO/L (22)](#ask-mycol-22)
 - [HISTORY (13)](#history-13)
 - [DATA (20)](#data-20)
 - [STAFF (21)](#staff-21)
@@ -712,7 +712,7 @@ Electricity in the books comes from ICE BILLS in LEDGER. Stock deliveries and lo
 
 Type STOCKTAKE to count many stock items and save once.
 
-## ASK THE LATTICE (22)
+## ASK MY/CO/L (22)
 
 *The farm assistant: ask in plain words, or tell it something to save.*
 
