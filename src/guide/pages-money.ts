@@ -358,7 +358,7 @@ export const MORE: GSection[] = [
       },
       {
         h: 'THE SCREEN IS HARD TO READ',
-        text: ['Press F6 for CLEAN mode in sunlight, or F5 to change the colour, or open TUNING (F3) and lower the glass strength.'],
+        text: ['Press F6 for CLEAN mode in sunlight, or F5 to change the colour, or open TUNING (F3) and raise BRIGHTNESS or lower the glass strength. WIREFRAMES on the same screen brightens just the species models.'],
       },
       {
         h: 'THERE IS NO SOUND',

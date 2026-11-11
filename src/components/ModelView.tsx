@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { WebGLRenderer } from 'three'
 import { useApp } from '../settings/AppContext'
 import { MODELS } from '../specimen/models'
-import { SpecimenScene, fitModel } from '../specimen/render'
+import { EL_MAX, EL_MIN, SpecimenScene, fitModel } from '../specimen/render'
 import { Builder } from '../specimen/builder'
 import { Director } from '../specimen/director'
 import { MARK, leaderPath, placeLabels, type LabelIn } from '../specimen/labels'
@@ -19,6 +19,11 @@ import type { Species } from '../data/species/types'
 const LOCKED = 'NO TEXTBOOK SENTENCE ON FILE FOR THIS YET. THE SOURCE IDS STILL APPLY.'
 /** Turning speed in radians a second: one turn about every 21 s. */
 const TURN = 0.3
+/** Radians of turn and of tilt for each pixel dragged. */
+const DRAG_TURN = 0.011
+const DRAG_TILT = 0.008
+/** Two taps this close together (ms) set the tilt back to the stage's own angle. */
+const DOUBLE_TAP = 350
 const TAGS_KEY = 'mycol.specimen.labels'
 /** How far above its anchor a label would like to sit (px). */
 const KINK = 16
@@ -65,6 +70,10 @@ interface Engine {
   spin: number
   swing: number
   drag: number
+  /** Extra camera height from dragging up or down (radians). */
+  tilt: number
+  /** Easing the tilt back to the stage's own angle (after a double tap). */
+  tiltHome: boolean
   dragging: boolean
   /** A drawing of this species is on screen. */
   shown: boolean
@@ -90,6 +99,8 @@ interface Live {
   model: SpecimenModel | undefined
   labels: LabelText[]
   tagsOn: boolean
+  /** TUNE > WIREFRAMES. */
+  bright: number
   focus: string | null
   hover: string | null
   reduced: boolean
@@ -112,7 +123,7 @@ function detailRows(x: { a?: string; v?: string; s?: string[] } | undefined, non
  * The species wireframe. It opens on the picking picture, then plays the
  * growth time-lapse round and round: each stage holds while its callouts are
  * up. PLAY/PAUSE, the stage keys and the growth bar take over by hand; a callout
- * lights up its part and fills the readout. Drag to turn it.
+ * lights up its part and fills the readout. Drag to turn or tilt it.
  */
 export function ModelView({ sp }: { sp: Species }) {
   const { settings, sound } = useApp()
@@ -160,6 +171,7 @@ export function ModelView({ sp }: { sp: Species }) {
     model,
     labels,
     tagsOn,
+    bright: settings.look.models ?? 1,
     focus,
     hover,
     reduced: reducedMotion(),
@@ -201,6 +213,8 @@ export function ModelView({ sp }: { sp: Species }) {
       spin: -0.5,
       swing: 0,
       drag: 0,
+      tilt: 0,
+      tiltHome: false,
       dragging: false,
       shown: false,
       yLo: 0,
@@ -257,6 +271,7 @@ export function ModelView({ sp }: { sp: Species }) {
       E.W = w
       E.H = h
       r.setSize(w, h, false)
+      E.sc.px = { w, h }
       E.sc.setAspect(w / h)
       // labels wrap inside this width
       host.style.setProperty('--colw', `${Math.round(Math.min(132, Math.max(70, w * 0.22)))}px`)
@@ -270,14 +285,19 @@ export function ModelView({ sp }: { sp: Species }) {
     })
     io.observe(host)
 
-    // drag to turn; a tap on the picture clears a lit callout
+    // drag sideways to turn, up or down to tilt; a tap on the picture clears a
+    // lit callout, and a double tap sets the tilt back to the stage's own angle
     let lastX = 0
+    let lastY = 0
     let moved = 0
     let pid = -1
+    let lastTap = -1e9
     const down = (e: PointerEvent) => {
       if ((e.target as HTMLElement).closest('button')) return
       E.dragging = true
+      E.tiltHome = false
       lastX = e.clientX
+      lastY = e.clientY
       moved = 0
       pid = e.pointerId
       try {
@@ -290,15 +310,25 @@ export function ModelView({ sp }: { sp: Species }) {
     const move = (e: PointerEvent) => {
       if (!E.dragging || e.pointerId !== pid) return
       const dx = e.clientX - lastX
+      const dy = e.clientY - lastY
       lastX = e.clientX
-      moved += Math.abs(dx)
-      E.drag += dx * 0.011
+      lastY = e.clientY
+      moved += Math.abs(dx) + Math.abs(dy)
+      E.drag += dx * DRAG_TURN
+      // the picture follows the finger: drag down and the top of the specimen comes into view
+      E.tilt = Math.min(EL_MAX - E.elev, Math.max(EL_MIN - E.elev, E.tilt + dy * DRAG_TILT))
     }
     const up = (e: PointerEvent) => {
       if (!E.dragging || e.pointerId !== pid) return
       E.dragging = false
       host.classList.remove('drag')
-      if (moved < 4 && e.type === 'pointerup') live.current.onTap()
+      if (moved < 4 && e.type === 'pointerup') {
+        live.current.onTap()
+        if (e.timeStamp - lastTap < DOUBLE_TAP) {
+          E.tiltHome = true
+          lastTap = -1e9
+        } else lastTap = e.timeStamp
+      }
     }
     host.addEventListener('pointerdown', down)
     host.addEventListener('pointermove', move)
@@ -377,6 +407,15 @@ export function ModelView({ sp }: { sp: Species }) {
       const yaw = (m.swing ? m.swing * Math.sin(E.swing) + (L.reduced ? 0.35 : 0) : E.spin) + E.drag
       E.sc.turn.rotation.y = yaw
       E.sc.bob = L.reduced ? 0 : 0.035 * Math.sin(time * 0.31)
+      if (E.tiltHome) {
+        E.tilt *= 1 - Math.min(1, dt / 0.35)
+        if (Math.abs(E.tilt) < 0.002) {
+          E.tilt = 0
+          E.tiltHome = false
+        }
+      }
+      E.sc.view.tilt = E.tilt
+      if (L.bright !== E.sc.brightness) E.sc.setBrightness(L.bright)
 
       // a slow scan band down the specimen
       const b = E.sc.built
@@ -530,6 +569,8 @@ export function ModelView({ sp }: { sp: Species }) {
     E.spin = -0.5
     E.swing = 0
     E.drag = 0
+    E.tilt = 0
+    E.tiltHome = false
     E.elev = elevAt(model, E.d.t)
     E.sc.view.elev = E.elev
     E.slowMs = 0
@@ -642,7 +683,7 @@ export function ModelView({ sp }: { sp: Species }) {
   return (
     <div className={`mv ${clean ? 'clean' : ''}`}>
       <div ref={stageEl} className="mv-stage">
-        <div ref={glEl} className="mv-gl" role="img" aria-label={`Wireframe of ${sp.name}, growth stage ${si + 1} of ${N}: ${stageName(si)}. Drag to turn it.`} />
+        <div ref={glEl} className="mv-gl" role="img" aria-label={`Wireframe of ${sp.name}, growth stage ${si + 1} of ${N}: ${stageName(si)}. Drag to turn or tilt it.`} />
         <svg className="mv-lines" aria-hidden>
           {labels.map((l) => (
             <g
@@ -691,7 +732,7 @@ export function ModelView({ sp }: { sp: Species }) {
           AXIS <span ref={hudYaw}>000°</span>
         </div>
         <div className="mv-hud br" aria-hidden>
-          DRAG TO TURN
+          DRAG TO TURN OR TILT
         </div>
         <i className="mv-corner a" aria-hidden />
         <i className="mv-corner b" aria-hidden />

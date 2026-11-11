@@ -19,7 +19,7 @@
 /* the stage, the bar, the stage keys and the readout all fit on one screen beside the data */
 .mv-stage {
   position: relative; box-sizing: border-box; width: 100%; height: clamp(290px, calc(100vh - 575px), 100cqw); height: clamp(290px, calc(100dvh - 575px), 100cqw); overflow: hidden;
-  border: 1px solid var(--fg-faint); cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  border: 1px solid var(--fg-faint); cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
   background: radial-gradient(ellipse 62% 58% at 50% 54%, var(--bg-hi), transparent 78%);
 }
 .mv-stage.drag { cursor: grabbing; }

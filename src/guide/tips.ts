@@ -11,6 +11,8 @@ export const TIPS: Record<string, string> = {
   TUNE: 'Look and sound settings.',
   MUTE: 'Switch all sound off.',
   SOUND: 'Switch sound on.',
+  BRIGHTNESS: 'Light or dim the whole screen. 100% is the normal look.',
+  WIREFRAMES: 'How bright the species models draw. Only the models change, not the rest of the screen.',
   THEME: 'Change the screen colour: green, blue, amber, spore or red.',
   CLEAN: 'Sunlight mode: turns off the curve, grain and glow so the screen can be read in bright light.',
   GLASS: 'Bring the glass effects back (curve, grain, scanlines).',

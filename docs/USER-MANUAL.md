@@ -618,7 +618,7 @@ Only bank from a P1 or later plate, never from the P0 master. Slants are replace
 
 ### GOOD TO KNOW
 
-The model turns slowly on purpose. Drag it to turn it yourself. A dashed label line means that part is on the far side. With reduced motion on, it stays still on the picking picture until you press PLAY. Numbers marked as context come from other conditions than your farm. Where sources differ the standard figure is given first.
+The model turns slowly on purpose. Drag it sideways to turn it, or up and down to tilt it, from just under the caps to straight overhead. Double-tap it to go back to the usual angle. TUNE > WIREFRAMES makes the models brighter or dimmer. A dashed label line means that part is on the far side. With reduced motion on, it stays still on the picking picture until you press PLAY. Numbers marked as context come from other conditions than your farm. Where sources differ the standard figure is given first.
 
 ## HAZARD INDEX (3.6)
 
@@ -1190,7 +1190,7 @@ In local mode this lock keeps a helper out of the money screens but is not real 
 
 ### SECTIONS
 
-- **LOOK**: Theme colour, glass strength (curve, grain, scanlines, glow), CLEAN mode for sunlight.
+- **LOOK**: Theme colour, BRIGHTNESS for the whole screen, WIREFRAMES for how bright the species models draw, glass strength (curve, grain, scanlines, glow), CLEAN mode for sunlight.
 - **SOUND**: Sound on or off, the typing sound, chatter or tick mode, volume. TEST buttons play each sound so you can hear it. Sound only plays when something appears on screen.
 - **LANGUAGE AND GLOVES**: English or Spanish, and glove mode.
 - **SYSTEM**: Replay the boot, test the alarm.
@@ -1200,6 +1200,8 @@ In local mode this lock keeps a helper out of the money screens but is not real 
 These settings belong to this device only. A phone and a laptop each keep their own. They are not part of UNDO.
 
 To drag a meter with the keyboard, focus it and use the arrow keys.
+
+Nothing here is ever greyed out. Moving a glass slider while CLEAN mode is on brings the glass back. Moving a sound slider or pressing a TEST button while sound is muted turns sound back on.
 
 ## WORDS AND SHORT FORMS
 
@@ -1244,7 +1246,7 @@ The answer bar above the prompt says why. A staff login cannot open money screen
 
 ### THE SCREEN IS HARD TO READ
 
-Press F6 for CLEAN mode in sunlight, or F5 to change the colour, or open TUNING (F3) and lower the glass strength.
+Press F6 for CLEAN mode in sunlight, or F5 to change the colour, or open TUNING (F3) and raise BRIGHTNESS or lower the glass strength. WIREFRAMES on the same screen brightens just the species models.
 
 ### THERE IS NO SOUND
 

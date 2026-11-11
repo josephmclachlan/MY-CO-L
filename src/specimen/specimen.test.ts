@@ -9,6 +9,8 @@ import { fitModel } from './fit'
 import { elevAt, stageAt, stageShowT } from './registry'
 import { Director, GROW_SPEED } from './director'
 import { leaderPath, placeLabels, stack } from './labels'
+import { BASE_GAIN, EL_MAX, EL_MIN, SpecimenScene, fitDistance } from './render'
+import type { ShaderMaterial } from 'three'
 import { ANATOMY } from '../data/anatomy'
 import { SPECIES } from '../data/species'
 
@@ -289,5 +291,64 @@ describe('callout layout', () => {
     expect(leaderPath(100, 100, 200, 80)).toMatch(/^M[\d.,-]+L[\d.,-]+L200,80$/)
     expect(leaderPath(100, 100, 200, 100)).toMatch(/^M103.5,100L200,100$/)
     expect(leaderPath(100, 100, 50, 60)).toMatch(/L50,60$/)
+  })
+})
+
+describe('tilting and brightness', () => {
+  const sceneFor = (id: string, t: number) => {
+    const m = MODELS[id]
+    const sc = new SpecimenScene()
+    sc.setModel(m, 0.6)
+    sc.setAspect(1.6)
+    sc.setT(t, true)
+    sc.view = { sideRoom: 0.1, elev: elevAt(m, t), tilt: 0 }
+    sc.frame()
+    return sc
+  }
+
+  it('tilts from just under the caps to nearly overhead, and no further', () => {
+    const sc = sceneFor('chestnut', 0.7)
+    for (const tilt of [-5, -0.3, 0, 0.6, 5]) {
+      sc.view.tilt = tilt
+      sc.frame()
+      const el = sc.elevation()
+      expect(el).toBeGreaterThanOrEqual(EL_MIN)
+      expect(el).toBeLessThanOrEqual(EL_MAX)
+      const p = sc.camera.position
+      expect(Math.atan2(p.y, p.z), `tilt ${tilt}`).toBeCloseTo(el, 5)
+    }
+  })
+
+  it('never moves the camera closer when tilted, so the specimen stays in view', () => {
+    for (const [id, m] of Object.entries(MODELS)) {
+      const sc = sceneFor(id, stageShowT(m, m.rest))
+      const d0 = sc.camera.position.length()
+      for (const tilt of [-0.6, 0.5, 1.2]) {
+        sc.view.tilt = tilt
+        sc.frame()
+        const d = sc.camera.position.length()
+        expect(Number.isFinite(d)).toBe(true)
+        expect(d, `${id} tilt ${tilt}`).toBeGreaterThanOrEqual(d0 * 0.999)
+      }
+    }
+  })
+
+  it('needs more room to see a flat cluster from above, less for a tall one', () => {
+    const tanV = Math.tan((15 * Math.PI) / 180)
+    expect(fitDistance(1, 4, 1.4, tanV)).toBeGreaterThan(fitDistance(1, 4, 0.2, tanV))
+    expect(fitDistance(8, 1, 1.4, tanV)).toBeLessThan(fitDistance(8, 1, 0.2, tanV))
+  })
+
+  it('draws brighter than the first cut at WIREFRAMES 100%, and keeps the slider inside 50-200%', () => {
+    const sc = new SpecimenScene()
+    const gain = () => (sc as unknown as { vis: ShaderMaterial }).vis.uniforms.uGain.value as number
+    expect(BASE_GAIN).toBeGreaterThan(1)
+    expect(gain()).toBeCloseTo(BASE_GAIN)
+    sc.setBrightness(9)
+    expect(gain()).toBeCloseTo(BASE_GAIN * 2)
+    sc.setBrightness(0)
+    expect(gain()).toBeCloseTo(BASE_GAIN * 0.5)
+    sc.setBrightness(Number.NaN)
+    expect(gain()).toBeCloseTo(BASE_GAIN)
   })
 })

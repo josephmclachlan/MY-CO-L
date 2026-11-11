@@ -19,6 +19,8 @@ export interface LookSettings {
   curve: number // 0..1
   flicker: number // 0..1
   noise: number // 0..1 grain and faint streaks
+  brightness: number // 0.6..1.5 the whole screen (1 = as designed)
+  models: number // 0.5..2 the species wireframes only (1 = the default drawing)
   textSize: number // 0.85..1.3 multiplier
   typeSpeed: number // characters per second for normal output
 }
@@ -62,6 +64,8 @@ export const DEFAULTS: Settings = {
     curve: 0.5,
     flicker: 0.25,
     noise: 0.3,
+    brightness: 1,
+    models: 1,
     textSize: 1,
     typeSpeed: 14,
   },

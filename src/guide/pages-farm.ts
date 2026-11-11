@@ -254,7 +254,7 @@ export const FARM: GSection[] = [
           'On OVERVIEW the file shows the strains you hold and the contaminants to watch, each tappable.',
         ],
       },
-      { h: 'GOOD TO KNOW', text: ['The model turns slowly on purpose. Drag it to turn it yourself. A dashed label line means that part is on the far side. With reduced motion on, it stays still on the picking picture until you press PLAY. Numbers marked as context come from other conditions than your farm. Where sources differ the standard figure is given first.'] },
+      { h: 'GOOD TO KNOW', text: ['The model turns slowly on purpose. Drag it sideways to turn it, or up and down to tilt it, from just under the caps to straight overhead. Double-tap it to go back to the usual angle. TUNE > WIREFRAMES makes the models brighter or dimmer. A dashed label line means that part is on the far side. With reduced motion on, it stays still on the picking picture until you press PLAY. Numbers marked as context come from other conditions than your farm. Where sources differ the standard figure is given first.'] },
     ],
   },
   {
