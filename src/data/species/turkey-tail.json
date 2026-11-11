@@ -1,0 +1,143 @@
+{
+ "id": "turkey-tail",
+ "order": 15,
+ "name": "TURKEY TAIL",
+ "latin": "Trametes versicolor",
+ "tier": "farm",
+ "form": "bracket",
+ "seed": 191,
+ "blurb": "THIN ZONED BRACKETS. BLOCKS SET HARD IF LEFT.",
+ "overview": [
+  {
+   "k": "Use",
+   "v": "Dried for teas and tinctures, not sold fresh. One supplement company began by foraging turkey tail and reishi for tinctures.",
+   "s": [
+    "F19-8127"
+   ],
+   "n": "Not sold fresh: general knowledge (the brackets are thin and leathery)."
+  },
+  {
+   "k": "Strain",
+   "v": "Cap n Stem keeps a turkey tail strain it knows well. Vials of it (Trametes versicolor #2, #3, #5) flew to the International Space Station in a school experiment.",
+   "s": [
+    "F20-8002",
+    "F20-0177"
+   ]
+  },
+  {
+   "k": "Evidence",
+   "v": "Medicinal claims rest mostly on test-tube studies and are unproven. Do not repeat claims you cannot source.",
+   "s": [
+    "F20-0104",
+    "F19-0244"
+   ]
+  }
+ ],
+ "cultivation": [
+  {
+   "k": "Spawn",
+   "v": "A matting species: the grain binds hard and breaks up far less easily than chestnut.",
+   "s": [
+    "F05-0153"
+   ]
+  },
+  {
+   "k": "Blocks",
+   "v": "Blocks left too long become extremely hard and difficult to break up.",
+   "s": [
+    "F11-0263",
+    "F17-0515"
+   ]
+  },
+  {
+   "k": "Recipe, spawn rate",
+   "f": "nodata"
+  }
+ ],
+ "timeline": [
+  {
+   "k": "Plate to full cover",
+   "v": "Usually 2-3 weeks before the plate goes in the fridge. A plate poured from colonized grain covered in about 5 days.",
+   "s": [
+    "F20-8003"
+   ],
+   "w": [
+    "pod-72 0:05:09"
+   ],
+   "d": [
+    14,
+    21
+   ]
+  },
+  {
+   "k": "Incubation",
+   "f": "nodata"
+  },
+  {
+   "k": "Knock to first harvest",
+   "f": "nodata"
+  }
+ ],
+ "fruitC": null,
+ "climate": [
+  {
+   "k": "Fruiting temp",
+   "f": "nodata"
+  },
+  {
+   "k": "RH",
+   "f": "nodata"
+  },
+  {
+   "k": "CO2",
+   "f": "nodata"
+  },
+  {
+   "k": "Light",
+   "f": "nodata"
+  }
+ ],
+ "yield_": [
+  {
+   "k": "Yield per block",
+   "f": "nodata"
+  }
+ ],
+ "cat": null,
+ "hazards": [
+  {
+   "k": "Health claims",
+   "v": "Treat every medicinal claim as unproven: the evidence is mostly in vitro or in animals.",
+   "s": [
+    "F20-0222"
+   ]
+  },
+  {
+   "k": "Contaminants",
+   "f": "nodata"
+  }
+ ],
+ "notes": [
+  {
+   "v": "After the space flight its cultures recovered in about 5 days, while lion's mane was only just leaving the grain.",
+   "s": [
+    "F20-8003"
+   ]
+  },
+  {
+   "v": "Tinctures: hard mushrooms such as reishi and turkey tail extracted best near 1 part mushroom to 20 parts solvent in one farm's beta-glucan tests; 1 to 1 extracts poorly.",
+   "f": "ctx",
+   "w": [
+    "pod-51 1:45:50"
+   ]
+  },
+  {
+   "v": "Blended into water with a cellulose binder it makes a mycelium paper that folds without cracking if dried slowly.",
+   "f": "ctx",
+   "w": [
+    "pod-58 1:20:32"
+   ]
+  }
+ ],
+ "strains": []
+}
