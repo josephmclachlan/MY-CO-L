@@ -3,7 +3,7 @@
 //
 // The rate is fetched once a day when the app is online (a free public feed of daily market rates,
 // with history, so past days can be filled in too). A rate you type for a day replaces the fetched one.
-// With no rate on or before a day, the nearest later day is used, then the fallback on PRICES + COSTS.
+// With no rate on or before a day, the nearest later day is used, then the fallback on PRICE BOOK.
 
 import type { Row, Store } from './store'
 

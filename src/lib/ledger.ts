@@ -304,7 +304,7 @@ export function buildLedger(inp: LedgerInput, speciesName: (key: string) => stri
 
   // ---- cook energy ----
   const planCook = planWeekCookCrc()
-  // Priced at today's rate from the run's kWh, so a rate change on PRICES + COSTS reaches old runs too.
+  // Priced at today's rate from the run's kWh, so a rate change on PRICE BOOK reaches old runs too.
   const cookCrc = (r: CookRun) => (r.kwh !== null && r.kwh !== undefined ? Number(r.kwh) * rates().ice.energyCrcPerKwh : Number(r.cost_crc ?? 0)) * rates().ice.tax
   const cookDay = (r: CookRun) => dayOf(r.started_at ?? (r.created_at as string | undefined) ?? '')
   const looseByWeek = new Map<string, number>()

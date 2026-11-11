@@ -88,7 +88,8 @@ function Money({ crc, fx, day }: { crc: number; fx: number; day?: string }) {
 }
 
 function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onClose: () => void; say: (t: string, warn?: boolean) => void }) {
-  const { store, prices, prefs } = useCargo()
+  const { store, prices } = useCargo()
+  const fxNow = useFx().today.rate
   const { sound } = useApp()
   const { money } = useRole() // staff never see a price
   const { item } = r
@@ -115,7 +116,7 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
   const crcFromInput = (): number | null => {
     const p = num(price.replace(',', '.'))
     if (p === null) return null
-    return cur === 'USD' ? p * prefs.fx : p
+    return cur === 'USD' ? p * fxNow : p
   }
 
   const doReceive = () => {
@@ -239,7 +240,7 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
               return (
                 <tr key={p.id}>
                   <td>{p.priced_on}</td>
-                  <td><Money crc={p.price_crc} fx={prefs.fx} day={p.priced_on} /></td>
+                  <td><Money crc={p.price_crc} fx={fxNow} day={p.priced_on} /></td>
                   <td className={d !== null && d > 0 ? 'warn' : ''}>{d === null ? '--' : `${d > 0 ? '+' : ''}${d.toFixed(0)}%`}</td>
                   <td>{p.supplier ?? '--'}</td>
                 </tr>
@@ -279,9 +280,12 @@ function ItemPanel({ r, moves, onClose, say }: { r: CargoRow; moves: Move[]; onC
   )
 }
 
-export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
+export function Cargo({ onOpenSequence, onOpenPrices }: { onOpenSequence: () => void; onOpenPrices: () => void }) {
   const { sound } = useApp()
   const { store, rows, moves, plan, prefs, setPrefs } = useCargo()
+  // One exchange rate for the whole app: the day's rate in the PRICE BOOK (it fetches itself when online).
+  const fx = useFx()
+  useFxSync()
   const { money } = useRole()
   const { status, kind, note, error } = useStoreStatus()
   const [openId, setOpenId] = useState<string | null>(null)
@@ -365,9 +369,10 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
         <span>{uncounted} NOT COUNTED</span>
         {money && (
           <span>
-            EXCHANGE RATE TODAY ₡
-            <input className="cg-fx" aria-label="Colones per US dollar" inputMode="decimal" defaultValue={prefs.fx} key={prefs.fx} onBlur={(e) => { const v = num(e.target.value); if (v && v > 0) setPrefs({ fx: v }) }} />
-            = US$1
+            EXCHANGE RATE TODAY ₡{fx.today.rate.toLocaleString('en-US')} = US$1{' '}
+            <button type="button" className="ck-link" onClick={onOpenPrices}>
+              SET IN THE PRICE BOOK
+            </button>
           </span>
         )}
       </div>
@@ -412,7 +417,7 @@ export function Cargo({ onOpenSequence }: { onOpenSequence: () => void }) {
                 <td>{fmtWeeks(r.weeks)}</td>
                 <td>{r.item.lead_time_days === null ? '--' : `${r.item.lead_time_days} D`}</td>
                 <td>{r.item.supplier ?? '--'}</td>
-                {money && <td>{r.last ? <Money crc={r.last.price_crc} fx={prefs.fx} day={r.last.priced_on} /> : '--'}</td>}
+                {money && <td>{r.last ? <Money crc={r.last.price_crc} fx={fx.today.rate} day={r.last.priced_on} /> : '--'}</td>}
               </tr>
             ))}
           </tbody>

@@ -67,18 +67,22 @@ export function ClimateGraph({ series, measure, band, from, to, label }: { serie
   const X = (t: number) => padL + ((t - from) / (to - from)) * (w - padL - padR)
   const Y = (v: number) => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB)
   const slice = (to - from) / n
-  // Break the line where there is a gap of more than 3 slices.
-  const parts: string[] = []
-  let cur = ''
+  // Break the line only where readings stop for much longer than usual. Hand-logged readings come every few
+  // hours, so "usual" is the median gap between slices, not one slice. A run of one slice is drawn as a dot.
+  const gaps = bs
+    .slice(1)
+    .map((b, i) => b.t0 - bs[i].t1)
+    .filter((g) => g >= 0)
+    .sort((a, b) => a - b)
+  const typical = gaps.length ? gaps[Math.floor(gaps.length / 2)] : 0
+  const breakAt = Math.max(3 * slice, 3 * (typical + slice))
+  const runs: { x: number; y: number }[][] = [[]]
   bs.forEach((b, i) => {
-    const pt = `${X((b.t0 + b.t1) / 2).toFixed(1)},${Y(b.avg).toFixed(1)}`
-    if (i > 0 && b.t0 - bs[i - 1].t1 > 3 * slice) {
-      parts.push(cur)
-      cur = ''
-    }
-    cur += `${cur ? ' L' : 'M'}${pt}`
+    if (i > 0 && b.t0 - bs[i - 1].t1 > breakAt) runs.push([])
+    runs[runs.length - 1].push({ x: X((b.t0 + b.t1) / 2), y: Y(b.avg) })
   })
-  parts.push(cur)
+  const parts = runs.filter((r) => r.length > 1).map((r) => r.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '))
+  const dots = runs.filter((r) => r.length === 1).map((r) => r[0])
   const area = bs.map((b) => `M${X(b.t0).toFixed(1)},${Y(b.max).toFixed(1)}H${Math.max(X(b.t1), X(b.t0) + 1).toFixed(1)}V${Y(b.min).toFixed(1)}H${X(b.t0).toFixed(1)}Z`).join('')
   const yt = niceTicks(lo, hi, narrow ? 3 : 4)
   const span = to - from
@@ -121,7 +125,8 @@ export function ClimateGraph({ series, measure, band, from, to, label }: { serie
         <path className="at-range" d={area} />
         {band?.hi !== null && band?.hi !== undefined && <line className="at-lim" x1={padL} x2={w - padR} y1={Y(band.hi)} y2={Y(band.hi)} />}
         {band?.lo !== null && band?.lo !== undefined && <line className="at-lim" x1={padL} x2={w - padR} y1={Y(band.lo)} y2={Y(band.lo)} />}
-        {parts.filter(Boolean).map((d, i) => <path key={i} className="at-line" d={d} />)}
+        {parts.map((d, i) => <path key={i} className="at-line" d={d} />)}
+        {dots.map((p, i) => <circle key={`d${i}`} className="at-pt" cx={p.x} cy={p.y} r="2.5" />)}
         {hb && <line className="at-cursor" x1={X((hb.t0 + hb.t1) / 2)} x2={X((hb.t0 + hb.t1) / 2)} y1={padT} y2={H - padB} />}
         {hb && <circle className="at-dot" cx={X((hb.t0 + hb.t1) / 2)} cy={Y(hb.avg)} r="3" />}
         <text className="at-unit" x={padL + 4} y={padT + 11}>{m.unit === 'C' ? '°C' : m.unit}</text>

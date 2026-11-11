@@ -2,7 +2,6 @@
 .cargo { display: grid; gap: 4px; }
 .cg-status { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; }
 .cg-status b { font-weight: normal; }
-.cg-fx { font: inherit; color: var(--fg); background: var(--bg-hi); border: 1px solid var(--fg-dim); width: 4.2em; padding: 0 4px; margin: 0 3px; }
 .cg-tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
 .cg-add { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px; border: 1px dashed var(--fg-faint); }
 .cargo input, .cargo select { font: inherit; color: var(--fg); background: var(--bg-hi); border: 1px solid var(--fg-dim); padding: 5px 8px; min-height: 34px; min-width: 0; }

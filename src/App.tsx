@@ -37,7 +37,7 @@ import { Guide, GuideIndex, GUIDE_START, type GuideState } from './screens/Guide
 import { TipLayer, TipsButton } from './components/Tips'
 import { useTableCards } from './components/TableCards'
 import { tipModeOn, toggleTipMode, useTipMode } from './guide/tipStore'
-import { guideSectionFor } from './guide/content'
+import { deckPageKey, guideSectionFor } from './guide/content'
 import { GlovePad } from './components/GlovePad'
 import { useT } from './settings/useT'
 import { useRole } from './settings/RoleContext'
@@ -62,9 +62,16 @@ import { SourcePopup } from './manual/SourcePopup'
 import { ManualLinksContext } from './manual/ManualLinks'
 import { MANUAL_ON } from './manual/load'
 import type { ManualLoc } from './manual/types'
+import { DeckView, type GoTo } from './screens/Decks'
+import { ColdStore } from './screens/ColdStore'
+import { DeckNav, RelatedFoot, StationBar, StationDirectory } from './nav/DeckNav'
+import { StationTabsContext } from './nav/StationContext'
+import { DeckPulseProvider } from './nav/useDeckPulse'
+import { DECKS, deckById, parseNav, stationById, stationFor, visibleStations, type DeckId, type StationAt } from './nav/decks'
+import type { CookRun } from './lib/cook'
 
 type Stage = 'power' | 'boot' | 'login' | 'shell'
-type View = { name: 'menu' } | { name: 'tune' } | { name: 'help' } | { name: 'status' } | { name: 'login' } | { name: 'module'; idx: number }
+type View = { name: 'menu' } | { name: 'deck'; deck: DeckId } | { name: 'tune' } | { name: 'help' } | { name: 'status' } | { name: 'login' } | { name: 'module'; idx: number }
 
 const VITALS_IDX = MODULES.findIndex((m) => m.key === 'VITALS')
 const DECK_IDX = MODULES.findIndex((m) => m.key === 'DECK')
@@ -89,6 +96,7 @@ const DATA_IDX = MODULES.findIndex((m) => m.key === 'DATA')
 const STAFF_IDX = MODULES.findIndex((m) => m.key === 'STAFF')
 const ASK_IDX = MODULES.findIndex((m) => m.key === 'ASK')
 const GUIDE_IDX = MODULES.findIndex((m) => m.key === 'GUIDE')
+const COLD_IDX = MODULES.findIndex((m) => m.key === 'COLD')
 
 /** Words that start a question or a command for the farm assistant (ASK), when more words follow. */
 const ASK_WORDS = new Set(['ASK', 'HOW', 'WHAT', 'WHATS', "WHAT'S", 'WHO', 'WHOS', "WHO'S", 'WHICH', 'WHEN', 'IS', 'ARE', 'WAS', 'DID', 'DO', 'DOES', 'HAS', 'HAVE', 'ANY', 'TELL', 'SHOW', 'OPEN', 'LIST', 'GIVE', 'LOG', 'ADD', 'RECORD', 'PICKED', 'HARVESTED', 'RECEIVED', 'USED', 'MARK', 'MOVE', 'SET', 'POWER', 'GENERATOR', 'GRID', 'CUANTOS', 'CUANTAS', 'CUANTO', 'QUIEN', 'QUE', 'CUAL'])
@@ -97,6 +105,7 @@ const ASK_WORDS = new Set(['ASK', 'HOW', 'WHAT', 'WHATS', "WHAT'S", 'WHO', 'WHOS
 interface Snap {
   view: View
   selected: number
+  deckSel: DeckId
   specimen: number
   specTab: Tab
   room: RoomId
@@ -118,10 +127,12 @@ interface Snap {
   askS: AskState
   guide: GuideState
 }
-const sameSpot = (a: Snap, b: View) => a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1)
+const sameSpot = (a: Snap, b: View) =>
+  a.view.name === b.name && ('idx' in a.view ? a.view.idx : -1) === ('idx' in b ? b.idx : -1) && ('deck' in a.view ? a.view.deck : '') === ('deck' in b ? b.deck : '')
 
 const TITLES: Record<View['name'], string> = {
   menu: 'MAIN MENU',
+  deck: '',
   tune: 'TUNING',
   help: 'HELP',
   status: 'SYSTEM STATUS',
@@ -137,6 +148,10 @@ export default function App() {
   const [view, setView] = useState<View>({ name: 'menu' })
   const [firstMenu, setFirstMenu] = useState(true)
   const [selected, setSelected] = useState(0)
+  /** The deck highlighted on the main menu. */
+  const [deckSel, setDeckSel] = useState<DeckId>('bridge')
+  /** True right after a deck is opened from somewhere else: its name types in. False when coming back to it. */
+  const [deckArrive, setDeckArrive] = useState(true)
   const [specimen, setSpecimen] = useState(0)
   const [specTab, setSpecTab] = useState<Tab>('OVERVIEW')
   const [sweep, setSweep] = useState(0)
@@ -187,12 +202,13 @@ export default function App() {
   const searchIndex = useSearchIndex()
   const store = useStore()
   const strains = useTable<Strain>('strains')
+  const cookRuns = useTable<CookRun>('cook_runs')
   useFxSync() // today's colones per dollar, once a day when online
-  useRates() // keeps the prices and costs from PRICES + COSTS live for every screen's maths
+  useRates() // keeps the prices and costs from PRICE BOOK live for every screen's maths
   // Back button: the screens you came from, newest last.
   const history = useRef<Snap[]>([])
   const [histLen, setHistLen] = useState(0)
-  const snapNow: Snap = { view, selected, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac, atm, srch, dat, askS, guide }
+  const snapNow: Snap = { view, selected, deckSel, specimen, specTab, room: power.selectedRoom, manualLoc, xeno, hazard, cook, ledger, trade, mission, hist, yld, ord, money, fac, atm, srch, dat, askS, guide }
   const snapRef = useRef(snapNow)
   snapRef.current = snapNow
   const alertTimer = useRef<number | null>(null)
@@ -213,6 +229,13 @@ export default function App() {
         setReply({ text: trf(langRef.current, 'STAFF CANNOT OPEN {name}. ASK THE OWNER.', { name: tr(langRef.current, MODULES[v.idx].name) }), warn: true, id: Date.now() })
         return
       }
+      if (v.name === 'deck') {
+        const d = deckById(v.deck)
+        if (!d || !visibleStations(d, (k) => k === 'TUNE' || roleRef.current.canOpen(k)).length) {
+          setReply({ text: trf(langRef.current, 'STAFF CANNOT OPEN {name}. ASK THE OWNER.', { name: tr(langRef.current, d?.name ?? v.deck) }), warn: true, id: Date.now() })
+          return
+        }
+      }
       if (record && !sameSpot(snapRef.current, v)) pushHist()
       setView(v)
       setSweep((n) => n + 1)
@@ -229,6 +252,8 @@ export default function App() {
     if (!s) return
     setView(s.view)
     setSelected(s.selected)
+    setDeckSel(s.deckSel)
+    setDeckArrive(false)
     setSpecimen(s.specimen)
     setSpecTab(s.specTab)
     setManualLoc(s.manualLoc ? { ...s.manualLoc, n: Date.now() } : null)
@@ -469,6 +494,58 @@ export default function App() {
     go({ name: 'module', idx: SPEC_IDX })
   }
 
+  // ---------- the deck map ----------
+
+  /** May this person open a station's screen? TUNING is for everyone. */
+  const canOpen = (screen: string) => screen === 'TUNE' || roleInfo.canOpen(screen)
+  // Where we are on the map, worked out from the screen and its tab, so every way in (menu, command, link,
+  // search hit, BACK) shows the right station without keeping a second copy of the state.
+  const modKey = view.name === 'module' ? MODULES[view.idx].key : null
+  const modTab: string | null =
+    modKey === 'MISSION' ? mission.tab : modKey === 'MONEY' ? money.tab : modKey === 'TRADE' ? trade.tab : modKey === 'ORDERS' ? ord.tab : modKey === 'LEDGER' ? ledger.sel : modKey === 'FACILITY' ? fac.tab : modKey === 'XENO' ? xeno.tab : null
+  const station: StationAt | undefined = view.name === 'tune' ? stationById('tuning') : modKey ? stationFor(modKey, modTab) : undefined
+  const curDeck = view.name === 'deck' ? deckById(view.deck) : station?.deck
+
+  const openDeck = (id: DeckId) => {
+    setDeckSel(id)
+    setDeckArrive(!(view.name === 'deck' && view.deck === id))
+    go({ name: 'deck', deck: id })
+  }
+  /** Open a station: its screen on the station's first tab (or the tab already showing, when it is this station). */
+  const openStation = (st: StationAt) => {
+    if (!canOpen(st.screen)) return say(tf('STAFF CANNOT OPEN {name}. ASK THE OWNER.', { name: t(st.name) }), true)
+    if (st.screen === 'TUNE') return go({ name: 'tune' })
+    const here = station?.id === st.id
+    const tab = (cur: string) => (here ? cur : (st.tabs?.[0] ?? cur))
+    switch (st.screen) {
+      case 'MISSION':
+        return openMission({ tab: tab(mission.tab) as MissionState['tab'] })
+      case 'MONEY':
+        return openMoney({ tab: tab(money.tab) as MoneyState['tab'] })
+      case 'TRADE':
+        return openTrade({ tab: tab(trade.tab) as TradeState['tab'] })
+      case 'ORDERS':
+        return openOrders({ tab: tab(ord.tab) as OrdersState['tab'] })
+      case 'LEDGER':
+        return openLedger({ sel: here ? ledger.sel : ((st.tabs?.[0] ?? 'overview') as LedgerState['sel']) })
+      case 'FACILITY':
+        return openFacility({ tab: tab(fac.tab) as FacState['tab'] })
+      case 'XENO':
+        return openXeno({ tab: tab(xeno.tab) as XenoState['tab'] })
+      default:
+        return openModuleKey(st.screen)
+    }
+  }
+  const openStationId = (id: string) => {
+    const st = stationById(id)
+    if (st) openStation(st)
+  }
+  /** Open where a reminder or work-list line says the job is done. */
+  const openWork = (g: GoTo) => {
+    if (!g) return say(t('NOTHING TO OPEN FOR THIS ONE.'))
+    openGo({ screen: g.screen, tab: g.tab })
+  }
+
   const enterShell = useCallback(() => {
     setStage('shell')
     // A scanned label opens straight onto its record: #xeno/c/<id>.
@@ -596,7 +673,7 @@ export default function App() {
   })
 
   /** Which guide page explains the screen being shown. */
-  const guideScreen = view.name === 'module' ? MODULES[view.idx].key : view.name.toUpperCase()
+  const guideScreen = view.name === 'module' ? MODULES[view.idx].key : view.name === 'deck' ? deckPageKey(view.deck) : view.name.toUpperCase()
 
   // ---------- commands ----------
 
@@ -605,11 +682,15 @@ export default function App() {
     // Spanish words mean their English command (AYUDA = HELP, BUSCAR = FIND). Accents never matter.
     const cmd = ES_COMMANDS[cmd0.normalize('NFD').replace(/[\u0300-\u036f]/g, '')] ?? cmd0
     const arg = rest.join(' ')
-    const num = Number(cmd)
-    const byNum = Number.isInteger(num) ? MODULES.findIndex((m) => m.num === num) : -1
-    if (byNum >= 0) {
-      setSelected(byNum)
-      return go({ name: 'module', idx: byNum })
+    // The deck map: 0 = main menu, 1-8 = a deck, 5.3 = deck 5 station 3, a deck name, a station name.
+    // A number that is a breaker tag (13 to 18) still flips that breaker.
+    const nav = parseNav(raw)
+    const isBreaker = allCircuits(power.state.heater).some((c) => c.tag === cmd)
+    if (nav && !(nav.kind === 'bad' && isBreaker)) {
+      if (nav.kind === 'menu') return go({ name: 'menu' })
+      if (nav.kind === 'bad') return say(nav.text, true)
+      if (nav.kind === 'deck') return openDeck(nav.deck.id)
+      return openStation(nav.station)
     }
     // Search: FIND blue oyster, /B1020, or just type a code or a name.
     if (raw.trim().startsWith('/') && raw.trim().length > 1) return openSearch({ tab: 'FIND', q: raw.trim().slice(1).trim().toUpperCase(), kinds: [] })
@@ -691,6 +772,13 @@ export default function App() {
     // Cook log: type COOK, STEAM, STERILIZE or 75X to open it, or on the screen a tab name (CURVE, READINGS, SHEET).
     const ckTab = COOK_TABS.find((t) => t === cmd)
     if (ckTab && view.name === 'module' && view.idx === COOK_IDX) {
+      // A run's tabs need a run: with none picked, open the newest one.
+      if (!cook.sel && ckTab !== 'RUN' && ckTab !== 'TARGETS') {
+        const newest = [...cookRuns].sort((a, b) => (b.started_at ?? '').localeCompare(a.started_at ?? ''))[0]
+        if (!newest) return say(t('NO COOK RUNS YET. START ONE ON THIS SCREEN FIRST.'), true)
+        setCook({ sel: newest.id, tab: ckTab })
+        return sound.chirp()
+      }
       setCook({ tab: ckTab })
       return sound.chirp()
     }
@@ -933,33 +1021,17 @@ export default function App() {
   ]
 
   const hints: Record<View['name'], string> = {
-    menu: 'ARROWS + ENTER OR TAP TO OPEN // [ INDEX // TYPE A NUMBER OR NAME // F1 HELP',
+    menu: 'ARROWS + ENTER OR TAP TO OPEN A DECK // TYPE 1-8 OR A NAME // 5.3 OPENS DECK 5, STATION 3 // F1 HELP',
+    deck: 'TAP A STATION OR A FIGURE TO OPEN IT // TYPE 5.3 FOR DECK 5, STATION 3 // 0 OR F2 MAIN MENU',
     tune: 'DRAG A METER OR USE ARROW KEYS ON IT // TEST BUTTONS PLAY EACH LAYER // SAVED ON THIS DEVICE',
     help: 'TYPE A COMMAND AT THE PROMPT',
     status: 'F2 MENU',
     login: 'ACCOUNTS ARE MADE IN THE SUPABASE DASHBOARD',
-    module: 'ARROWS MOVE // [ INDEX ] PAGE // BKSP BACK // F2 MENU // TYPE ANOTHER MODULE NAME TO JUMP',
+    module: 'ARROWS MOVE // [ INDEX ] PAGE // BKSP BACK // F2 MENU // TYPE A STATION CODE (5.3) OR NAME TO JUMP',
   }
 
-  const moduleIndex = (
-    <>
-      <div className="section-title">{t('INDEX')}</div>
-      <ul className="index-list">
-        <li tabIndex={0} data-tip={t('The main menu.')} onClick={() => go({ name: 'menu' })}>
-          <span>00 {t('CORE')}</span>
-          <span className="k">{t('ONLINE')}</span>
-        </li>
-        {MODULES.map((m, i) => roleInfo.canOpen(m.key) && (
-          <li tabIndex={0} key={m.key} data-tip={`${t(m.name)}: ${t(m.what)}`} className={view.name === 'module' && view.idx === i ? 'sel' : ''} onClick={() => (setSelected(i), go({ name: 'module', idx: i }))}>
-            <span>
-              {String(m.num).padStart(2, '0')} {m.key}
-            </span>
-            <span className="k">B{m.build}</span>
-          </li>
-        ))}
-      </ul>
-    </>
-  )
+  const directory = <StationDirectory canOpen={canOpen} onDeck={(d) => openDeck(d.id)} onStation={openStation} />
+  const deckNav = curDeck ? <DeckNav deck={curDeck} station={station ?? null} canOpen={canOpen} onDeck={() => openDeck(curDeck.id)} onStation={openStation} /> : null
   const tuneIndex = (
     <>
       <div className="section-title">{t('SECTIONS')}</div>
@@ -981,8 +1053,14 @@ export default function App() {
   let content: React.ReactNode
   switch (view.name) {
     case 'menu':
-      content = <Menu selected={selected} setSelected={setSelected} onOpen={(i) => go({ name: 'module', idx: i })} firstShow={firstMenu} />
+      content = <Menu selected={deckSel} setSelected={setDeckSel} onOpen={openDeck} onBackup={() => openStationId('vault')} onStatus={() => openStationId('reminders')} firstShow={firstMenu} />
       break
+    case 'deck': {
+      const d = deckById(view.deck) ?? DECKS[0]
+      title = t(d.name)
+      content = <DeckView deck={d} canOpen={canOpen} onStation={openStationId} onDeck={openDeck} onGo={openWork} arrive={deckArrive} />
+      break
+    }
     case 'tune':
       content = <Tuning onAlarm={toggleAlarm} onReplayBoot={replayBoot} />
       break
@@ -1016,7 +1094,7 @@ export default function App() {
       )
       break
     case 'module':
-      title = t(MODULES[view.idx].name)
+      title = t(station?.name ?? MODULES[view.idx].name)
       if (view.idx === VITALS_IDX)
         content = (
           <Vitals
@@ -1078,6 +1156,7 @@ export default function App() {
               setSelected(SEQ_IDX)
               go({ name: 'module', idx: SEQ_IDX })
             }}
+            onOpenPrices={() => openLedger({ sel: 'settings' })}
           />
         )
       else if (view.idx === LEDGER_IDX)
@@ -1102,15 +1181,26 @@ export default function App() {
       else if (view.idx === SEARCH_IDX) content = <Search x={srch} set={setSrch} say={say} onOpen={openHit} />
       else if (view.idx === DATA_IDX) content = <Data x={dat} set={setDat} say={say} />
       else if (view.idx === STAFF_IDX) content = <Staff say={say} />
-      else if (view.idx === GUIDE_IDX) content = <Guide x={guide} set={setGuide} onGo={openModuleKey} />
+      else if (view.idx === GUIDE_IDX) content = <Guide x={guide} set={setGuide} onGo={(k) => (k.startsWith('DECK:') ? openDeck(k.slice(5) as DeckId) : openModuleKey(k))} />
       else if (view.idx === ASK_IDX) content = <Ask x={askS} set={setAsk} say={say} onGo={openGo} />
       else if (view.idx === HISTORY_IDX) content = <History x={hist} set={setHist} say={say} />
       else if (view.idx === TRADE_IDX) content = <Trade x={trade} set={setTrade} say={say} onOpenLedger={() => openLedger({ sel: 'overview' })} onOpenPrices={() => openLedger({ sel: 'settings' })} onOpenOrders={() => openOrders({ tab: 'ORDERS' })} />
       else if (view.idx === MANUAL_IDX) content = <Manual loc={manualLoc} onOpen={openManual} />
+      else if (view.idx === COLD_IDX)
+        content = <ColdStore onOpenHarvest={() => openMission({ tab: 'HARVEST' })} onOpenSale={() => openTrade({ tab: 'SALE' })} onOpenWaste={() => openMoney({ tab: 'WASTE' })} onOpenPrices={() => openLedger({ sel: 'settings' })} />
       else content = <Pending mod={MODULES[view.idx]} />
       break
   }
 
+  // Every station's screen: its deck and station drop-down (phones), what it is for, and RELATED at the foot (phones).
+  if (station && curDeck && (view.name === 'tune' || (view.name === 'module' && view.idx !== MANUAL_IDX)))
+    content = (
+      <>
+        <StationBar deck={curDeck} station={station} canOpen={canOpen} onDeck={() => openDeck(curDeck.id)} onStation={openStation} screenName={view.name === 'module' ? MODULES[view.idx].name : 'TUNING'} />
+        {content}
+        <RelatedFoot station={station} canOpen={canOpen} onStation={openStation} />
+      </>
+    )
   store.screen = title || null
   if (view.name === 'module' && view.idx === VITALS_IDX)
     hints.module = 'TAP A BREAKER TO FLIP IT // TYPE A TAG (S4) OR GEN, UTILITY, HEATER A/B // F2 MENU'
@@ -1160,36 +1250,12 @@ export default function App() {
     hints.module = 'TAP A CHANGE TO SEE THAT RECORD // UNDO OR CTRL+Z REVERSES THE LAST CHANGE // TYPE SYNC FOR SAVING STATUS // F2 MENU'
   if (view.name === 'module' && view.idx === MANUAL_IDX)
     hints.module = 'PICK A CHAPTER OR SECTION FROM THE CONTENTS // TAP A LINK TO JUMP // BACK RETURNS TO WHERE YOU WERE // F2 MENU'
+  if (view.name === 'module' && view.idx === COLD_IDX)
+    hints.module = 'ON HAND = PICKED MINUS SOLD FRESH MINUS WRITTEN OFF, OLDEST PICKS FIRST // SHELF LIFE IS IN THE PRICE BOOK // F2 MENU'
 
-  const result = reply ? { id: reply.id, warn: reply.warn, text: <TypeText key={reply.id} lines={[reply.text]} /> } : null
-  const hint = tipMode ? (
-    t('TIP MODE: TAP ANY CONTROL TO READ WHAT IT DOES. TAP ? TIPS AGAIN OR PRESS ESC TO LEAVE.')
-  ) : (
-    t(hints[view.name])
-  )
-
-  return (
-    <ManualLinksContext.Provider value={links}>
-    <HistoryNavContext.Provider value={openRecordHistory}>
-    <Crt alert={alert}>
-      <ReminderWatcher />
-      <GlovePad />
-      {stage === 'shell' && <TipLayer screen={guideScreen} onGuide={(k) => openGuide({ sec: k })} />}
-      {stage === 'login' ? (
-        <div className="shell" style={{ gridTemplateRows: 'auto minmax(0,1fr)' }}>
-          <header className="titlebar">
-            <span className="tb-left">{STATION.system} // IDENTIFY</span>
-            <span className="tb-right">{STATION.company}</span>
-          </header>
-          <main className="panel">
-            <Login onDone={enterShell} />
-          </main>
-        </div>
-      ) : (
-        <>
-          <Shell
-            title={title}
-            index={
+  // The left panel: the deck's station list (with RELATED decks) above the screen's own index.
+  // MANUAL keeps its full contents panel. The menu, help, status and login list every station.
+  const ownIndex =
               view.name === 'tune'
                 ? tuneIndex
                 : view.name === 'module' && view.idx === VITALS_IDX
@@ -1200,8 +1266,6 @@ export default function App() {
                       ? <SpecimenIndex index={specimen} onPick={setSpecimen} />
                       : view.name === 'module' && view.idx === CARGO_IDX
                         ? <CargoIndex />
-                        : view.name === 'module' && view.idx === MANUAL_IDX
-                          ? undefined
                           : view.name === 'module' && view.idx === HAZARD_IDX
                             ? <HazardIndex x={hazard} set={setHazard} />
                           : view.name === 'module' && view.idx === XENO_IDX
@@ -1236,8 +1300,65 @@ export default function App() {
                             ? <AskIndex x={askS} set={setAsk} />
                           : view.name === 'module' && view.idx === GUIDE_IDX
                             ? <GuideIndex x={guide} set={setGuide} />
-                          : moduleIndex
-            }
+                          : undefined
+  const indexPanel =
+    view.name === 'deck'
+      ? deckNav
+      : view.name === 'module' && view.idx === MANUAL_IDX
+        ? undefined
+        : view.name === 'module' || view.name === 'tune'
+          ? deckNav || ownIndex
+            ? (
+                <>
+                  {deckNav}
+                  {ownIndex}
+                </>
+              )
+            : undefined
+          : directory
+  // Title bar: MY/CO/L // DECK // STATION, each part tappable. The deck page itself shows only its name.
+  const trail =
+    curDeck && view.name !== 'deck' ? (
+      <span className="tb-trail">
+        <button type="button" className="tb-crumb" onClick={() => openDeck(curDeck.id)} data-tip={t('This deck: its overview and station list.')}>
+          {t(curDeck.name)}
+        </button>{' '}
+        <span className="tb-sep">//</span>{' '}
+      </span>
+    ) : undefined
+
+  const result = reply ? { id: reply.id, warn: reply.warn, text: <TypeText key={reply.id} lines={[reply.text]} /> } : null
+  const hint = tipMode ? (
+    t('TIP MODE: TAP ANY CONTROL TO READ WHAT IT DOES. TAP ? TIPS AGAIN OR PRESS ESC TO LEAVE.')
+  ) : (
+    t(hints[view.name])
+  )
+
+  return (
+    <ManualLinksContext.Provider value={links}>
+    <HistoryNavContext.Provider value={openRecordHistory}>
+    <Crt alert={alert}>
+      <ReminderWatcher />
+      <GlovePad />
+      {stage === 'shell' && <TipLayer screen={guideScreen} onGuide={(k) => openGuide({ sec: k })} />}
+      {stage === 'login' ? (
+        <div className="shell" style={{ gridTemplateRows: 'auto minmax(0,1fr)' }}>
+          <header className="titlebar">
+            <span className="tb-left">{STATION.system} // IDENTIFY</span>
+            <span className="tb-right">{STATION.company}</span>
+          </header>
+          <main className="panel">
+            <Login onDone={enterShell} />
+          </main>
+        </div>
+      ) : (
+        <StationTabsContext.Provider value={station?.tabs ?? null}>
+        <DeckPulseProvider>
+          <Shell
+            title={title}
+            index={indexPanel}
+            trail={trail}
+            onHome={() => go({ name: 'menu' })}
             keys={keys}
             onKey={onKey}
             hint={hint}
@@ -1253,7 +1374,7 @@ export default function App() {
             glove={settings.glove ? <button type="button" className="gl-badge" title={t('Glove mode is on. Tap to switch it off.')} onClick={() => update((x) => ({ ...x, glove: false }))}>{t('GLOVE')} {'\u2715'}</button> : undefined}
             undo={<UndoButton say={say} />}
             tips={<TipsButton />}
-            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX || view.idx === ATMOS_IDX || view.idx === SEARCH_IDX || view.idx === DATA_IDX || view.idx === STAFF_IDX || view.idx === ASK_IDX || view.idx === GUIDE_IDX) ? ' view-ledger' : ''}`}
+            bodyClass={`view-${view.name}${view.name === 'module' && view.idx === MANUAL_IDX ? ' view-manual' : ''}${view.name === 'module' && (view.idx === VITALS_IDX || view.idx === DECK_IDX) ? ' view-power' : ''}${view.name === 'module' && view.idx === XENO_IDX ? ' view-strip' : ''}${view.name === 'module' && view.idx === SPEC_IDX ? ' view-fullindex' : ''}${view.name === 'module' && view.idx === HAZARD_IDX ? ' view-hazard' : ''}${view.name === 'module' && view.idx === COOK_IDX ? ' view-cook' : ''}${view.name === 'module' && (view.idx === LEDGER_IDX || view.idx === TRADE_IDX || view.idx === MISSION_IDX || view.idx === HISTORY_IDX || view.idx === YIELD_IDX || view.idx === ORDERS_IDX || view.idx === MONEY_IDX || view.idx === FACILITY_IDX || view.idx === ATMOS_IDX || view.idx === SEARCH_IDX || view.idx === DATA_IDX || view.idx === STAFF_IDX || view.idx === ASK_IDX || view.idx === GUIDE_IDX || view.idx === COLD_IDX) ? ' view-ledger' : ''}`}
           >
             <div key={`${view.name}-${'idx' in view ? view.idx : ''}`}>{content}</div>
           </Shell>
@@ -1268,7 +1389,8 @@ export default function App() {
               }}
             />
           )}
-        </>
+        </DeckPulseProvider>
+        </StationTabsContext.Provider>
       )}
     </Crt>
     </HistoryNavContext.Provider>

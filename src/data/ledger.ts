@@ -5,7 +5,7 @@ export { GUESS } from './cook'
 
 // ---------- ICE bill (electrical package, 4 Nov 2026: calculations/build_data.py) ----------
 
-// The numbers themselves are editable on PRICES + COSTS (src/lib/rates.ts). These are the source notes.
+// The numbers themselves are editable on PRICE BOOK (src/lib/rates.ts). These are the source notes.
 export const ICE = {
   source: 'BUILT-IN: ELECTRICAL PACKAGE 4 NOV 2026 (BUILD_DATA.PY): ₡59.67/KWH + ₡9,861.68/KW ABOVE 8 KW (10 KW MIN) + ₡7,924 FIXED, X1.16 TAXES',
 }

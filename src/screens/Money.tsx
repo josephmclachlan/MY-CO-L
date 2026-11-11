@@ -1,7 +1,9 @@
 import { useMemo, useState, type ReactNode } from 'react'
+import { useStationTabs } from '../nav/StationContext'
 import { useApp } from '../settings/AppContext'
 import { useStore, useTable } from '../store/StoreContext'
 import { Select } from '../components/Select'
+import { Columns, shortCrc } from '../components/Charts'
 import { PickInput } from '../components/PickInput'
 import { HistoryButton } from './History'
 import { Confirm, Guess } from './CookParts'
@@ -176,17 +178,18 @@ export function MoneyIndex({ x, set }: { x: MoneyState; set: SetMoney }) {
   const d = useMoney()
   const m = monthOf(d.today)
   const p = pnlMonth(m, d.pnl, d.bud, d.sales)
+  const tabs = useStationTabs(MONEY_TABS)
   return (
     <>
-      <div className="section-title">MONEY</div>
-      <ul className="index-list">
-        {MONEY_TABS.map((t) => (
+      {tabs.length > 1 && <div className="section-title">MONEY</div>}
+      {tabs.length > 1 && <ul className="index-list">
+        {tabs.map((t) => (
           <li tabIndex={0} key={t} className={x.tab === t ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
             <span>{TAB_LABEL[t]}</span>
             {t === 'OWED' && d.owed.buyers.length > 0 && <span className="k">{d.owed.buyers.length} ON HOLD</span>}
           </li>
         ))}
-      </ul>
+      </ul>}
       <div className="section-title" style={{ marginTop: 10 }}>{monthLabel(m)} SO FAR</div>
       <div className="lg-mini">
         <div>SALES {fmtCrc(p.revenue)}</div>
@@ -204,14 +207,15 @@ export function Money({ x, set, say, onOpenTrade, onOpenLedger }: { x: MoneyStat
   const { sound } = useApp()
   const d = useMoney()
   useFxSync([...d.sales.map((s) => s.sold_on), ...d.moves.map((m) => m.day)])
+  const tabs = useStationTabs(MONEY_TABS)
   return (
     <div className="cook ledger od mn">
-      <label className="ck-picker">
-        <span>SHOW ({MONEY_TABS.length} SCREENS)</span>
+      {tabs.length > 1 && <label className="ck-picker">
+        <span>SHOW ({tabs.length} SCREENS)</span>
         <Select value={x.tab} onChange={(e) => (sound.chirp(), set({ tab: e.target.value as MoneyTab }))}>
-          {MONEY_TABS.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
+          {tabs.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
         </Select>
-      </label>
+      </label>}
       {(x.tab === 'OWED' || x.tab === 'RECEIPTS') && <div className="od-pay" role="note">{PAYMENT_RULE}</div>}
       {x.tab === 'OWED' && <OwedTab d={d} say={say} onOpenTrade={onOpenTrade} set={set} />}
       {x.tab === 'RECEIPTS' && <ReceiptsTab d={d} x={x} set={set} say={say} />}
@@ -481,9 +485,9 @@ function SpendTab({ d, say, onOpenLedger }: { d: MoneyData; say: Say; onOpenLedg
         <label className="ck-field"><span>NOTES</span><input value={notes} onChange={(e) => setNotes(e.target.value)} /></label>
         <button type="button" className="btn on lg-save" onClick={save}>SAVE</button>
         <div className="dim tiny">
-          SALES COME FROM TRADE. ICE BILLS COME FROM LEDGER ({d.bills.length} LOGGED). {d.settings.cargoAsSpend ? 'CARGO DELIVERIES COUNT AS SPENT, SO DO NOT TYPE SUPPLY BILLS HERE TOO. ' : ''}
-          {d.settings.hoursAsSpend ? 'LEDGER HOURS COUNT AS WAGES, SO DO NOT TYPE WAGES HERE TOO. ' : ''}
-          <button type="button" className="ck-link" onClick={onOpenLedger}>OPEN LEDGER</button> // SWITCHES ARE ON THE CASH FLOW TAB.
+          SALES COME FROM NEW SALE. ICE BILLS COME FROM POWER BILLS ({d.bills.length} LOGGED). {d.settings.cargoAsSpend ? 'SUPPLY DELIVERIES COUNT AS SPENT, SO DO NOT TYPE SUPPLY BILLS HERE TOO. ' : ''}
+          {d.settings.hoursAsSpend ? 'LABOUR HOURS COUNT AS WAGES, SO DO NOT TYPE WAGES HERE TOO. ' : ''}
+          <button type="button" className="ck-link" onClick={onOpenLedger}>OPEN POWER BILLS</button> // SWITCHES ARE ON THE CASH FLOW TAB.
         </div>
       </div>
 
@@ -603,13 +607,21 @@ function PnlTab({ d, x, set, onOpenLedger }: { d: MoneyData; x: MoneyState; set:
             </tbody>
           </table>
         </div>
-        {!bookGet(d.pnl, month, 'electricity') && month <= now && <div className="dim tiny">NO ICE BILL LOGGED FOR {monthLabel(month)}. <button type="button" className="ck-link" onClick={onOpenLedger}>ADD IT IN LEDGER</button></div>}
-        {d.unpriced > 0 && <div className="dim tiny">{d.unpriced} CARGO DELIVERIES HAVE NO PRICE, SO THEY ARE NOT COUNTED. ADD PRICES IN CARGO.</div>}
+        {!bookGet(d.pnl, month, 'electricity') && month <= now && <div className="dim tiny">NO ICE BILL LOGGED FOR {monthLabel(month)}. <button type="button" className="ck-link" onClick={onOpenLedger}>ADD IT IN POWER BILLS</button></div>}
+        {d.unpriced > 0 && <div className="dim tiny">{d.unpriced} SUPPLY DELIVERIES HAVE NO PRICE, SO THEY ARE NOT COUNTED. ADD THE PRICE ON EACH DELIVERY IN THE SUPPLY MANIFEST.</div>}
         <div className="dim tiny">SALES COUNT IN THE MONTH SOLD (PAID OR NOT). US$ IS EACH RECORD AT ITS OWN DAY&apos;S RATE. EQUIPMENT AND LOANS ARE ON THE CASH FLOW, NOT HERE.</div>
       </div>
 
       <div className="ck-box">
         <div className="section-title">LAST 12 MONTHS</div>
+        <Columns
+          data={yr.map((y) => ({ key: y.month, label: monthLabel(y.month).slice(0, 3), value: y.profit, warn: y.profit < 0, title: `${monthLabel(y.month)} PROFIT` }))}
+          label="Profit each month, last 12 months"
+          fmt={shortCrc}
+          onPick={(k) => set({ month: k === now ? null : k })}
+          selected={month}
+        />
+        <div className="dim tiny">PROFIT EACH MONTH. AMBER = A LOSS. TAP A MONTH TO SHOW IT ABOVE.</div>
         <div className="rc-wrap">
           <table className="lg-table rc-table mn-year">
             <thead><tr><th>MONTH</th><th>SALES</th><th>COSTS</th><th>PROFIT</th><th className="hide-sm">MARGIN</th><th className="hide-sm" /></tr></thead>
@@ -670,31 +682,17 @@ function avgKgPerBlock(recs: ReturnType<typeof useRecords>['recs']): number | nu
 
 // ---------- 12-month cash flow ----------
 
+/** Money in and out each month (out hatched), cash at the end of each month as a line, and the floor band under it. */
 function CashChart({ months, floor }: { months: ReturnType<typeof cashFlow>['months']; floor: number }) {
-  const W = 360
-  const H = 120
-  const vals = [...months.map((m) => m.end), floor, 0]
-  const hi = Math.max(...vals)
-  const lo = Math.min(...vals)
-  const span = hi - lo || 1
-  const y = (v: number) => 8 + (H - 16) * (1 - (v - lo) / span)
-  const xs = (i: number) => 14 + (i * (W - 28)) / Math.max(1, months.length - 1)
-  const pts = months.map((m, i) => `${xs(i)},${y(m.end)}`).join(' ')
   return (
-    <svg className="lg-chart mn-chart" viewBox={`0 0 ${W} ${H + 18}`} role="img" aria-label="Cash at the end of each month, with the three-month floor">
-      <line x1="0" y1={y(0)} x2={W} y2={y(0)} className="ax" />
-      {floor > 0 && <line x1="0" y1={y(floor)} x2={W} y2={y(floor)} className="floor" />}
-      <polyline points={pts} className="spark" />
-      {months.map((m, i) => (
-        <g key={m.month}>
-          <circle cx={xs(i)} cy={y(m.end)} r={m.end < floor ? 3.5 : 2.5} className={m.end < floor ? 'pt low' : m.basis === 'PLAN' ? 'pt plan' : 'pt'}>
-            <title>{`${monthLabel(m.month)}: ₡${Math.round(m.end).toLocaleString('en-US')} (${m.basis})`}</title>
-          </circle>
-          {i % 2 === 0 && <text x={xs(i)} y={H + 13} textAnchor="middle" className="lb">{monthLabel(m.month).slice(0, 3)}</text>}
-        </g>
-      ))}
-      {floor > 0 && <text x={W - 2} y={y(floor) - 3} textAnchor="end" className="lb">FLOOR</text>}
-    </svg>
+    <Columns
+      data={months.map((m) => ({ key: m.month, label: monthLabel(m.month).slice(0, 3), value: m.cashIn, alt: m.cashOut, title: `${monthLabel(m.month)} (${m.basis})` }))}
+      label="Money in and out each month, with cash at the end of the month and the floor"
+      fmt={shortCrc}
+      legend={['MONEY IN', 'MONEY OUT', 'CASH AT MONTH END']}
+      line={months.map((m) => m.end)}
+      band={floor > 0 ? { at: floor, label: `FLOOR ${shortCrc(floor)}`, shade: 'below' } : undefined}
+    />
   )
 }
 
@@ -756,11 +754,11 @@ function CashTab({ d, set, say }: { d: MoneyData; set: SetMoney; say: Say }) {
           </label>
         </div>
         <div className="lg-btns">
-          <button type="button" className={`btn ${ms.cargoAsSpend ? 'on' : ''}`} aria-pressed={ms.cargoAsSpend} onClick={() => run({ cargoAsSpend: !ms.cargoAsSpend }, ms.cargoAsSpend ? 'CARGO DELIVERIES NO LONGER COUNT AS SPENT' : 'CARGO DELIVERIES COUNT AS SPENT')}>
-            CARGO DELIVERIES = SPENT: {ms.cargoAsSpend ? 'ON' : 'OFF'}
+          <button type="button" className={`btn ${ms.cargoAsSpend ? 'on' : ''}`} aria-pressed={ms.cargoAsSpend} onClick={() => run({ cargoAsSpend: !ms.cargoAsSpend }, ms.cargoAsSpend ? 'SUPPLY DELIVERIES NO LONGER COUNT AS SPENT' : 'SUPPLY DELIVERIES COUNT AS SPENT')}>
+            SUPPLY DELIVERIES = SPENT: {ms.cargoAsSpend ? 'ON' : 'OFF'}
           </button>
-          <button type="button" className={`btn ${ms.hoursAsSpend ? 'on' : ''}`} aria-pressed={ms.hoursAsSpend} onClick={() => run({ hoursAsSpend: !ms.hoursAsSpend }, ms.hoursAsSpend ? 'LEDGER HOURS NO LONGER COUNT AS WAGES' : 'LEDGER HOURS COUNT AS WAGES')}>
-            LEDGER HOURS = WAGES: {ms.hoursAsSpend ? 'ON' : 'OFF'}
+          <button type="button" className={`btn ${ms.hoursAsSpend ? 'on' : ''}`} aria-pressed={ms.hoursAsSpend} onClick={() => run({ hoursAsSpend: !ms.hoursAsSpend }, ms.hoursAsSpend ? 'LABOUR HOURS NO LONGER COUNT AS WAGES' : 'LABOUR HOURS COUNT AS WAGES')}>
+            LABOUR HOURS = WAGES: {ms.hoursAsSpend ? 'ON' : 'OFF'}
           </button>
         </div>
         <div className="dim tiny">TURN A SWITCH OFF WHEN YOU TYPE THOSE BILLS ON SPENDING INSTEAD, SO NOTHING COUNTS TWICE. SAVED FOR THE WHOLE FARM, WITH UNDO.</div>

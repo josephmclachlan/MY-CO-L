@@ -1,8 +1,9 @@
 import { Select } from '../components/Select'
+import { useStationTabs } from '../nav/StationContext'
 import { PickInput } from '../components/PickInput'
 import { useMemo, useState } from 'react'
 import { useApp } from '../settings/AppContext'
-import { useCargoPrefs, useStore, useTable } from '../store/StoreContext'
+import { useStore, useTable } from '../store/StoreContext'
 import { speciesName, useLedger } from '../store/useLedger'
 import { CHANNELS, FORMS, GRADES, SALE_SPECIES, TRADE_GUESSES, type Channel, type Form } from '../data/ledger'
 import { addDays, costPerKg, weekOf, type Basis } from '../lib/ledger'
@@ -50,17 +51,18 @@ export function TradeIndex({ x, set }: { x: TradeState; set: SetTrade }) {
   const { sound } = useApp()
   const sales = useSales()
   const wk = between(sales, weekOf(today()), null)
+  const tabs = useStationTabs(TRADE_TABS)
   return (
     <>
-      <div className="section-title">TRADE</div>
-      <ul className="index-list">
-        {TRADE_TABS.map((t) => (
+      {tabs.length > 1 && <div className="section-title">TRADE</div>}
+      {tabs.length > 1 && <ul className="index-list">
+        {tabs.map((t) => (
           <li tabIndex={0} key={t} className={x.tab === t ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
             <span>{TAB_LABEL[t]}</span>
             {t === 'LOG' && <span className="k">{sales.length}</span>}
           </li>
         ))}
-      </ul>
+      </ul>}
       <div className="section-title" style={{ marginTop: 10 }}>THIS WEEK</div>
       <div className="lg-mini">
         <div>{wk.length} SALES</div>
@@ -74,22 +76,22 @@ export function TradeIndex({ x, set }: { x: TradeState; set: SetTrade }) {
 export function Trade({ x, set, say, onOpenLedger, onOpenPrices, onOpenOrders }: { x: TradeState; set: SetTrade; say: Say; onOpenLedger: () => void; onOpenPrices: () => void; onOpenOrders?: () => void }) {
   const { sound } = useApp()
   const sales = useSales()
-  const [cp] = useCargoPrefs()
   const d = useLedger()
   const cost = (k: string) => costPerKg(d.ledger, k, d.plan)
   const fxd = useFx()
   useFxSync(sales.map((s) => s.sold_on))
+  const tabs = useStationTabs(TRADE_TABS)
   return (
     <div className="cook ledger">
-      <label className="ck-picker">
+      {tabs.length > 1 && <label className="ck-picker">
         <span>SHOW</span>
         <Select value={x.tab} onChange={(e) => (sound.chirp(), set({ tab: e.target.value as TradeTab }))}>
-          {TRADE_TABS.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
+          {tabs.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
         </Select>
-      </label>
-      {x.tab === 'SALE' && <SaleForm sales={sales} fx={cp.fx} rate={fxd.rate} say={say} cost={cost} lotCodes={d.lots.map((l) => l.lot_code)} onOpenPrices={onOpenPrices} />}
-      {x.tab === 'TOTALS' && <Totals sales={sales} fx={cp.fx} rate={fxd.rate} cost={cost} noPrices={d.plan.all.parts.consumables.basis === 'NONE'} onOpenLedger={onOpenLedger} />}
-      {x.tab === 'BUYERS' && <Buyers sales={sales} fx={cp.fx} rate={fxd.rate} onOpenOrders={onOpenOrders} />}
+      </label>}
+      {x.tab === 'SALE' && <SaleForm sales={sales} fx={fxd.today.rate} rate={fxd.rate} say={say} cost={cost} lotCodes={d.lots.map((l) => l.lot_code)} onOpenPrices={onOpenPrices} />}
+      {x.tab === 'TOTALS' && <Totals sales={sales} fx={fxd.today.rate} rate={fxd.rate} cost={cost} noPrices={d.plan.all.parts.consumables.basis === 'NONE'} onOpenLedger={onOpenLedger} />}
+      {x.tab === 'BUYERS' && <Buyers sales={sales} fx={fxd.today.rate} rate={fxd.rate} onOpenOrders={onOpenOrders} />}
       {x.tab === 'LOG' && <Log sales={sales} rate={fxd.rate} say={say} />}
       {x.tab === 'GUESSES' && (
         <div className="ck-box">

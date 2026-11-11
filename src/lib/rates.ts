@@ -1,4 +1,4 @@
-// Every price and cost the app uses, in one record you can change on the PRICES + COSTS screen.
+// Every price and cost the app uses, in one record you can change on the PRICE BOOK screen.
 // Saved in the app_settings table (row id 'rates'), so phone and laptop agree once Supabase is linked.
 // Values left blank fall back to the defaults below, which name their source.
 
@@ -24,6 +24,8 @@ export interface Rates {
   wearPerBlock: number | null
   /** ₡ per kg by species key and form. A missing entry uses the default price. */
   sale: Record<string, Partial<Record<Form, number>>>
+  /** COLD STORE: days a fresh pick still counts as on hand. GUESS 7 for every species (Joseph, 11 Nov 2026). */
+  shelfDays: number
 }
 
 export const DEFAULT_ICE: IceRates = {
@@ -45,6 +47,7 @@ export const DEFAULT_RATES: Rates = {
   wearOn: false,
   wearPerBlock: null,
   sale: {},
+  shelfDays: 7,
 }
 
 export const RATES_ID = 'rates'
@@ -86,6 +89,7 @@ export function mergeRates(saved: unknown): Rates {
     wearOn: typeof s.wearOn === 'boolean' ? s.wearOn : DEFAULT_RATES.wearOn,
     wearPerBlock: pos(s.wearPerBlock),
     sale,
+    shelfDays: Math.min(30, Math.max(1, Math.round(pos(s.shelfDays) ?? DEFAULT_RATES.shelfDays))),
   }
 }
 
