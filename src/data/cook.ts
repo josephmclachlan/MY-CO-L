@@ -8,8 +8,7 @@
 //   ELECTRICAL  Joseph's electrical package (4 Nov 2026)
 // Anything not in those files is marked GUESS - REVIEW, here and on screen.
 //
-// Textbook sentences are NOT in this file. They live in src/data/cook/context.json, which the
-// public build empties (see vite.config.ts), like the contaminant library.
+// Textbook sentences are NOT in this file. They live in src/data/cook/context.json.
 
 export type CookKind = 'steam_box' | 'megachef' | 'pressure_75x' | 'other'
 export type Purpose = 'substrate' | 'grain' | 'agar' | 'other'

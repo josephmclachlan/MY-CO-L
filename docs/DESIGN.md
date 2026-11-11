@@ -79,7 +79,7 @@ Each module replaces its `Pending` placeholder in `src/App.tsx` (see `MODULES` i
 
 The contaminant library is data, not database rows: `src/data/hazards/*.json` (one file per group, loaded by
 `index.ts`). Each entry has spot / look-alikes / cause / treat / prevent / risk facts, every fact with textbook
-fact IDs (WHY? opens them; the textbook text itself stays out of the public build), plus colour, smell, texture,
+fact IDs (WHY? opens them in the textbook), plus colour, smell, texture,
 place and stage tags that feed the DIAGNOSE helper (`src/lib/hazard.ts`). Entries have text ids (`neurospora`).
 Losses are logged against those ids: `hazard_logs` (cultures and grain runs, new in migration 0004) and
 `lot_losses.hazard_key` (block lots). The library shows the counts. Species HAZARDS facts carry `hz` to open an entry.
@@ -100,7 +100,7 @@ Screen `src/screens/Propulsion.tsx` (parts in `CookParts.tsx`), logic `src/lib/c
   under 1 h in 115-140 F, F at 97 C / 206 F 6-8 ideal), the confirmed 4 h hold, Avery's 75X (1 h 45 min at 17 psi)
   and MegaChef (10-12 min to pressure, 12-15 min cook). Every row on the screen shows its source. Anything that is a
   guess shows GUESS - REVIEW (and `guess: true` in `src/data/cook.ts`). Textbook sentences live in
-  `src/data/cook/context.json`, which the public build empties (vite `hazard-text-gate`, now also covering `cook`).
+  `src/data/cook/context.json`.
 - Energy: meter reading, else heater on-time x element watts, else an estimate from a power profile (full power to
   come-up, then 1.5 kW for the steam box; 1.2 kW per MegaChef pot; 1.65 kW for the 75X). Cost at ICE binomic
   ₡59.67/kWh, shown with 16% taxes too. The same profile is intersected with the ICE peak windows (CR time, UTC-6).

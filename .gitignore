@@ -10,8 +10,6 @@ dev-dist
 .wrangler
 dist-preview
 
-# Textbook text for the private test copy only. Never committed, never in the public build.
-src/manual-data/
 
 # Self-host box (selfhost/): made on the box or by npm run build:selfhost, never committed.
 selfhost/bridge/bridge.mjs

@@ -1,13 +1,18 @@
 // Turns the textbook chapters (Markdown + SVG figures) into one JSON file for the
-// MANUAL screen. PRIVATE TEST COPY ONLY: the output (src/manual-data/manual.json)
-// is gitignored and the public Pages build never imports it (see vite.config.ts).
-// Usage: MANUAL_SRC=/path/to/textbook node scripts/build-manual.mjs
+// MANUAL screen: src/manual-data/manual.json. The file is committed and goes in every
+// build (nothing is private for now, Joseph 11 Nov 2026). Run it again when the
+// textbook changes, and commit the new file.
+// Usage: npm run manual   (or MANUAL_SRC=/path/to/textbook node scripts/build-manual.mjs)
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { marked } from 'marked'
 
 const SRC = process.env.MANUAL_SRC || '/mnt/project-files/knowledge/01-core-knowledge/textbook'
 if (!existsSync(join(SRC, 'chapters'))) {
+  if (existsSync('src/manual-data/manual.json')) {
+    console.log(`Textbook not found at ${SRC}: keeping the committed src/manual-data/manual.json.`)
+    process.exit(0)
+  }
   console.error(`Textbook not found at ${SRC}. Set MANUAL_SRC to the textbook folder.`)
   process.exit(1)
 }

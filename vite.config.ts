@@ -1,6 +1,7 @@
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 // MY/CO/L build config.
@@ -12,37 +13,22 @@ const base = process.env.BASE_PATH || '/'
 // PREVIEW=1 builds the single-file test copy (no service worker), see scripts/build-preview.mjs.
 const preview = process.env.PREVIEW === '1'
 
-// MANUAL=1 puts the textbook in the build. Only the private test copy sets it.
-// The public build aliases the data to an empty stub, so the textbook text cannot
-// end up in it. Remove this gate once the Supabase login serves the manual.
-const manual = process.env.MANUAL === '1'
 const at = (p: string) => fileURLToPath(new URL(p, import.meta.url))
 
-// The contaminant library, the species facts and the cook log's context notes are paraphrased from the textbook, so their sentences follow the manual's rule:
-// they are in the private test copy only. In the public build every fact keeps its id and tags but its
-// text (v) and note (n) are emptied here, before bundling. The screens show LOCKED in their place.
-const hazardText = (): Plugin => ({
-  name: 'hazard-text-gate',
-  enforce: 'pre',
-  transform(code, id) {
-    if (manual || !/\/src\/data\/(hazards|patterns|species|cook)\/[^/]+\.json$/.test(id)) return null
-    const strip = (x: unknown): unknown => {
-      if (Array.isArray(x)) return x.map(strip)
-      if (x && typeof x === 'object')
-        return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, ['v', 'n', 'see', 'source'].includes(k) && typeof v === 'string' ? '' : strip(v)]))
-      return x
-    }
-    return { code: JSON.stringify(strip(JSON.parse(code))), map: null }
-  },
-})
+// Nothing is private for now (Joseph, 11 Nov 2026): every build carries the textbook (the MANUAL
+// screen and every WHY? > READ SECTION link) and all the textbook sentences in the data files.
+// Locked access comes later, with the self-hosted farm box and a private repo.
+// The textbook data is src/manual-data/manual.json (npm run manual rebuilds it from the chapters).
+// MANUAL=0 leaves it out; a copy without the file shows MANUAL LOCKED.
+const manualFile = at('./src/manual-data/manual.json')
+const manual = process.env.MANUAL !== '0' && existsSync(manualFile)
 
 export default defineConfig({
   base,
   define: { __MANUAL__: JSON.stringify(manual) },
-  resolve: { alias: { '@manual-data': at(manual ? './src/manual-data/manual.json' : './src/manual/empty.json') } },
+  resolve: { alias: { '@manual-data': manual ? manualFile : at('./src/manual/empty.json') } },
   build: preview ? { outDir: 'dist-preview', assetsInlineLimit: 0, rollupOptions: { output: { inlineDynamicImports: true } } } : undefined,
   plugins: [
-    hazardText(),
     react(),
     !preview &&
     VitePWA({
