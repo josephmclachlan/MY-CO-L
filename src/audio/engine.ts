@@ -661,13 +661,13 @@ export class SoundEngine {
     this.glitch(t)
   }
 
-  /** Fire one glitch now (also used by the tuning screen's test button). */
-  glitch(at?: number): void {
+  /** Fire one glitch now: a hard cut to silence or a crackle, at random unless asked. */
+  glitch(at?: number, kind?: 'cut' | 'crackle'): void {
     const ctx = this.live()
     if (!ctx || !this.duck) return
     const t = at ?? ctx.currentTime
     const ms = rand(50, 200)
-    if (Math.random() < 0.5) {
+    if ((kind ?? (Math.random() < 0.5 ? 'cut' : 'crackle')) === 'cut') {
       // Hard cut to silence.
       this.duck.gain.setValueAtTime(0, t)
       this.duck.gain.setValueAtTime(1, t + ms / 1000)
@@ -676,5 +676,21 @@ export class SoundEngine {
       for (let i = 0; i < 5; i++) this.noiseBurst('glitch', t + (i * ms) / 5000, ms / 7000, rand(0.3, 0.8), 'highpass', rand(1500, 6000))
     }
     for (const fn of this.glitchListeners) fn(ms)
+  }
+
+  /**
+   * TUNE's TEST GLITCH: one crackle at the GLITCH level, even while glitches are
+   * switched off, and without switching them on. Always the crackle: the other
+   * kind is a cut to silence, which would sound like nothing happened.
+   */
+  testGlitch(): void {
+    const ctx = this.live()
+    if (!ctx) return
+    const t = ctx.currentTime
+    const g = this.bus.glitch.gain
+    g.cancelScheduledValues(t)
+    g.setValueAtTime(this.settings.glitch * LAYER_SCALE.glitch, t)
+    if (!this.settings.glitchOn) g.setValueAtTime(0, t + 0.5)
+    this.glitch(t + 0.01, 'crackle')
   }
 }

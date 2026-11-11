@@ -63,7 +63,7 @@
 .mv-corner.b { top: 2px; right: 2px; border-top-width: 2px; border-right-width: 2px; }
 .mv-corner.c { bottom: 2px; left: 2px; border-bottom-width: 2px; border-left-width: 2px; }
 .mv-corner.d { bottom: 2px; right: 2px; border-bottom-width: 2px; border-right-width: 2px; }
-.mv-bar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.mv-bar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 12px; align-items: center; }
 .mv-bar[hidden] { display: none; }
 .mv-btn {
   font: inherit; font-size: 0.8em; letter-spacing: 0.1em; color: var(--fg); background: transparent; border: 1px solid var(--fg-dim);
@@ -72,6 +72,9 @@
 .mv-btn:hover, .mv-btn:focus-visible { border-color: var(--fg); outline: none; }
 .mv-btn.on { background: var(--fg); color: var(--bg); border-color: var(--fg); text-shadow: none; }
 .mv-play { min-width: 6.6em; }
+/* tilt: two small square keys; a finger can't tilt by dragging (that scrolls the page) */
+.mv-tilt { display: inline-flex; gap: 4px; }
+.mv-tilt .mv-btn { min-width: 30px; justify-content: center; padding: 4px 6px; letter-spacing: 0; }
 .ic-play { width: 0; height: 0; border-left: 7px solid currentColor; border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; }
 .ic-pause { width: 7px; height: 9px; border-left: 2.5px solid currentColor; border-right: 2.5px solid currentColor; box-sizing: border-box; }
 .mv-track { position: relative; height: 14px; border: 1px solid var(--fg-dim); }

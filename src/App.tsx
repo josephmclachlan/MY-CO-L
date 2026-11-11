@@ -1062,7 +1062,7 @@ export default function App() {
       break
     }
     case 'tune':
-      content = <Tuning onAlarm={toggleAlarm} onReplayBoot={replayBoot} />
+      content = <Tuning onAlarm={toggleAlarm} onReplayBoot={replayBoot} onSay={say} />
       break
     case 'help':
       content = <Help />

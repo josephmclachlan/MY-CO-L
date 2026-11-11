@@ -267,13 +267,20 @@ export const BASICS: GSection[] = [
       {
         h: 'SECTIONS',
         items: [
-          ['LOOK', 'Theme colour, glass strength (curve, grain, scanlines, glow), CLEAN mode for sunlight.'],
+          ['LOOK', 'Theme colour, BRIGHTNESS for the whole screen, WIREFRAMES for how bright the species models draw, glass strength (curve, grain, scanlines, glow), CLEAN mode for sunlight.'],
           ['SOUND', 'Sound on or off, the typing sound, chatter or tick mode, volume. TEST buttons play each sound so you can hear it. Sound only plays when something appears on screen.'],
           ['LANGUAGE AND GLOVES', 'English or Spanish, and glove mode.'],
           ['SYSTEM', 'Replay the boot, test the alarm.'],
         ],
       },
-      { h: 'GOOD TO KNOW', text: ['These settings belong to this device only. A phone and a laptop each keep their own. They are not part of UNDO.', 'To drag a meter with the keyboard, focus it and use the arrow keys.'] },
+      {
+        h: 'GOOD TO KNOW',
+        text: [
+          'These settings belong to this device only. A phone and a laptop each keep their own. They are not part of UNDO.',
+          'To drag a meter with the keyboard, focus it and use the arrow keys.',
+          'Nothing here is ever greyed out. Moving a glass slider while CLEAN mode is on brings the glass back. Moving a sound slider or pressing a TEST button while sound is muted turns sound back on.',
+        ],
+      },
     ],
   },
   {

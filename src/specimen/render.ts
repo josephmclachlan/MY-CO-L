@@ -2,7 +2,9 @@
 //   1. an invisible skin writes depth (so lines behind a cap or stem are hidden),
 //   2. visible lines glow with a brighter rim where the surface turns away,
 //      fading with depth, with a slow scan band and a draw-in sweep,
-//   3. hidden lines come back as faint dashes, like an engineering drawing.
+//   3. the same lines again, a pixel over and fainter, so they read bolder,
+//   4. hidden lines come back as faint dashes, like an engineering drawing.
+// TUNE > WIREFRAMES scales all of it (setBrightness).
 // The same class drives the SPECIMEN FILES viewer and the test gallery.
 import {
   AdditiveBlending,
@@ -18,6 +20,7 @@ import {
   PerspectiveCamera,
   Scene,
   ShaderMaterial,
+  Vector2,
   Vector3,
   type WebGLRenderer,
 } from 'three'
@@ -36,6 +39,7 @@ uniform float uReveal;
 uniform float uFocus;
 uniform float uPulse;
 uniform float uHidden;
+uniform vec2 uShift;
 varying float vB;
 varying float vD;
 varying float vDash;
@@ -43,6 +47,7 @@ varying float vY;
 void main() {
   vec4 mv = modelViewMatrix * vec4(position, 1.0);
   gl_Position = projectionMatrix * mv;
+  gl_Position.xy += uShift * gl_Position.w;
   float b = aInfo.x;
   if (dot(aNormal, aNormal) > 0.01) {
     vec3 n = normalize(normalMatrix * aNormal);
@@ -65,6 +70,7 @@ void main() {
 const FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform float uOpacity;
+uniform float uGain;
 uniform float uHidden;
 uniform float uDashLen;
 uniform float uReveal;
@@ -75,7 +81,7 @@ varying float vDash;
 varying float vY;
 void main() {
   if (vY > uReveal) discard;
-  float a = vB * uOpacity;
+  float a = vB * uOpacity * uGain;
   float edge = 1.0 - clamp((uReveal - vY) / uRevealW, 0.0, 1.0);
   a += edge * 0.9;
   if (uHidden > 0.5) {
@@ -96,6 +102,8 @@ function lineMaterial(hidden: boolean) {
     uniforms: {
       uColor: { value: new Color('#5dff8a') },
       uOpacity: { value: hidden ? 0.2 : 1 },
+      uGain: { value: 1 },
+      uShift: { value: new Vector2(0, 0) },
       uNear: { value: 1 },
       uFar: { value: 10 },
       uScan: { value: -1e3 },
@@ -165,6 +173,22 @@ export interface ViewOpts {
   sideRoom: number
   /** Camera height above the specimen centre, as an angle (radians). */
   elev: number
+  /** Extra camera height from dragging up or down (radians), on top of elev. */
+  tilt?: number
+}
+
+/** Lowest and highest camera angle (radians): a little below the caps (to see the gills) up to nearly overhead. */
+export const EL_MIN = -0.4
+export const EL_MAX = 1.45
+/** The drawing's own brightness at WIREFRAMES 100% (the first cut read too dim on a phone). */
+export const BASE_GAIN = 1.6
+
+/** How far back the camera must sit (vertically) to see a h tall, r wide specimen from angle el. */
+export function fitDistance(h: number, r: number, el: number, tanV: number) {
+  const c = Math.abs(Math.cos(el))
+  const s = Math.abs(Math.sin(el))
+  // a cylinder seen from el: its outline, plus room for the near side coming forward
+  return ((h / 2) * c + r * s) / tanV + 0.7 * (r * c + (h / 2) * s)
 }
 
 export class SpecimenScene {
@@ -178,7 +202,9 @@ export class SpecimenScene {
   readonly sk = new Sketch()
   private buf = new Buffers()
   private vis = lineMaterial(false)
+  private bold = lineMaterial(false)
   private hid = lineMaterial(true)
+  private boldLines: LineSegments
   private occMat = new MeshBasicMaterial({ colorWrite: false, depthWrite: true, polygonOffset: true, polygonOffsetFactor: 1.5, polygonOffsetUnits: 2 })
   fit: Fit | null = null
   model: SpecimenModel | null = null
@@ -197,10 +223,15 @@ export class SpecimenScene {
     const lines = new LineSegments(this.buf.lines, this.vis)
     lines.renderOrder = 1
     lines.frustumCulled = false
+    const bold = new LineSegments(this.buf.lines, this.bold)
+    bold.renderOrder = 1
+    bold.frustumCulled = false
+    this.boldLines = bold
     const hidden = new LineSegments(this.buf.lines, this.hid)
     hidden.renderOrder = 2
     hidden.frustumCulled = false
-    this.inner.add(occ, lines, hidden)
+    this.inner.add(occ, lines, bold, hidden)
+    this.setBrightness(1)
     this.turn.add(this.inner)
     this.scene.add(this.turn)
   }
@@ -239,13 +270,22 @@ export class SpecimenScene {
 
   setColour(css: string) {
     const c = new Color(css)
-    this.vis.uniforms.uColor.value.copy(c)
-    this.hid.uniforms.uColor.value.copy(c)
+    for (const m of this.mats) m.uniforms.uColor.value.copy(c)
+  }
+
+  private get mats() {
+    return [this.vis, this.bold, this.hid]
   }
 
   setAspect(a: number) {
     this.aspect = a
     this.place()
+  }
+
+  /** The camera angle in use now: the stage's own, the slow bob, and any tilt from dragging. */
+  elevation() {
+    const el = this.view.elev + this.bob + (this.view.tilt ?? 0)
+    return Math.min(EL_MAX, Math.max(EL_MIN, el))
   }
 
   /** Where the camera wants to be for the current drawing: distance and look height. */
@@ -281,7 +321,11 @@ export class SpecimenScene {
     const el = this.view.elev + this.bob
     // a turning specimen fills a cylinder: its sides touch the view edges when seen from d
     const dH = (r * Math.sqrt(1 + tanH * tanH)) / tanH
-    const dV = (h / 2 + r * Math.abs(Math.sin(el))) / tanV + r * Math.cos(el) * 0.7
+    let dV = (h / 2 + r * Math.abs(Math.sin(el))) / tanV + r * Math.cos(el) * 0.7
+    // tilted by hand: back off if the specimen needs more room from there, never come
+    // closer; eased in over the first few degrees so the camera doesn't hop as a tilt starts
+    const tilt = Math.abs(this.view.tilt ?? 0)
+    if (tilt > 0.001) dV = Math.max(dV, dV + (fitDistance(h, r, this.elevation(), tanV) - dV) * Math.min(1, tilt / 0.15))
     const d = Math.max(dH, dV) * 1.04
     this.want = { d, y: (ylo + yhi) / 2, span: Math.max(r, h / 2), h }
   }
@@ -309,7 +353,7 @@ export class SpecimenScene {
     const cam = this.camera
     cam.aspect = this.aspect
     const c = this.cur
-    const el = this.view.elev + this.bob
+    const el = this.elevation()
     // the model sits so its turning axis passes through the origin; look at the middle height
     this.inner.position.set(-f.cx, -c.y, -f.cz)
     cam.position.set(0, Math.sin(el) * c.d, Math.cos(el) * c.d)
@@ -317,7 +361,9 @@ export class SpecimenScene {
     cam.near = Math.max(0.1, c.d - c.span * 3)
     cam.far = c.d + c.span * 3
     cam.updateProjectionMatrix()
-    for (const m of [this.vis, this.hid]) {
+    // the bold pass sits about 0.8 px over and down, whatever the pixel density
+    this.bold.uniforms.uShift.value.set(1.6 / Math.max(1, this.px.w), -1.6 / Math.max(1, this.px.h))
+    for (const m of this.mats) {
       m.uniforms.uNear.value = c.d - c.span
       m.uniforms.uFar.value = c.d + c.span
       m.uniforms.uScanW.value = c.h * 0.035
@@ -329,22 +375,35 @@ export class SpecimenScene {
   /** Scan band height (model space), or off. */
   setScan(y: number | null) {
     const v = y === null ? -1e6 : y
-    this.vis.uniforms.uScan.value = v
-    this.hid.uniforms.uScan.value = v
+    for (const m of this.mats) m.uniforms.uScan.value = v
   }
   /** Draw-in sweep: lines above y are not drawn yet. */
   setReveal(y: number | null) {
     const v = y === null ? 1e6 : y
-    this.vis.uniforms.uReveal.value = v
-    this.hid.uniforms.uReveal.value = v
+    for (const m of this.mats) m.uniforms.uReveal.value = v
   }
   setFocus(part: string | null, pulse: number) {
     const id = part ? this.partId(part) : -1
-    this.vis.uniforms.uFocus.value = id > 0 ? id : 0
-    this.vis.uniforms.uPulse.value = pulse
+    for (const m of [this.vis, this.bold]) {
+      m.uniforms.uFocus.value = id > 0 ? id : 0
+      m.uniforms.uPulse.value = pulse
+    }
   }
-  setGlow(k: number) {
-    this.vis.uniforms.uOpacity.value = k
+  /** Size of the drawing on screen in CSS pixels (for the bold pass). */
+  px = { w: 460, h: 460 }
+  /** Brightness of the whole drawing: 1 = WIREFRAMES 100%, from 0.5 to 2. */
+  brightness = 1
+  setBrightness(k: number) {
+    this.brightness = k
+    const b = Math.min(2, Math.max(0.5, Number.isFinite(k) ? k : 1))
+    this.vis.uniforms.uGain.value = BASE_GAIN * b
+    this.bold.uniforms.uGain.value = BASE_GAIN * b
+    // the dashed far side follows more gently, so it stays behind the near side
+    this.hid.uniforms.uGain.value = 0.75 + 0.5 * b
+    // the bold pass comes in from 50% and is at full strength by 170%
+    const w = Math.min(0.6, Math.max(0, (b - 0.5) * 0.5))
+    this.bold.uniforms.uOpacity.value = w
+    this.boldLines.visible = w > 0.01
   }
 
   /** Model-space point to pixel position in a w x h view (and whether it faces the camera). */
@@ -369,6 +428,7 @@ export class SpecimenScene {
   dispose() {
     this.buf.dispose()
     this.vis.dispose()
+    this.bold.dispose()
     this.hid.dispose()
     this.occMat.dispose()
   }
