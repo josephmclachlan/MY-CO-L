@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useStationTabs } from '../nav/StationContext'
 import { useApp } from '../settings/AppContext'
 import { useStore } from '../store/StoreContext'
 import { Select } from '../components/Select'
@@ -60,11 +61,12 @@ export function FacilityIndex({ x, set }: { x: FacState; set: SetFac }) {
   const { sound } = useApp()
   const d = useReminders()
   const o = d.summary
+  const tabs = useStationTabs(FAC_TABS)
   return (
     <>
-      <div className="section-title">FACILITY LOGS</div>
-      <ul className="index-list">
-        {FAC_TABS.map((t) => (
+      {tabs.length > 1 && <div className="section-title">FACILITY LOGS</div>}
+      {tabs.length > 1 && <ul className="index-list">
+        {tabs.map((t) => (
           <li tabIndex={0} key={t} className={x.tab === t ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
             <span>{t}</span>
             {t === 'POWER CUTS' && o.open && <span className="k">OUT NOW</span>}
@@ -72,7 +74,7 @@ export function FacilityIndex({ x, set }: { x: FacState; set: SetFac }) {
             {t === 'MAINTENANCE' && d.board.filter((m) => m.state === 'late' || m.state === 'due').length > 0 && <span className="k">{d.board.filter((m) => m.state === 'late' || m.state === 'due').length} DUE</span>}
           </li>
         ))}
-      </ul>
+      </ul>}
       <div className="section-title" style={{ marginTop: 10 }}>{monthLabel(o.thisMonth.month)} SO FAR</div>
       <div className="lg-mini">
         <div>CUTS {o.thisMonth.cuts}</div>
@@ -89,14 +91,15 @@ export function FacilityIndex({ x, set }: { x: FacState; set: SetFac }) {
 export function Facility({ x, set, say, onGo }: { x: FacState; set: SetFac; say: Say; onGo: (screen: GoScreen, tab?: string) => void }) {
   const { sound } = useApp()
   const d = useReminders()
+  const tabs = useStationTabs(FAC_TABS)
   return (
     <div className="cook ledger od mn fc">
-      <label className="ck-picker">
-        <span>SHOW ({FAC_TABS.length} SCREENS)</span>
+      {tabs.length > 1 && <label className="ck-picker">
+        <span>SHOW ({tabs.length} SCREENS)</span>
         <Select value={x.tab} onChange={(e) => (sound.chirp(), set({ tab: e.target.value as FacTab }))}>
-          {FAC_TABS.map((t) => <option key={t} value={t}>{t}</option>)}
+          {tabs.map((t) => <option key={t} value={t}>{t}</option>)}
         </Select>
-      </label>
+      </label>}
       {x.tab === 'STATUS' && <StatusTab d={d} lines={d.lines} reminders={d.reminders} set={set} onGo={onGo} say={say} />}
       {x.tab === 'POWER CUTS' && <PowerTab d={d} say={say} />}
       {x.tab === 'WATER' && <WaterTab d={d} say={say} />}
@@ -290,7 +293,7 @@ export function StatusBoard({ onOpen }: { onOpen: () => void }) {
     <div className="fc-board" role="group" aria-label="Farm status board">
       <div className="section-title">STATUS BOARD</div>
       <StatusLines lines={d.lines} />
-      <button type="button" className="btn fc-board-open" onClick={onOpen}>OPEN FACILITY LOGS</button>
+      <button type="button" className="btn fc-board-open" onClick={onOpen} data-tip="Open REMINDERS (7.8): the status board and everything due.">OPEN REMINDERS</button>
     </div>
   )
 }

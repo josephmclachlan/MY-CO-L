@@ -13,6 +13,7 @@
 .ck-picker { display: none; gap: 2px; }
 .ck-picker > span { color: var(--fg-dim); font-size: 0.78em; letter-spacing: 0.08em; }
 .ck-box { border: 1px solid var(--fg-faint); padding: 8px 10px; display: grid; gap: 6px; min-width: 0; }
+.ck-norun .btn { justify-self: start; }
 .ck-box.due { border: 2px dashed var(--hazard); }
 .ck-head { display: grid; gap: 6px; }
 .ck-verdict { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; padding: 6px 10px; border: 1px solid var(--fg-dim); }

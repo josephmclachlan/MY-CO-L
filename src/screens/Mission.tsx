@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { useStationTabs } from '../nav/StationContext'
 import { HistoryButton } from './History'
 import { PickInput } from '../components/PickInput'
 import { useMemo, useState } from 'react'
@@ -95,18 +96,19 @@ export function MissionIndex({ x, set }: { x: MissionState; set: SetMission }) {
   const { t: tt, tf } = useT()
   const m = useMission()
   const due = m.today.filter((t) => t.kind === 'MOVE' || t.kind === 'HARVEST').length
+  const tabs = useStationTabs(MISSION_TABS)
   return (
     <>
-      <div className="section-title">{tt('MISSION CONTROL')}</div>
-      <ul className="index-list">
-        {MISSION_TABS.map((t) => (
+      {tabs.length > 1 && <div className="section-title">{tt('MISSION CONTROL')}</div>}
+      {tabs.length > 1 && <ul className="index-list">
+        {tabs.map((t) => (
           <li tabIndex={0} key={t} className={x.tab === t ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
             <span>{tt(TAB_LABEL[t])}</span>
             {t === 'BOARD' && <span className="k">{m.rows.length}</span>}
             {t === 'TODAY' && <span className="k">{m.today.length}</span>}
           </li>
         ))}
-      </ul>
+      </ul>}
       <div className="section-title" style={{ marginTop: 10 }}>{tt('NOW')}</div>
       <div className="lg-mini">
         <div>{tf('{n} ACTIVE LOTS', { n: m.rows.length })}</div>
@@ -121,14 +123,15 @@ export function Mission({ x, set, say, openRecord, onOpenOrders }: { x: MissionS
   const { sound } = useApp()
   const { t: tt } = useT()
   const m = useMission()
+  const tabs = useStationTabs(MISSION_TABS)
   return (
     <div className="cook ledger">
-      <label className="ck-picker">
+      {tabs.length > 1 && <label className="ck-picker">
         <span>{tt('SHOW')}</span>
         <Select value={x.tab} onChange={(e) => (sound.chirp(), set({ tab: e.target.value as MissionTab }))}>
-          {MISSION_TABS.map((t) => <option key={t} value={t}>{tt(TAB_LABEL[t])}</option>)}
+          {tabs.map((t) => <option key={t} value={t}>{tt(TAB_LABEL[t])}</option>)}
         </Select>
-      </label>
+      </label>}
       {x.tab === 'BOARD' && <Board m={m} say={say} />}
       {x.tab === 'TODAY' && <Today m={m} onOpenOrders={onOpenOrders} />}
       {x.tab === 'HARVEST' && <HarvestForm m={m} say={say} />}

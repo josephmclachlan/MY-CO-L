@@ -27,6 +27,7 @@
 .at-lim { stroke: var(--hazard); stroke-width: 1.2; stroke-dasharray: 5 4; }
 .at-cursor { stroke: var(--fg-dim); stroke-width: 1; stroke-dasharray: 2 3; }
 .at-dot { fill: var(--fg); }
+.at-pt { fill: var(--fg); stroke: var(--bg); stroke-width: 1; }
 .at-sum { margin-top: 4px; }
 .at-paste { width: 100%; box-sizing: border-box; font: inherit; font-size: 0.85em; background: transparent; color: var(--fg); border: 1px solid var(--fg-dim); padding: 4px 6px; resize: vertical; }
 .at-bands { display: grid; gap: 6px; }

@@ -147,8 +147,8 @@ export const TABLE_SCREEN: Record<string, string> = {
   sale_lots: 'TRADE',
   energy_bills: 'LEDGER',
   labour_entries: 'LEDGER',
-  app_settings: 'PRICES + COSTS',
-  fx_rates: 'PRICES + COSTS',
+  app_settings: 'PRICE BOOK',
+  fx_rates: 'PRICE BOOK',
 }
 
 export const tableName = (t: string, n = 1) => {

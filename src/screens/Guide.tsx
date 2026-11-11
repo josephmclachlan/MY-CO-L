@@ -4,6 +4,7 @@ import { useT } from '../settings/useT'
 import { useRole } from '../settings/RoleContext'
 import { Select } from '../components/Select'
 import { GUIDE, GUIDE_GROUPS, findSection, searchGuide, type GSection } from '../guide/content'
+import { deckById, visibleStations } from '../nav/decks'
 
 // USER GUIDE (build G11): plain-English help for every screen. About the app, not the textbook, so it is in the public build.
 // The text lives in src/guide/content.ts; docs/USER-MANUAL.md is made from the same file (npm run docs:guide).
@@ -15,10 +16,18 @@ export interface GuideState {
 export const GUIDE_START: GuideState = { sec: 'START', q: '' }
 type SetGuide = (p: Partial<GuideState>) => void
 
-/** Pages this person may read: staff do not get the pages for owner-only screens. */
+/** Pages this person may read: staff do not get the pages for owner-only screens, or for decks with no station they may open. */
 function usePages(): GSection[] {
   const role = useRole()
-  return useMemo(() => GUIDE.filter((s) => !s.module || role.canOpen(s.module)), [role])
+  return useMemo(
+    () =>
+      GUIDE.filter((s) => {
+        if (s.module) return role.canOpen(s.module)
+        const deck = s.deck ? deckById(s.deck) : undefined
+        return !deck || visibleStations(deck, role.canOpen).length > 0
+      }),
+    [role],
+  )
 }
 
 export function GuideIndex({ x, set }: { x: GuideState; set: SetGuide }) {
@@ -48,6 +57,7 @@ export function GuideIndex({ x, set }: { x: GuideState; set: SetGuide }) {
   )
 }
 
+/** onGo gets a module key, or DECK:<deck id> for a deck's overview page. */
 export function Guide({ x, set, onGo }: { x: GuideState; set: SetGuide; onGo: (moduleKey: string) => void }) {
   const { t } = useT()
   const { sound } = useApp()
@@ -98,6 +108,11 @@ export function Guide({ x, set, onGo }: { x: GuideState; set: SetGuide; onGo: (m
           {sec.module && (
             <button type="button" className="btn gd-open" onClick={() => (sound.chirp(), onGo(sec.module as string))}>
               {t('OPEN THIS SCREEN')}
+            </button>
+          )}
+          {sec.deck && (
+            <button type="button" className="btn gd-open" data-tip="Open this deck's overview." onClick={() => (sound.chirp(), onGo(`DECK:${sec.deck}`))}>
+              {t('OPEN THIS DECK')}
             </button>
           )}
           {sec.blocks.map((b, i) => (
