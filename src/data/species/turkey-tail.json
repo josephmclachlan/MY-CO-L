@@ -10,11 +10,10 @@
  "overview": [
   {
    "k": "Use",
-   "v": "Dried for teas and tinctures, not sold fresh. One supplement company began by foraging turkey tail and reishi for tinctures.",
+   "v": "One supplement company began with tinctures for its own health, moved on to foraged turkey tail and reishi, then partnered with farms for its raw material.",
    "s": [
     "F19-8127"
-   ],
-   "n": "Not sold fresh: general knowledge (the brackets are thin and leathery)."
+   ]
   },
   {
    "k": "Strain",
@@ -26,7 +25,7 @@
   },
   {
    "k": "Evidence",
-   "v": "Medicinal claims rest mostly on test-tube studies and are unproven. Do not repeat claims you cannot source.",
+   "v": "Medicinal claims are unproven: the evidence is mostly from lab dishes or animals. When a customer asks on behalf of a sick relative, say so honestly and suggest a supplement at most.",
    "s": [
     "F20-0104",
     "F19-0244"
@@ -67,7 +66,8 @@
    "d": [
     14,
     21
-   ]
+   ],
+   "n": "A remark in passing (\"I think usually\"), not a measured figure."
   },
   {
    "k": "Incubation",
@@ -125,17 +125,19 @@
    ]
   },
   {
-   "v": "Tinctures: hard mushrooms such as reishi and turkey tail extracted best near 1 part mushroom to 20 parts solvent in one farm's beta-glucan tests; 1 to 1 extracts poorly.",
+   "v": "Tinctures: one extract maker uses about 1 part mushroom to 20 parts solvent for hard mushrooms such as reishi and turkey tail (1 to 10 for soft ones). They say beta-glucan lab tests show some ratios return more, and 1 to 1 extracts poorly.",
    "f": "ctx",
    "w": [
     "pod-51 1:45:50"
    ]
   },
   {
-   "v": "Blended into water with a cellulose binder it makes a mycelium paper that folds without cracking if dried slowly.",
+   "v": "Paper: one grower blends 100% turkey tail into water with a cellulose binder. The sheets are soft, almost like linen, and fold without cracking if dried slowly; dried fast they turn wavy and brittle.",
    "f": "ctx",
    "w": [
-    "pod-58 1:20:32"
+    "pod-58 1:20:32",
+    "pod-58 1:21:32",
+    "pod-58 1:25:48"
    ]
   }
  ],

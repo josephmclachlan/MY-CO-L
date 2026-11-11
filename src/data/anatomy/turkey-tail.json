@@ -1,11 +1,11 @@
 {
   "id": "turkey-tail",
-  "note": "The textbook mentions turkey tail only in passing: a matting species whose blocks set hard if left too long, and the Cap n Stem strain that flew to the space station. The rest of this drawing is general knowledge, not from the sources.",
+  "note": "The textbook mentions turkey tail only in passing: a matting species whose blocks set hard if left too long, and the Cap n Stem strain that flew to the space station. Everything else in this drawing (the bag, the slits and how the brackets look as they grow) is general knowledge, not from the sources, and not a growing method.",
   "stages": [
     {
       "id": "cut",
       "k": "SLITS CUT",
-      "a": "A fully colonized block in its bag, cut with two long slits across one face.",
+      "a": "In this drawing: a fully colonized block in a closed bag, cut with two long slits across one face.",
       "v": "A matting species: blocks left too long become extremely hard.",
       "s": [
         "F17-0515"
@@ -28,20 +28,20 @@
     },
     {
       "id": "pick",
-      "k": "PICK",
-      "a": "Thin, flexible brackets with all their colour zones and only a narrow pale rim left at the edge. Cut each one off at its base."
+      "k": "FULL SIZE",
+      "a": "Thin, flexible brackets with all their colour zones, and only a narrow pale rim left at the edge."
     },
     {
       "id": "late",
-      "k": "TOO LATE",
-      "a": "The edge has stopped growing. Margins curl under, the brackets dry stiff and leathery, and the colours fade."
+      "k": "OLD AND DRY",
+      "a": "The edge has stopped growing. Margins curl under, the brackets dry stiff and leathery, and the colours fade. Seen low, from the side."
     }
   ],
   "labels": [
     {
       "id": "slits",
       "k": "SLITS",
-      "a": "Two long slits cut across the bag face. Turkey tail fruits from the cut edges.",
+      "a": "In this drawing, two long slits cut across the bag face; the brackets grow from them.",
       "on": [
         "cut",
         "knobs"
@@ -71,7 +71,7 @@
     {
       "id": "knobs",
       "k": "KNOBS",
-      "a": "White knobs crowding out of the slit, some fused into lumps.",
+      "a": "White knobs crowding out of the slit, some fused into lumps. The rest stay as the lumpy base the shelves grow from.",
       "on": [
         "knobs"
       ],
@@ -103,8 +103,7 @@
       "a": "Concentric bands of brown, rust, grey and blue, darker and lighter by turns, parallel to the edge.",
       "on": [
         "zones",
-        "pick",
-        "late"
+        "pick"
       ],
       "part": "zones"
     },
@@ -129,9 +128,8 @@
     {
       "id": "pores",
       "k": "PORES",
-      "a": "No gills: the white underside is covered in tiny pores, three to five to a millimetre.",
+      "a": "No gills: the white underside is covered in tiny pores.",
       "on": [
-        "pick",
         "late"
       ],
       "part": "pores"

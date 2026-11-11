@@ -1,10 +1,13 @@
 // TURKEY TAIL (Trametes versicolor): thin, leathery brackets with no stem,
 // out of two long slits in the side of a bag, row over row like roof shingles.
-// White knobs push out of the slits, fuse, and flatten into little shelves that
-// grow outward, not upward. Behind the pale growing edge, concentric colour
-// zones form one ring at a time, the bands alternately velvety and smooth. The
-// underside is a white pore surface (no gills). Left too long, the edge stops
-// growing, curls under and the brackets dry stiff and fade.
+// White knobs push out of the slits, fuse into a lumpy base, and flatten into
+// little shelves that grow outward, not upward: every shelf is rooted in its
+// slit, the upper ones tipped up a little and the lower ones down, so they fan
+// out in tiers. Behind the pale growing edge, concentric colour zones form one
+// ring at a time, the bands alternately velvety and smooth. The underside is a
+// white pore surface (no gills). When old, the edge stops growing, curls under
+// and the brackets dry stiff and fade. (The textbook only mentions turkey tail
+// in passing: this look is general knowledge, as the anatomy note says.)
 import { type Cap, bag, block, cap, faceCut, fluff, keys, pin, pores } from '../parts'
 import { B, type Sketch } from '../sketch'
 import { type V3, add, clamp, lerp, madd, mul, norm, rng, rr, smooth, wobble } from '../math'
@@ -28,7 +31,7 @@ interface Bracket {
   /** Upper layer of the shingles (smaller, later). */
   upper: boolean
   /** Turned this far sideways from straight out (radians), and how far the shelf
-   * slopes down from its base to its margin, like a roof tile. */
+   * slopes down from its base to its margin, like a roof tile (less than 0: tipped up). */
   yaw: number
   droop: number
   /** Final size (plan radius, cm). */
@@ -70,10 +73,12 @@ function plan(): Bracket[] {
       out.push({
         slit: si,
         x,
-        y: sl.y + (r.upper ? rr(rnd, 1.0, 1.35) : rr(rnd, -0.6, -0.3)),
+        // rooted in the slit's open lips: the upper row just above the cut, the lower just below
+        y: sl.y + (r.upper ? rr(rnd, 0.1, 0.24) : rr(rnd, -0.24, -0.1)),
         upper: r.upper,
         yaw,
-        droop: r.upper ? rr(rnd, 0.2, 0.3) : rr(rnd, 0.1, 0.2),
+        // the upper row tips up a little and the lower row down, so they fan out in tiers
+        droop: r.upper ? rr(rnd, -0.16, -0.06) : rr(rnd, 0.14, 0.26),
         size: (r.upper ? rr(rnd, 2.3, 2.9) : rr(rnd, 3.1, 3.9)) * (si === 1 ? 1.06 : 1),
         delay: (r.upper ? rr(rnd, 0.15, 0.19) : rr(rnd, 0.1, 0.13)) + si * 0.012,
         grow: rr(rnd, 0.56, 0.62),
@@ -85,10 +90,24 @@ function plan(): Bracket[] {
   return out
 }
 const BRACKETS = plan()
-/** The bracket that carries the labels: a middle shelf of the upper slit's lower row. */
-const LEAD = 2
-/** An upper-row shelf over it shows the tiers. */
-const TIER = 5
+/**
+ * Which shelves carry which callouts, spread out so each leader is easy to follow
+ * (0-3 and 7-10 are the lower rows of the upper and lower slit, left to right;
+ * 4-6 and 11-13 the upper rows).
+ */
+const ON = {
+  shelves: 8,
+  edge: 9,
+  zones: 12,
+  tiers: 5,
+  velvet: 4,
+  /** an end shelf, labelled on its outer edge */
+  margin: 10,
+  dry: 0,
+  /** a lower shelf of the lower slit: its underside shows from the low camera of the last stage */
+  pores: 8,
+  spores: 9,
+}
 
 /** Plan of a bracket seen from above, by angle from straight out: wider than deep,
  * narrowing to its base at the slit. */
@@ -107,7 +126,8 @@ export const turkeyTail: SpecimenModel = {
     { id: 'shelves', at: 0.28, elev: 0.44 },
     { id: 'zones', at: 0.44, elev: 0.6 },
     { id: 'pick', at: 0.6, hold: 3.2, elev: 0.62 },
-    { id: 'late', at: 0.82, elev: 0.54 },
+    // low and nearly side on: the thin dry shelves, their curled edges and the pores underneath
+    { id: 'late', at: 0.82, elev: 0.16 },
   ],
   rest: 'pick',
   elev: 0.46,
@@ -141,8 +161,9 @@ export const turkeyTail: SpecimenModel = {
       })
 
     // knobs: rounded white lumps crowd out of the slits and fuse; most become
-    // shelves (the brackets below start as knobs), a few stay small
-    const knobK = smooth(0.08, 0.2, t) * (1 - smooth(0.32, 0.46, t))
+    // shelves (the brackets below start as knobs), the rest stay as the lumpy
+    // base the shelves grow from
+    const knobK = smooth(0.08, 0.2, t) * (1 - 0.62 * smooth(0.32, 0.46, t))
     if (knobK > 0.01)
       sk.inPart('knobs', () => {
         const kr = rng(SEED + 7)
@@ -158,8 +179,10 @@ export const turkeyTail: SpecimenModel = {
       })
 
     const late = smooth(0.84, 1, t)
-    const lead: { c?: Cap; band?: number; m?: number } = {}
-    const tier: { p?: V3; n?: V3 } = {}
+    // each grown shelf, for its callouts; and points under the shelves that drop spores when old
+    const caps: (Cap | undefined)[] = []
+    const bands: number[] = []
+    const emit: V3[] = []
     BRACKETS.forEach((bk, i) => {
       const m = clamp((t - bk.delay) / bk.grow)
       if (m <= 0.01) return
@@ -303,45 +326,61 @@ export const turkeyTail: SpecimenModel = {
         sk.inPart('pores', () => {
           pores(sk, c, rng(bk.seed + 17), Math.round(46 * smooth(0.3, 0.85, m) * (bk.size / 3.8)), 0.05 + 0.03 * (R / 3.8), B.SOFT, 0.18, 0.9)
         })
-      if (i === LEAD) {
-        lead.c = c
-        lead.band = band
-        lead.m = m
-      }
-      // an upper shelf over the lead one shows the tiers
-      if (i === TIER) {
-        tier.p = c.rim(0.5)
-        tier.n = c.topN(0.95, 0.5)
+      caps[i] = c
+      bands[i] = band
+      if (late > 0.02 && !bk.upper) {
+        const er = rng(bk.seed + 23)
+        for (let q = 0; q < 3; q++) emit.push(c.under(rr(er, 0.35, 0.8), rr(er, -0.9, 0.9)))
       }
     })
 
-    const c = lead.c
-    if (c && lead.band !== undefined) {
-      sk.anchor('shelves', c.top(0.45, 0.25), c.topN(0.45, 0.25))
-      sk.anchor('edge', c.top(lead.band, 0.55), c.topN(lead.band, 0.55))
-      sk.anchor('zones', c.top(0.42, -0.35), c.topN(0.42, -0.35))
-      sk.anchor('velvet', c.top(0.6, 0.95), c.topN(0.6, 0.95))
-      sk.anchor('margin', c.rim(-0.85), c.topN(0.95, -0.85))
-      sk.anchor('dry', c.rim(0.2), c.topN(0.95, 0.2))
-      sk.anchor('pores', c.under(0.62, 0.35), mul(c.topN(0.62, 0.35), -1))
+    // callouts, each on its own shelf
+    const on = (k: keyof typeof ON) => caps[ON[k]]
+    let c = on('shelves')
+    if (c) sk.anchor('shelves', c.top(0.45, 0.2), c.topN(0.45, 0.2))
+    c = on('edge')
+    if (c) sk.anchor('edge', c.top(bands[ON.edge], 0.15), c.topN(bands[ON.edge], 0.15))
+    c = on('zones')
+    if (c) sk.anchor('zones', c.top(0.3, -0.3), c.topN(0.3, -0.3))
+    c = on('tiers')
+    if (c) sk.anchor('tiers', c.rim(0.5), c.topN(0.95, 0.5))
+    c = on('velvet')
+    if (c) sk.anchor('velvet', c.top(0.6, 0.4), c.topN(0.6, 0.4))
+    // the end shelves: the side of the rim that faces away from the bag's middle
+    const outer = (cc: Cap, sign: number) => {
+      const a = cc.rim(0.95)
+      const b = cc.rim(-0.95)
+      return (a[0] - b[0]) * sign >= 0 ? 0.95 : -0.95
     }
-    if (tier.p) sk.anchor('tiers', tier.p, tier.n)
+    c = on('margin')
+    if (c) {
+      const th = outer(c, 1)
+      sk.anchor('margin', c.rim(th), c.topN(0.95, th))
+    }
+    c = on('dry')
+    if (c) {
+      const th = outer(c, -1)
+      sk.anchor('dry', c.rim(th), c.topN(0.95, th))
+    }
+    c = on('pores')
+    if (c) sk.anchor('pores', c.under(0.6, 0), mul(c.topN(0.6, 0), -1))
 
-    // fine white spores drift down from the pores when old
-    if (late > 0.02) {
+    // fine white spores drift down from under the shelves when old
+    const sc = on('spores')
+    if (late > 0.02 && emit.length && sc) {
       const sr = rng(SEED + 99)
       sk.inPart('spores', () => {
         for (let i = 0; i < 40; i++) {
-          const x0 = rr(sr, -6, 6)
-          const z0 = rr(sr, 8, 12)
-          const y0 = rr(sr, -5, 4)
+          const e = emit[Math.floor(sr() * emit.length)]
           const ph = sr()
-          const fall = ((t * 9 + ph) % 1) * 7
-          const p: V3 = [x0 + Math.sin(ph * 9 + t * 20) * 0.3, y0 - fall, z0]
-          sk.mark(p, [0, 0, 1], 0.1, { b: B.FINE * late * (1 - fall / 7), hid: 0 }, ph * 6)
-          if (i === 5) sk.anchor('spores', p, [0, 0, 1])
+          const drift = rr(sr, -0.3, 0.3)
+          const k = (t * 9 + ph) % 1
+          const p: V3 = [e[0] + Math.sin(ph * 9 + t * 20) * 0.3, e[1] - 0.15 - k * 4.5, e[2] + drift + k * 0.6]
+          sk.mark(p, [0, 0, 1], 0.1, { b: B.FINE * late * (1 - k), hid: 0 }, ph * 6)
         }
       })
+      // the label stays put in the falling cloud, under one shelf
+      sk.anchor('spores', madd(sc.under(0.55, 0), [0, -1, 0], 1.8), [0, 0, 1])
     }
   },
 }

@@ -12,7 +12,7 @@ import { leaderPath, placeLabels, stack } from './labels'
 import { BASE_GAIN, EL_MAX, EL_MIN, SpecimenScene, fitDistance } from './render'
 import type { ShaderMaterial } from 'three'
 import { ANATOMY } from '../data/anatomy'
-import { SPECIES } from '../data/species'
+import { SPECIES, srcLabel } from '../data/species'
 
 const sk = new Sketch()
 function draw(id: string, t: number, detail = 0.5): Built {
@@ -150,6 +150,18 @@ describe('stage and label notes', () => {
       .map((f) => readFileSync(`${BOOK}/${f}`, 'utf8'))
       .join('\n')
     for (const a of Object.values(ANATOMY)) for (const x of [...a.stages, ...a.labels]) for (const f of x.s ?? []) expect(text.includes(f), `${a.id} ${x.id} ${f}`).toBe(true)
+  })
+
+  it('every fact id cited anywhere in a species file shows its chapter, not a bare id', () => {
+    const ids = new Set<string>()
+    const walk = (v: unknown): void => {
+      if (Array.isArray(v)) v.forEach(walk)
+      else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) k === 's' && Array.isArray(x) ? x.forEach((f) => ids.add(String(f))) : walk(x)
+    }
+    walk(SPECIES)
+    walk(Object.values(ANATOMY))
+    expect(ids.size).toBeGreaterThan(100)
+    for (const f of ids) expect(srcLabel(f), f).not.toBe(f)
   })
 })
 
