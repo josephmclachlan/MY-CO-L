@@ -14,8 +14,8 @@ export const TABS = ['OVERVIEW', 'CULTIVATION', 'TIMELINE', 'CLIMATE', 'YIELD', 
 export type Tab = (typeof TABS)[number]
 
 const NO_DATA = 'NO DATA IN SOURCES'
-/** The public build empties the species text (see vite.config.ts); fact IDs stay. */
-const LOCKED = 'TEXT LOCKED IN THE PUBLIC BUILD. LOG IN TO READ IT. THE SOURCE IDS STILL APPLY.'
+/** Shown if a fact has no sentence (none do today); fact IDs still apply. */
+const LOCKED = 'NO TEXTBOOK SENTENCE ON FILE FOR THIS YET. THE SOURCE IDS STILL APPLY.'
 
 function factRows(prefix: string, facts: Fact[], openHazard?: (id: string) => void): Row[] {
   return facts.map((f, i) => {

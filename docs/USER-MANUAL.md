@@ -610,13 +610,15 @@ Only bank from a P1 or later plate, never from the P0 master. Slants are replace
 ### HOW TO USE IT
 
 1. Tap a species in the list (on a phone use the strip at the top).
-2. Read the tabs: OVERVIEW, CULTIVATION, TIMELINE, CLIMATE, YIELD, HAZARDS, NOTES, SOURCES.
-3. Tap WHY? beside a number to see where it came from.
-4. On OVERVIEW the file shows the strains you hold and the contaminants to watch, each tappable.
+2. Watch the model grow from the cut to picking, one stage at a time. PAUSE stops it and PLAY starts it again. The stage keys under it jump to a stage, and the growth bar scrubs through it.
+3. Tap a label on the model to light up that part and read about it under the model. LABELS hides them.
+4. Read the tabs: OVERVIEW, CULTIVATION, TIMELINE, CLIMATE, YIELD, HAZARDS, NOTES, SOURCES.
+5. Tap WHY? beside a number to see where it came from.
+6. On OVERVIEW the file shows the strains you hold and the contaminants to watch, each tappable.
 
 ### GOOD TO KNOW
 
-The model turns slowly on purpose. Numbers marked as context come from other conditions than your farm. Where sources differ the standard figure is given first.
+The model turns slowly on purpose. Drag it to turn it yourself. A dashed label line means that part is on the far side. With reduced motion on, it stays still on the picking picture until you press PLAY. Numbers marked as context come from other conditions than your farm. Where sources differ the standard figure is given first.
 
 ## HAZARD INDEX (3.6)
 
@@ -1087,7 +1089,7 @@ There is a copy of this guide as a plain file, docs/USER-MANUAL.md in the app's 
 
 ### WHAT IT IS
 
-The textbook is the farm's own reference on growing. It is only in the owner's private copy of the app. On the public site this screen says MANUAL LOCKED. The WHY? buttons on other screens open the exact section a number came from.
+The textbook is the farm's own reference on growing. The WHY? buttons on other screens open the exact section a number came from.
 
 ### HOW TO USE IT
 

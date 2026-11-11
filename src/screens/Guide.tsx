@@ -6,7 +6,7 @@ import { Select } from '../components/Select'
 import { GUIDE, GUIDE_GROUPS, findSection, searchGuide, type GSection } from '../guide/content'
 import { deckById, visibleStations } from '../nav/decks'
 
-// USER GUIDE (build G11): plain-English help for every screen. About the app, not the textbook, so it is in the public build.
+// USER GUIDE (build G11): plain-English help for every screen. About the app, not the textbook.
 // The text lives in src/guide/content.ts; docs/USER-MANUAL.md is made from the same file (npm run docs:guide).
 
 export interface GuideState {

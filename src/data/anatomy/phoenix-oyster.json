@@ -1,0 +1,169 @@
+{
+  "id": "phoenix-oyster",
+  "note": "Phoenix oyster is not named in the textbook or the manual. These notes are the general oyster rules; the drawing is a general oyster form.",
+  "stages": [
+    {
+      "id": "cut",
+      "k": "X CUT",
+      "a": "A colonized block. An X is cut through the bag on its face.",
+      "v": "Oysters share Pleurotus biology and differ mainly in colour and temperature preference. Blue oysters are opened with side slits or X cuts.",
+      "s": [
+        "F17-0003",
+        "F17-0048"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "PINS",
+      "a": "Pins push out through the cut.",
+      "v": "Staple species fruit at 13-18 °C: slower and denser at 13 °C, faster at 18 °C.",
+      "s": [
+        "F17-0046"
+      ]
+    },
+    {
+      "id": "young",
+      "k": "YOUNG CAPS",
+      "a": "Fan-shaped caps on longer stems. Their edges still roll under.",
+      "v": "High CO2 gives long stems and no caps. Watch stem length and cap shape as your airflow gauge.",
+      "s": [
+        "F12-0262",
+        "F17-0072"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "The caps are open, the edges still turned down a little.",
+      "v": "Oysters are picked before the caps flatten. A good room gives short stems and flattening caps.",
+      "s": [
+        "F13-0132",
+        "F12-0263"
+      ]
+    },
+    {
+      "id": "flat",
+      "k": "CAPS FLATTEN",
+      "a": "The caps flatten out and their edges lift.",
+      "v": "Flat caps mean the pick is past.",
+      "s": [
+        "F13-0132"
+      ]
+    },
+    {
+      "id": "late",
+      "k": "TOO LATE",
+      "a": "The edges turn up and split, and the gills shed spores.",
+      "v": "Spore load matters for staff health.",
+      "s": [
+        "F17-0071"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "cut",
+      "k": "X CUT",
+      "a": "The cut in the bag. The cluster comes out here.",
+      "v": "Side slits or X cuts, as for blue oyster.",
+      "s": [
+        "F17-0048"
+      ],
+      "on": [
+        "cut",
+        "pins"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "PIN KNOT",
+      "a": "A knot of pins at the cut.",
+      "v": "Blotch shows first on the centre pin of a budding cluster, and on aborted pins at its base.",
+      "s": [
+        "F17-0061"
+      ],
+      "on": [
+        "pins"
+      ]
+    },
+    {
+      "id": "stem",
+      "k": "STEMS",
+      "a": "Stems run off-centre into the caps, joined at the base.",
+      "v": "Short stems mean good airflow; long stems and small caps mean high CO2.",
+      "s": [
+        "F12-0263",
+        "F12-0262"
+      ],
+      "on": [
+        "young",
+        "pick"
+      ],
+      "part": "stem"
+    },
+    {
+      "id": "margin",
+      "k": "ROLLED EDGE",
+      "a": "A young cap keeps its edge rolled under.",
+      "on": [
+        "young"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "cap",
+      "k": "CAP",
+      "a": "A fan-shaped cap, streaked out from the stem.",
+      "on": [
+        "pick"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "gills",
+      "k": "GILLS",
+      "a": "Gills run down from the cap onto the stem.",
+      "on": [
+        "pick",
+        "flat"
+      ],
+      "part": "gills"
+    },
+    {
+      "id": "flat",
+      "at": "margin",
+      "k": "CAPS FLATTEN",
+      "a": "The cap opens flat and its edge lifts.",
+      "v": "Pick before the caps flatten.",
+      "s": [
+        "F13-0132"
+      ],
+      "on": [
+        "flat"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "curl",
+      "at": "margin",
+      "k": "EDGES TURN UP",
+      "a": "The edge curls up and splits as the cap ages.",
+      "on": [
+        "late"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "spores",
+      "k": "SPORES",
+      "a": "Spores drift down from the gills.",
+      "v": "Spore load matters for staff health.",
+      "s": [
+        "F17-0071"
+      ],
+      "on": [
+        "late"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "id": "chestnut",
+  "stages": [
+    {
+      "id": "cut",
+      "k": "CUT",
+      "a": "A ripened block stands upright. A razor slice opens across the top.",
+      "v": "Ripen 1-2 weeks or more past full colonization, until caramel droplets form and a rust ring shows in the headspace. Then stand it upright, slice 3-6 mm deep across the top and press the air out.",
+      "s": ["F17-0422", "F17-0427"]
+    },
+    {
+      "id": "knots",
+      "k": "KNOTS",
+      "a": "Small knots bead along the cut. Most stay small; a few become mushrooms.",
+      "v": "Hyphal knots appear along the cut first. Recognisable baby mushrooms follow in about 7-10 days.",
+      "s": ["F17-0431"]
+    },
+    {
+      "id": "buttons",
+      "k": "BUTTONS",
+      "a": "Tight round buttons on fused stems. Every cap is scaly and still sealed to its stem.",
+      "v": "Fruit cold and foggy: pin at 10 to about 16 °C (ideal 13-16 °C), 90-95% RH, CO2 below about 900 ppm.",
+      "s": ["F17-0428", "F17-0429", "F17-0430"]
+    },
+    {
+      "id": "stretch",
+      "k": "VEIL STRETCH",
+      "a": "The caps widen and pull away from the stems. The veil under each cap stretches thin.",
+      "v": "After primordia, about 16-17 °C and 88-90% RH. The slowest of the mixed species: 7-12 more days from babies to harvest.",
+      "s": ["F17-0428", "F17-0429", "F17-0431"]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "The veil tears at the cap edge and the gills show, still half covered. The caps are still rounded.",
+      "v": "Pick while the gills are still semi-covered and before the caps flatten. One day late sharply cuts shelf life. Clusters do not mature in sync.",
+      "s": ["F17-0433"]
+    },
+    {
+      "id": "late",
+      "k": "TOO LATE",
+      "a": "The caps flatten and tip, the gills open wide and the stems sag.",
+      "v": "Picked late, it keeps badly. If the room is too warm, caps flatten fast, stems wither, and the mushrooms droop and smell bad.",
+      "s": ["F17-0433", "F13-0020"]
+    }
+  ],
+  "labels": [
+    {
+      "id": "rust",
+      "k": "RUST RING",
+      "a": "A rust-coloured band on the bag wall, just above the block.",
+      "v": "A rust-coloured ring in the headspace is one sign the block is ripe.",
+      "s": ["F17-0422"],
+      "on": ["cut"],
+      "part": "rust"
+    },
+    {
+      "id": "caramel",
+      "k": "CARAMEL DROPS",
+      "a": "Caramel-coloured droplets beading on the block top.",
+      "v": "A ripening block swells with caramel-coloured metabolites and turns golden-mustard, which new staff mistake for Neurospora.",
+      "s": ["F17-0422"],
+      "on": ["cut"],
+      "part": "caramel"
+    },
+    {
+      "id": "cut",
+      "k": "RAZOR SLICE",
+      "a": "The slice across the top of the block.",
+      "v": "A cross, an X, or a razor slice about 3-6 mm deep across the top. Chestnut takes a slightly deeper cut than most. No half-moons around pins already there.",
+      "s": ["F17-0427"],
+      "on": ["cut", "knots"]
+    },
+    {
+      "id": "knots",
+      "k": "HYPHAL KNOTS",
+      "a": "White knots along the cut: the very first sign of mushrooms.",
+      "v": "Knots first, then baby mushrooms in about 7-10 days.",
+      "s": ["F17-0431"],
+      "on": ["knots", "buttons"],
+      "part": "knots"
+    },
+    {
+      "id": "stem",
+      "k": "FUSED STEMS",
+      "a": "Slender stems, fused low down where the cluster leaves the cut.",
+      "on": ["buttons"],
+      "part": "stem"
+    },
+    {
+      "id": "scales",
+      "k": "SCALY CAPS",
+      "a": "Raised scales over the cap, thickest at the centre.",
+      "v": "Speckled, scaly caps: it photographs very well, which helps at market and online.",
+      "s": ["F17-0398"],
+      "on": ["buttons", "stretch", "pick"],
+      "part": "scales"
+    },
+    {
+      "id": "veil",
+      "k": "VEIL",
+      "a": "The partial veil: a skin from the cap edge to the stem that covers the gills.",
+      "v": "The gills should still be semi-covered when you pick.",
+      "s": ["F17-0433"],
+      "on": ["stretch"],
+      "part": "veil"
+    },
+    {
+      "id": "margin",
+      "k": "CAP EDGE",
+      "a": "The cap edge, still rolled in toward the stem.",
+      "on": ["stretch"],
+      "part": "cap"
+    },
+    {
+      "id": "veil-tear",
+      "at": "veil",
+      "k": "VEIL TEARS",
+      "a": "The veil splits at the cap edge: the cap is separating from the stem.",
+      "v": "This is the picking point: gills still semi-covered, caps not yet flat.",
+      "s": ["F17-0433"],
+      "on": ["pick"],
+      "part": "veil"
+    },
+    {
+      "id": "gills",
+      "k": "GILLS",
+      "a": "Gills under the cap, showing through the torn veil.",
+      "v": "Harvest while the gills are still semi-covered. One day late sharply cuts storage life.",
+      "s": ["F17-0433"],
+      "on": ["pick", "late"],
+      "part": "gills"
+    },
+    {
+      "id": "lagging",
+      "k": "NOT IN SYNC",
+      "a": "A younger mushroom in the same cluster, still a button.",
+      "v": "Clusters do not mature in sync. Trade some yield for shelf life.",
+      "s": ["F17-0433"],
+      "on": ["pick"]
+    },
+    {
+      "id": "flat",
+      "at": "margin",
+      "k": "CAPS FLATTEN",
+      "a": "The cap opens out flat and its edge lifts.",
+      "v": "Too warm a room: caps flatten fast, stems wither, and the mushrooms droop and smell bad.",
+      "s": ["F13-0020"],
+      "on": ["late"],
+      "part": "cap"
+    },
+    {
+      "id": "ring",
+      "k": "RING",
+      "a": "What is left of the veil hangs on the stem as a ragged ring.",
+      "on": ["late"],
+      "part": "veil"
+    }
+  ]
+}

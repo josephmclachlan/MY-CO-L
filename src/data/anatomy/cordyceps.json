@@ -1,0 +1,123 @@
+{
+  "id": "cordyceps",
+  "note": "The sources mention cordyceps only in passing (rice media, dim early incubation, fast fruiting in high-exchange bags, stalled white heads). The rest of this drawing is general knowledge, not from the sources.",
+  "stages": [
+    {
+      "id": "rice",
+      "k": "RICE MEDIA",
+      "a": "Rice grains packed in a filter bag.",
+      "v": "Some cordyceps growers dry-bag rice-based media with a Fenrir-type filler.",
+      "s": [
+        "F17-0492"
+      ]
+    },
+    {
+      "id": "mat",
+      "k": "WHITE MAT",
+      "a": "White mycelium knits the rice into one mat.",
+      "v": "Early incubation goes best in dim light or none; black bags help.",
+      "s": [
+        "F17-0490"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "PINS",
+      "a": "Small pins rise from the mat.",
+      "v": "Fast species like cordyceps may suit fruiting inside high-exchange (B patch) bags.",
+      "s": [
+        "F17-0491"
+      ]
+    },
+    {
+      "id": "clubs",
+      "k": "CLUBS",
+      "a": "Slender clubs stretch up; their tops swell into the fertile heads."
+    },
+    {
+      "id": "pick",
+      "k": "FULL CLUBS",
+      "a": "Full-height clubs with swollen, pimpled heads.",
+      "v": "It degenerates quickly, especially through serial liquid-culture expansion. Preserve good cultures early.",
+      "s": [
+        "F17-0488"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "bag",
+      "k": "FILTER BAG",
+      "a": "A closed bag with a filter patch.",
+      "v": "Fast species like cordyceps may suit high-exchange (B patch) bags.",
+      "s": [
+        "F17-0491"
+      ],
+      "on": [
+        "rice"
+      ],
+      "at": "patch"
+    },
+    {
+      "id": "rice",
+      "k": "RICE GRAINS",
+      "a": "The rice the culture grows on.",
+      "on": [
+        "rice",
+        "mat"
+      ],
+      "part": "rice"
+    },
+    {
+      "id": "mat",
+      "k": "MYCELIUM MAT",
+      "a": "A white mat over the rice.",
+      "on": [
+        "mat",
+        "pins"
+      ],
+      "part": "mat"
+    },
+    {
+      "id": "pins",
+      "k": "PINS",
+      "a": "Pins rising from the mat.",
+      "on": [
+        "pins"
+      ]
+    },
+    {
+      "id": "stalk",
+      "k": "STALK",
+      "a": "A slender, slightly curving stalk.",
+      "on": [
+        "clubs",
+        "pick"
+      ],
+      "part": "clubs"
+    },
+    {
+      "id": "head",
+      "k": "FERTILE HEAD",
+      "a": "The swollen top, pimpled with tiny bumps where the spores form.",
+      "on": [
+        "clubs",
+        "pick"
+      ],
+      "part": "clubs"
+    },
+    {
+      "id": "stalled",
+      "k": "STALLED HEAD",
+      "a": "A short, fat white head that stopped growing.",
+      "v": "Stalled white heads that look like stroma also show up with cordyceps.",
+      "s": [
+        "F17-0493"
+      ],
+      "on": [
+        "clubs",
+        "pick"
+      ]
+    }
+  ]
+}

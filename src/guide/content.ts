@@ -1,5 +1,5 @@
 // The USER GUIDE text. One source: the in-app USER GUIDE screen and docs/USER-MANUAL.md (npm run docs:guide) both read it.
-// Plain English, short sentences. About the app only: no textbook text (the textbook stays out of the public build).
+// Plain English, short sentences. About the app only: no textbook text (the textbook has its own MANUAL screen).
 
 import { DECKS, STATIONS, parseNav, type DeckId } from '../nav/decks'
 import { BASICS } from './pages-basics'

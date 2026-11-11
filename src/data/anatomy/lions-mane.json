@@ -1,0 +1,136 @@
+{
+  "id": "lions-mane",
+  "stages": [
+    {
+      "id": "cut",
+      "k": "PILLOW, CUT",
+      "a": "The block at the pillowy stage, with a long shallow slit across the bag.",
+      "v": "Pull blocks at the pillowy stage and cut a long shallow slit or X, well into the block to scar the outer mat. Do not wait for pins.",
+      "s": [
+        "F17-0226"
+      ]
+    },
+    {
+      "id": "knob",
+      "k": "KNOB",
+      "a": "A white knob of tissue pushes out of the slit.",
+      "v": "Fruit at 13-18 °C, about 16 °C for HeCNS, with RH in the upper 80s to low 90s %.",
+      "s": [
+        "F17-0228",
+        "F17-0229"
+      ]
+    },
+    {
+      "id": "ball",
+      "k": "SPINES FORM",
+      "a": "The knob rounds into a ball covered in short spines, all pointing down.",
+      "v": "Too high a humidity gives uneven spines; swings help them grow evenly. A wide CO2 swing gives \"dreadlocks\".",
+      "s": [
+        "F17-0229",
+        "F17-0231"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "A compact white pom-pom with short, even spines.",
+      "v": "Pick well before full maturity, on even spine growth: 14-20 days at about 16-17 °C.",
+      "s": [
+        "F17-0238",
+        "F13-0021"
+      ]
+    },
+    {
+      "id": "late",
+      "k": "TOO LATE",
+      "a": "The spines grow long and droop, and spores fall.",
+      "v": "Late signs: long, drooping spines, dropping spores, fruit swelling with water. It should start and finish white.",
+      "s": [
+        "F13-0021"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "cut",
+      "k": "SLIT",
+      "a": "The long shallow slit in the bag.",
+      "v": "Cut too late and the fruit grows malformed inside the bag; too early raises contamination risk.",
+      "s": [
+        "F17-0226"
+      ],
+      "on": [
+        "cut",
+        "knob"
+      ]
+    },
+    {
+      "id": "body",
+      "k": "FRUIT BODY",
+      "a": "A dense white ball of tissue.",
+      "v": "Pink or yellow tints on young fruit mostly mean the room is too dry.",
+      "s": [
+        "F17-0235"
+      ],
+      "on": [
+        "knob",
+        "ball"
+      ],
+      "part": "body"
+    },
+    {
+      "id": "spines",
+      "k": "SHORT SPINES",
+      "a": "Short spines hang down all over the ball.",
+      "v": "The cue is even spine growth. HeCNS has short spines that do not droop.",
+      "s": [
+        "F17-0238",
+        "F17-0241"
+      ],
+      "on": [
+        "ball",
+        "pick"
+      ],
+      "part": "spines"
+    },
+    {
+      "id": "pompom",
+      "at": "body",
+      "k": "POM-POM",
+      "a": "Dense and compact: the shape buyers want.",
+      "v": "A good HeCNS block carries several large, compact pom-poms.",
+      "s": [
+        "F17-0237"
+      ],
+      "on": [
+        "pick"
+      ],
+      "part": "body"
+    },
+    {
+      "id": "long",
+      "k": "LONG SPINES",
+      "a": "The spines lengthen and droop.",
+      "v": "Long, drooping spines that swell with water mean you are late.",
+      "s": [
+        "F13-0021"
+      ],
+      "on": [
+        "late"
+      ],
+      "part": "spines"
+    },
+    {
+      "id": "spores",
+      "k": "SPORES",
+      "a": "Spores fall from the spine tips.",
+      "v": "Dropping spores is a late sign.",
+      "s": [
+        "F13-0021"
+      ],
+      "on": [
+        "late"
+      ]
+    }
+  ]
+}

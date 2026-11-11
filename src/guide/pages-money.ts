@@ -285,7 +285,7 @@ export const TOOLS: GSection[] = [
     blocks: [
       {
         h: 'WHAT IT IS',
-        text: ['The textbook is the farm\'s own reference on growing. It is only in the owner\'s private copy of the app. On the public site this screen says MANUAL LOCKED. The WHY? buttons on other screens open the exact section a number came from.'],
+        text: ['The textbook is the farm\'s own reference on growing. The WHY? buttons on other screens open the exact section a number came from.'],
       },
       { h: 'HOW TO USE IT', steps: ['Pick a chapter or section in the contents.', 'Tap a link to jump. BACK returns you to where you were.'] },
     ],

@@ -1,0 +1,169 @@
+{
+  "id": "reishi",
+  "stages": [
+    {
+      "id": "bag",
+      "k": "SEALED BAG",
+      "a": "A colonized block in a closed bag with a filter patch.",
+      "v": "Antlers form in high in-bag CO2, perhaps 3,000-5,000 ppm with an A-style filter.",
+      "s": [
+        "F17-0475"
+      ]
+    },
+    {
+      "id": "antlers",
+      "k": "ANTLERS",
+      "a": "Knobbly antlers grow up inside the bag; their tips stay pale.",
+      "v": "Antlers take 3-4 months to reach the bag top and can keep growing for up to a year.",
+      "s": [
+        "F17-0478"
+      ]
+    },
+    {
+      "id": "bag-top",
+      "k": "BAG TOP",
+      "a": "The antlers reach the top of the bag.",
+      "v": "Fruited in the bag, the antlers are \"scalped\" level with the block once they reach the top.",
+      "s": [
+        "F13-0025",
+        "F17-0482"
+      ]
+    },
+    {
+      "id": "strip",
+      "k": "STRIP",
+      "a": "The bag comes off and the antlers meet fresh air.",
+      "v": "In fresh air, below about 1,000 ppm CO2, the kidney-shaped cap forms. Stripping the bag brings caps back.",
+      "s": [
+        "F17-0475"
+      ]
+    },
+    {
+      "id": "caps",
+      "k": "CAPS FORM",
+      "a": "The antler tips flatten and spread into caps with a pale growing edge.",
+      "v": "On year-old antlers, caps come back about a month after stripping.",
+      "s": [
+        "F17-0475"
+      ]
+    },
+    {
+      "id": "cap",
+      "k": "KIDNEY CAP",
+      "a": "Kidney-shaped caps ringed with growth zones, the edge still pale.",
+      "v": "Fruiting RH 85-95%. Below about 85% the pore surface may not develop properly.",
+      "s": [
+        "F17-0477"
+      ]
+    },
+    {
+      "id": "spores",
+      "k": "SPORES",
+      "a": "Brown spores dust the cap tops.",
+      "v": "Spore loads are heavy: wear a respirator at harvest.",
+      "s": [
+        "F17-0485"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "bag",
+      "k": "FILTER BAG",
+      "a": "The closed bag keeps CO2 high.",
+      "v": "Very airtight bags kept one culture stuck as small antlers; very open B patches would probably stunt them.",
+      "s": [
+        "F17-0476"
+      ],
+      "on": [
+        "bag",
+        "antlers"
+      ],
+      "at": "patch"
+    },
+    {
+      "id": "antlers",
+      "k": "ANTLERS",
+      "a": "Branching, knobbly stems with no cap.",
+      "v": "High CO2 in the bag makes antlers instead of a cap.",
+      "s": [
+        "F17-0475"
+      ],
+      "on": [
+        "antlers",
+        "bag-top",
+        "strip"
+      ],
+      "part": "antlers"
+    },
+    {
+      "id": "tips",
+      "k": "PALE TIPS",
+      "a": "The growing tips stay pale.",
+      "on": [
+        "antlers",
+        "bag-top"
+      ],
+      "part": "tips"
+    },
+    {
+      "id": "cap",
+      "k": "KIDNEY CAP",
+      "a": "A flat, kidney-shaped cap.",
+      "v": "Lower CO2 (fresh air) makes a cap instead of antlers.",
+      "s": [
+        "F17-0475"
+      ],
+      "on": [
+        "caps",
+        "cap"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "edge",
+      "k": "GROWING EDGE",
+      "a": "A pale band at the edge where the cap is still growing.",
+      "on": [
+        "caps",
+        "cap"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "zones",
+      "k": "GROWTH ZONES",
+      "a": "Ridges ring the cap as it grows.",
+      "on": [
+        "cap"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "pores",
+      "k": "PORE SURFACE",
+      "a": "The underside is fine pores, not gills.",
+      "v": "Below about 85% RH the pore surface may not develop properly.",
+      "s": [
+        "F17-0477"
+      ],
+      "on": [
+        "cap"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "spores",
+      "k": "SPORE DUST",
+      "a": "Brown spores fall and settle on the caps.",
+      "v": "Spore loads are heavy; one farm always harvested reishi outdoors.",
+      "s": [
+        "F17-0485"
+      ],
+      "on": [
+        "spores"
+      ],
+      "part": "spores"
+    }
+  ]
+}

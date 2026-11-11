@@ -48,8 +48,8 @@ export const HAZARD_START: HazardState = { mode: 'file', id: null, tab: 'SPOT', 
 type SetHazard = (p: Partial<HazardState>) => void
 
 const NO_DATA = 'NO DATA IN SOURCES'
-/** The public build empties the paraphrased text (see vite.config.ts); fact IDs and tags stay. */
-const LOCKED = 'TEXT LOCKED IN THE PUBLIC BUILD. LOG IN TO READ IT. THE SOURCE IDS BELOW STILL APPLY.'
+/** Shown if a fact has no sentence (none do today); fact IDs and tags still apply. */
+const LOCKED = 'NO TEXTBOOK SENTENCE ON FILE FOR THIS YET. THE SOURCE IDS BELOW STILL APPLY.'
 const narrow = () => typeof window !== 'undefined' && window.matchMedia?.('(max-width: 700px)').matches
 const join = <T extends string>(xs: T[], label: Record<T, string>) => (xs.length ? xs.map((x) => label[x]).join(', ') : NO_DATA)
 
