@@ -27,7 +27,7 @@ export interface AskState {
 export const ASK_START: AskState = { tab: 'ASK', turns: [], queued: null }
 type SetAsk = (p: Partial<AskState> | ((s: AskState) => Partial<AskState>)) => void
 
-const TAB_LABEL: Record<AskTab, string> = { ASK: 'ASK THE LATTICE', ENGINE: 'ENGINE (LOCAL MODEL)', EXAMPLES: 'EXAMPLES' }
+const TAB_LABEL: Record<AskTab, string> = { ASK: 'ASK MY/CO/L', ENGINE: 'ENGINE (LOCAL MODEL)', EXAMPLES: 'EXAMPLES' }
 const KEEP = 40
 
 /** The browser's fetch, wrapped to the shape llm.ts wants. */

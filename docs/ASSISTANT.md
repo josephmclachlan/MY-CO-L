@@ -1,4 +1,4 @@
-# Farm assistant (ASK THE LATTICE, module 22)
+# Farm assistant (ASK MY/CO/L, module 22)
 
 Plain-English notes for the owner and for the self-host build (G13).
 

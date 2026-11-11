@@ -22,7 +22,7 @@ export const TIPS: Record<string, string> = {
   'COMMAND PROMPT': 'Type a word or a number and press Enter: a module number opens it, FIND looks for a record, HELP lists the commands.',
   GLOVE: 'Glove mode is on. Tap to switch it off.',
   UNDO: 'Reverse the last saved change.',
-  'ASK THE LATTICE': 'Ask the farm assistant a question, or tell it something to save in plain words.',
+  'ASK MY/CO/L': 'Ask the farm assistant a question, or tell it something to save in plain words.',
 
   // ---- common buttons ----
   SAVE: 'Save what you typed. The change is written to this device and can be undone with UNDO.',

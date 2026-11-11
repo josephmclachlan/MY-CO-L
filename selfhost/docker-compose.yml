@@ -9,7 +9,7 @@
 #             /rest/v1/    the tables (rest)
 #             /auth/v1/    the login (auth)
 #             /llm/        the assistant's local model (ollama), chat only
-#   ollama  the local model for ASK THE LATTICE (optional: profile "ai")
+#   ollama  the local model for ASK MY/CO/L (optional: profile "ai")
 #   bridge  reads Govee sensors into the climate log (optional: profile "sensors")
 #
 # Start everything with:  ./mycol.sh start      (see docs/SELF-HOST.md)

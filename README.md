@@ -87,7 +87,7 @@ Modules 1 and 4-9 show "NOT YET INSTALLED" until their build threads land.
   the frame, menu, help, the new screens, LOG HARVEST and HARVEST SESSION; the other screens stay English for now.
   The Spanish was written by Claude and needs a native reader (`src/lib/es.ts`; a test fails if a string has no entry).
 
-## What's in the farm assistant build (ASK THE LATTICE, module 22)
+## What's in the farm assistant build (ASK MY/CO/L, module 22)
 
 - Type a question or a command in plain words, on the ASK screen or at the `>` prompt on any screen
   (start with ASK, end with ?, or begin with HOW / WHO / LOG / SHOW ...). Examples: "how many LM blocks are
