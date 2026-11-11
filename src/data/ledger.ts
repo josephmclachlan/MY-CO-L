@@ -73,7 +73,23 @@ export const FORMS: { id: Form; label: string }[] = [
 export const GRADES = ['A', 'B', 'SECONDS'] as const
 
 /** Species offered on the sale form: the crop plan first, then the rest that have a lot letter. */
-export const SALE_SPECIES = ['blue-oyster', 'lions-mane', 'comb-tooth', 'golden-oyster', 'phoenix-oyster', 'pink-oyster', 'black-pearl', 'king-oyster', 'chestnut', 'pioppino', 'shiitake', 'maitake', 'reishi', 'cordyceps']
+export const SALE_SPECIES = ['blue-oyster', 'lions-mane', 'comb-tooth', 'golden-oyster', 'phoenix-oyster', 'pink-oyster', 'black-pearl', 'king-oyster', 'chestnut', 'pioppino', 'shiitake', 'maitake', 'reishi', 'cordyceps', 'turkey-tail']
+
+/** Sold dried (Joseph, 11 Nov 2026: turkey tail). Picking one on the sale or standing order form switches it to
+ *  DRIED, the price book asks only for its dried price, and the surplus log (fresh kilos not sold) leaves it out. */
+export const SOLD_DRIED: ReadonlySet<string> = new Set(['turkey-tail'])
+
+/** Species sold fresh: the surplus log's list. */
+export const FRESH_SPECIES = SALE_SPECIES.filter((s) => !SOLD_DRIED.has(s))
+
+/** The form after the species on a sale or order form changes from `prev` to `next`: DRIED for a species sold
+ *  dried, back to FRESH when leaving one while still on DRIED (even if DRIED was pressed by hand before), otherwise
+ *  the form already picked. */
+export function formAfterPick<F extends Form>(prev: string, next: string, form: F): F | 'fresh' | 'dried' {
+  if (SOLD_DRIED.has(next)) return 'dried'
+  if (SOLD_DRIED.has(prev) && form === 'dried') return 'fresh'
+  return form
+}
 
 /** Fresh price per kg. Oysters ₡10,000-13,000 (Joseph). Lion's mane and coral +20% is a GUESS. Dried has no default. */
 export const OYSTER_PRICE: [number, number] = [10000, 13000]

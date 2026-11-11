@@ -27,6 +27,7 @@ import {
   RATIO,
   RATIO_SRC,
   STORAGE_KINDS,
+  STRAINS_ON_FILE,
   buildTree,
   childP,
   cultureAge,
@@ -261,7 +262,7 @@ function StrainsTab({ d, x, set, say, onOpenSpecies }: { d: XData; x: XenoState;
   return (
     <div className="xn-sec">
       <div className="dim tiny">
-        {d.strains.length} OF 17 STRAINS ON FILE // {d.strains.filter((s) => s.active).length} ACTIVE // CODES ARE SPECIES LETTERS + NUMBER (LM-01)
+        {d.strains.length} OF {STRAINS_ON_FILE} STRAINS ON FILE // {d.strains.filter((s) => s.active).length} ACTIVE // CODES ARE SPECIES LETTERS + NUMBER (LM-01)
       </div>
       <div className="xn-list">
         {d.strains.map((s) => {

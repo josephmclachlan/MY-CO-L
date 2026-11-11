@@ -1,7 +1,7 @@
 import { useStore, useTable } from '../store/StoreContext'
 import { useRatesEditor } from '../store/useRates'
 import { speciesName } from '../store/useLedger'
-import { BILL_ESTIMATE, ICE, LEDGER_GUESSES, SALE_SPECIES, TRADE_GUESSES, type Form } from '../data/ledger'
+import { BILL_ESTIMATE, ICE, LEDGER_GUESSES, SALE_SPECIES, SOLD_DRIED, TRADE_GUESSES, type Form } from '../data/ledger'
 import { DEFAULT_ICE, DEFAULT_RATES, builtInPrice, estimateMid, iceBill, type IceRates, type Rates } from '../lib/rates'
 import { fmtCrc, fmtUsd, priceHistory, type Item, type Price } from '../lib/cargo'
 import { addPrice } from '../lib/cargoActions'
@@ -76,7 +76,7 @@ export function Prices({ say, onOpenCargo }: { say: Say; onOpenCargo: () => void
 
       <div className="ck-box">
         <div className="section-title">SALE PRICES // ₡ PER KG</div>
-        <div className="dim tiny">THE SALE FORM IN TRADE STARTS FROM THESE. BUILT-IN: OYSTERS ₡11,500 (MIDDLE OF YOUR ₡10,000-13,000), LION'S MANE AND CORAL +20% <Guess />. DRIED HAS NO BUILT-IN PRICE.</div>
+        <div className="dim tiny">THE SALE FORM IN TRADE STARTS FROM THESE. BUILT-IN: OYSTERS ₡11,500 (MIDDLE OF YOUR ₡10,000-13,000), LION'S MANE AND CORAL +20% <Guess />. DRIED HAS NO BUILT-IN PRICE. TURKEY TAIL IS SOLD DRIED, SO ONLY ITS DRIED PRICE IS ASKED FOR.</div>
         <div className="ck-scroll">
           <table className="lg-table lg-edit">
             <thead><tr><th>SPECIES</th><th>FRESH ₡/KG</th><th>DRIED ₡/KG</th></tr></thead>
@@ -85,6 +85,7 @@ export function Prices({ say, onOpenCargo }: { say: Say; onOpenCargo: () => void
                 <tr key={k}>
                   <td>{speciesName(k)}</td>
                   {(['fresh', 'dried'] as Form[]).map((f) => {
+                    if (f === 'fresh' && SOLD_DRIED.has(k)) return <td key={f} className="dim">SOLD DRIED</td>
                     const mine = r.sale[k]?.[f]
                     const def = builtInPrice(k, f)
                     return (

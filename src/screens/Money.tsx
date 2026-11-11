@@ -13,7 +13,7 @@ import { useMoney, useMoneyEditor, type MoneyData } from '../store/useMoney'
 import { useFxSync } from '../store/useFx'
 import { useRates } from '../store/useRates'
 import { useRecords } from '../store/useRecords'
-import { CHANNELS, LB_KG, SALE_SPECIES, YIELD_LB } from '../data/ledger'
+import { CHANNELS, FRESH_SPECIES, LB_KG, YIELD_LB } from '../data/ledger'
 import { STATION } from '../data/farm'
 import { averageSplit, usePlan } from '../data/cropplan'
 import { fmtCrc as crcBase, fmtUsd } from '../lib/cargo'
@@ -983,7 +983,7 @@ function WasteTab({ d, say }: { d: MoneyData; say: Say }) {
           <label className="ck-field">
             <span>SPECIES</span>
             <Select aria-label="Species" value={species} onChange={(e) => setSpecies(e.target.value)}>
-              {SALE_SPECIES.map((s) => <option key={s} value={s}>{sp(s)}</option>)}
+              {FRESH_SPECIES.map((s) => <option key={s} value={s}>{sp(s)}</option>)}
             </Select>
           </label>
         </div>

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { EDIT_LOG, MemoryBackend, Store, type Row } from './store'
 import type { EditEntry } from './history'
 import { rng } from './testkit'
-import { addDays, planChain, type BlockLot, type Culture, type GrainRun, type Strain } from './xeno'
+import { STRAINS_ON_FILE, addDays, planChain, type BlockLot, type Culture, type GrainRun, type Strain } from './xeno'
 import { addCultures, addGrainRun, addLot, lossLot, newStrain } from './xenoActions'
 import {
   DEFAULT_PRACTICE,
@@ -507,11 +507,11 @@ describe('stress: thousands of random bank actions', () => {
   }
 
   it('10,000 tubes and 20,000 checks: status and due dates stay fast and exact', () => {
-    const strains = Array.from({ length: 17 }, (_, i) => ({ id: `s${i}`, code: `BO-${i}`, species_key: 'blue-oyster', active: true }) as Strain)
+    const strains = Array.from({ length: STRAINS_ON_FILE }, (_, i) => ({ id: `s${i}`, code: `BO-${i}`, species_key: 'blue-oyster', active: true }) as Strain)
     const cultures: Culture[] = []
     const checks: ViabilityCheck[] = []
     for (let i = 0; i < 10000; i++) {
-      const s = strains[i % 17]
+      const s = strains[i % strains.length]
       const kind = i % 2 ? 'water' : 'slant'
       cultures.push({ id: `c${i}`, strain_id: s.id, parent_culture_id: null, kind, p_level: 1, made_on: addDays('2024-01-01', i % 900), status: 'cold_storage', cold_since: null, location: null, label: `${s.code} ${i}`, notes: null, bank_batch: `b${Math.floor(i / 8)}`, offsite: i % 8 === 0 })
       checks.push({ id: `k${i}a`, culture_id: `c${i}`, strain_id: s.id, checked_on: addDays('2024-06-01', i % 800), days_to_cover: 9, appearance: null, contamination: null, result: 'pass', notes: null, initials: null })
@@ -522,7 +522,7 @@ describe('stress: thousands of random bank actions', () => {
     const ms = performance.now() - t0
     expect(st.reduce((n, b) => n + b.slants + b.water + b.offsiteSlants + b.offsiteWater, 0)).toBe(10000)
     expect(st.reduce((n, b) => n + b.offsiteSlants + b.offsiteWater, 0)).toBe(1250)
-    expect(ms).toBeLessThan(1500) // all 17 strains, on a slow test machine
+    expect(ms).toBeLessThan(1500) // every strain on file, on a slow test machine
   }, 120000)
 })
 
