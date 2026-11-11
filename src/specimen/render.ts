@@ -322,8 +322,10 @@ export class SpecimenScene {
     // a turning specimen fills a cylinder: its sides touch the view edges when seen from d
     const dH = (r * Math.sqrt(1 + tanH * tanH)) / tanH
     let dV = (h / 2 + r * Math.abs(Math.sin(el))) / tanV + r * Math.cos(el) * 0.7
-    // tilted by hand: back off if the specimen needs more room from there, never come closer
-    if (Math.abs(this.view.tilt ?? 0) > 0.01) dV = Math.max(dV, fitDistance(h, r, this.elevation(), tanV))
+    // tilted by hand: back off if the specimen needs more room from there, never come
+    // closer; eased in over the first few degrees so the camera doesn't hop as a tilt starts
+    const tilt = Math.abs(this.view.tilt ?? 0)
+    if (tilt > 0.001) dV = Math.max(dV, dV + (fitDistance(h, r, this.elevation(), tanV) - dV) * Math.min(1, tilt / 0.15))
     const d = Math.max(dH, dV) * 1.04
     this.want = { d, y: (ylo + yhi) / 2, span: Math.max(r, h / 2), h }
   }

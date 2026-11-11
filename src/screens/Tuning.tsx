@@ -17,6 +17,8 @@ type Test =
   | { kind: 'glitch' }
 
 const pct = (v: number) => `${Math.round(v * 100)}`
+/** Unmuting fades the volume up over about a tenth of a second, so a test waits this long (ms) and plays at full volume. */
+const WAKE_MS = 160
 
 /** Holds the drone on for as long as the WORKING bar is on screen. */
 function DroneTest() {
@@ -47,7 +49,7 @@ function WarbleTest() {
  * TUNE: every look and sound setting, each sound layer with a TEST button.
  * Each test puts something on screen at the same moment the sound plays.
  */
-export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onReplayBoot: () => void }) {
+export function Tuning({ onAlarm, onReplayBoot, onSay }: { onAlarm: () => void; onReplayBoot: () => void; onSay: (text: string) => void }) {
   const { settings, update, reset, sound } = useApp()
   const { look, sound: snd } = settings
   const { t: tt } = useT()
@@ -60,26 +62,39 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
   const setLook = <K extends keyof LookSettings>(k: K, v: LookSettings[K]) =>
     update((s) => ({ ...s, look: { ...s.look, [k]: v } }))
   /** A glass slider: moving it while CLEAN MODE is on brings the glass back, so the change shows. */
-  const setGlass = (k: 'strength' | 'glow' | 'scanlines' | 'curve' | 'flicker' | 'noise', v: number) =>
+  const setGlass = (k: 'strength' | 'glow' | 'scanlines' | 'curve' | 'flicker' | 'noise', v: number) => {
+    if (look.clean) onSay(tt('CLEAN MODE OFF'))
     update((s) => ({ ...s, look: { ...s.look, [k]: v, clean: false } }))
+  }
   const setSound = <K extends keyof SoundSettings>(k: K, v: SoundSettings[K]) =>
     update((s) => ({ ...s, sound: { ...s.sound, [k]: v } }))
-  /** Turn sound back on, in the sound engine too, so a TEST plays in this same tap. */
-  const wake = (extra: Partial<SoundSettings> = {}) => {
-    if (snd.enabled && Object.entries(extra).every(([k, v]) => snd[k as keyof SoundSettings] === v)) return
+  /**
+   * Turn sound back on, in the sound engine too, so a TEST plays from this same tap.
+   * Returns how long the test should wait (ms) so it plays at full volume.
+   */
+  const wake = (extra: Partial<SoundSettings> = {}): number => {
+    if (snd.enabled && Object.entries(extra).every(([k, v]) => snd[k as keyof SoundSettings] === v)) return 0
     sound.apply({ ...snd, ...extra, enabled: true })
     update((s) => ({ ...s, sound: { ...s.sound, ...extra, enabled: true } }))
+    if (snd.enabled) return 0
+    onSay(tt('SOUND ON'))
+    return WAKE_MS
   }
-  /** A level slider: moving it while muted (or with its layer off) turns the sound back on. */
-  const setLevel = (k: 'master' | 'typing' | 'chatter' | 'drone' | 'hum' | 'signals' | 'warble' | 'glitch' | 'ambience', v: number) =>
+  /** Run fn now, or after the wait wake() asked for. */
+  const after = (ms: number, fn: () => void) => (ms > 0 ? void window.setTimeout(fn, ms) : fn())
+  /** A level slider: moving it while muted (or with its layer off) turns the sound back on, and says so. */
+  const setLevel = (k: 'master' | 'typing' | 'chatter' | 'drone' | 'hum' | 'signals' | 'warble' | 'glitch' | 'ambience', v: number) => {
+    const said: string[] = []
+    if (!snd.enabled) said.push(tt('SOUND ON'))
+    if (k === 'glitch' && !snd.glitchOn) said.push('GLITCHES ON')
+    if (k === 'ambience' && !snd.ambienceOn) said.push('AMBIENCE ON')
+    if (said.length) onSay(said.join(' // '))
     update((s) => ({
       ...s,
       sound: { ...s.sound, [k]: v, enabled: true, ...(k === 'glitch' ? { glitchOn: true } : k === 'ambience' ? { ambienceOn: true } : {}) },
     }))
-  const runTest = (t: Test) => {
-    wake()
-    run(t)
   }
+  const runTest = (t: Test) => after(wake(), () => run(t))
 
   // Drone and test visuals stop after a few seconds.
   useEffect(() => {
@@ -89,11 +104,11 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
     return () => window.clearTimeout(timer)
   }, [test])
 
-  const signal = (text: string, fn: () => void) => {
-    wake()
-    fn()
-    run({ kind: 'signal', text })
-  }
+  const signal = (text: string, fn: () => void) =>
+    after(wake(), () => {
+      fn()
+      run({ kind: 'signal', text })
+    })
 
   const muted = !snd.enabled
   const pctOf = (v: number) => `${Math.round(v * 100)}%`
@@ -255,10 +270,7 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
           <button
             type="button"
             className="btn hazard"
-            onClick={() => {
-              wake()
-              onAlarm()
-            }}
+            onClick={() => after(wake(), onAlarm)}
           >
             ALARM
           </button>
@@ -276,17 +288,19 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
 
         <div className="tune-row">
           <span className="lbl">GLITCHES</span>
-          <button type="button" className={`btn ${snd.glitchOn ? 'on' : ''}`} onClick={() => (snd.glitchOn ? setSound('glitchOn', false) : wake({ glitchOn: true }))}>
+          <button type="button" className={`btn ${snd.glitchOn ? 'on' : ''}`} onClick={() => (snd.glitchOn ? setSound('glitchOn', false) : void wake({ glitchOn: true }))}>
             {snd.glitchOn ? 'ON' : 'OFF'}
           </button>
           <button
             type="button"
             className="btn"
-            onClick={() => {
-              wake({ glitchOn: true })
-              sound.glitch()
-              run({ kind: 'glitch' })
-            }}
+            onClick={() =>
+              // one crackle at the GLITCH level; glitches stay as they are (on or off)
+              after(wake(), () => {
+                sound.testGlitch()
+                run({ kind: 'glitch' })
+              })
+            }
           >
             TEST GLITCH
           </button>
@@ -296,7 +310,7 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
 
         <div className="tune-row">
           <span className="lbl">AMBIENCE</span>
-          <button type="button" className={`btn ${snd.ambienceOn ? 'on' : ''}`} onClick={() => (snd.ambienceOn ? setSound('ambienceOn', false) : wake({ ambienceOn: true }))}>
+          <button type="button" className={`btn ${snd.ambienceOn ? 'on' : ''}`} onClick={() => (snd.ambienceOn ? setSound('ambienceOn', false) : void wake({ ambienceOn: true }))}>
             {snd.ambienceOn ? 'ON' : 'OFF'}
           </button>
           <span className="dim">ROOM RUMBLE AND AIR HISS. BEST ON HEADPHONES OR SPEAKERS.</span>
