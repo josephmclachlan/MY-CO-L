@@ -357,6 +357,8 @@ describe('cleaning and checklists', () => {
     const cook = CHECKLISTS.find((c) => c.key === 'cook')!
     expect(cook.steps.map((s) => s.text).join(' ')).toContain('93 C')
     expect(cook.steps.map((s) => s.text).join(' ')).toContain('4 hours')
+    const power = CHECKLISTS.find((c) => c.key === 'power')!.steps.map((s) => s.text).join(' ')
+    for (const w of ['MODE 1', 'MODE 2', 'element 2 (30-32)', '7 and 9', '15 and 17', 'START']) expect(power).toContain(w)
   })
   it('sign-off due dates', () => {
     const run = (day: string): ChecklistRun => ({ id: day, template: 'lab', done_on: day, finished_at: `${day}T20:00:00Z`, who: 'JM', items: [], note: null })
