@@ -22,14 +22,14 @@ export interface SeedItem {
 
 export const SEED_ITEMS: SeedItem[] = [
   // SUBSTRATE: Master's Mix is 50:50 hardwood sawdust : soy hulls (t10). Room guesses follow DECK PLAN.
-  { code: 'SAWDUST', name: 'Hardwood sawdust or fuel pellets', category: 'SUBSTRATE', unit: 'kg', room: 'boiling', notes: 'Half of Master\'s Mix (t10). Red oak is the standard. Counted dry, in kg.' },
-  { code: 'SOY-HULL', name: 'Soy hulls', category: 'SUBSTRATE', unit: 'kg', room: 'boiling', notes: 'Other half of Master\'s Mix; never more than 50% (t10). Soy hulls are a US input, so find a local supplier. Counted in kg.' },
-  { code: 'COMBO', name: 'Combo pellets 50:50 (red oak + soy hull)', category: 'SUBSTRATE', unit: 'kg', room: 'boiling', supplier: 'Cap n Stem (t23); also Mushroom Media Online (t23)', notes: 'Use these INSTEAD of separate sawdust and soy hulls. Switch CARGO to COMBO PELLETS so weekly use books against this item.' },
+  { code: 'SAWDUST', name: 'Hardwood sawdust or fuel pellets', category: 'SUBSTRATE', unit: 'kg', room: 'packing', notes: 'Half of Master\'s Mix (t10). Red oak is the standard. Counted dry, in kg.' },
+  { code: 'SOY-HULL', name: 'Soy hulls', category: 'SUBSTRATE', unit: 'kg', room: 'packing', notes: 'Other half of Master\'s Mix; never more than 50% (t10). Soy hulls are a US input, so find a local supplier. Counted in kg.' },
+  { code: 'COMBO', name: 'Combo pellets 50:50 (red oak + soy hull)', category: 'SUBSTRATE', unit: 'kg', room: 'packing', supplier: 'Cap n Stem (t23); also Mushroom Media Online (t23)', notes: 'Use these INSTEAD of separate sawdust and soy hulls. Switch CARGO to COMBO PELLETS so weekly use books against this item.' },
 
   // GRAIN AND SPAWN
-  { code: 'GRAIN', name: 'Grain, dry (rye, millet or oats)', category: 'GRAIN AND SPAWN', unit: 'kg', room: 'boiling', notes: 'Rye is the forgiving standard, millet gives the most inoculation points, oats are easiest to hydrate (t09). Counted dry, in kg.' },
-  { code: 'SPAWN-BAG', name: 'Spawn bags with filter patch (G1 4 lb, G2 6 lb)', category: 'GRAIN AND SPAWN', unit: 'bags', room: 'boiling', supplier: 'Unicorn Bags (t23)', notes: 'One bag per G1 master and per G2 (t09).' },
-  { code: 'BAG-10', name: 'Grow bags, 10 lb, filter patch (XLS-A)', category: 'GRAIN AND SPAWN', unit: 'bags', room: 'boiling', supplier: 'Unicorn Bags (t23)', notes: 'XLS-A is most farms\' standard for a 10 lb block (t23).' },
+  { code: 'GRAIN', name: 'Grain, dry (rye, millet or oats)', category: 'GRAIN AND SPAWN', unit: 'kg', room: 'packing', notes: 'Rye is the forgiving standard, millet gives the most inoculation points, oats are easiest to hydrate (t09). Counted dry, in kg.' },
+  { code: 'SPAWN-BAG', name: 'Spawn bags with filter patch (G1 4 lb, G2 6 lb)', category: 'GRAIN AND SPAWN', unit: 'bags', room: 'lab', supplier: 'Unicorn Bags (t23)', notes: 'One bag per G1 master and per G2 (t09).' },
+  { code: 'BAG-10', name: 'Grow bags, 10 lb, filter patch (XLS-A)', category: 'GRAIN AND SPAWN', unit: 'bags', room: 'packing', supplier: 'Unicorn Bags (t23)', notes: 'XLS-A is most farms\' standard for a 10 lb block (t23).' },
 
   // CULTURE LAB
   { code: 'AGAR', name: 'Agar powder', category: 'CULTURE LAB', unit: 'g', room: 'lab', notes: 'Agar is the jelly; nutrients come from malt or potato plus a little yeast (t07).' },

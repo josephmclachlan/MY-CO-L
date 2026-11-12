@@ -1,12 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactElement } from 'react'
 import { useApp } from '../settings/AppContext'
 import { usePower } from '../power/PowerContext'
 import {
   allCircuits,
   CEILING_A,
-  GEN_MAX_W,
-  GEN_MIN_W,
-  GEN_PRESETS,
   GENERATOR,
   HEATER_OPTIONS,
   SCENARIOS,
@@ -18,7 +15,6 @@ import {
 import { circuitWatts, fmtDur, fmtMin, itemWatts } from '../lib/power'
 import { roomById } from '../data/rooms'
 import { LoadBar } from '../components/LoadBar'
-import { Meter } from '../components/Meter'
 import { TypeText } from '../components/TypeText'
 import { PowerCutBox } from './Facility'
 
@@ -70,6 +66,90 @@ export function BreakerBox({ c, flashDelay, compact }: { c: Circuit; flashDelay?
         {c.cls !== 'out' && <span className="b-amp">{ampsOf(c, w).toFixed(1)}A</span>}
       </span>
     </button>
+  )
+}
+
+/** The slots a breaker takes, from its tag: '7' -> [7], '21-23' -> [21, 23]. */
+export function slotsOf(tag: string): number[] {
+  return tag.split('-').map((n) => Number(n)).filter((n) => Number.isFinite(n) && n > 0)
+}
+
+/** Leg of a slot in a split-phase box: row = slot / 2 rounded up, odd rows on L1. */
+export function legOfSlot(slot: number): 'L1' | 'L2' {
+  return Math.ceil(slot / 2) % 2 === 1 ? 'L1' : 'L2'
+}
+
+/** Where the power comes in: the grid through the main, or the generator through its own breaker. One interlock, never both. */
+function FeedStrip() {
+  const { sound } = useApp()
+  const p = usePower()
+  const gen = p.state.source === 'generator'
+  return (
+    <div className="feed-strip" role="group" aria-label="What feeds the box">
+      <button type="button" className={`feed ${!gen ? 'live' : ''}`} onClick={() => (sound.chirp(), p.setSource('utility'))} aria-pressed={!gen}>
+        <span className="feed-k">ICE GRID</span>
+        <span className="feed-v">MAIN BREAKER {!gen ? 'ON' : 'OFF'}</span>
+        <span className="feed-s">200 A METER // 3/0 AL 155 A</span>
+      </button>
+      <span className="feed-lock" aria-hidden>
+        INTERLOCK
+        <i />
+      </span>
+      <button type="button" className={`feed ${gen ? 'live' : ''}`} onClick={() => (sound.chirp(), p.setSource('generator'))} aria-pressed={gen}>
+        <span className="feed-k">GENERATOR</span>
+        <span className="feed-v">50 A 2-POLE {gen ? 'ON' : 'OFF'}</span>
+        <span className="feed-s">XP17500HX // ONE 50 A CORD</span>
+      </button>
+    </div>
+  )
+}
+
+/** The box drawn as it is: two columns of slots with the L1/L2 bus down the middle. */
+function PanelBoard({ circuits, flash }: { circuits: Circuit[]; flash: Record<string, number> }) {
+  const bySlot = new Map<number, Circuit[]>()
+  let maxSlot = 0
+  for (const c of circuits) {
+    const sl = slotsOf(c.tag)
+    if (!sl.length) continue
+    const first = Math.min(...sl)
+    bySlot.set(first, [...(bySlot.get(first) ?? []), c])
+    maxSlot = Math.max(maxSlot, ...sl)
+  }
+  const rows = Math.ceil(Math.max(maxSlot, 32) / 2)
+  const taken = new Set(circuits.flatMap((c) => slotsOf(c.tag)))
+  const cells: ReactElement[] = []
+  for (let slot = 1; slot <= rows * 2; slot++) {
+    const col = slot % 2 === 1 ? 1 : 3
+    const row = Math.ceil(slot / 2)
+    const here = bySlot.get(slot)
+    if (here) {
+      const span = slotsOf(here[0].tag).length
+      cells.push(
+        <div key={`s${slot}`} className={`pb-cell ${here.length > 1 ? 'shared' : ''}`} style={{ gridColumn: col, gridRow: `${row} / span ${span}` }}>
+          {here.map((c) => (
+            <BreakerBox key={c.id} c={c} flashDelay={flash[c.id]} compact />
+          ))}
+        </div>,
+      )
+    } else if (!taken.has(slot)) {
+      cells.push(
+        <div key={`s${slot}`} className="pb-cell spare" style={{ gridColumn: col, gridRow: row }}>
+          <span className="b-tag">{slot}</span> SPARE
+        </div>,
+      )
+    }
+  }
+  for (let row = 1; row <= rows; row++) {
+    cells.push(
+      <div key={`bus${row}`} className={`pb-bus ${row % 2 ? 'l1' : 'l2'}`} style={{ gridColumn: 2, gridRow: row }}>
+        {row % 2 ? 'L1' : 'L2'}
+      </div>,
+    )
+  }
+  return (
+    <div className="panel-board" style={{ gridTemplateRows: `repeat(${rows}, auto)` }}>
+      {cells}
+    </div>
   )
 }
 
@@ -159,8 +239,6 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
   const { state, reading: r, warns, peak, on } = p
   const gen = state.source === 'generator'
   const circuits = allCircuits(state.heater)
-  const main = circuits.filter((c) => c.panel === 'main')
-  const sub = circuits.filter((c) => c.panel === 'sub')
   const [flash, setFlash] = useState<Record<string, number>>({})
   const flashTimer = useRef<number | null>(null)
   const pendingRipple = useRef<Set<string> | null>(null)
@@ -201,7 +279,7 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
   )
 
   const shareTxt = Number.isFinite(r.share) ? `${(r.share * 100).toFixed(0)}%` : '---'
-  const scaleA = ['0', '31', '63', '94', `${CEILING_A} A`]
+  const scaleA = ['0', String(Math.round(CEILING_A / 4)), String(Math.round(CEILING_A / 2)), String(Math.round((CEILING_A * 3) / 4)), `${CEILING_A} A`]
   const scenarios = SCENARIOS.filter((s) => s.source === state.source && (!s.only || s.only === state.heater))
   const heater = HEATER_OPTIONS[state.heater]
   const fullHeatA = heater.elements.reduce((n, e) => n + e.w, 0) / 240
@@ -244,12 +322,12 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
           <div className="ro">
             <span className="ro-k">{gen ? 'GENERATOR LOAD' : 'WORST LEG'}</span>
             <span className={`ro-v big lv-${r.level}`}>{gen ? shareTxt : fmtA(r.worst)}</span>
-            <span className="ro-s dim">{gen ? `${fmtW(r.watts)} OF ${fmtW(state.genW)}` : `${shareTxt} OF ${CEILING_A} A METER`}</span>
+            <span className="ro-s dim">{gen ? (r.worst / r.legA >= r.wattShare ? `SET BY ${r.l1 > r.l2 ? 'L1' : 'L2'}: ${fmtA(r.worst)} OF ${r.legA.toFixed(0)} A ON THE CORD` : `SET BY WATTS: ${fmtW(r.watts)} OF ${fmtW(state.genW)}`) : `${shareTxt} OF THE ${CEILING_A} A FEEDER`}</span>
           </div>
           <div className="ro">
             <span className="ro-k">HEADROOM</span>
-            <span className="ro-v">{gen ? fmtW(state.genW - r.watts) : fmtA(CEILING_A - r.worst)}</span>
-            <span className="ro-s dim">{gen ? `${state.fuel.toUpperCase()} RUNNING WATTS` : 'TO THE CEILING'}</span>
+            <span className="ro-v">{gen ? fmtA(r.legA - r.worst) : fmtA(CEILING_A - r.worst)}</span>
+            <span className="ro-s dim">{gen ? `ON THE WORST LEG // ${fmtW(state.genW - r.watts)} ${state.fuel.toUpperCase()} WATTS LEFT` : 'TO THE CEILING'}</span>
           </div>
           <div className="ro">
             <span className="ro-k">TOTAL</span>
@@ -266,9 +344,9 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
         </div>
         {gen ? (
           <>
-            <LoadBar label="GEN" share={r.share} level={r.level} value={shareTxt} scale={['0', '', '', '', `${(state.genW / 1000).toFixed(1)} KW`]} />
-            <LoadBar label="L1" share={r.l1 / (state.genW / 2 / 120)} level={r.level} value={fmtA(r.l1)} />
-            <LoadBar label="L2" share={r.l2 / (state.genW / 2 / 120)} level={r.level} value={fmtA(r.l2)} />
+            <LoadBar label="GEN" share={r.wattShare} level={r.wattShare > 1 ? 'over' : r.wattShare > 0.85 ? 'near' : 'ok'} value={`${(r.wattShare * 100).toFixed(0)}%`} scale={['0', '', '', '', `${(state.genW / 1000).toFixed(1)} KW`]} />
+            <LoadBar label="L1" share={r.l1 / r.legA} level={r.l1 > r.legA ? 'over' : r.l1 > 0.85 * r.legA ? 'near' : 'ok'} value={fmtA(r.l1)} scale={['0', '', '', '', `${r.legA.toFixed(0)} A`]} />
+            <LoadBar label="L2" share={r.l2 / r.legA} level={r.l2 > r.legA ? 'over' : r.l2 > 0.85 * r.legA ? 'near' : 'ok'} value={fmtA(r.l2)} scale={['0', '', '', '', `${r.legA.toFixed(0)} A`]} />
           </>
         ) : (
           <>
@@ -278,38 +356,44 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
         )}
         <div className="dim tiny">
           {gen
-            ? `${GENERATOR.model} // ${GENERATOR.outlet} // ${GENERATOR.connection} // NEUTRAL MUST BE UN-BONDED`
-            : `125 A METER > 3/0 AL 115 M (155 A) > 200 A MAIN // LABEL: ${SERVICE.label}`}
-          {` // SUB-PANEL FEED L1 ${fmtA(r.subL1)} L2 ${fmtA(r.subL2)} OF ${SERVICE.subFeedA} A`}
+            ? `${GENERATOR.model} // ${GENERATOR.outlet} > ${GENERATOR.connection} // NEUTRAL MUST BE UN-BONDED`
+            : `200 A METER > 3/0 AL 115 M (155 A, THE LIMIT) > MAIN BREAKER > THE ONE EATON CH BOX // LABEL: ${SERVICE.label}`}
         </div>
       </section>
 
       {gen && (
         <section className="box" id="v-gen">
-          <div className="section-title">GENERATOR</div>
-          <div className="tune-row">
-            <span className="lbl">FUEL</span>
+          <div className="section-title">GENERATOR // {GENERATOR.model}</div>
+          <div className="seg gen-fuel" role="group" aria-label="Generator fuel">
+            <span className="seg-lbl">FUEL</span>
             {(['propane', 'gasoline'] as const).map((f) => (
-              <button key={f} type="button" className={`btn ${state.fuel === f ? 'on' : ''}`} onClick={() => p.setFuel(f)}>
+              <button key={f} type="button" className={`btn ${state.fuel === f ? 'on' : ''}`} onClick={() => (sound.chirp(), p.setFuel(f))} aria-pressed={state.fuel === f}>
                 {f === 'propane' ? 'PROPANE' : 'GASOLINE'}
               </button>
             ))}
           </div>
-          <Meter
-            label="CAPACITY"
-            value={state.genW}
-            min={GEN_MIN_W}
-            max={GEN_MAX_W}
-            step={100}
-            onChange={(v) => p.setGenW(v)}
-            format={(v) => `${(v / 1000).toFixed(1)}K`}
-          />
-          <div className="presets">
-            {GEN_PRESETS.map((g) => (
-              <button key={g.id} type="button" className={`btn ${state.preset === g.id ? 'on' : ''}`} onClick={() => p.setGenW(g[state.fuel], g.id)}>
-                {g.name} <span className="dim-on">{(g[state.fuel] / 1000).toFixed(1)}K</span>
-              </button>
-            ))}
+          <table className="gen-ratings">
+            <thead>
+              <tr>
+                <th>FUEL</th>
+                <th className="num">RUNNING</th>
+                <th className="num">STARTING</th>
+                <th className="num">PER LEG</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(['propane', 'gasoline'] as const).map((f) => (
+                <tr key={f} className={state.fuel === f ? '' : 'dim'}>
+                  <td>{f === 'propane' ? 'PROPANE' : 'GASOLINE'}{state.fuel === f ? ' <' : ''}</td>
+                  <td className="num">{fmtW(GENERATOR.running[f])}</td>
+                  <td className="num">{fmtW(GENERATOR.starting[f])}</td>
+                  <td className="num">{fmtA(Math.min(GENERATOR.running[f] / 240, GENERATOR.cordA))}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="dim tiny">
+            ONE {GENERATOR.cordA} A CORD FROM A 14-50R INTO THE SAME BREAKER BOX AS THE GRID, SO EACH LEG GETS AT MOST {GENERATOR.cordA} A ON EITHER FUEL. THE PLAN ON ONE CORD: THE EMERGENCY LIST AND BOTH INCUBATION 12KS. STEAM WAITS FOR THE GRID.
           </div>
         </section>
       )}
@@ -348,20 +432,11 @@ export function Vitals({ onOpenRoom, onOpenCuts }: { onOpenRoom: (r: RoomId) => 
       </section>
 
       <section className="box" id="v-main">
-        <div className="section-title">MAIN PANEL // 200 A</div>
-        <div className="brk-grid">
-          {main.map((c) => (
-            <BreakerBox key={c.id} c={c} flashDelay={flash[c.id]} />
-          ))}
-        </div>
-      </section>
-
-      <section className="box" id="v-sub">
-        <div className="section-title">SUB-PANEL // S1-S18 // 60 A FEED</div>
-        <div className="brk-grid">
-          {sub.map((c) => (
-            <BreakerBox key={c.id} c={c} flashDelay={flash[c.id]} />
-          ))}
+        <div className="section-title">BREAKER BOX // EATON CH 225 A // OUTSIDE BACK WALL BEHIND INCUBATION</div>
+        <FeedStrip />
+        <PanelBoard circuits={circuits} flash={flash} />
+        <div className="dim tiny">
+          ONE BOX. ODD SLOTS ON THE LEFT, EVEN ON THE RIGHT, AS THE ELECTRICIAN WIRED IT. 240 V BREAKERS TAKE TWO SLOTS. SLOTS 5 AND 9 EACH FEED TWO LOADS: FLIPPING THE REAL BREAKER CUTS BOTH. SLOTS 33-42 SPARE.
         </div>
       </section>
 
@@ -388,8 +463,7 @@ export function VitalsIndex() {
           ['POWER CUTS', 'v-cuts-box'],
           ['RULES', 'v-rules'],
           ['PRESETS', 'v-presets'],
-          ['MAIN PANEL', 'v-main'],
-          ['SUB-PANEL', 'v-sub'],
+          ['BREAKER BOX', 'v-main'],
           ['DETAIL', 'v-detail'],
         ].map(([label, id]) => (
           <li tabIndex={0} key={id} onClick={() => jump(id)}>

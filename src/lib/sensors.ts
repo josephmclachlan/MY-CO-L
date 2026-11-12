@@ -29,7 +29,7 @@ export const PLACES: Place[] = [
   { id: 'coldroom', label: 'COLD ROOMS', long: 'COLD ROOMS (PACKING)', room: 'packing' },
   { id: 'incubation', label: 'INCUBATION', long: 'INCUBATION AIR', room: 'incubation' },
   { id: 'fruiting', label: 'FRUITING', long: 'FRUITING AIR', room: 'fruiting' },
-  { id: 'boiling', label: 'BOILING ROOM', long: 'BOILING ROOM', room: 'boiling' },
+  { id: 'boiling', label: 'COOK ROOM', long: 'COOK ROOM (20 FT CONTAINER)', room: 'boiling' },
   { id: 'outside', label: 'OUTSIDE', long: 'OUTSIDE (SHADE)', room: 'outside' },
 ]
 export const PLACE_IDS = PLACES.map((p) => p.id)
@@ -1024,6 +1024,6 @@ export const SENSOR_GUESSES = [
   'The Govee cloud reports temperature in Fahrenheit (its own sample reads 79.52 next to 61.2% RH). The app turns it into Celsius. If the first real readings look wrong, switch the unit on FEEDS.',
   'Govee CSV dates: 03/04/2026 is read month first (as the Govee app writes), unless the file shows a day over 12 first. Times are taken as the farm clock.',
   'Air conditioner checks are by hand until a Lennox feed is found (see FEEDS). Which Lennox app the mini-splits use is not known yet: Joseph to read the model number on the indoor units.',
-  'Places: LAB, CULTURE FRIDGE, PACKING (the fruiting supply plenum), COLD ROOMS, INCUBATION, FRUITING, BOILING ROOM, OUTSIDE. One place can have several sensors.',
+  'Places: LAB, CULTURE FRIDGE, PACKING (the fruiting supply plenum), COLD ROOMS, INCUBATION, FRUITING, COOK ROOM, OUTSIDE. One place can have several sensors.',
   'Readings are not in the JSON backup file (they grow without limit). Use EXPORT READINGS CSV on GRAPHS for a copy.',
 ]

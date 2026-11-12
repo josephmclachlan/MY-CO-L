@@ -99,7 +99,7 @@ export const ROOM_LIST: { id: Exclude<RoomId, 'outside'>; label: string }[] = [
   { id: 'packing', label: 'PACKING' },
   { id: 'incubation', label: 'INCUBATION' },
   { id: 'fruiting', label: 'FRUITING' },
-  { id: 'boiling', label: 'BOILING ROOM' },
+  { id: 'boiling', label: 'COOK ROOM' },
 ]
 export const ROOM_LABEL: Record<string, string> = { ...Object.fromEntries(ROOM_LIST.map((r) => [r.id, r.label])), outside: 'OUTSIDE' }
 

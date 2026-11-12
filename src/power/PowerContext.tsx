@@ -1,10 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
+  allCircuits,
   BASE,
   EMERG,
-  GEN_MAX_W,
-  GEN_MIN_W,
-  GEN_PRESETS,
   GENERATOR,
   LINKED,
   SCENARIOS,
@@ -19,35 +17,63 @@ import { compute, peakState, warnings, type PeakState, type PowerConfig, type Re
 // The breaker board is shared by VITALS and DECK PLAN, so flipping a breaker on
 // one screen shows on the other. It's saved on this device.
 
-interface Saved {
+export interface Saved {
   on: string[]
   heater: HeaterOption
   source: Source
   fuel: Fuel
+  /** Running watts of Joseph's XP17500HX on the chosen fuel. Always set from GENERATOR, never typed. */
   genW: number
-  preset: string // preset id or 'custom'
   overrides: Record<string, number>
   scenario: string | null
 }
 
 const KEY = 'mycol.power.v1'
 
+/** What goes on when the source switches to the generator: the one-cord plan. */
+const GEN_PLAN = [...EMERG, 'c78', 'c910']
+
 const DEFAULTS: Saved = {
   on: [...BASE],
-  heater: '2x4500', // Joseph's planner opens on this; the choice is still open
+  heater: '2x4500', // Joseph chose option A (2 x 4,500 W), 6 Nov 2026; option B kept for comparison
   source: 'utility',
   fuel: 'propane',
   genW: GENERATOR.running.propane,
-  preset: 'duromax',
   overrides: {},
   scenario: 'base',
 }
 
 function load(): Saved {
   try {
-    const raw = localStorage.getItem(KEY)
+    return migrateSaved(localStorage.getItem(KEY))
+  } catch {
+    return structuredClone(DEFAULTS)
+  }
+}
+
+/** Read a saved board, bringing an old one up to the one-box map and the XP17500HX. Bad data gives the defaults. */
+export function migrateSaved(raw: string | null): Saved {
+  try {
     if (!raw) return structuredClone(DEFAULTS)
-    return { ...structuredClone(DEFAULTS), ...(JSON.parse(raw) as Partial<Saved>) }
+    const saved = { ...structuredClone(DEFAULTS), ...(JSON.parse(raw) as Partial<Saved> & { preset?: string }) }
+    delete (saved as { preset?: string }).preset
+    if (saved.fuel !== 'propane' && saved.fuel !== 'gasoline') saved.fuel = 'propane'
+    if (saved.heater !== '2x4500' && saved.heater !== '6500') saved.heater = DEFAULTS.heater
+    // The generator is the owned XP17500HX: its watts come from the fuel, not from an old slider value.
+    saved.genW = GENERATOR.running[saved.fuel]
+    if (saved.source !== 'utility' && saved.source !== 'generator') saved.source = 'utility'
+    // A board saved before it matched the real box (the S1-S18 sub-panel map) used some of the same ids
+    // for different breakers, so it can't be trusted: start again from its preset, or baseline / the generator plan.
+    const valid = new Set(allCircuits(saved.heater).map((c) => c.id))
+    const list = Array.isArray(saved.on) ? saved.on : []
+    if (list.some((i) => !valid.has(i))) {
+      const sc = SCENARIOS.find((x) => x.key === saved.scenario && x.source === saved.source && (!x.only || x.only === saved.heater))
+      saved.on = sc ? scenarioIds(sc, saved.heater) : saved.source === 'utility' ? [...BASE] : [...GEN_PLAN]
+      saved.scenario = sc ? sc.key : saved.source === 'utility' ? 'base' : 'g12s'
+    } else saved.on = list
+    if (saved.scenario && !SCENARIOS.some((x) => x.key === saved.scenario)) saved.scenario = null
+    if (!saved.overrides || typeof saved.overrides !== 'object') saved.overrides = {}
+    return saved
   } catch {
     return structuredClone(DEFAULTS)
   }
@@ -64,7 +90,6 @@ interface PowerCtx {
   setSource: (s: Source) => void
   setHeater: (h: HeaterOption) => void
   setFuel: (f: Fuel) => void
-  setGenW: (w: number, preset?: string) => void
   applyScenario: (key: string) => void
   setOverride: (itemId: string, w: number | null) => void
   selectedRoom: RoomId
@@ -133,8 +158,8 @@ export function PowerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setSource = useCallback((src: Source) => {
-    // Like the planner: switching source resets to baseline or the emergency list.
-    setState((s) => (s.source === src ? s : { ...s, source: src, on: src === 'utility' ? [...BASE] : [...EMERG], scenario: src === 'utility' ? 'base' : 'emerg' }))
+    // Switching source resets to baseline, or on generator to the plan: emergency list + both incubation 12ks.
+    setState((s) => (s.source === src ? s : { ...s, source: src, on: src === 'utility' ? [...BASE] : [...GEN_PLAN], scenario: src === 'utility' ? 'base' : 'g12s' }))
   }, [])
 
   const setHeater = useCallback((h: HeaterOption) => {
@@ -149,18 +174,7 @@ export function PowerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setFuel = useCallback((f: Fuel) => {
-    setState((s) => {
-      const p = GEN_PRESETS.find((x) => x.id === s.preset)
-      return { ...s, fuel: f, genW: p ? p[f] : s.genW }
-    })
-  }, [])
-
-  const setGenW = useCallback((w: number, preset?: string) => {
-    const clamped = Math.max(GEN_MIN_W, Math.min(GEN_MAX_W, Math.round(w)))
-    setState((s) => {
-      const match = preset ?? GEN_PRESETS.find((p) => p[s.fuel] === clamped)?.id ?? 'custom'
-      return { ...s, genW: clamped, preset: match }
-    })
+    setState((s) => ({ ...s, fuel: f, genW: GENERATOR.running[f] }))
   }, [])
 
   const setOverride = useCallback((itemId: string, w: number | null) => {
@@ -184,7 +198,6 @@ export function PowerProvider({ children }: { children: ReactNode }) {
       setSource,
       setHeater,
       setFuel,
-      setGenW,
       applyScenario,
       setOverride,
       selectedRoom,
@@ -192,7 +205,7 @@ export function PowerProvider({ children }: { children: ReactNode }) {
       selectedCircuit,
       setSelectedCircuit,
     }),
-    [state, on, config, reading, warns, peak, toggle, setSource, setHeater, setFuel, setGenW, applyScenario, setOverride, selectedRoom, selectedCircuit],
+    [state, on, config, reading, warns, peak, toggle, setSource, setHeater, setFuel, applyScenario, setOverride, selectedRoom, selectedCircuit],
   )
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

@@ -919,7 +919,7 @@ Owner only.
 - **CLIMATE ALARMS**: Alarms not yet seen in LIFE SUPPORT.
 - **UPKEEP LATE, WATER TESTS DUE**: Maintenance and cleaning past due, and water tests due.
 - **TEMPERATURE NOW**: A dial for each room. The shaded arc is its alarm band; amber means outside it.
-- **PLANNED LOAD**: The worst leg with the breakers set on POWER GRID, against the 125 A the meter allows. The shaded arc is under 80%.
+- **PLANNED LOAD**: The worst leg with the breakers set on POWER GRID, against the 155 A the 3/0 aluminium feeder carries. The shaded arc is under 80%.
 - **HOURS WITHOUT GRID POWER**: Each month, from the power cut log.
 - **UPKEEP COMING DUE**: The next maintenance and cleaning jobs.
 
@@ -940,19 +940,20 @@ Owner only.
 
 ### HOW TO USE IT
 
-1. Choose the source: ICE UTILITY (the grid) or GENERATOR.
+1. Choose the source: ICE UTILITY (the grid) or GENERATOR. Both feed the same box; tapping ICE GRID or GENERATOR above the box does the same.
 2. Choose the steam heater: A (two 4,500 W elements) or B (one 6,500 W element).
-3. Tap a breaker to flip it on or off. Or type its tag at the prompt (S4, 13).
+3. Tap a breaker to flip it on or off. Or type its slot number at the prompt (7, 21-23).
 4. Watch the budget bar. It turns to warning colour as you near the limit.
 5. Use a PRESET for a quick set: BASELINE, EVERYTHING ON, ALL OFF and others.
 
 ### THE SECTIONS
 
-- **BUDGET**: Amps and watts on, against the 200 A service or the generator.
+- **BUDGET**: Amps on each leg against the 155 A feeder, or on generator the watts and the 50 A each leg gets through the one cord.
+- **GENERATOR**: The DuroMax XP17500HX: running and starting watts on propane and on gasoline. Pick the fuel.
 - **POWER CUTS**: Buttons for a cut in progress. Same as POWER CUTS (7.2).
 - **RULES**: Things the board checks, like linked breakers.
 - **PRESETS**: One-tap sets of breakers.
-- **MAIN PANEL, SUB-PANEL**: The two panels with every breaker.
+- **BREAKER BOX**: The one box behind incubation, drawn as it is: odd slots left, even right, L1 and L2 down the middle. The grid and the generator both feed it.
 - **DETAIL**: The breaker you picked: its load and room.
 
 ### GOOD TO KNOW
