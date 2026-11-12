@@ -375,9 +375,9 @@ export const FARM: GSection[] = [
       {
         h: 'HOW TO USE IT',
         steps: [
-          'Choose the source: ICE UTILITY (the grid) or GENERATOR.',
+          'Choose the source: ICE UTILITY (the grid) or GENERATOR. Both feed the same box; tapping ICE GRID or GENERATOR above the box does the same.',
           'Choose the steam heater: A (two 4,500 W elements) or B (one 6,500 W element).',
-          'Tap a breaker to flip it on or off. Or type its tag at the prompt (S4, 13).',
+          'Tap a breaker to flip it on or off. Or type its slot number at the prompt (7, 21-23).',
           'Watch the budget bar. It turns to warning colour as you near the limit.',
           'Use a PRESET for a quick set: BASELINE, EVERYTHING ON, ALL OFF and others.',
         ],
@@ -385,11 +385,12 @@ export const FARM: GSection[] = [
       {
         h: 'THE SECTIONS',
         items: [
-          ['BUDGET', 'Amps and watts on, against the 200 A service or the generator.'],
+          ['BUDGET', 'Amps on each leg against the 155 A feeder, or on generator the watts and the 50 A each leg gets through the one cord.'],
+          ['GENERATOR', 'The DuroMax XP17500HX: running and starting watts on propane and on gasoline. Pick the fuel.'],
           ['POWER CUTS', 'Buttons for a cut in progress. Same as POWER CUTS (7.2).'],
           ['RULES', 'Things the board checks, like linked breakers.'],
           ['PRESETS', 'One-tap sets of breakers.'],
-          ['BREAKER BOX', 'Every breaker by its slot number in the box behind incubation.'],
+          ['BREAKER BOX', 'The one box behind incubation, drawn as it is: odd slots left, even right, L1 and L2 down the middle. The grid and the generator both feed it.'],
           ['DETAIL', 'The breaker you picked: its load and room.'],
         ],
       },

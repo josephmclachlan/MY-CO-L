@@ -15,8 +15,8 @@ export const STATION = {
 // Letters other than B are a first guess; correct them here if yours differ.
 export const SPECIES_LETTERS = ['B', 'L', 'C', 'G', 'P'] as const
 
-// Breaker tags on the 18-circuit sub-panel.
-export const BREAKERS = Array.from({ length: 18 }, (_, i) => `S${i + 1}`)
+// Slot numbers in the one breaker box (Eaton CH, slots 1-32 as wired).
+export const BREAKERS = Array.from({ length: 32 }, (_, i) => String(i + 1))
 
 export const SELF_TEST: [string, string][] = [
   ['MAINS 120/240V 60HZ SPLIT PHASE', 'OK'],
@@ -27,7 +27,7 @@ export const SELF_TEST: [string, string][] = [
   ['HVAC 2x36K + 2x12K INVERTER', 'NOMINAL'],
   ['HEPA FFU x3', 'NOMINAL'],
   ['FRUITING AIR S8 x2 + HURRICANE x2', 'NOMINAL'],
-  ['GENERATOR XP15000HX', 'STANDBY'],
+  ['GENERATOR XP17500HX // SAME BOX', 'STANDBY'],
   ['KNOCK PLAN', '130 BLK/WK'],
 ]
 

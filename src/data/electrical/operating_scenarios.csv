@@ -8,13 +8,14 @@
 2x4500,Utility,"Baseline + 75X, ZVS & sealer (lab bench)",16755,75.8,63.9,75.8,49%,3.01%,232.8,OK
 2x4500,Utility,RULE BROKEN: heater full + 4 MegaChefs,29425,130.5,114.7,130.5,84%,5.18%,227.6,OK
 2x4500,Utility,THEORETICAL: everything on at once,33355,163.2,114.7,163.2,105%,6.48%,224.4,Over cable rating
-2x4500,"Generator (propane 11,400 W)",Emergency baseline,4045,8.4,25.3,25.3,35% LP / 34% gas,,,OK
-2x4500,"Generator (propane 11,400 W)",Emergency + 36k mini-split #1,7645,23.4,40.3,40.3,67% LP / 64% gas,,,OK
-2x4500,"Generator (propane 11,400 W)",Emergency + 36k + 12k,8645,27.6,44.5,44.5,76% LP / 72% gas,,,OK
-2x4500,"Generator (propane 11,400 W)",Emergency + heater (1 element),8545,27.2,44.1,44.1,75% LP / 71% gas,,,OK
-2x4500,"Generator (propane 11,400 W)",Emergency + BOTH heater elements,13045,45.9,62.8,62.8,114% LP / 109% gas,,,Overload
-2x4500,"Generator (propane 11,400 W)",Emergency + Thor bagger & pump,5245,18.4,25.3,25.3,46% LP / 44% gas,,,OK
-2x4500,"Generator (propane 11,400 W)",Emergency + heater + 36k,12145,42.2,59.1,59.1,107% LP / 101% gas,,,Overload
+2x4500,"Generator (propane 13,000 W, one 50 A cord)",Emergency baseline,4045,8.4,25.3,25.3,31% LP / 29% gas,,,OK
+2x4500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + both 12k (incubation),6045,16.7,33.6,33.6,46% LP / 44% gas,,,OK
+2x4500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + 36k mini-split #1,7645,23.4,40.3,40.3,59% LP / 56% gas,,,OK
+2x4500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + 36k + 12k,8645,27.6,44.5,44.5,66% LP / 63% gas,,,No surge headroom
+2x4500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + heater (1 element),8545,27.2,44.1,44.1,66% LP / 62% gas,,,No surge headroom
+2x4500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + BOTH heater elements,13045,45.9,62.8,62.8,100% LP / 95% gas,,,Overload
+2x4500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + Thor bagger & pump,5245,18.4,25.3,25.3,40% LP / 38% gas,,,OK
+2x4500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + heater + 36k,12145,42.2,59.1,59.1,93% LP / 88% gas,,,Overload
 6500,Utility,Baseline (continuous loads),14025,53.0,63.9,63.9,41%,2.54%,233.9,OK
 6500,Utility,"Baseline + heater, full",20525,80.1,91.0,91.0,59%,3.61%,231.3,OK
 6500,Utility,Baseline + 4 MegaChefs,20425,93.0,77.2,93.0,60%,3.69%,231.1,OK
@@ -23,9 +24,10 @@
 6500,Utility,"Baseline + 75X, ZVS & sealer (lab bench)",16755,75.8,63.9,75.8,49%,3.01%,232.8,OK
 6500,Utility,RULE BROKEN: heater full + 4 MegaChefs,26925,120.1,104.3,120.1,77%,4.77%,228.6,OK
 6500,Utility,THEORETICAL: everything on at once,30855,152.8,104.3,152.8,99%,6.07%,225.4,Near ceiling
-6500,"Generator (propane 11,400 W)",Emergency baseline,4045,8.4,25.3,25.3,35% LP / 34% gas,,,OK
-6500,"Generator (propane 11,400 W)",Emergency + 36k mini-split #1,7645,23.4,40.3,40.3,67% LP / 64% gas,,,OK
-6500,"Generator (propane 11,400 W)",Emergency + 36k + 12k,8645,27.6,44.5,44.5,76% LP / 72% gas,,,OK
-6500,"Generator (propane 11,400 W)","Emergency + 6,500 W heater",10545,35.5,52.4,52.4,92% LP / 88% gas,,,No surge headroom
-6500,"Generator (propane 11,400 W)",Emergency + Thor bagger & pump,5245,18.4,25.3,25.3,46% LP / 44% gas,,,OK
-6500,"Generator (propane 11,400 W)",Emergency + heater + 36k,14145,50.5,67.4,67.4,124% LP / 118% gas,,,Overload
+6500,"Generator (propane 13,000 W, one 50 A cord)",Emergency baseline,4045,8.4,25.3,25.3,31% LP / 29% gas,,,OK
+6500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + both 12k (incubation),6045,16.7,33.6,33.6,46% LP / 44% gas,,,OK
+6500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + 36k mini-split #1,7645,23.4,40.3,40.3,59% LP / 56% gas,,,OK
+6500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + 36k + 12k,8645,27.6,44.5,44.5,66% LP / 63% gas,,,No surge headroom
+6500,"Generator (propane 13,000 W, one 50 A cord)","Emergency + 6,500 W heater",10545,35.5,52.4,52.4,81% LP / 77% gas,,,Overload
+6500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + Thor bagger & pump,5245,18.4,25.3,25.3,40% LP / 38% gas,,,OK
+6500,"Generator (propane 13,000 W, one 50 A cord)",Emergency + heater + 36k,14145,50.5,67.4,67.4,109% LP / 103% gas,,,Overload

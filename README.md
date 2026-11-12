@@ -33,7 +33,7 @@ the screen names still work.
 ## What's in build 2 (power and rooms)
 
 - **VITALS (module 2):** every breaker from the electrical package (main panel, S1-S18) as a box you tap on or off.
-  Live L1/L2 amps against the 125 A meter, a hatched load meter, feeder voltage drop and the sub-panel feed.
+  Live L1/L2 amps against the 155 A feeder, a hatched load meter and feeder voltage drop. One breaker box (slots 1-32 as wired), fed by the grid or the DuroMax XP17500HX through an interlock.
   Utility or generator (fuel, capacity slider, presets), steam heater option A (2 x 4,500 W) or B (1 x 6,500 W),
   one-tap presets, and rule warnings (one heat load at a time, generator overloads, heater + AC on the generator,
   ICE peak windows 10:00-12:30 and 17:30-20:00 in Costa Rica time). Estimated wattages can be edited on screen.

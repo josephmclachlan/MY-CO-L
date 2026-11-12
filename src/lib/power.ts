@@ -1,7 +1,7 @@
 // Load arithmetic and operating rules for VITALS and DECK PLAN.
 // Same maths as Joseph's planner (project_data.py legs() and feeder_drop_V()):
 //   240 V circuit: W/240 added to both legs.  120 V circuit: W/120 on its own leg.
-//   worst leg = max(L1, L2).  Utility % = worst / 155 A (the 3/0 Al feeder; the meter is 200 A).  Generator % = total W / generator running W.
+//   worst leg = max(L1, L2).  Utility % = worst / 155 A (the 3/0 Al feeder; the meter is 200 A).  Generator % = the higher of total W / running W and worst leg / 50 A (one cord).
 //   Feeder drop V = 2 x 21.2 x worst A x (115 m x 3.28084 ft/m) / 167,800 cmil.
 
 import {
@@ -29,7 +29,7 @@ export interface PowerConfig {
   heater: HeaterOption
   source: Source
   fuel: Fuel
-  /** Generator running watts in use (slider or preset). */
+  /** Generator running watts for the chosen fuel (XP17500HX: propane 13,000, gasoline 13,750). */
   genW: number
   /** Watt overrides for estimated items, by item id. */
   overrides: Record<string, number>
@@ -49,9 +49,10 @@ export interface Reading {
   dropV: number
   dropPct: number
   voltsAtPanel: number
-  /** Sub-panel feed amps per leg (S-circuits only), against the 60 A sub-feed. */
-  subL1: number
-  subL2: number
+  /** Generator only: amps each leg can draw (the lower of running W / 240 V and the 50 A cord). 0 on utility. */
+  legA: number
+  /** Generator only: total watts as a share of the running watts. 0 on utility. */
+  wattShare: number
   /** Live watts by room. */
   rooms: Record<RoomId, number>
 }
@@ -90,8 +91,6 @@ export function legs(on: Set<string>, heater: HeaterOption, overrides: Record<st
   let l1 = 0
   let l2 = 0
   let watts = 0
-  let subL1 = 0
-  let subL2 = 0
   const rooms = Object.fromEntries(ROOM_IDS.map((r) => [r, 0])) as Record<RoomId, number>
   for (const c of allCircuits(heater)) {
     if (!on.has(c.id)) continue
@@ -104,26 +103,27 @@ export function legs(on: Set<string>, heater: HeaterOption, overrides: Record<st
     else a2 = w / 120
     l1 += a1
     l2 += a2
-    if (c.panel === 'sub') {
-      subL1 += a1
-      subL2 += a2
-    }
     for (const i of c.items) rooms[i.room] += itemWatts(i.id, i.w, overrides)
   }
-  return { l1, l2, watts, subL1, subL2, rooms }
+  return { l1, l2, watts, rooms }
 }
 
 export function compute(on: Set<string>, cfg: PowerConfig): Reading {
-  const { l1, l2, watts, subL1, subL2, rooms } = legs(on, cfg.heater, cfg.overrides)
+  const { l1, l2, watts, rooms } = legs(on, cfg.heater, cfg.overrides)
   const worst = Math.max(l1, l2)
   const dropV = feederDropV(worst)
   let share: number
   let st: { level: Level; status: string }
+  let legA = 0
+  let wattShare = 0
   if (cfg.source === 'utility') {
     share = worst / CEILING_A
     st = utilityStatus(worst)
   } else {
-    share = cfg.genW > 0 ? watts / cfg.genW : Infinity
+    // Two limits on the generator: its running watts, and the amps one 50 A cord carries per leg.
+    legA = generatorLegA(cfg.genW)
+    wattShare = cfg.genW > 0 ? watts / cfg.genW : Infinity
+    share = Math.max(wattShare, legA > 0 ? worst / legA : Infinity)
     st = generatorStatus(share * 100)
   }
   return {
@@ -132,13 +132,13 @@ export function compute(on: Set<string>, cfg: PowerConfig): Reading {
     worst,
     watts,
     share,
+    legA,
+    wattShare,
     level: st.level,
     status: st.status,
     dropV,
     dropPct: (dropV / SERVICE.nominalV) * 100,
     voltsAtPanel: SERVICE.nominalV - dropV,
-    subL1,
-    subL2,
     rooms,
   }
 }
@@ -246,16 +246,23 @@ export function warnings(on: Set<string>, cfg: PowerConfig, r: Reading, peak: Pe
     }
   } else {
     const pct = r.share * 100
-    if (r.level === 'over') {
-      out.push({ id: 'genover', level: 'warn', text: `GENERATOR OVERLOAD: ${Math.round(r.watts).toLocaleString('en-US')} W ON ${cfg.genW.toLocaleString('en-US')} W (${Math.round(pct)}%).`, rooms: [] })
-    } else if (r.level === 'near') {
-      out.push({ id: 'gennear', level: 'warn', text: `NO SURGE HEADROOM: GENERATOR AT ${Math.round(pct)}%. COMPRESSOR STARTS MAY STALL IT.`, rooms: [] })
-    }
-    // Each 120 V leg of the generator carries half its rating (11,400 W / 240 V = 47.5 A).
-    const legMax = cfg.genW / 240
+    const wPct = r.wattShare * 100
     const worstLeg = Math.max(r.l1, r.l2)
-    if (r.level !== 'over' && worstLeg > legMax) {
-      out.push({ id: 'genleg', level: 'warn', text: `GENERATOR LEG OVERLOAD: ${worstLeg.toFixed(1)} A ON ${r.l1 > r.l2 ? 'L1' : 'L2'}, EACH LEG GIVES ${legMax.toFixed(1)} A.`, rooms: [] })
+    const heavy = r.l1 > r.l2 ? 'L1' : 'L2'
+    // The 50 A cord: each leg can draw at most 50 A, whatever the generator's watts.
+    const legOver = worstLeg > r.legA
+    if (wPct > 100) {
+      out.push({ id: 'genover', level: 'warn', text: `GENERATOR OVERLOAD: ${Math.round(r.watts).toLocaleString('en-US')} W ON ${cfg.genW.toLocaleString('en-US')} W (${Math.round(wPct)}%).`, rooms: [] })
+    }
+    if (legOver) {
+      out.push({ id: 'genleg', level: 'warn', text: `GENERATOR LEG OVERLOAD: ${worstLeg.toFixed(1)} A ON ${heavy}. ONE 50 A CORD GIVES ${r.legA.toFixed(1)} A PER LEG.`, rooms: [] })
+    }
+    if (r.level === 'near' && !legOver && wPct <= 100) {
+      out.push({ id: 'gennear', level: 'warn', text: `NO SURGE HEADROOM: GENERATOR AT ${Math.round(pct)}% (${heavy} ${worstLeg.toFixed(1)} OF ${r.legA.toFixed(1)} A). COMPRESSOR STARTS MAY STALL IT.`, rooms: [] })
+    }
+    // The plan on one cord: emergency list + both incubation 12ks; steam waits for the grid.
+    if (heat) {
+      out.push({ id: 'gensteam', level: 'note', text: 'ON ONE 50 A CORD THE PLAN IS THE EMERGENCY LIST + BOTH INCUBATION 12KS. STEAM WAITS FOR THE GRID.', rooms: ['boiling'] })
     }
     // Rule 6: never heater + AC on the generator.
     if (heat && ac) {
@@ -281,12 +288,12 @@ export function warnings(on: Set<string>, cfg: PowerConfig, r: Reading, peak: Pe
     out.push({ id: 'imbalance', level: 'note', text: `LEGS UNEVEN BY ${gap.toFixed(1)} A (${heavy} HEAVY). MOVE A 120 V LOAD TO THE OTHER LEG IF THIS IS A NORMAL RUN.`, rooms: [] })
   }
 
-  // Sub-panel feed (60 A 2-pole), only if a separate sub-panel is kept.
-  const sub = Math.max(r.subL1, r.subL2)
-  if (sub > SERVICE.subFeedA) {
-    out.push({ id: 'subfeed', level: 'warn', text: `SUB-PANEL FEED OVER ${SERVICE.subFeedA} A: ${sub.toFixed(1)} A ON ONE LEG.`, rooms: [] })
-  }
   return out
+}
+
+/** Amps per leg on generator: half the running watts at 120 V, capped by the one 50 A cord. */
+export function generatorLegA(genW: number): number {
+  return Math.min(genW / 240, GENERATOR.cordA)
 }
 
 /** A leg gap at or above this many amps is flagged. */

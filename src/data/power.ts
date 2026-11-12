@@ -32,7 +32,6 @@ export interface Item {
 export interface Circuit {
   id: string
   tag: string
-  panel: 'main' | 'sub'
   leg: Leg
   v: 120 | 240
   breaker: string
@@ -57,7 +56,6 @@ export const SERVICE = {
   mainBreakerA: 200,
   nominalV: 240,
   kAluminum: 21.2, // ohm-cmil/ft
-  subFeedA: 60, // the package planned a 60 A sub-panel; the box as wired has none
   label: 'ACOMETIDA 3/0 AL - MAX. 150 A',
 } as const
 
@@ -69,32 +67,26 @@ export const NEAR_LIMIT = 0.85
 
 // ---------------------------------------------------------------- generator
 
+/**
+ * Joseph's generator: DuroMax XP17500HX dual fuel (planned 9 Nov 2026).
+ * Maker's spec table: gasoline 13,750 W running / 17,500 W starting,
+ * propane 13,000 W running / 16,500 W starting. Outlets: 2 x 14-50R,
+ * 1 x L14-30R, 4 x GFCI 5-20R.
+ *
+ * It feeds the SAME breaker box as the ICE service (Joseph, 12 Nov 2026):
+ * one 50 A cord from a 14-50R into an inlet, then a 50 A 2-pole generator
+ * breaker in the box, interlocked with the box's main so the two can never
+ * be on together. One cord caps each leg at 50 A, whatever the generator
+ * itself could give.
+ */
 export const GENERATOR = {
-  model: 'DUROMAX XP15000HX',
-  running: { gasoline: 12_000, propane: 11_400 } as Record<Fuel, number>,
-  starting: { gasoline: 15_000, propane: 14_250 } as Record<Fuel, number>,
+  model: 'DUROMAX XP17500HX',
+  running: { gasoline: 13_750, propane: 13_000 } as Record<Fuel, number>,
+  starting: { gasoline: 17_500, propane: 16_500 } as Record<Fuel, number>,
   outlet: 'NEMA 14-50R',
-  connection: 'MAIN-PANEL INTERLOCK // 50 A 2-POLE // CS6364 INLET',
+  cordA: 50,
+  connection: '50 A CORD > INLET > 50 A 2-POLE GENERATOR BREAKER IN THE SAME BOX, INTERLOCKED WITH THE MAIN',
 }
-
-export interface GenPreset {
-  id: string
-  name: string
-  gasoline: number
-  propane: number
-}
-
-export const GEN_PRESETS: GenPreset[] = [
-  { id: 'duromax', name: 'XP15000HX (OWNED)', gasoline: 12000, propane: 11400 },
-  { id: 'g9500', name: 'MID DUAL-FUEL', gasoline: 9500, propane: 9025 },
-  { id: 'g7500', name: 'SMALL DUAL-FUEL', gasoline: 7500, propane: 7125 },
-  { id: 'g5500', name: 'PORTABLE 5500', gasoline: 5500, propane: 5225 },
-  { id: 'g4000', name: 'COMPACT 4000', gasoline: 4000, propane: 3800 },
-  { id: 'g3500', name: 'INVERTER 3500', gasoline: 3500, propane: 3325 },
-]
-
-export const GEN_MIN_W = 1000
-export const GEN_MAX_W = 20000
 
 // ---------------------------------------------------------------- heater
 
@@ -139,17 +131,19 @@ const it = (id: string, name: string, qty: number, w: number, room: RoomId, est 
 
 // The breaker box as the electrician wired it (Joseph's slot list, 8 Nov 2026).
 // One square box on the outside back wall behind incubation; no sub-panel.
+// The generator feeds this same box (Joseph, 12 Nov 2026).
 // Tags are the slot numbers. Leg follows the standard split-phase layout:
 // slots 1-2 on L1, 3-4 on L2, and so on by row (row = slot / 2 rounded up,
 // odd rows L1). Two loads can share one breaker (slots 5 and 9); they are
 // listed apart so the board can show what runs all the time and what is used
 // only now and then, but flipping the real breaker cuts both.
 const b = (id: string, tag: string, leg: Leg, cls: LoadClass, em: boolean, name: string, short: string, note: string, items: Item[], breaker = '20 A 1-POLE', wire = '#12 CU'): Circuit => ({
-  id, tag, panel: 'main', leg, v: 120, breaker, wire, cls, em, name, short, note, items,
+  id, tag, leg, v: 120, breaker, wire, cls, em, name, short, note, items,
 })
 const SIZE_NOTE = ' Breaker size not given yet; 20 A assumed.'
 
-export const MAIN: Circuit[] = [
+/** Every breaker in the one box, slots 1-28 (the heater is 29-32, below). */
+export const BOX: Circuit[] = [
   b('m1', '1', 'L1', 'int', false, 'MEGACHEF 12 QT PRESSURE COOKER 1', 'MEGACHEF 1', '1,600 W / 120 V = 13.3 A. The four MegaChefs run together as one batch.', [it('mega1', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)]),
   b('s5', '2', 'L1', 'base', false, '7 SYLVANIA 2X18 W LED FIXTURES (ALL LIGHTS BUT THE ACTIVEGROWS)', 'WORK LIGHTS', 'Sylvania 705 ECO-48, two 18 W tubes = 36 W each: 3 incubation, 2 packing, 2 lab.' + SIZE_NOTE, [
     it('led-inc', 'Sylvania 705 ECO-48 2x18 W LED fixture', 3, 108, 'incubation', false),
@@ -192,32 +186,30 @@ export const MAIN: Circuit[] = [
   b('m4', '19', 'L2', 'int', false, 'MEGACHEF 12 QT PRESSURE COOKER 4', 'MEGACHEF 4', 'Runs with the other three. The only MegaChef on L2.', [it('mega4', 'MegaChef 12 qt pressure cooker', 1, 1600, 'boiling', false)]),
   b('o1', '20', 'L2', 'out', false, 'LAB OUTLET', 'LAB OUTLET', 'Receptacle, no fixed load.', []),
   {
-    id: 'c78', tag: '21-23', panel: 'main', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
+    id: 'c78', tag: '21-23', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
     name: 'LENNOX 12K BTU MINI-SPLIT #1 (INCUBATION)', short: 'LENNOX 12K #1',
     note: 'Indoor 37A88, outdoor 379A1. Lennox 12k submittals list 3.7 A typical (about 850 W), 6.3 A max and a 15 A max breaker. 1,000 W kept as the running figure.',
     items: [it('lennox12a', 'Lennox 12k BTU mini-split #1 (37A88 / 379A1)', 1, 1000, 'incubation')],
   },
   {
-    id: 'c910', tag: '22-24', panel: 'main', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
+    id: 'c910', tag: '22-24', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
     name: 'LENNOX 12K BTU MINI-SPLIT #2 (INCUBATION)', short: 'LENNOX 12K #2',
     note: 'Same as #1.',
     items: [it('lennox12b', 'Lennox 12k BTU mini-split #2 (37A88 / 379A1)', 1, 1000, 'incubation')],
   },
   {
-    id: 'c34', tag: '25-27', panel: 'main', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
+    id: 'c34', tag: '25-27', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
     name: 'LENNOX 36K BTU MINI-SPLIT #1 (PACKING)', short: 'LENNOX 36K #1',
     note: 'Inverter. 3,600 W = 15 A typical cooling on the Lennox 36k submittal; it can peak near 24 A. 40 A breaker (Joseph, 8 Nov 2026), so #8 wire and a 40 A voltage protector.',
     items: [it('lennox36a', 'Lennox 36k BTU mini-split #1', 1, 3600, 'packing')],
   },
   {
-    id: 'c56', tag: '26-28', panel: 'main', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
+    id: 'c56', tag: '26-28', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
     name: 'LENNOX 36K BTU MINI-SPLIT #2 (PACKING)', short: 'LENNOX 36K #2',
     note: 'Same as #1. Stagger compressor starts.',
     items: [it('lennox36b', 'Lennox 36k BTU mini-split #2', 1, 3600, 'packing')],
   },
 ]
-
-export const SUB: Circuit[] = []
 
 /** Which room each receptacle circuit serves (they have no items to carry a room). */
 export const OUTLET_ROOM: Record<string, RoomId> = { o1: 'lab' }
@@ -227,7 +219,6 @@ export function heaterCircuits(opt: HeaterOption): Circuit[] {
   return HEATER_OPTIONS[opt].elements.map((e) => ({
     id: e.id,
     tag: e.tag,
-    panel: 'main' as const,
     leg: 'B' as const,
     v: 240 as const,
     breaker: e.breaker,
@@ -242,7 +233,7 @@ export function heaterCircuits(opt: HeaterOption): Circuit[] {
 }
 
 export function allCircuits(opt: HeaterOption): Circuit[] {
-  return [...heaterCircuits(opt), ...MAIN, ...SUB]
+  return [...heaterCircuits(opt), ...BOX]
 }
 
 // ---------------------------------------------------------------- groups and links
@@ -297,6 +288,8 @@ export const SCENARIOS: Scenario[] = [
   { key: 'all', label: 'EVERYTHING ON', source: 'utility', danger: true, on: ['everything'] },
   { key: 'goff', label: 'ALL OFF', source: 'generator', on: [] },
   { key: 'emerg', label: 'EMERGENCY LIST', source: 'generator', on: [...EMERG] },
+  // The plan on one 50 A cord (9 Nov 2026): emergency list plus both incubation 12ks, no steam.
+  { key: 'g12s', label: '+ BOTH 12K (THE PLAN)', source: 'generator', on: [...EMERG, 'c78', 'c910'] },
   { key: 'gclim', label: '+ 36K', source: 'generator', on: [...EMERG, 'c34'] },
   { key: 'gboth', label: '+ 36K + 12K', source: 'generator', on: [...EMERG, 'c34', 'c78'] },
   { key: 'gboil', label: '+ HEATER (1 ELEMENT)', label6: '+ 6.5 KW HEATER', source: 'generator', on: [...EMERG, 'heatOne'] },

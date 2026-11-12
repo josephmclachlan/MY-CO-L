@@ -257,7 +257,7 @@ export const DECK_PAGES: GSection[] = [
           ['CLIMATE ALARMS', 'Alarms not yet seen in LIFE SUPPORT.'],
           ['UPKEEP LATE, WATER TESTS DUE', 'Maintenance and cleaning past due, and water tests due.'],
           ['TEMPERATURE NOW', 'A dial for each room. The shaded arc is its alarm band; amber means outside it.'],
-          ['PLANNED LOAD', 'The worst leg with the breakers set on POWER GRID, against the 125 A the meter allows. The shaded arc is under 80%.'],
+          ['PLANNED LOAD', 'The worst leg with the breakers set on POWER GRID, against the 155 A the 3/0 aluminium feeder carries. The shaded arc is under 80%.'],
           ['HOURS WITHOUT GRID POWER', 'Each month, from the power cut log.'],
           ['UPKEEP COMING DUE', 'The next maintenance and cleaning jobs.'],
         ],

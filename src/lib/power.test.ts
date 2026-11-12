@@ -55,6 +55,7 @@ function idsFor(opt: HeaterOption, source: string, name: string): string[] | nul
   }
   const map: Record<string, string[]> = {
     'Emergency baseline': EMERG,
+    'Emergency + both 12k (incubation)': [...EMERG, 'c78', 'c910'],
     'Emergency + 36k mini-split #1': [...EMERG, 'c34'],
     'Emergency + 36k + 12k': [...EMERG, 'c34', 'c78'],
     'Emergency + heater (1 element)': [...EMERG, ...heatOne],
@@ -90,8 +91,8 @@ const pct0 = (n: number) => {
 }
 
 describe('operating_scenarios.csv', () => {
-  it('has 30 rows', () => {
-    expect(rows.length).toBe(30)
+  it('has 32 rows', () => {
+    expect(rows.length).toBe(32)
   })
 
   const diffs: string[] = []
@@ -110,7 +111,7 @@ describe('operating_scenarios.csv', () => {
         want.push(pctLimit, dropPct, volts, status)
       } else {
         const g = ownedGeneratorShare(watts)
-        got.push(`${pct0(g.propane)} LP / ${pct0(g.gasoline)} gas`, '', '', generatorStatus(g.propane).status)
+        got.push(`${pct0(g.propane)} LP / ${pct0(g.gasoline)} gas`, '', '', generatorStatus(Math.max(g.propane, (worst / 50) * 100)).status)
         want.push(pctLimit, dropPct, volts, status)
       }
       // Python prints 234.9 as "234.9" and 233.0 as "233.0"; compare as numbers where numeric.
@@ -129,7 +130,7 @@ describe('on-screen scenario presets', () => {
   it('match the CSV scenarios they stand for', () => {
     const check = (key: string, opt: HeaterOption, worst: number) => {
       const s = SCENARIOS.find((x) => x.key === key)!
-      const r = compute(new Set(scenarioIds(s, opt)), { heater: opt, source: s.source, fuel: 'propane', genW: 11400, overrides: {} })
+      const r = compute(new Set(scenarioIds(s, opt)), { heater: opt, source: s.source, fuel: 'propane', genW: 13000, overrides: {} })
       expect(r1(r.worst)).toBe(String(worst))
     }
     check('base', '2x4500', 63.9)
@@ -221,17 +222,17 @@ describe('breaker box as wired (Joseph, 8 Nov 2026)', () => {
     expect(legs).toEqual(['L1', 'L1', 'L1', 'L2'])
   })
   it('flags uneven legs on a MegaChef batch but not on the baseline', () => {
-    const cfgU = { heater: '2x4500' as const, source: 'utility' as const, fuel: 'propane' as const, genW: 11400, overrides: {} }
+    const cfgU = { heater: '2x4500' as const, source: 'utility' as const, fuel: 'propane' as const, genW: 13000, overrides: {} }
     const ids = (key: string) => new Set(scenarioIds(SCENARIOS.find((s) => s.key === key)!, '2x4500'))
     const run = (on: Set<string>) => warnings(on, cfgU, compute(on, cfgU), peakState(new Date('2026-11-05T21:00:00Z'))).map((w) => w.id)
     expect(run(ids('base'))).not.toContain('imbalance')
     expect(run(ids('mega'))).toContain('imbalance')
   })
   it('flags a generator leg over half the generator even when the total fits', () => {
-    const cfgG = { heater: '2x4500' as const, source: 'generator' as const, fuel: 'propane' as const, genW: 11400, overrides: {} }
+    const cfgG = { heater: '2x4500' as const, source: 'generator' as const, fuel: 'propane' as const, genW: 13000, overrides: {} }
     const on = new Set([...EMERG, 'c34', 'c78', 's7', 's5', 's4', 'm4'])
     const r = compute(on, cfgG)
-    expect(r.watts).toBeLessThan(11400)
+    expect(r.watts).toBeLessThan(13000)
     expect(Math.max(r.l1, r.l2)).toBeGreaterThan(47.5)
     expect(warnings(on, cfgG, r, peakState(new Date('2026-11-05T21:00:00Z'))).map((w) => w.id)).toContain('genleg')
   })
@@ -241,7 +242,7 @@ describe('breaker box as wired (Joseph, 8 Nov 2026)', () => {
 })
 
 describe('operating rules', () => {
-  const cfg = (source: 'utility' | 'generator', heater: HeaterOption = '2x4500') => ({ heater, source, fuel: 'propane' as const, genW: 11400, overrides: {} })
+  const cfg = (source: 'utility' | 'generator', heater: HeaterOption = '2x4500') => ({ heater, source, fuel: 'propane' as const, genW: 13000, overrides: {} })
   const offPeak = peakState(new Date('2026-11-05T21:00:00Z')) // 15:00 in Costa Rica
   const inPeak = peakState(new Date('2026-11-05T17:00:00Z')) // 11:00 in Costa Rica
   const ids = (key: string, opt: HeaterOption = '2x4500') => new Set(scenarioIds(SCENARIOS.find((s) => s.key === key)!, opt))
