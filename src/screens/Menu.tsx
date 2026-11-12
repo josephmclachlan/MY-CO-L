@@ -62,6 +62,8 @@ export function Menu({ selected, setSelected, onOpen, onBackup, onStatus, firstS
   }, [selected, setSelected, onOpen, shown.length, role.role]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
+    // menu-cq: a size container, so the menu fits the space it is given, not the window (narrow desktop windows).
+    <div className="menu-cq">
     <div className="menu-grid">
       <div>
         <div className="section-title">{t('MAIN MENU')}</div>
@@ -115,6 +117,7 @@ export function Menu({ selected, setSelected, onOpen, onBackup, onStatus, firstS
         <span className="sign dim">LATTICE NODE 01</span>
       </div>
       {listReady && <StatusBoard onOpen={onStatus} />}
+    </div>
     </div>
   )
 }

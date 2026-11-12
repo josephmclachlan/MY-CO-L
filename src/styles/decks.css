@@ -602,6 +602,70 @@ button.cx-bar-row:focus-visible {
   background: var(--hazard);
   padding: 0 4px;
 }
+/* Narrow desktop windows (Joseph, 12 Nov 2026: shrinking the window before it turns into the phone layout hid
+   every deck name). The live figure used to sit in its own one-line column that never shrank, so it squeezed the
+   name to nothing and ran under the status board. When the deck list itself is narrow, whatever the window size,
+   the figure moves under the name and wraps, and the name is never cut. */
+.dk-menu,
+.menu-cq {
+  container-type: inline-size;
+}
+/* When the menu itself is narrow, the deck list takes the full width first; the status board and the logo
+   sit under it, side by side. Phones keep their own layout (logo on top). */
+@media (min-width: 701px) {
+  @container (max-width: 640px) {
+    .menu-cq > .menu-grid {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .menu-cq > .menu-grid > div:first-child {
+      grid-column: 1 / -1;
+      grid-row: 1;
+    }
+    .menu-cq > .menu-grid > .fc-board {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .menu-cq > .menu-grid > .menu-wire {
+      grid-column: 2;
+      grid-row: 2;
+    }
+  }
+  @container (max-width: 420px) {
+    .menu-cq > .menu-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .menu-cq > .menu-grid > .menu-wire {
+      grid-column: 1;
+      grid-row: 3;
+    }
+  }
+}
+@container (max-width: 560px) {
+  .menu-item.dk-mi {
+    grid-template-columns: 1.4em 34px minmax(0, 1fr);
+    gap: 0 10px;
+  }
+  .dk-mi-num,
+  .menu-item.dk-mi .dk-mi-em {
+    grid-row: 1 / span 2;
+  }
+  .dk-mi-name {
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+  }
+  .dk-mi-fig {
+    grid-column: 3;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 8px;
+    justify-items: start;
+    text-align: left;
+    white-space: normal;
+    font-size: 0.72em;
+    min-width: 0;
+  }
+}
 @keyframes dk-row-in {
   from { opacity: 0; transform: translateX(-6px); }
   to { opacity: 1; transform: none; }
