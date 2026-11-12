@@ -1,7 +1,7 @@
 import { useStore, useTable } from '../store/StoreContext'
 import { useRatesEditor } from '../store/useRates'
 import { speciesName } from '../store/useLedger'
-import { BILL_ESTIMATE, ICE, LEDGER_GUESSES, SALE_SPECIES, TRADE_GUESSES, type Form } from '../data/ledger'
+import { BILL_ESTIMATE, ICE, LEDGER_GUESSES, SALE_SPECIES, SOLD_DRIED, TRADE_GUESSES, type Form } from '../data/ledger'
 import { DEFAULT_ICE, DEFAULT_RATES, builtInPrice, estimateMid, iceBill, type IceRates, type Rates } from '../lib/rates'
 import { fmtCrc, fmtUsd, priceHistory, type Item, type Price } from '../lib/cargo'
 import { addPrice } from '../lib/cargoActions'
@@ -11,7 +11,7 @@ import { useState } from 'react'
 import { useFx } from '../store/useFx'
 import { clearRate, setManualRate } from '../lib/fx'
 
-// PRICES + COSTS: every price and cost the app uses, in one place. Blank = the built-in figure.
+// PRICE BOOK: every price and cost the app uses, in one place. Blank = the built-in figure.
 // Saved in the shared settings record, so phone and laptop agree once Supabase is linked.
 
 type Say = (t: string, warn?: boolean) => void
@@ -67,7 +67,7 @@ export function Prices({ say, onOpenCargo }: { say: Say; onOpenCargo: () => void
   return (
     <div className="lg-stack">
       <div className="ck-box">
-        <div className="section-title">PRICES + COSTS</div>
+        <div className="section-title">PRICE BOOK</div>
         <div className="dim tiny">
           EVERY PRICE AND COST THE APP USES. TYPE A FIGURE AND LEAVE THE BOX (OR PRESS ENTER) TO SAVE IT. LEAVE A BOX BLANK TO USE THE BUILT-IN
           FIGURE SHOWN IN GREY. SAVED FOR THE WHOLE FARM, SO THE PHONE AND THE LAPTOP AGREE ONCE THE DATABASE IS LINKED.
@@ -76,7 +76,7 @@ export function Prices({ say, onOpenCargo }: { say: Say; onOpenCargo: () => void
 
       <div className="ck-box">
         <div className="section-title">SALE PRICES // ₡ PER KG</div>
-        <div className="dim tiny">THE SALE FORM IN TRADE STARTS FROM THESE. BUILT-IN: OYSTERS ₡11,500 (MIDDLE OF YOUR ₡10,000-13,000), LION'S MANE AND CORAL +20% <Guess />. DRIED HAS NO BUILT-IN PRICE.</div>
+        <div className="dim tiny">THE SALE FORM IN TRADE STARTS FROM THESE. BUILT-IN: OYSTERS ₡11,500 (MIDDLE OF YOUR ₡10,000-13,000), LION'S MANE AND CORAL +20% <Guess />. DRIED HAS NO BUILT-IN PRICE. TURKEY TAIL IS SOLD DRIED, SO ONLY ITS DRIED PRICE IS ASKED FOR.</div>
         <div className="ck-scroll">
           <table className="lg-table lg-edit">
             <thead><tr><th>SPECIES</th><th>FRESH ₡/KG</th><th>DRIED ₡/KG</th></tr></thead>
@@ -85,6 +85,7 @@ export function Prices({ say, onOpenCargo }: { say: Say; onOpenCargo: () => void
                 <tr key={k}>
                   <td>{speciesName(k)}</td>
                   {(['fresh', 'dried'] as Form[]).map((f) => {
+                    if (f === 'fresh' && SOLD_DRIED.has(k)) return <td key={f} className="dim">SOLD DRIED</td>
                     const mine = r.sale[k]?.[f]
                     const def = builtInPrice(k, f)
                     return (
@@ -157,6 +158,23 @@ export function Prices({ say, onOpenCargo }: { say: Say; onOpenCargo: () => void
       </div>
 
       <ExchangeRates say={say} fallback={r.fx} onFallback={(n) => void put({ fx: n }, 'FALLBACK RATE')} />
+
+      <div className="ck-box">
+        <div className="section-title">COLD STORE <Guess /></div>
+        <div className="ck-fields">
+          <Field
+            label="SHELF LIFE, DAYS (FRESH PICKS COUNT AS ON HAND THIS LONG)"
+            value={String(r.shelfDays)}
+            inputMode="numeric"
+            onSave={(v) => {
+              const d = num(v)
+              if (d === null || d < 1 || d > 30) return say('TYPE 1 TO 30 DAYS.', true)
+              void put({ shelfDays: Math.round(d) }, 'SHELF LIFE')
+            }}
+          />
+        </div>
+        <div className="dim tiny">GUESS: 7 DAYS FOR EVERY SPECIES. OLDER PICKS NOT LOGGED AS SOLD OR WASTE SHOW AS STALE IN COLD STORE.</div>
+      </div>
 
       <div className="ck-box">
         <div className="section-title">START AGAIN</div>

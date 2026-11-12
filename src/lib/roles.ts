@@ -10,10 +10,10 @@
 
 export type Role = 'owner' | 'staff'
 
-/** Screens STAFF may open. Money screens, edit history, export and the textbook are owner only. */
+/** Screens STAFF may open. Money screens, edit history, export, the textbook and COLD STORE (it reads sales) are owner only. */
 export const STAFF_MODULES: readonly string[] = ['SPECIMEN', 'VITALS', 'DECK', 'CARGO', 'XENO', 'HAZARD', 'PROPULSION', 'SEQUENCE', 'MISSION', 'YIELD', 'FACILITY', 'ATMOS', 'SEARCH', 'STAFF', 'ASK', 'GUIDE']
 /** Owner-only screens, listed so the tests and the screen can say it. */
-export const OWNER_ONLY_MODULES: readonly string[] = ['LEDGER', 'TRADE', 'ORDERS', 'MONEY', 'HISTORY', 'DATA', 'MANUAL']
+export const OWNER_ONLY_MODULES: readonly string[] = ['LEDGER', 'TRADE', 'ORDERS', 'MONEY', 'HISTORY', 'DATA', 'MANUAL', 'COLD']
 
 export const canOpenModule = (role: Role, key: string): boolean => role === 'owner' || STAFF_MODULES.includes(key)
 /** Prices, costs, sales, owed money. */

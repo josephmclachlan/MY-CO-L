@@ -1,8 +1,9 @@
 import { Select } from '../components/Select'
+import { useStationTabs } from '../nav/StationContext'
 import { PickInput } from '../components/PickInput'
 import { useState } from 'react'
 import { useApp } from '../settings/AppContext'
-import { useCargoPrefs, useStore } from '../store/StoreContext'
+import { useStore } from '../store/StoreContext'
 import { speciesName, useLedger, type LedgerData } from '../store/useLedger'
 import { useRatesEditor } from '../store/useRates'
 import { estimateMid, iceBill, rates } from '../lib/rates'
@@ -52,23 +53,26 @@ const PICKS: { id: LedgerSel; label: string }[] = [
   { id: 'overview', label: 'OVERVIEW + PLAN WEEK' },
   { id: 'bills', label: 'ICE BILLS' },
   { id: 'labour', label: 'LABOUR HOURS' },
-  { id: 'settings', label: 'PRICES + COSTS' },
+  { id: 'settings', label: 'PRICE BOOK' },
 ]
 
 export function LedgerIndex({ x, set }: { x: LedgerState; set: SetLedger }) {
   const { sound } = useApp()
   const { ledger } = useLedger()
+  const ids = useStationTabs(PICKS.map((p) => p.id))
+  const picks = PICKS.filter((p) => ids.includes(p.id))
+  const weeks = ids.includes('overview')
   return (
     <>
-      <div className="section-title">LEDGER</div>
-      <ul className="index-list">
-        {PICKS.map((p) => (
+      {picks.length > 1 && <div className="section-title">LEDGER</div>}
+      {picks.length > 1 && <ul className="index-list">
+        {picks.map((p) => (
           <li tabIndex={0} key={p.id} className={x.sel === p.id ? 'sel' : ''} onClick={() => (sound.chirp(), set({ sel: p.id }))}>
             <span>{p.label}</span>
           </li>
         ))}
-      </ul>
-      <div className="section-title" style={{ marginTop: 10 }}>KNOCK WEEKS</div>
+      </ul>}
+      {weeks && <><div className="section-title" style={{ marginTop: picks.length > 1 ? 10 : 0 }}>KNOCK WEEKS</div>
       <ul className="index-list ck-index">
         {ledger.weeks.length === 0 && <li className="dim"><span>NO LOTS LOGGED YET</span></li>}
         {ledger.weeks.map((w) => (
@@ -77,7 +81,7 @@ export function LedgerIndex({ x, set }: { x: LedgerState; set: SetLedger }) {
             <span className="k">{w.all.blocks}</span>
           </li>
         ))}
-      </ul>
+      </ul></>}
     </>
   )
 }
@@ -85,18 +89,21 @@ export function LedgerIndex({ x, set }: { x: LedgerState; set: SetLedger }) {
 export function Ledger({ x, set, say, onOpenTrade, onOpenCargo }: { x: LedgerState; set: SetLedger; say: Say; onOpenTrade: () => void; onOpenCargo: () => void }) {
   const { sound } = useApp()
   const d = useLedger()
-  const [cp] = useCargoPrefs()
-  const fx = cp.fx
+  // One exchange rate for the whole app: today's rate from the PRICE BOOK.
+  const fx = useFx().today.rate
   const week = x.sel.startsWith('week:') ? d.ledger.weeks.find((w) => w.week === x.sel.slice(5)) ?? null : null
+  const ids = useStationTabs(PICKS.map((p) => p.id))
+  const picks = PICKS.filter((p) => ids.includes(p.id))
+  const weeks = ids.includes('overview') ? d.ledger.weeks : []
   return (
     <div className="cook ledger">
-      <label className="ck-picker">
+      {picks.length + weeks.length > 1 && <label className="ck-picker">
         <span>SHOW</span>
         <Select value={x.sel} onChange={(e) => (sound.chirp(), set({ sel: e.target.value as LedgerSel }))}>
-          {PICKS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
-          {d.ledger.weeks.map((w) => <option key={w.week} value={`week:${w.week}`}>{weekLabel(w.week)} // {w.all.blocks} BLOCKS</option>)}
+          {picks.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
+          {weeks.map((w) => <option key={w.week} value={`week:${w.week}`}>{weekLabel(w.week)} // {w.all.blocks} BLOCKS</option>)}
         </Select>
-      </label>
+      </label>}
       {x.sel === 'overview' && <Overview d={d} fx={fx} set={set} onOpenTrade={onOpenTrade} onOpenCargo={onOpenCargo} />}
       {x.sel === 'bills' && <Bills d={d} fx={fx} say={say} />}
       {x.sel === 'labour' && <Labour d={d} fx={fx} say={say} />}
@@ -194,7 +201,7 @@ function Overview({ d, fx, set, onOpenTrade, onOpenCargo }: { d: LedgerData; fx:
     <div className="lg-stack">
       <div className="ck-box">
         <div className="section-title">COST OF GOODS // ₡ FIRST, US$ AT EACH DAY'S RATE</div>
-        <div className="dim tiny">US$ USES THE RATE ON EACH LOT'S KNOCK DAY, SO OLD WEEKS KEEP THEIR OLD RATE. TODAY ₡{fxNow.rate} ({fxNow.source === 'FALLBACK' ? 'NO DAILY RATE YET: THE FIGURE ON PRICES + COSTS' : fxNow.source === 'MANUAL' ? 'TYPED' : `FETCHED ${fxNow.day}`}).</div>
+        <div className="dim tiny">US$ USES THE RATE ON EACH LOT'S KNOCK DAY, SO OLD WEEKS KEEP THEIR OLD RATE. TODAY ₡{fxNow.rate} ({fxNow.source === 'FALLBACK' ? 'NO DAILY RATE YET: THE FIGURE ON PRICE BOOK' : fxNow.source === 'MANUAL' ? 'TYPED' : `FETCHED ${fxNow.day}`}).</div>
         <div className="dim tiny">
           EACH PART SAYS WHERE IT CAME FROM. NO TAG = LOGGED DATA. <span className="lg-tag estimate">ESTIMATE</span> = FROM THE PLAN OR THE ELECTRICAL PACKAGE. <span className="lg-tag mixed">MIXED</span> = SOME OF EACH. <span className="lg-tag none">NO DATA</span> = NOTHING TO COUNT YET.
         </div>
@@ -218,7 +225,7 @@ function Overview({ d, fx, set, onOpenTrade, onOpenCargo }: { d: LedgerData; fx:
       <div className="ck-box">
         <div className="section-title">ROOM ENERGY BY MONTH</div>
         {ledger.months.length === 0 ? (
-          <div className="dim">NO LOTS OR BILLS YET. UNTIL A BILL IS TYPED IN, A MONTH USES THE ESTIMATE {fmtCrc(rates().ice.estimateLow)}-{fmtCrc(rates().ice.estimateHigh)} ({fmtUsd(rates().ice.estimateLow, fx)}-{fmtUsd(rates().ice.estimateHigh, fx)}), SET ON PRICES + COSTS.</div>
+          <div className="dim">NO LOTS OR BILLS YET. UNTIL A BILL IS TYPED IN, A MONTH USES THE ESTIMATE {fmtCrc(rates().ice.estimateLow)}-{fmtCrc(rates().ice.estimateHigh)} ({fmtUsd(rates().ice.estimateLow, fx)}-{fmtUsd(rates().ice.estimateHigh, fx)}), SET ON PRICE BOOK.</div>
         ) : (
           <div className="ck-scroll">
             <table className="lg-table">
@@ -300,14 +307,14 @@ function Bills({ d, fx, say }: { d: LedgerData; fx: number; say: Say }) {
             {c !== null && Math.abs(c - check) / check > 0.1 && ' MORE THAN 10% OFF: CHECK THE FIGURES OR ASK ICE WHICH TARIFF YOU ARE ON.'}
           </div>
         )}
-        <div className="dim tiny">TARIFF FIGURES ARE ON PRICES + COSTS. {ICE.source}</div>
+        <div className="dim tiny">TARIFF FIGURES ARE ON PRICE BOOK. {ICE.source}</div>
         <div className="ck-btns"><button type="button" className="btn on" onClick={() => void save()}>SAVE BILL</button></div>
       </div>
       <div className="ck-box">
         <div className="section-title">BILLS</div>
         {list.length === 0 ? (
           <div className="dim">
-            NO BILLS YET. UNTIL THEN EVERY MONTH USES THE ESTIMATE {fmtCrc(estimateMid())} ({fmtUsd(estimateMid(), fx)}) <span className="lg-tag estimate">ESTIMATE</span>, THE MIDDLE OF THE RANGE ON PRICES + COSTS (BUILT-IN: THE ELECTRICAL PACKAGE).
+            NO BILLS YET. UNTIL THEN EVERY MONTH USES THE ESTIMATE {fmtCrc(estimateMid())} ({fmtUsd(estimateMid(), fx)}) <span className="lg-tag estimate">ESTIMATE</span>, THE MIDDLE OF THE RANGE ON PRICE BOOK (BUILT-IN: THE ELECTRICAL PACKAGE).
           </div>
         ) : (
           <div className="ck-scroll">
@@ -392,7 +399,7 @@ function Labour({ d, say }: { d: LedgerData; fx: number; say: Say }) {
         <div className="ck-fields">
           <Field label="₡ PER HOUR (BLANK = HOURS ONLY)" value={p.rate === null ? '' : String(p.rate)} inputMode="decimal" onSave={(v) => void saveRt({ labourRate: num(v) }).then(() => say('LABOUR RATE SAVED'), (e: Error) => say(e.message.toUpperCase(), true))} />
         </div>
-        {!p.labourOn && <div className="lg-warn">LABOUR IS SWITCHED OFF ON PRICES + COSTS, SO IT IS NOT IN THE COST.</div>}
+        {!p.labourOn && <div className="lg-warn">LABOUR IS SWITCHED OFF ON PRICE BOOK, SO IT IS NOT IN THE COST.</div>}
       </div>
       <div className="ck-box">
         <div className="section-title">HOURS LOGGED</div>

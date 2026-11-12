@@ -1,0 +1,181 @@
+{
+  "id": "maitake",
+  "stages": [
+    {
+      "id": "eyes",
+      "k": "SPIDER EYES",
+      "a": "A pillowy top on the block, dotted with moisture bubbles.",
+      "v": "Do not rush or disturb incubation. \"Spider eyes\", moisture bubbles on a pillowy top, show at about 4-6 weeks.",
+      "s": [
+        "F17-0371",
+        "F17-0372"
+      ]
+    },
+    {
+      "id": "primordia",
+      "k": "PRIMORDIA",
+      "a": "Knobbly primordia build up across the top.",
+      "v": "Primordia build across the top at about 4-8 weeks. Give noticeably more light than usual incubation.",
+      "s": [
+        "F17-0372",
+        "F17-0373"
+      ]
+    },
+    {
+      "id": "fist",
+      "k": "FIST",
+      "a": "The primordia rise toward the patch as a fist, splitting into fingers.",
+      "v": "At 5-8 weeks the fists split into fingers: time to cut. Check every block; they do not stay in sync.",
+      "s": [
+        "F17-0372",
+        "F17-0376"
+      ]
+    },
+    {
+      "id": "cut",
+      "k": "CUT THE TOP",
+      "a": "The bag top is cut off above the block, and slits open in the sides.",
+      "v": "Cut the bag top off, but not down to the block: the rest of the bag is a microclimate. Slit one or two sides so the mushroom can push out and CO2 can spill out.",
+      "s": [
+        "F17-0376"
+      ]
+    },
+    {
+      "id": "fronds",
+      "k": "FRONDS",
+      "a": "The tops darken and fronds open fast, fan over fan.",
+      "v": "Healthy blocks show the primordia tops darkening after the cut; fronds then form fast. A block cut too early stalls.",
+      "s": [
+        "F17-0381"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "A full rosette of grey-brown fronds on branching white stalks.",
+      "v": "Harvest when the fronds have formed, 7-10 days after the cut. One flush only.",
+      "s": [
+        "F13-0023",
+        "F17-0381",
+        "F17-0385"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "eyes",
+      "k": "SPIDER EYES",
+      "a": "Moisture bubbles on the pillowy top.",
+      "v": "Spider eyes at about 4-6 weeks.",
+      "s": [
+        "F17-0372"
+      ],
+      "on": [
+        "eyes",
+        "primordia"
+      ],
+      "part": "eyes"
+    },
+    {
+      "id": "primordia",
+      "k": "PRIMORDIA",
+      "a": "The knobbly first growths of the fruit body.",
+      "v": "Too little light shows as brown primordia only around the edge.",
+      "s": [
+        "F17-0373"
+      ],
+      "on": [
+        "primordia",
+        "fist"
+      ],
+      "part": "primordia"
+    },
+    {
+      "id": "fist",
+      "k": "FIST",
+      "a": "The rising mass, splitting into fingers.",
+      "v": "Fist-to-fingers: time to cut. On a scale farm, give staff a ruler mark for the height.",
+      "s": [
+        "F17-0376"
+      ],
+      "on": [
+        "fist"
+      ],
+      "part": "fist"
+    },
+    {
+      "id": "cut",
+      "k": "CUT HERE",
+      "a": "The bag top cut off, not down to the block.",
+      "v": "The remaining bag is a protective microclimate.",
+      "s": [
+        "F17-0376"
+      ],
+      "on": [
+        "cut"
+      ]
+    },
+    {
+      "id": "slit",
+      "k": "SIDE SLIT",
+      "a": "A slit in the side of the bag.",
+      "v": "One or two side slits let the mushroom push out and CO2 spill out.",
+      "s": [
+        "F17-0376"
+      ],
+      "on": [
+        "cut",
+        "fronds"
+      ]
+    },
+    {
+      "id": "fingers",
+      "k": "DARK TOPS",
+      "a": "The finger tips darken.",
+      "v": "Healthy blocks show the primordia tops darkening considerably after the cut.",
+      "s": [
+        "F17-0381"
+      ],
+      "on": [
+        "cut"
+      ]
+    },
+    {
+      "id": "fronds",
+      "k": "FRONDS",
+      "a": "Overlapping, spoon-shaped fronds.",
+      "v": "Fronds form fast once the tops darken.",
+      "s": [
+        "F17-0381"
+      ],
+      "on": [
+        "fronds",
+        "pick"
+      ],
+      "part": "fronds"
+    },
+    {
+      "id": "pores",
+      "k": "PORES",
+      "a": "The underside of each frond is fine pores, not gills.",
+      "on": [
+        "pick"
+      ],
+      "part": "fronds"
+    },
+    {
+      "id": "stalks",
+      "k": "BRANCHING STALKS",
+      "a": "White stalks branch from one base to carry the fronds.",
+      "v": "Some buyers want the whole \"blob\": it slices like king oyster. Others want shredded fronds.",
+      "s": [
+        "F17-0386"
+      ],
+      "on": [
+        "fronds",
+        "pick"
+      ],
+      "part": "stalks"
+    }
+  ]
+}

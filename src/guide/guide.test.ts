@@ -6,7 +6,8 @@ import { describe, expect, it } from 'vitest'
 import { MODULES } from '../data/farm'
 import { OWNER_ONLY_MODULES, STAFF_MODULES, canOpenModule } from '../lib/roles'
 import { ES } from '../lib/es'
-import { GUIDE, GUIDE_GROUPS, findSection, guideSectionFor, searchGuide } from './content'
+import { DECKS, STATIONS } from '../nav/decks'
+import { GUIDE, GUIDE_GROUPS, deckPageKey, findSection, guideSectionFor, screenPageKey, searchGuide } from './content'
 import { guideMarkdown } from './markdown'
 import { normLabel, tipFor, tipForClass } from './tipLookup'
 import { TIPS, TIP_RULES, TIP_SELECTORS } from './tips'
@@ -97,6 +98,40 @@ describe('guide pages', () => {
     expect(guideSectionFor('vitals')).toBe('VITALS')
     expect(guideSectionFor('MISSION')).toBe('MISSION')
     expect(guideSectionFor('nonsense words')).toBe('START')
+  })
+})
+
+describe('guide pages follow the deck map', () => {
+  it('has one overview page per deck, naming every station of the deck with its code', () => {
+    for (const d of DECKS) {
+      const page = findSection(deckPageKey(d.id))
+      expect(page, d.name).toBeTruthy()
+      expect(page?.group).toBe(`${d.num} ${d.name}`)
+      const text = allText(page!).join(' ')
+      for (const s of STATIONS.filter((x) => x.deck.id === d.id)) expect(text, `${d.name} page: ${s.code} ${s.name}`).toContain(`${s.code} ${s.name}`)
+    }
+  })
+  it('explains every station on the page of the screen it opens, by its code', () => {
+    for (const s of STATIONS) {
+      const key = screenPageKey(s.screen)
+      expect(key, `${s.code} ${s.name}: no page for ${s.screen}`).toBeTruthy()
+      expect(allText(findSection(key!)!).join(' '), `${key} page should name ${s.code}`).toMatch(new RegExp(`\\b${s.code.replace('.', '\\.')}\\b|\\b${s.code.split('.')[0]}\\.\\d TO ${s.code.split('.')[0]}\\.\\d\\b`))
+    }
+  })
+  it('lists the groups in deck order, each deck page first in its group', () => {
+    expect(GUIDE_GROUPS.slice(2, 2 + DECKS.length)).toEqual(DECKS.map((d) => `${d.num} ${d.name}`))
+    for (const d of DECKS) expect(GUIDE.find((p) => p.group === `${d.num} ${d.name}`)?.deck, d.name).toBe(d.id)
+  })
+  it('GUIDE <deck or station> opens the right page', () => {
+    expect(guideSectionFor('5')).toBe('TRADEDOCK')
+    expect(guideSectionFor('5.3')).toBe('TRADE')
+    expect(guideSectionFor('5.6')).toBe('MONEY')
+    expect(guideSectionFor('bursar')).toBe('BURSAR')
+    expect(guideSectionFor('COLD STORE')).toBe('COLD')
+    expect(guideSectionFor('LIFE SUPPORT')).toBe('ATMOS')
+    expect(guideSectionFor('DECK')).toBe('DECK')
+    expect(guideSectionFor('8.6')).toBe('TUNE')
+    expect(guideSectionFor('9')).toBe('START')
   })
 })
 

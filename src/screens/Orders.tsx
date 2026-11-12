@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useStationTabs } from '../nav/StationContext'
 import { useApp } from '../settings/AppContext'
 import { useStore } from '../store/StoreContext'
 import { Select } from '../components/Select'
@@ -9,7 +10,7 @@ import { PracticeFields } from './XenoBank'
 import { speciesName } from '../store/useLedger'
 import { useOrders, type OrdersData } from '../store/useOrders'
 import { useFx } from '../store/useFx'
-import { CHANNELS, SALE_SPECIES, type Channel } from '../data/ledger'
+import { CHANNELS, SALE_SPECIES, formAfterPick, type Channel } from '../data/ledger'
 import { STATION } from '../data/farm'
 import { fmtCrc, fmtUsd } from '../lib/cargo'
 import { salePrice } from '../lib/rates'
@@ -126,18 +127,19 @@ export function OrdersIndex({ x, set }: { x: OrdersState; set: SetOrders }) {
   const d = useOrders(x.week)
   const short = d.plan.filter((p) => p.status === 'SHORT').length
   const over = d.dep.rows.filter((r) => r.level === 'over').length
+  const tabs = useStationTabs(ORDERS_TABS)
   return (
     <>
-      <div className="section-title">STANDING ORDERS</div>
-      <ul className="index-list">
-        {ORDERS_TABS.map((t) => (
+      {tabs.length > 1 && <div className="section-title">STANDING ORDERS</div>}
+      {tabs.length > 1 && <ul className="index-list">
+        {tabs.map((t) => (
           <li tabIndex={0} key={t} className={x.tab === t ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
             <span>{TAB_LABEL[t]}</span>
             {t === 'ORDERS' && <span className="k">{d.lines.filter((l) => l.kg > 0).length}</span>}
             {t === 'PICK' && short > 0 && <span className="k">{short} SHORT</span>}
           </li>
         ))}
-      </ul>
+      </ul>}
       <div className="section-title" style={{ marginTop: 10 }}>WEEK OF {d.week}</div>
       <div className="lg-mini">
         <div>{d.dep.buyers} BUYERS // {kgF(d.dep.totalKg)} KG</div>
@@ -155,14 +157,15 @@ export function Orders({ x, set, say }: { x: OrdersState; set: SetOrders; say: S
   const { sound } = useApp()
   const d = useOrders(x.week)
   const fx = useFx()
+  const tabs = useStationTabs(ORDERS_TABS)
   return (
     <div className="cook ledger od">
-      <label className="ck-picker">
+      {tabs.length > 1 && <label className="ck-picker">
         <span>SHOW</span>
         <Select value={x.tab} onChange={(e) => (sound.chirp(), set({ tab: e.target.value as OrdersTab }))}>
-          {ORDERS_TABS.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
+          {tabs.map((t) => <option key={t} value={t}>{TAB_LABEL[t]}</option>)}
         </Select>
-      </label>
+      </label>}
       <div className="od-pay" role="note">{PAYMENT_RULE}</div>
       {(x.tab === 'ORDERS' || x.tab === 'PICK' || x.tab === 'LIST') && <WeekBar d={d} set={set} />}
       {x.tab === 'ORDERS' && <OrdersTabView d={d} x={x} set={set} say={say} rate={fx.rate} />}
@@ -471,7 +474,7 @@ function NewOrder({ d, say, rate, onMade }: { d: OrdersData; say: Say; rate: (da
       <div className="ck-fields">
         <label className="ck-field">
           <span>SPECIES</span>
-          <Select aria-label="Species" value={species} onChange={(e) => (setSpecies(e.target.value), setPrice(''))}>
+          <Select aria-label="Species" value={species} onChange={(e) => (setForm(formAfterPick(species, e.target.value, form)), setSpecies(e.target.value), setPrice(''))}>
             {SALE_SPECIES.map((s) => <option key={s} value={s}>{sp(s)}</option>)}
           </Select>
         </label>
@@ -806,7 +809,7 @@ function ListTab({ d, x, set, say }: { d: OrdersData; x: OrdersState; set: SetOr
         ) : (
           <div className="dim">NOTHING IS FREE THIS WEEK: EVERYTHING FORECAST IS ORDERED OR HELD AS SPARE (OR NOTHING IS FORECAST).</div>
         )}
-        <div className="dim tiny">FREE = FORECAST MINUS THE {d.practice.spareBlockPct}% SPARE BUFFER MINUS STANDING ORDERS, ROUNDED DOWN TO HALF A KILO. UNDER 1 KG IS NOT OFFERED. PRICES ARE YOUR LIST PRICES (PRICES + COSTS).</div>
+        <div className="dim tiny">FREE = FORECAST MINUS THE {d.practice.spareBlockPct}% SPARE BUFFER MINUS STANDING ORDERS, ROUNDED DOWN TO HALF A KILO. UNDER 1 KG IS NOT OFFERED. PRICES ARE YOUR LIST PRICES (PRICE BOOK).</div>
       </div>
       <div className="ck-box">
         <div className="section-title">MESSAGE</div>

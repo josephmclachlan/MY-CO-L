@@ -19,17 +19,18 @@ export const BASICS: GSection[] = [
         h: 'YOUR FIRST FIVE MINUTES',
         steps: [
           'Tap or press any key on the dark start screen. The boot text runs, then the MAIN MENU appears. Any key or tap skips the boot text (unless TUNE > BOOT is set to ALWAYS FULL).',
-          'On the MAIN MENU, tap a module (a numbered line) to open it. You can also type its number or name at the > prompt and press Enter. Try 12 for MISSION CONTROL.',
+          'On the MAIN MENU, tap a deck to open it. A deck is one part of the farm, like GROW DECK or TRADE DOCK. Its page shows the figures that matter and its stations, one job each.',
+          'You can also type a deck number or name at the > prompt and press Enter. Try 2 for GROW DECK, or 2.3 to go straight to LOG HARVEST.',
           'Look at the top left of any screen for the BACK button. It returns you to the screen you came from, with everything as you left it.',
           'Tap ? TIPS in the grey line under the title bar. Now tap a button: instead of pressing it, you get a note saying what it does. Tap ? TIPS again to leave. While tip mode is on, buttons do not press, so nothing saves.',
-          'Open this guide from the MAIN MENU (module 23) or type GUIDE. On any screen, GUIDE opens the page for that screen.',
+          'Open this guide from MAINFRAME (station 8.1) or type GUIDE. On any screen, GUIDE opens the page for that screen. The DECKS AND STATIONS page explains the whole map.',
         ],
       },
       {
         h: 'WHERE YOUR RECORDS LIVE',
         text: [
           'Today the app runs in LOCAL MODE. Your records are saved inside this browser on this device. Nothing is sent anywhere. A phone and a laptop each have their own copy until a database is linked later.',
-          'Because of that, make a backup often. See the DATA page. A backup is one file you can keep on a USB stick or send to yourself.',
+          'Because of that, make a backup often. See the DATA VAULT page. A backup is one file you can keep on a USB stick or send to yourself.',
           'The app works with no internet and no signal. When there is no network the status line says NET DOWN // CACHED, and you can keep working.',
         ],
       },
@@ -50,12 +51,14 @@ export const BASICS: GSection[] = [
       {
         h: 'FROM TOP TO BOTTOM',
         items: [
-          ['TITLE BAR', 'The dark bar at the top. It shows the screen name. The < BACK button at the left goes back one step. On a phone the little saving lamp sits in the status line instead.'],
+          ['TITLE BAR', 'The dark bar at the top. It shows where you are: MY/CO/L, the deck, then the station. Tap MY/CO/L for the main menu, or the deck name for its overview. The < BACK button at the left goes back one step. On a phone the deck name is left out, and the little saving lamp sits in the status line instead.'],
           ['STATUS LINE', 'The small grey line under it: the farm clock (Costa Rica time, the same clock every log uses), DB LINKED or LOCAL MODE, NET OK or NET DOWN, the sound and look in use, the saving lamp, the ? TIPS button, the UNDO button (it shows up after your first saved change), and GLOVE when glove mode is on.'],
-          ['INDEX (LEFT)', 'The menu column on the left of a desktop screen. It lists the tabs or records for the screen you are on. On a phone it is hidden: pick the tab from the SHOW list (or the strip of tabs) at the top of the page instead.'],
+          ['INDEX (LEFT)', 'The menu column on the left of a desktop screen. On a station it starts with the deck and its stations, then RELATED stations, then the tabs or records of the screen you are on. On the main menu it lists every deck and station.'],
+          ['ON A PHONE', 'The index is hidden. The deck button and a drop-down of its stations sit at the top of the screen, RELATED stations at the foot. Pick a tab from the SHOW list (or the strip of tabs) at the top of the page.'],
+          ['STATION LINE', 'The line at the top of every station: its code, the screen name, and what the station is for.'],
           ['MAIN PANEL', 'The big box with the work in it. It scrolls by itself.'],
           ['ANSWER BAR', 'A boxed line just above the prompt that appears after you save something, undo, or type a command. It says what happened. It is red when something went wrong and stays until you close it with X; other answers fade after about 12 seconds.'],
-          ['> PROMPT', 'The line with a blinking block. Type a word and press Enter: a number opens a module, a name opens a screen, FIND looks for a record. HELP lists every command.'],
+          ['> PROMPT', 'The line with a blinking block. Type a word and press Enter: 1 to 8 opens a deck, 5.3 opens a station, a name opens a deck or a screen, FIND looks for a record. HELP lists every command.'],
           ['HINT LINE', 'One line of advice for the screen you are on, under the prompt.'],
           ['F-KEY BAR', 'The eight buttons at the bottom: F1 HELP, F2 MENU, F3 TUNE, F4 MUTE or SOUND, F5 THEME, F6 CLEAN or GLASS, F7 BOOT, F8 LOGIN or LOGOUT. On a phone you see four and a MORE key that opens the other four.'],
         ],
@@ -136,11 +139,13 @@ export const BASICS: GSection[] = [
       {
         h: 'THE ONES YOU WILL USE MOST',
         items: [
-          ['MENU', 'The main menu.'],
-          ['1 TO 23', 'Open that module.'],
+          ['MENU OR 0', 'The main menu.'],
+          ['1 TO 8', 'Open that deck.'],
+          ['5.3', 'Open deck 5, station 3. A space or a comma works too: 5 3.'],
+          ['A DECK OR STATION NAME', 'BURSAR, COLD STORE, LOG HARVEST. The old screen names still work too: CARGO, VITALS, MISSION. MONEY opens BURSAR.'],
           ['BACK', 'Go back.'],
           ['HELP', 'The full list of commands.'],
-          ['GUIDE', 'This user guide, at the page for the screen you are on. GUIDE VITALS opens the VITALS page.'],
+          ['GUIDE', 'This user guide, at the page for the screen you are on. GUIDE 7.1, GUIDE POWER GRID or GUIDE VITALS opens the page for that station.'],
           ['TIPS', 'Turn tip mode on or off.'],
           ['FIND words', 'Search every record and screen. Or type / and the words.'],
           ['HARVEST, LOT, TODAY, BOARD', 'Open that part of MISSION CONTROL.'],
@@ -179,13 +184,13 @@ export const BASICS: GSection[] = [
       {
         h: 'HISTORY',
         text: [
-          'Every change is written down: who made it, when, the old value and the new value. Open HISTORY (module 13). You can look at one record\'s whole life, or put an old value back.',
+          'Every change is written down: who made it, when, the old value and the new value. Open EDIT HISTORY (8.3). You can look at one record\'s whole life, or put an old value back.',
         ],
       },
       {
         h: 'BACKUPS',
         text: [
-          'Your records are only in this browser. If the browser data is wiped, or the phone is lost, they are gone. Open DATA and use SAVE EVERYTHING (ZIP) often. (BACKUP FILE ONLY (.JSON) saves just the backup file.) The main menu warns you when the last backup is old.',
+          'Your records are only in this browser. If the browser data is wiped, or the phone is lost, they are gone. Open DATA VAULT (8.4) and use SAVE EVERYTHING (ZIP) often. (BACKUP FILE ONLY (.JSON) saves just the backup file.) The main menu warns you when the last backup is old.',
         ],
       },
     ],
@@ -227,18 +232,21 @@ export const BASICS: GSection[] = [
     key: 'MENU',
     title: 'THE MAIN MENU',
     group: 'FRAME',
-    what: 'The home screen. F2 always brings you here.',
+    what: 'The home screen: the 8 decks. F2 or 0 always brings you here.',
     blocks: [
       {
         h: 'WHAT YOU SEE',
         items: [
-          ['MODULE LIST', 'Every screen you may open, in number order, with a few words on what it is for.'],
-          ['STATION BOARD', 'Under the list: a short status of power, water, climate alarms and what is due. Tap it to open FACILITY LOGS.'],
-          ['BACKUP WARNING', 'A line in warning colour appears when your last backup is old. Tap it to open DATA.'],
+          ['DECK LIST', 'The decks you may open, each with its emblem, a few words on what it holds, and one live figure: kilos picked this week, cash, money owed and so on.'],
+          ['ALERTS', 'A deck with something that needs you shows its emblem in amber and a short amber line saying what.'],
+          ['STATION DIRECTORY', 'On a desktop the left panel lists every deck and its stations. Tap one to go straight there.'],
+          ['STATION BOARD', 'Under the list: a short status of power, water, climate alarms and what is due. Tap it to open REMINDERS (7.8).'],
+          ['BACKUP WARNING', 'A line in warning colour appears when your last backup is old. Tap it to open DATA VAULT.'],
           ['THE LOGO', 'The turning globe. It is only decoration.'],
         ],
       },
-      { h: 'HOW TO USE IT', steps: ['Tap a line, or use the up and down arrows and Enter.', 'Or type the number or the name at the > prompt.'] },
+      { h: 'HOW TO USE IT', steps: ['Tap a deck, or use the up and down arrows and Enter.', 'Or type the deck number (1 to 8) or its name at the > prompt. A station code like 2.3 goes straight to that station.'] },
+      { h: 'GOOD TO KNOW', text: ['Staff see only the decks they may open: no TRADE DOCK and no BURSAR.'] },
     ],
   },
   {
@@ -252,20 +260,27 @@ export const BASICS: GSection[] = [
   },
   {
     key: 'TUNE',
-    title: 'TUNING (F3)',
-    group: 'FRAME',
+    title: 'TUNING (8.6, F3)',
+    group: '8 MAINFRAME',
     what: 'The look, the sound, language and gloves, saved on this device.',
     blocks: [
       {
         h: 'SECTIONS',
         items: [
-          ['LOOK', 'Theme colour, glass strength (curve, grain, scanlines, glow), CLEAN mode for sunlight.'],
+          ['LOOK', 'Theme colour, BRIGHTNESS for the whole screen, WIREFRAMES for how bright the species models draw, glass strength (curve, grain, scanlines, glow), CLEAN mode for sunlight.'],
           ['SOUND', 'Sound on or off, the typing sound, chatter or tick mode, volume. TEST buttons play each sound so you can hear it. Sound only plays when something appears on screen.'],
           ['LANGUAGE AND GLOVES', 'English or Spanish, and glove mode.'],
           ['SYSTEM', 'Replay the boot, test the alarm.'],
         ],
       },
-      { h: 'GOOD TO KNOW', text: ['These settings belong to this device only. A phone and a laptop each keep their own. They are not part of UNDO.', 'To drag a meter with the keyboard, focus it and use the arrow keys.'] },
+      {
+        h: 'GOOD TO KNOW',
+        text: [
+          'These settings belong to this device only. A phone and a laptop each keep their own. They are not part of UNDO.',
+          'To drag a meter with the keyboard, focus it and use the arrow keys.',
+          'Nothing here is ever greyed out. Moving a glass slider while CLEAN mode is on brings the glass back. Moving a sound slider or pressing a TEST button while sound is muted turns sound back on.',
+        ],
+      },
     ],
   },
   {

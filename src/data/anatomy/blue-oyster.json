@@ -1,0 +1,172 @@
+{
+  "id": "blue-oyster",
+  "stages": [
+    {
+      "id": "cut",
+      "k": "X CUT",
+      "a": "A colonized block. An X is cut through the bag on its face.",
+      "v": "Blue oysters are opened with side slits or X cuts.",
+      "s": [
+        "F17-0048"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "PINS",
+      "a": "A tight knot of pins pushes out through the cut.",
+      "v": "Staple species fruit at 13-18 °C. At 13 °C fruit grows slower and denser; at 18 °C, faster.",
+      "s": [
+        "F17-0046"
+      ]
+    },
+    {
+      "id": "young",
+      "k": "YOUNG CAPS",
+      "a": "The caps fan out in an overlapping shelf. Their edges still roll under.",
+      "v": "High CO2 gives long stems and no caps. Watch stem length and cap shape as your airflow gauge.",
+      "s": [
+        "F12-0262",
+        "F17-0072"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "The caps are open wide, the edges still turned down a little.",
+      "v": "Pick before the caps flatten. A good room gives short stems and flattening caps, not vase shapes.",
+      "s": [
+        "F13-0132",
+        "F12-0263"
+      ]
+    },
+    {
+      "id": "flat",
+      "k": "CAPS FLATTEN",
+      "a": "The caps flatten out and their edges lift and wave.",
+      "v": "Flat caps mean the pick is past: oysters are picked before the caps flatten.",
+      "s": [
+        "F13-0132"
+      ]
+    },
+    {
+      "id": "late",
+      "k": "TOO LATE",
+      "a": "The edges turn up and split, and the gills shed spores.",
+      "v": "Spore load matters for staff health. Choosing strains for it cuts spores, but no oyster is truly spore-less.",
+      "s": [
+        "F17-0071"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "cut",
+      "k": "X CUT",
+      "a": "The cut in the bag. The cluster comes out here.",
+      "v": "Side slits or X cuts.",
+      "s": [
+        "F17-0048"
+      ],
+      "on": [
+        "cut",
+        "pins"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "PIN KNOT",
+      "a": "A tight knot of pins at the cut.",
+      "v": "Blotch shows first on the centre pin of a budding cluster, and on aborted pins at its base.",
+      "s": [
+        "F17-0061"
+      ],
+      "on": [
+        "pins"
+      ]
+    },
+    {
+      "id": "stem",
+      "k": "SHORT STEMS",
+      "a": "Short, thick stems, off-centre, joined at the base.",
+      "v": "Short stems mean good airflow. High CO2 gives long stems with small caps or none.",
+      "s": [
+        "F12-0263",
+        "F12-0262"
+      ],
+      "on": [
+        "young",
+        "pick"
+      ],
+      "part": "stem"
+    },
+    {
+      "id": "margin",
+      "k": "ROLLED EDGE",
+      "a": "A young cap keeps its edge rolled under.",
+      "on": [
+        "young"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "cap",
+      "k": "CAP",
+      "a": "A shell-shaped cap, streaked out from where it joins the stem.",
+      "v": "In some strains colour tracks temperature: Steel Blue came out near white when hot and deep blue when cold.",
+      "s": [
+        "F17-0047"
+      ],
+      "on": [
+        "young",
+        "pick"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "gills",
+      "k": "GILLS",
+      "a": "Gills run down from the cap onto the stem.",
+      "on": [
+        "pick",
+        "flat"
+      ],
+      "part": "gills"
+    },
+    {
+      "id": "flat",
+      "at": "margin",
+      "k": "CAPS FLATTEN",
+      "a": "The cap opens flat and its edge lifts.",
+      "v": "Pick before the caps flatten.",
+      "s": [
+        "F13-0132"
+      ],
+      "on": [
+        "flat"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "curl",
+      "at": "margin",
+      "k": "EDGES TURN UP",
+      "a": "The edge curls up and splits as the cap ages.",
+      "on": [
+        "late"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "spores",
+      "k": "SPORES",
+      "a": "Spores drift down from the gills.",
+      "v": "Spore load matters for staff health.",
+      "s": [
+        "F17-0071"
+      ],
+      "on": [
+        "late"
+      ]
+    }
+  ]
+}

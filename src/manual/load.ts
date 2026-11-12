@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Chapter, ManualData } from './types'
 
-/** False in the public build. The textbook only exists in the private test copy for now. */
+/** True in every build that has the textbook data file (src/manual-data/manual.json). */
 export const MANUAL_ON: boolean = __MANUAL__
 
 let pending: Promise<ManualData> | null = null

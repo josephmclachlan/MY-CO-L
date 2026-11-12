@@ -149,6 +149,9 @@ export function nextKnockDay(from: string): string {
 
 // ---------- species codes ----------
 
+/** Strains Joseph keeps, all from Cap n Stem: 17 (5 Nov 2026) plus turkey tail (11 Nov 2026). */
+export const STRAINS_ON_FILE = 18
+
 /** Two-letter strain code prefix per species. Joseph's own codes replace these if he has them. */
 export const STRAIN_PREFIX: Record<string, string> = {
   'blue-oyster': 'BO',
@@ -165,6 +168,7 @@ export const STRAIN_PREFIX: Record<string, string> = {
   maitake: 'MT',
   reishi: 'RS',
   cordyceps: 'CM',
+  'turkey-tail': 'TT',
 }
 
 /** Lot code letter (species letter + knock MMDD). B is Catawba's; the rest are a first guess, editable on each lot. */
@@ -183,6 +187,7 @@ export const LOT_LETTER: Record<string, string> = {
   maitake: 'M',
   reishi: 'R',
   cordyceps: 'Y',
+  'turkey-tail': 'T',
 }
 
 export const speciesOf = (key: string): Species | undefined => SPECIES.find((s) => s.id === key)

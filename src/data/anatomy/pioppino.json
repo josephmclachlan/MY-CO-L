@@ -1,0 +1,169 @@
+{
+  "id": "pioppino",
+  "stages": [
+    {
+      "id": "fluff",
+      "k": "TOP FLUFF",
+      "a": "Wild white fluff grows on top of the block.",
+      "v": "A healthy block grows fluff on top, but only if it was incubated no warmer than about 18 °C and not held too long. Don't be afraid of the fluff.",
+      "s": [
+        "F17-9101",
+        "F17-0453"
+      ]
+    },
+    {
+      "id": "droplets",
+      "k": "AMBER DROPS",
+      "a": "Amber droplets bead on the fluff.",
+      "v": "The amber droplets are the giveaway that the block is about to pin. Open now: snip the corners or cut the top off.",
+      "s": [
+        "F17-0453",
+        "F17-0455"
+      ]
+    },
+    {
+      "id": "carpet",
+      "k": "PIN CARPET",
+      "a": "A carpet of golden pin nodules covers the top.",
+      "v": "Waiting for the carpet is the traditional way, but a little late: the fruit comes out stringy and gnarly. Once the carpet changes, it is ready in about 1.5-2 days.",
+      "s": [
+        "F17-9102",
+        "F17-0457"
+      ]
+    },
+    {
+      "id": "stems",
+      "k": "STEMS RISE",
+      "a": "Long, slender stems lift small round caps.",
+      "v": "Fast in the fruit room, like shiitake. 18-24 °C, and warmer is faster. Lights on once the carpet forms.",
+      "s": [
+        "F17-0456",
+        "F17-0457"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "The caps are still held to the stems by the veil.",
+      "v": "Harvest just before the cap breaks away from the edge of the stem and flattens.",
+      "s": [
+        "F17-9105",
+        "F13-0024"
+      ]
+    },
+    {
+      "id": "late",
+      "k": "TOO LATE",
+      "a": "The caps break from the stems and flatten. The veil is left as a ring.",
+      "v": "Forgotten racks give oversized pioppino.",
+      "s": [
+        "F17-9105"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "fluff",
+      "k": "TOP FLUFF",
+      "a": "Aerial mycelium on the block top.",
+      "v": "A lack of fluff is a warning sign.",
+      "s": [
+        "F17-0460"
+      ],
+      "on": [
+        "fluff",
+        "droplets"
+      ]
+    },
+    {
+      "id": "drops",
+      "k": "AMBER DROPS",
+      "a": "Droplets of amber exudate.",
+      "v": "The giveaway that the block is about to pin.",
+      "s": [
+        "F17-0453"
+      ],
+      "on": [
+        "droplets"
+      ]
+    },
+    {
+      "id": "carpet",
+      "k": "PIN CARPET",
+      "a": "Golden pin nodules across the top.",
+      "v": "Waiting for the pin carpet is a little late: the fruit comes out stringy.",
+      "s": [
+        "F17-9102"
+      ],
+      "on": [
+        "carpet",
+        "stems"
+      ],
+      "part": "carpet"
+    },
+    {
+      "id": "stem",
+      "k": "LONG STEMS",
+      "a": "Long, slender stems in a tight bunch.",
+      "on": [
+        "stems",
+        "pick"
+      ],
+      "part": "stem"
+    },
+    {
+      "id": "cap",
+      "k": "ROUND CAP",
+      "a": "A small, round cap.",
+      "on": [
+        "stems"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "veil",
+      "k": "VEIL",
+      "a": "The veil still joins the cap edge to the stem.",
+      "v": "Pick just before the cap breaks away from the stem.",
+      "s": [
+        "F17-9105"
+      ],
+      "on": [
+        "pick"
+      ],
+      "part": "veil"
+    },
+    {
+      "id": "flat",
+      "at": "margin",
+      "k": "CAPS FLATTEN",
+      "a": "The cap breaks away from the stem and flattens.",
+      "v": "Pick just before the cap breaks away from the stem edge and flattens.",
+      "s": [
+        "F13-0024"
+      ],
+      "on": [
+        "late"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "ring",
+      "k": "RING",
+      "a": "The torn veil left as a ring on the stem.",
+      "on": [
+        "late"
+      ],
+      "part": "veil"
+    },
+    {
+      "id": "gills",
+      "k": "GILLS",
+      "a": "Gills under the opened cap.",
+      "on": [
+        "late"
+      ],
+      "part": "gills"
+    }
+  ]
+}

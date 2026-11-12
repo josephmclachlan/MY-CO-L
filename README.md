@@ -6,6 +6,19 @@
 An original late-1970s industrial sci-fi terminal that will run the whole farm: species readouts, the
 power panel, rooms, stock, cultures, cooks, costs and sales. It works offline on phone and laptop.
 
+## How it is laid out: decks and stations (11 Nov 2026)
+
+The screens are grouped into 8 decks, each with its stations (one job each): 1 BRIDGE, 2 GROW DECK, 3 XENOLAB,
+4 CARGO HOLD, 5 TRADE DOCK, 6 BURSAR, 7 ENGINEERING, 8 MAINFRAME. Type 1 to 8 at the prompt for a deck, 5.3 for
+deck 5 station 3, or a deck or station name. Each deck opens to an overview page of figures and charts.
+
+- The map: `src/nav/decks.ts` (every screen and tab has exactly one home station; `decks.test.ts` checks it).
+- Deck overview pages: `src/screens/Decks.tsx`, figures in `src/lib/overview.ts`, chart parts in `src/components/Charts.tsx`.
+- The user guide follows the same map: `docs/USER-MANUAL.md` (made by `npm run docs:guide`).
+
+The module numbers in the build notes below are the old menu numbers. Typing 9 to 23 no longer opens a screen;
+the screen names still work.
+
 ## What's in build 1 (foundation)
 
 - Boot sequence, main menu with an F1-F8 key bar and a `>` command prompt, help, status and tuning screens.
@@ -87,7 +100,7 @@ Modules 1 and 4-9 show "NOT YET INSTALLED" until their build threads land.
   the frame, menu, help, the new screens, LOG HARVEST and HARVEST SESSION; the other screens stay English for now.
   The Spanish was written by Claude and needs a native reader (`src/lib/es.ts`; a test fails if a string has no entry).
 
-## What's in the farm assistant build (ASK THE LATTICE, module 22)
+## What's in the farm assistant build (ASK MY/CO/L, module 22)
 
 - Type a question or a command in plain words, on the ASK screen or at the `>` prompt on any screen
   (start with ASK, end with ?, or begin with HOW / WHO / LOG / SHOW ...). Examples: "how many LM blocks are

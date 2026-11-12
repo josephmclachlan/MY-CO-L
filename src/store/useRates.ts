@@ -8,7 +8,7 @@ export interface SettingsRow extends Row {
   updated_at?: string
 }
 
-/** Settings that lived on the device before PRICES + COSTS: carried over until the first save. */
+/** Settings that lived on the device before PRICE BOOK: carried over until the first save. */
 function deviceDefaults(): Rates {
   try {
     const l = JSON.parse(localStorage.getItem('mycol.ledger.v1') ?? '{}') as Record<string, unknown>

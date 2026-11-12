@@ -71,7 +71,8 @@ const canWarp = (() => {
 /**
  * The glass: theme colours, phosphor glow, scanlines, a real convex bulge,
  * colour fringing toward the edges, glare, grain and flicker. Every effect
- * scales with the STRENGTH slider; CLEAN mode turns them all off.
+ * scales with the STRENGTH slider; CLEAN mode turns them all off. BRIGHTNESS
+ * works in both, on the whole screen.
  */
 export function Crt({ children, alert, powered = true }: { children: ReactNode; alert?: boolean; powered?: boolean }) {
   const { settings, sound } = useApp()
@@ -125,6 +126,8 @@ export function Crt({ children, alert, powered = true }: { children: ReactNode; 
     '--noise-k': k * look.noise,
     '--text-scale': look.textSize,
     '--noise-img': noise ? `url(${noise})` : 'none',
+    // BRIGHTNESS lifts or dims the whole screen; at 100% no filter is drawn at all
+    filter: Math.abs(look.brightness - 1) > 0.005 ? `brightness(${look.brightness.toFixed(2)})` : undefined,
   } as React.CSSProperties
 
   return (

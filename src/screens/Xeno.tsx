@@ -1,4 +1,5 @@
 import { Select } from '../components/Select'
+import { useStationTabs } from '../nav/StationContext'
 import { HistoryButton } from './History'
 import { PickInput } from '../components/PickInput'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
@@ -26,6 +27,7 @@ import {
   RATIO,
   RATIO_SRC,
   STORAGE_KINDS,
+  STRAINS_ON_FILE,
   buildTree,
   childP,
   cultureAge,
@@ -260,7 +262,7 @@ function StrainsTab({ d, x, set, say, onOpenSpecies }: { d: XData; x: XenoState;
   return (
     <div className="xn-sec">
       <div className="dim tiny">
-        {d.strains.length} OF 17 STRAINS ON FILE // {d.strains.filter((s) => s.active).length} ACTIVE // CODES ARE SPECIES LETTERS + NUMBER (LM-01)
+        {d.strains.length} OF {STRAINS_ON_FILE} STRAINS ON FILE // {d.strains.filter((s) => s.active).length} ACTIVE // CODES ARE SPECIES LETTERS + NUMBER (LM-01)
       </div>
       <div className="xn-list">
         {d.strains.map((s) => {
@@ -1172,6 +1174,7 @@ export function Xeno({ x, set, say, onOpenSpecies }: { x: XenoState; set: SetXen
   const d = useXenoData()
   const status = useStoreStatus()
   const [picked, setPicked] = useState<Set<string>>(new Set())
+  const tabs = useStationTabs(XENO_TABS)
 
   // A scanned label arrives as a record key with no strain: find its strain once the tables load.
   useEffect(() => {
@@ -1198,13 +1201,13 @@ export function Xeno({ x, set, say, onOpenSpecies }: { x: XenoState; set: SetXen
         </div>
         {x.node && !x.strain && d.strains.length > 0 && <div className="warn tiny">THAT LABEL'S RECORD IS NOT ON THIS DEVICE.</div>}
       </div>
-      <nav className="spec-tabs" role="tablist">
-        {XENO_TABS.map((t) => (
+      {tabs.length > 1 && <nav className="spec-tabs" role="tablist">
+        {tabs.map((t) => (
           <button key={t} role="tab" aria-selected={t === x.tab} className={t === x.tab ? 'sel' : ''} onClick={() => (sound.chirp(), set({ tab: t }))}>
             {t}
           </button>
         ))}
-      </nav>
+      </nav>}
       {x.tab === 'STRAINS' && <StrainsTab d={d} x={x} set={set} say={say} onOpenSpecies={onOpenSpecies} />}
       {x.tab === 'BANK' && <BankTab d={d} x={x} set={set} say={say} />}
       {x.tab === 'STOCK' && <StockTab d={d} x={x} set={set} say={say} />}

@@ -1,0 +1,160 @@
+{
+  "id": "pink-oyster",
+  "stages": [
+    {
+      "id": "cut",
+      "k": "X CUT",
+      "a": "A colonized block. An X is cut through the bag on its face.",
+      "v": "Little detailed data exists for pink oyster: treat it like the other oysters.",
+      "s": [
+        "F17-0173"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "PINS",
+      "a": "Pins crowd out through the cut.",
+      "v": "Made for heat: a grower whose greenhouse ran 27-32 °C was still turning out oysters. In hot places, start with pinks.",
+      "s": [
+        "F17-8007"
+      ]
+    },
+    {
+      "id": "young",
+      "k": "YOUNG CAPS",
+      "a": "Thin, frilled caps crowd into a rosette. Their edges still roll under.",
+      "v": "High CO2 gives long stems and no caps. Watch stem length and cap shape as your airflow gauge.",
+      "s": [
+        "F12-0262",
+        "F17-0072"
+      ]
+    },
+    {
+      "id": "pick",
+      "k": "PICK NOW",
+      "a": "The caps open out, thin and frilled at the edge.",
+      "v": "Oysters are picked before the caps flatten.",
+      "s": [
+        "F13-0132"
+      ]
+    },
+    {
+      "id": "flat",
+      "k": "CAPS FLATTEN",
+      "a": "The caps flatten and the frilled edges lift.",
+      "v": "Pinks look pretty but do not hold up in the pan, and old pinks smell bad in the bin. Sell them fast.",
+      "s": [
+        "F17-8008"
+      ]
+    },
+    {
+      "id": "late",
+      "k": "TOO LATE",
+      "a": "The edges turn up and split, and the gills shed spores.",
+      "v": "Spore load matters for staff health.",
+      "s": [
+        "F17-0071"
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "cut",
+      "k": "X CUT",
+      "a": "The cut in the bag. The cluster comes out here.",
+      "v": "Treat pinks like other oysters: blue oysters are opened with side slits or X cuts.",
+      "s": [
+        "F17-0173",
+        "F17-0048"
+      ],
+      "on": [
+        "cut",
+        "pins"
+      ]
+    },
+    {
+      "id": "pins",
+      "k": "PIN KNOT",
+      "a": "A crowded knot of pins at the cut.",
+      "v": "Blotch shows first on the centre pin of a budding cluster, and on aborted pins at its base.",
+      "s": [
+        "F17-0061"
+      ],
+      "on": [
+        "pins"
+      ]
+    },
+    {
+      "id": "stem",
+      "k": "SHORT STEMS",
+      "a": "Short stems, joined at the base.",
+      "v": "Short stems mean good airflow. High CO2 gives long stems with small caps or none.",
+      "s": [
+        "F12-0263",
+        "F12-0262"
+      ],
+      "on": [
+        "young",
+        "pick"
+      ],
+      "part": "stem"
+    },
+    {
+      "id": "margin",
+      "k": "FRILLED EDGE",
+      "a": "Pink oyster caps are thin, with a wavy, frilled edge.",
+      "on": [
+        "young",
+        "pick"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "gills",
+      "k": "GILLS",
+      "a": "Gills run down from the cap onto the stem.",
+      "on": [
+        "pick",
+        "flat"
+      ],
+      "part": "gills"
+    },
+    {
+      "id": "flat",
+      "at": "margin",
+      "k": "CAPS FLATTEN",
+      "a": "The cap opens flat and its edge lifts.",
+      "v": "Pick before the caps flatten. Pinks keep badly, so sell them fast.",
+      "s": [
+        "F13-0132",
+        "F17-8008"
+      ],
+      "on": [
+        "flat"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "curl",
+      "at": "margin",
+      "k": "EDGES TURN UP",
+      "a": "The edge curls up and splits as the cap ages.",
+      "on": [
+        "late"
+      ],
+      "part": "cap"
+    },
+    {
+      "id": "spores",
+      "k": "SPORES",
+      "a": "Spores drift down from the gills.",
+      "v": "Spore load matters for staff health.",
+      "s": [
+        "F17-0071"
+      ],
+      "on": [
+        "late"
+      ]
+    }
+  ]
+}

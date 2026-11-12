@@ -13,6 +13,10 @@ export interface FKey {
 
 interface Props {
   title: string
+  /** Where the screen sits on the deck map, shown before the title (each part can be tapped). */
+  trail?: ReactNode
+  /** Tapping the system name opens the main menu. */
+  onHome?: () => void
   index?: ReactNode
   children: ReactNode
   keys: FKey[]
@@ -62,7 +66,7 @@ function useClock() {
 }
 
 /** The frame every screen shares: title bar, status line, index column, prompt, hint line and F-key bar. */
-export function Shell({ title, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack, lamp, undo, glove, tips, result, onCloseResult }: Props) {
+export function Shell({ title, trail, onHome, index, children, keys, onKey, hint, onCommand, focusToken, bodyClass, onBack, lamp, undo, glove, tips, result, onCloseResult }: Props) {
   const { settings, sound, session } = useApp()
   const { t } = useT()
   const clock = useClock()
@@ -102,7 +106,18 @@ export function Shell({ title, index, children, keys, onKey, hint, onCommand, fo
               &lt; {t('BACK')}
             </button>
           )}
-          <span className="tb-sys">{STATION.system} <span className="tb-sep">//</span> </span>{title}
+          {onHome ? (
+            <span className="tb-sys">
+              <button type="button" className="tb-crumb" onClick={onHome} data-tip={t('The main menu.')}>
+                {STATION.system}
+              </button>{' '}
+              <span className="tb-sep">//</span>{' '}
+            </span>
+          ) : (
+            <span className="tb-sys">{STATION.system} <span className="tb-sep">//</span> </span>
+          )}
+          {trail}
+          <span className="tb-title">{title}</span>
         </span>
         {lamp && <span className="tb-lamp">{lamp}</span>}
         <span className="tb-right">

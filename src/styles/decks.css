@@ -1,0 +1,1198 @@
+/* DECKS (11 Nov 2026): the main menu's deck rows, the deck pages with their overviews, the station list on the
+   left, the station bar and RELATED links, the title-bar trail, the deck emblems and the chart parts.
+   One phosphor colour; amber (--hazard) only for a warning that also says it in words.
+   Every animation runs once and stops; reduced motion shows the final state straight away (end of file). */
+
+/* ---------- chart parts (components/Charts.tsx) ---------- */
+
+.cx-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+.cx-tile {
+  font: inherit;
+  color: var(--fg);
+  background: transparent;
+  text-align: left;
+  text-shadow: inherit;
+  border: 1px solid var(--fg-faint);
+  border-left: 2px solid var(--fg-dim);
+  padding: 7px 10px 8px;
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  min-width: 0;
+  animation: cx-in 0.4s ease-out both;
+}
+button.cx-tile {
+  cursor: pointer;
+}
+button.cx-tile:hover,
+button.cx-tile:focus-visible {
+  border-color: var(--fg);
+  background: var(--bg-hi);
+  outline: none;
+}
+.cx-tile.warn {
+  color: var(--fg);
+  border-color: var(--hazard);
+  border-left-color: var(--hazard);
+}
+.cx-tile-label {
+  color: var(--fg-dim);
+  font-size: 0.7em;
+  letter-spacing: 0.12em;
+}
+.cx-tile-value {
+  font-weight: normal;
+  font-size: 1.55em;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cx-tile.warn .cx-tile-value {
+  color: var(--hazard);
+  text-shadow: none;
+}
+.cx-tile-sub {
+  color: var(--fg-dim);
+  font-size: 0.7em;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.cx-spark {
+  display: block;
+  overflow: visible;
+}
+.cx-spark .cx-line {
+  stroke-width: 1.5;
+}
+.cx-spark.warn .cx-line {
+  stroke: var(--hazard);
+}
+.cx-spark .cx-end {
+  fill: var(--fg);
+}
+.cx-spark.warn .cx-end {
+  fill: var(--hazard);
+}
+
+.cx-chart {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+.cx-chart svg {
+  display: block;
+  overflow: visible;
+  touch-action: pan-y;
+}
+.cx-readout {
+  font-size: 0.78em;
+  min-height: 1.35em;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cx-readout b {
+  font-weight: normal;
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+  padding: 0 5px;
+}
+.cx-grid {
+  stroke: var(--fg-faint);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+.cx-zero {
+  stroke: var(--fg-dim);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+.cx-lab {
+  fill: var(--fg-dim);
+  font-family: 'Share Tech Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+.cx-col {
+  fill: var(--fg);
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+.cx-col.alt {
+  stroke: var(--fg);
+  stroke-width: 1;
+}
+.cx-col.warn {
+  fill: var(--hazard);
+}
+.cx-on .cx-col {
+  opacity: 1;
+  filter: drop-shadow(0 0 calc(4px * var(--glow-k, 1)) var(--glow));
+}
+.cx-pickable {
+  cursor: pointer;
+}
+.cx-hatch-bg {
+  fill: var(--bg);
+}
+.cx-hatch-line {
+  stroke: var(--fg);
+  stroke-width: 1.6;
+}
+.cx-line {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+/* A dark casing under a line that crosses columns of the same colour, so it stays readable. */
+.cx-case {
+  fill: none;
+  stroke: var(--bg);
+  stroke-width: 5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.cx-pt {
+  fill: var(--fg);
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+.cx-band {
+  fill: var(--fg-faint);
+  opacity: 0.45;
+}
+.cx-band-line {
+  stroke: var(--fg-dim);
+  stroke-width: 1;
+  stroke-dasharray: 5 3;
+}
+.cx-band-lab {
+  fill: var(--fg);
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3px;
+}
+
+.cx-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 0.72em;
+  color: var(--fg-dim);
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+.cx-legend b {
+  font-weight: normal;
+  color: var(--fg);
+}
+.cx-sw {
+  display: inline-block;
+  width: 12px;
+  height: 10px;
+  margin-right: 5px;
+  vertical-align: -1px;
+  border: 1px solid var(--fg);
+  box-sizing: border-box;
+}
+.cx-sw.solid {
+  background: var(--fg);
+}
+.cx-sw.mid {
+  background: var(--fg-dim);
+  border-color: var(--fg-dim);
+}
+.cx-sw.hatch {
+  background: repeating-linear-gradient(45deg, var(--fg) 0 1.5px, transparent 1.5px 4px);
+}
+.cx-sw.cross {
+  background:
+    repeating-linear-gradient(45deg, var(--fg) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-45deg, var(--fg) 0 1px, transparent 1px 4px);
+}
+.cx-sw.faint {
+  background: var(--fg-faint);
+  border-color: var(--fg-dim);
+}
+.cx-sw.warn {
+  background: var(--hazard);
+  border-color: var(--hazard);
+}
+.cx-sw.line {
+  height: 0;
+  border: 0;
+  border-top: 2px solid var(--fg);
+  vertical-align: 3px;
+}
+.cx-sw.mark {
+  width: 2px;
+  height: 12px;
+  border: 0;
+  background: var(--fg);
+  vertical-align: -2px;
+}
+.cx-leg-btn {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid transparent;
+  padding: 3px 5px;
+  cursor: pointer;
+  letter-spacing: inherit;
+  text-shadow: inherit;
+}
+.cx-leg-btn:hover,
+.cx-leg-btn:focus-visible {
+  border-color: var(--fg-dim);
+  color: var(--fg);
+  outline: none;
+}
+
+/* One stacked bar: a 2px gap of background between the parts. */
+.cx-stack {
+  display: grid;
+  gap: 2px;
+}
+.cx-stack-bar {
+  display: flex;
+  gap: 2px;
+  height: 24px;
+  padding: 2px;
+  border: 1px solid var(--fg-faint);
+}
+.cx-seg {
+  display: block;
+  min-width: 3px;
+  transform-origin: left center;
+  animation: cx-grow 0.7s ease-out both;
+}
+.cx-seg.solid {
+  background: var(--fg);
+  box-shadow: 0 0 calc(5px * var(--glow-k, 1)) var(--glow);
+}
+.cx-seg.mid {
+  background: var(--fg-dim);
+}
+.cx-seg.hatch {
+  background: repeating-linear-gradient(45deg, var(--fg) 0 2px, transparent 2px 6px);
+  outline: 1px solid var(--fg-dim);
+  outline-offset: -1px;
+}
+.cx-seg.cross {
+  background:
+    repeating-linear-gradient(45deg, var(--fg) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(-45deg, var(--fg) 0 1px, transparent 1px 5px);
+  outline: 1px solid var(--fg-dim);
+  outline-offset: -1px;
+}
+.cx-seg.faint {
+  background: var(--fg-faint);
+}
+.cx-seg.warn {
+  background: var(--hazard);
+}
+.cx-seg.empty {
+  background: repeating-linear-gradient(90deg, var(--fg-faint) 0 2px, transparent 2px 8px);
+  animation: none;
+}
+
+/* Ranked bars: label, track, value. */
+.cx-bars {
+  display: grid;
+  gap: 2px;
+}
+.cx-bar-row {
+  font: inherit;
+  font-size: 0.86em;
+  color: var(--fg);
+  background: none;
+  border: 0;
+  text-align: left;
+  text-shadow: inherit;
+  letter-spacing: inherit;
+  display: grid;
+  grid-template-columns: minmax(7em, 32%) minmax(50px, 1fr) minmax(4.5em, max-content);
+  gap: 10px;
+  align-items: center;
+  padding: 3px 4px;
+  min-height: 28px;
+}
+button.cx-bar-row {
+  cursor: pointer;
+}
+button.cx-bar-row:hover,
+button.cx-bar-row:focus-visible {
+  background: var(--bg-hi);
+  outline: none;
+}
+.cx-bar-label {
+  color: var(--fg-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cx-track {
+  position: relative;
+  height: 12px;
+  border: 1px solid var(--fg-faint);
+}
+.cx-fill {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: 1px;
+  max-width: calc(100% - 2px);
+  background: var(--fg);
+  box-shadow: 0 0 calc(4px * var(--glow-k, 1)) var(--glow);
+  transform-origin: left center;
+  animation: cx-grow 0.7s ease-out both;
+}
+.cx-fill.warn {
+  background: var(--hazard);
+  box-shadow: none;
+}
+/* The tick (a target or a reorder point) wears a ring of background so it shows over the bar. */
+.cx-mark {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--fg);
+  box-shadow: 0 0 0 1px var(--bg);
+}
+.cx-bar-value {
+  text-align: right;
+  white-space: nowrap;
+}
+.cx-bar-value small {
+  color: var(--fg-dim);
+  font-size: 0.82em;
+}
+.cx-bar-value.warn {
+  color: var(--hazard);
+  text-shadow: none;
+}
+
+/* Half dial. */
+.cx-gauge {
+  display: inline-grid;
+  justify-items: center;
+  gap: 1px;
+  text-align: center;
+  font-size: 0.8em;
+  color: var(--fg);
+}
+.cx-gauge svg {
+  overflow: visible;
+}
+.cx-gauge b {
+  font-weight: normal;
+  font-size: 1.2em;
+  letter-spacing: 0.04em;
+}
+.cx-gauge b.warn {
+  color: var(--hazard);
+  text-shadow: none;
+}
+.cx-gauge > span {
+  color: var(--fg-dim);
+  font-size: 0.85em;
+  letter-spacing: 0.06em;
+  max-width: 18em;
+}
+.cx-g-track {
+  fill: none;
+  stroke: var(--fg-faint);
+  stroke-width: 7;
+}
+.cx-g-band {
+  fill: none;
+  stroke: var(--fg-dim);
+  stroke-width: 7;
+  opacity: 0.55;
+}
+.cx-g-val {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 3;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 calc(3px * var(--glow-k, 1)) var(--glow));
+}
+.cx-g-val.warn {
+  stroke: var(--hazard);
+  filter: none;
+}
+.cx-g-tip {
+  fill: var(--fg);
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+.cx-g-tip.warn {
+  fill: var(--hazard);
+}
+
+/* Draw-in: lines trace, bars and columns rise, tiles fade up. */
+.cx-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: cx-trace 0.9s ease-out 0.15s forwards;
+}
+.cx-rise .cx-col {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: cx-rise 0.55s ease-out both;
+  animation-delay: calc(var(--i, 0) * 28ms);
+}
+.cx-rise .cx-col.neg {
+  transform-origin: 50% 0;
+}
+@keyframes cx-trace {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes cx-rise {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@keyframes cx-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes cx-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 700px) {
+  .cx-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .cx-tile-value {
+    font-size: 1.3em;
+  }
+  .cx-bar-row {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 2px 8px;
+  }
+  .cx-track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+/* ---------- deck emblems (components/Emblem.tsx) ---------- */
+
+.emblem {
+  flex: none;
+  display: inline-block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+  filter: drop-shadow(0 0 calc(3px * var(--glow-k, 1)) var(--glow));
+}
+.emblem .em-fill {
+  fill: currentColor;
+  stroke: none;
+}
+.emblem.em-draw > * {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: cx-trace 1.1s ease-out forwards;
+  animation-delay: calc(var(--i, 0) * 70ms + 0.1s);
+}
+.emblem.em-draw .em-fill {
+  opacity: 0;
+  animation: em-show 0.3s ease-out forwards;
+  animation-delay: calc(var(--i, 0) * 70ms + 1s);
+}
+/* A deck with something wrong breathes slowly in amber. The words beside it say what. */
+.emblem.em-alert {
+  color: var(--hazard);
+  filter: none;
+  animation: em-pulse 2.6s ease-in-out infinite;
+}
+@keyframes em-show {
+  to { opacity: 1; }
+}
+@keyframes em-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ---------- main menu: the eight decks (screens/Menu.tsx) ---------- */
+
+.menu-item.dk-mi {
+  grid-template-columns: 1.4em 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+  margin-bottom: 2px;
+  animation: dk-row-in 0.35s ease-out both;
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+.dk-mi-num {
+  color: var(--fg-dim);
+  font-size: 1.15em;
+  text-align: right;
+}
+.dk-mi-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.dk-mi-name {
+  font-family: 'Michroma', 'Share Tech Mono', sans-serif;
+  letter-spacing: 0.14em;
+  font-size: 0.92em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dk-mi-sub {
+  color: var(--fg-dim);
+  font-size: 0.72em;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dk-mi-fig {
+  display: grid;
+  justify-items: end;
+  gap: 1px;
+  font-size: 0.78em;
+  color: var(--fg-dim);
+  text-align: right;
+  white-space: nowrap;
+}
+.dk-mi-alert {
+  font-weight: normal;
+  color: var(--hazard);
+  text-shadow: none;
+}
+.dk-mi.has-alert:not(.sel) {
+  box-shadow: inset 2px 0 0 var(--hazard);
+}
+.dk-mi.sel .dk-mi-num,
+.dk-mi.sel .dk-mi-sub,
+.dk-mi.sel .dk-mi-fig {
+  color: var(--bg);
+}
+.dk-mi.sel .emblem {
+  color: var(--bg);
+  filter: none;
+}
+.dk-mi.sel .dk-mi-alert {
+  color: #000;
+  background: var(--hazard);
+  padding: 0 4px;
+}
+@keyframes dk-row-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: none; }
+}
+/* Phones: a compact two-line row (name, then the live figure) so most decks fit under the logo.
+   The deck page itself says what the deck is for. */
+@media (max-width: 700px) {
+  .menu-item.dk-mi {
+    grid-template-columns: 1.1em 28px minmax(0, 1fr);
+    gap: 0 8px;
+    padding: 4px 6px;
+  }
+  .menu-item.dk-mi .dk-mi-em {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    width: 28px;
+    height: 28px;
+  }
+  .dk-mi-num {
+    grid-row: 1 / span 2;
+  }
+  .dk-mi-sub {
+    display: none;
+  }
+  .dk-mi-fig {
+    grid-column: 3;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 8px;
+    justify-items: start;
+    text-align: left;
+    white-space: normal;
+    font-size: 0.72em;
+  }
+}
+
+/* ---------- a deck page (screens/Decks.tsx) ---------- */
+
+.dk-page {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.dk-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 4px 4px 12px;
+  border-bottom: 1px solid var(--fg-faint);
+}
+/* The route line: a pulse runs along the deck's rail as you arrive. */
+.dk-route {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--fg) 50%, transparent) no-repeat;
+  background-size: 24% 100%;
+  background-position: -40% 0;
+  filter: drop-shadow(0 0 calc(4px * var(--glow-k, 1)) var(--glow));
+  opacity: 0;
+  animation: dk-route 1.2s ease-in-out 0.1s forwards;
+}
+@keyframes dk-route {
+  0% { opacity: 1; background-position: -40% 0; }
+  85% { opacity: 1; }
+  100% { opacity: 0; background-position: 140% 0; }
+}
+.dk-hero-text {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.dk-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: 'Michroma', 'Share Tech Mono', sans-serif;
+  font-size: 1.4em;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+}
+.dk-num {
+  color: var(--fg-dim);
+}
+.dk-name {
+  min-width: 0;
+}
+.dk-name .tline {
+  min-height: 1.2em;
+  line-height: 1.2;
+}
+.dk-sub {
+  color: var(--fg-dim);
+  font-size: 0.8em;
+  letter-spacing: 0.08em;
+}
+.dk-alert {
+  color: var(--hazard);
+  font-size: 0.85em;
+  letter-spacing: 0.06em;
+  text-shadow: none;
+}
+
+/* On desktop the stations are listed on the left, so the cards come after the readout.
+   On a phone the left list is hidden, so the cards come first: they are the deck's menu. */
+.dk-readout {
+  order: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  gap: 10px;
+  align-items: start;
+  min-width: 0;
+}
+.dk-readout > .cx-tiles,
+.dk-readout > .dk-sec.wide {
+  grid-column: 1 / -1;
+}
+.dk-cards {
+  order: 2;
+  display: grid;
+  gap: 2px;
+}
+.dk-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px;
+}
+.dk-card {
+  font: inherit;
+  color: var(--fg);
+  background: transparent;
+  text-shadow: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  border: 1px solid var(--fg-faint);
+  border-left: 2px solid var(--fg-dim);
+  padding: 7px 10px;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'code name badge' 'sub sub sub';
+  gap: 2px 8px;
+  align-items: baseline;
+  cursor: pointer;
+}
+.dk-card:hover,
+.dk-card:focus-visible {
+  border-color: var(--fg);
+  background: var(--bg-hi);
+  outline: none;
+}
+.dk-card-code {
+  grid-area: code;
+  color: var(--fg-dim);
+}
+.dk-card-name {
+  grid-area: name;
+  font-weight: normal;
+  letter-spacing: 0.1em;
+}
+.dk-card-sub {
+  grid-area: sub;
+  color: var(--fg-dim);
+  font-size: 0.72em;
+  letter-spacing: 0.05em;
+}
+.dk-card-badge {
+  grid-area: badge;
+  align-self: start;
+  font-size: 0.72em;
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+  padding: 0 5px;
+  white-space: nowrap;
+}
+.dk-sec {
+  align-content: start;
+  min-width: 0;
+}
+.dk-sec > .section-title {
+  margin-bottom: 4px;
+}
+
+.dk-work-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 8px;
+}
+.dk-work {
+  border: 1px solid var(--fg-faint);
+  padding: 6px 8px;
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  min-width: 0;
+}
+.dk-work.warn {
+  color: var(--fg);
+  border-color: var(--hazard);
+}
+.dk-work-head {
+  font-size: 0.76em;
+  letter-spacing: 0.12em;
+  color: var(--fg-dim);
+}
+.dk-work-head b {
+  font-weight: normal;
+  color: var(--fg);
+}
+.dk-work.warn .dk-work-head b {
+  color: var(--hazard);
+}
+.dk-work-list,
+.dk-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.dk-work-list button,
+.dk-rows button {
+  font: inherit;
+  font-size: 0.85em;
+  color: var(--fg);
+  background: none;
+  border: 0;
+  border-left: 2px solid var(--fg-faint);
+  text-shadow: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  width: 100%;
+  min-height: 32px;
+  padding: 4px 8px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: baseline;
+  cursor: pointer;
+}
+.dk-rows button {
+  grid-template-columns: minmax(5.5em, auto) minmax(0, 1fr) auto;
+}
+.dk-work-list button.warn,
+.dk-rows button.warn {
+  color: var(--hazard);
+  border-left-color: var(--hazard);
+  text-shadow: none;
+}
+.dk-work-list button:hover,
+.dk-work-list button:focus-visible,
+.dk-rows button:hover,
+.dk-rows button:focus-visible {
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+  outline: none;
+}
+.dk-work-list button:hover .dim,
+.dk-work-list button:focus-visible .dim,
+.dk-work-list button:hover .dk-work-kind,
+.dk-work-list button:focus-visible .dk-work-kind {
+  color: var(--bg);
+}
+.dk-work-kind {
+  color: var(--fg-dim);
+  font-size: 0.85em;
+}
+.dk-rows b {
+  font-weight: normal;
+}
+.dk-gauges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+.dk-gauge-btn {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid transparent;
+  padding: 4px 6px;
+  cursor: pointer;
+  text-shadow: inherit;
+  justify-self: start;
+}
+.dk-gauge-btn:hover,
+.dk-gauge-btn:focus-visible {
+  border-color: var(--fg-dim);
+  outline: none;
+}
+
+@media (max-width: 700px) {
+  .dk-hero {
+    gap: 10px;
+    padding-bottom: 8px;
+  }
+  .dk-hero .emblem {
+    width: 46px;
+    height: 46px;
+  }
+  .dk-title {
+    font-size: 1.1em;
+    gap: 8px;
+  }
+  .dk-cards {
+    order: 0;
+  }
+  .dk-card-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .dk-rows button {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .dk-rows button > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---------- moving around a deck (nav/DeckNav.tsx) ---------- */
+
+/* Left panel: the deck, its stations and RELATED, above the screen's own index. */
+.dk-nav {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--fg-faint);
+}
+.index-panel > .dk-nav:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.dk-head {
+  font: inherit;
+  font-family: 'Michroma', 'Share Tech Mono', sans-serif;
+  font-size: 0.76em;
+  letter-spacing: 0.14em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--bg);
+  background: var(--fg-dim);
+  border: 0;
+  text-shadow: none;
+  padding: 4px 8px;
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+.dk-head .emblem {
+  filter: none;
+}
+.dk-head:hover,
+.dk-head:focus-visible {
+  background: var(--fg);
+  outline: none;
+}
+.dk-rel-title {
+  margin: 8px 0 2px;
+}
+.dk-rel li .k {
+  font-size: 0.78em;
+  white-space: nowrap;
+}
+
+/* Above every station's screen: what the station is for. On a phone also the deck and a station drop-down. */
+.dk-bar {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--fg-faint);
+}
+.dk-bar-nav {
+  display: none;
+}
+.dk-bar-what {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  font-size: 0.78em;
+  letter-spacing: 0.06em;
+  color: var(--fg-dim);
+}
+.dk-bar-code {
+  color: var(--bg);
+  background: var(--fg-dim);
+  text-shadow: none;
+  padding: 0 5px;
+}
+.dk-bar-theme {
+  font-weight: normal;
+  color: var(--fg);
+  letter-spacing: 0.12em;
+}
+.dk-bar-deck {
+  font: inherit;
+  font-size: 0.82em;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg);
+  background: none;
+  border: 1px solid var(--fg-dim);
+  text-shadow: inherit;
+  padding: 4px 8px;
+  min-height: 40px;
+  cursor: pointer;
+  flex: none;
+  max-width: 45%;
+}
+.dk-bar-deck span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dk-bar-nav .ui-select {
+  flex: 1;
+  min-width: 0;
+}
+
+/* RELATED at the foot of the screen: phones only (desktop has it on the left). */
+.dk-foot {
+  display: none;
+}
+.dk-foot-label {
+  width: 100%;
+  font-size: 0.74em;
+  letter-spacing: 0.12em;
+  color: var(--fg-dim);
+}
+.dk-chip {
+  font-size: 0.78em;
+  min-height: 38px;
+}
+
+/* The station directory (menu, help and status screens). */
+.dk-dir {
+  display: grid;
+  gap: 8px;
+}
+.dk-dir-deck {
+  display: grid;
+  gap: 2px;
+}
+.dk-dir-head {
+  font: inherit;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--fg-faint);
+  text-shadow: inherit;
+  padding: 2px 0;
+  text-align: left;
+  cursor: pointer;
+}
+.dk-dir-head:hover,
+.dk-dir-head:focus-visible {
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+  outline: none;
+}
+.dk-dir-head:hover .emblem,
+.dk-dir-head:focus-visible .emblem {
+  filter: none;
+}
+.dk-dir .index-list {
+  padding-left: 22px;
+  font-size: 0.92em;
+}
+
+@media (max-width: 700px) {
+  .index-panel .dk-nav {
+    display: none;
+  }
+  .dk-bar-nav {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .dk-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--fg-faint);
+  }
+}
+
+/* ---------- title bar: MY/CO/L // DECK // STATION, each part tappable ---------- */
+
+.tb-crumb {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  letter-spacing: inherit;
+  text-shadow: none;
+  cursor: pointer;
+  text-decoration: underline dotted transparent;
+  text-underline-offset: 3px;
+}
+.tb-crumb:hover,
+.tb-crumb:focus-visible {
+  text-decoration-color: currentColor;
+  outline: none;
+}
+@media (max-width: 700px) {
+  .tb-trail {
+    display: none;
+  }
+}
+
+/* ---------- COLD STORE (screens/ColdStore.tsx) ---------- */
+
+.cs {
+  display: grid;
+  gap: 10px;
+}
+.cs-batches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+  font-size: 0.88em;
+}
+.cs-batches li {
+  display: grid;
+  grid-template-columns: 7.5em minmax(0, 1fr) 6em 6em;
+  gap: 8px;
+  padding: 2px 6px;
+  border-left: 2px solid var(--fg-faint);
+}
+.cs-batches li.warn {
+  color: var(--hazard);
+  border-left-color: var(--hazard);
+  text-shadow: none;
+}
+.cs-batches b {
+  font-weight: normal;
+  text-align: right;
+}
+@media (max-width: 700px) {
+  .cs-batches li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+/* ---------- reduced motion: everything shows its final state ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-tile,
+  .cx-seg,
+  .cx-fill,
+  .cx-rise .cx-col,
+  .menu-item.dk-mi,
+  .dk-route {
+    animation: none !important;
+  }
+  .cx-draw,
+  .emblem.em-draw > * {
+    animation: none !important;
+    stroke-dashoffset: 0;
+  }
+  .emblem.em-draw .em-fill {
+    animation: none !important;
+    opacity: 1;
+  }
+  .emblem.em-alert {
+    animation: none !important;
+  }
+  .cx-col {
+    transition: none;
+  }
+}

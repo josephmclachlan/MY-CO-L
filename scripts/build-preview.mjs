@@ -1,4 +1,4 @@
-// Builds a single self-contained HTML file of the app for a private test link
+// Builds a single self-contained HTML file of the app for a test link
 // (a claude.ai page), so new screens can be tried on a phone before merging.
 // Usage: npm run build:preview  ->  dist-preview/mycol-preview.html
 // No service worker or install in this copy; everything else works, in LOCAL MODE.
@@ -6,7 +6,7 @@ import { execSync } from 'node:child_process'
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
-// The private test copy carries the textbook. The public Pages build does not.
+// Refresh the textbook data from the chapters when they are here (every build carries it).
 execSync('node scripts/build-manual.mjs', { stdio: 'inherit' })
 execSync('npx vite build', {
   stdio: 'inherit',

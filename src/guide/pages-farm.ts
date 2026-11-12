@@ -1,14 +1,24 @@
 import type { GSection } from './content'
 
-// The growing and daily-work screens.
+// The growing, stock and engineering screens. Each page names the stations (deck map codes) that open its screen.
 export const FARM: GSection[] = [
   {
     key: 'MISSION',
-    title: 'MISSION CONTROL (12)',
-    group: 'DAILY WORK',
+    title: 'MISSION CONTROL (1.1, 2.1 TO 2.3)',
+    group: '2 GROW DECK',
     module: 'MISSION',
     what: 'Every block lot on the farm, today\'s jobs, and the harvest log.',
     blocks: [
+      {
+        h: 'ITS STATIONS',
+        text: ['Four stations open this screen. Each one shows only its own tabs.'],
+        items: [
+          ["1.1 TODAY'S WORK", 'The TODAY tab, on the BRIDGE.'],
+          ['2.1 LOT BOARD', 'The BOARD tab, with BULK ACTIONS, SCAN A LABEL and GUESSES.'],
+          ['2.2 NEW BLOCK LOT', 'The NEW BLOCK LOT tab.'],
+          ['2.3 LOG HARVEST', 'The LOG HARVEST tab.'],
+        ],
+      },
       {
         h: 'WORDS TO KNOW',
         items: [
@@ -33,18 +43,18 @@ export const FARM: GSection[] = [
       {
         h: 'LOG A HARVEST',
         steps: [
-          'Open LOG HARVEST.',
+          'Open LOG HARVEST (2.3).',
           'Pick the lot (or type its code).',
           'Type the weight in kilograms. The grade starts on A: change it to B or SECONDS if needed. Type the flush number (1 for the first pick of a block).',
           'Add your initials.',
-          'Press SAVE HARVEST. The pick shows under RECENT PICKS and feeds PRODUCTION RECORDS, LEDGER and TRADE.',
+          'Press SAVE HARVEST. The pick shows under RECENT PICKS and feeds YIELD RECORDS, the COLD STORE and COST OF GOODS.',
           'Made a mistake? Press UNDO straight away.',
         ],
       },
       {
         h: 'START A NEW LOT',
         steps: [
-          'Open NEW BLOCK LOT after you have inoculated the blocks.',
+          'Open NEW BLOCK LOT (2.2) after you have inoculated the blocks.',
           'Pick the species and strain, the knock date and how many blocks.',
           'Press LOG BLOCK LOT. The app makes the code. It starts as incubating.',
         ],
@@ -57,10 +67,10 @@ export const FARM: GSection[] = [
   },
   {
     key: 'YIELD',
-    title: 'PRODUCTION RECORDS (14)',
-    group: 'DAILY WORK',
+    title: 'YIELD RECORDS (2.6)',
+    group: '2 GROW DECK',
     module: 'YIELD',
-    what: 'How well each lot, strain and room is doing, and strain trials.',
+    what: 'How well each lot, strain and room is doing, and strain trials. The screen is called PRODUCTION RECORDS.',
     blocks: [
       {
         h: 'WORDS TO KNOW',
@@ -84,10 +94,10 @@ export const FARM: GSection[] = [
   },
   {
     key: 'CARGO',
-    title: 'CARGO (4)',
-    group: 'DAILY WORK',
+    title: 'SUPPLY MANIFEST (4.1)',
+    group: '4 CARGO HOLD',
     module: 'CARGO',
-    what: 'The stock list: what you have, what is low, what to reorder.',
+    what: 'The supply list: what you have, what is low, what to reorder. The screen is called CARGO.',
     blocks: [
       {
         h: 'HOW STOCK WORKS',
@@ -115,16 +125,52 @@ export const FARM: GSection[] = [
       },
       {
         h: 'GOOD TO KNOW',
-        text: ['Weekly use comes from the production plan (130 bags a week). The substrate mix (60:40, 55:45 or 50:50) changes how much sawdust and soy hulls it needs. Prices are hidden from staff.'],
+        text: [
+          'Weekly use comes from the production plan (130 bags a week). The substrate mix (60:40, 55:45 or 50:50) changes how much sawdust and soy hulls it needs. Prices are hidden from staff.',
+          'US dollar prices use the exchange rate set in the PRICE BOOK (6.8). The status line shows the rate in use.',
+        ],
+      },
+    ],
+  },
+  {
+    key: 'COLD',
+    title: 'COLD STORE (4.2)',
+    group: '4 CARGO HOLD',
+    module: 'COLD',
+    what: 'Fresh mushrooms on hand: picked, minus sold fresh, minus surplus and waste.',
+    blocks: [
+      {
+        h: 'WHAT YOU SEE',
+        items: [
+          ['ON HAND NOW', 'Fresh kilos still in the cold store, all species together.'],
+          ['OLDEST PICK', 'The age of the oldest pick still on hand. It turns amber two days before the shelf life runs out: sell, dry or donate it first. Tap it to change the shelf life.'],
+          ['PICKED, SOLD FRESH', 'Kilos picked, and kilos sold fresh, in the last 7 days.'],
+          ['STALE, NOT LOGGED', 'Kilos that went past the shelf life in the last 30 days and were never logged as sold or written off. It shows only when there are some. Tap it to log where they went.'],
+          ['BY SPECIES', 'A bar for each species on hand, then a table of the last 7 days: picked, sold fresh, written off, on hand, oldest and stale.'],
+          ['PICKS STILL ON HAND', 'Each day\'s pick that is not yet sold, oldest first.'],
+        ],
+      },
+      {
+        h: 'HOW IT COUNTS',
+        text: [
+          'Nothing is typed in here. The store is worked out from three logs: LOG HARVEST adds kilos, a fresh sale in NEW SALE takes them off, and SURPLUS + WASTE takes them off too.',
+          'A fresh sale takes kilos off the oldest picks of its species that were still fresh on the day of the sale. Surplus or waste also takes the oldest picks first, and can clear picks that went off.',
+          'A pick older than the shelf life no longer counts as on hand. If it was never logged as sold or waste, it shows as stale for 30 days.',
+          'Dried sales do not count here: drying is logged as surplus.',
+        ],
+      },
+      {
+        h: 'GOOD TO KNOW',
+        text: ['The shelf life is a GUESS: 7 days for every species. Change it in the PRICE BOOK (6.8).', 'Owner only, because it reads the sales.'],
       },
     ],
   },
   {
     key: 'SEQUENCE',
-    title: 'PRODUCTION SEQUENCE (10)',
-    group: 'DAILY WORK',
+    title: 'RUN PLANNER (2.5)',
+    group: '2 GROW DECK',
     module: 'SEQUENCE',
-    what: 'The planner for this week\'s bag run.',
+    what: 'The planner for this week\'s bag run. The screen is called PRODUCTION SEQUENCE.',
     blocks: [
       {
         h: 'WHAT IT DOES',
@@ -138,18 +184,29 @@ export const FARM: GSection[] = [
           'For a mix, tick the species under SPECIES IN THIS RUN. The ALLOTMENT list shows each share.',
           'The second slot is a small fixed run (16 bags a week) of one extra species of your pick.',
           'Press INITIATE PRODUCTION SEQUENCE to run the animation of the plan (optional).',
-          'Press COMMIT RUN TO CARGO to book the stock out of CARGO. CARGO lists the run and can undo it. If CARGO has no counts yet the stock will show as negative: count it first with STOCK TAKE.',
+          'Press COMMIT RUN TO CARGO to book the stock out of the SUPPLY MANIFEST (4.1). The manifest lists the run and can undo it. If it has no counts yet the stock will show as negative: count it first with STOCK TAKE.',
         ],
       },
     ],
   },
   {
     key: 'FACILITY',
-    title: 'FACILITY LOGS (17)',
-    group: 'DAILY WORK',
+    title: 'FACILITY LOGS (7.2, 7.5 TO 7.8)',
+    group: '7 ENGINEERING',
     module: 'FACILITY',
     what: 'Power cuts, water tests, upkeep, cleaning, checklists and reminders.',
     blocks: [
+      {
+        h: 'ITS STATIONS',
+        text: ['Five stations on ENGINEERING open this screen. Each one shows only its own tabs.'],
+        items: [
+          ['7.2 POWER CUTS', 'The POWER CUTS tab.'],
+          ['7.5 WATER', 'The WATER tab.'],
+          ['7.6 UPKEEP', 'The MAINTENANCE and CLEANING tabs.'],
+          ['7.7 CHECKLISTS', 'The CHECKLISTS tab.'],
+          ['7.8 REMINDERS', 'The STATUS, REMINDERS and GUESSES tabs.'],
+        ],
+      },
       {
         h: 'THE TABS',
         items: [
@@ -165,7 +222,7 @@ export const FARM: GSection[] = [
       {
         h: 'WHEN THE POWER GOES OUT',
         steps: [
-          'The moment the grid fails press POWER WENT OUT NOW. Press it on the VITALS screen too: both do the same.',
+          'The moment the grid fails press POWER WENT OUT NOW. Press it on POWER GRID (7.1) too: both do the same.',
           'If you start the generator press GENERATOR STARTED NOW. Press GENERATOR STOPPED NOW when it stops. (Before a cut the screen offers GENERATOR TEST STARTED NOW instead, to log a test run.)',
           'When the grid comes back press POWER IS BACK NOW.',
           'Add fuel used, what was affected, and any losses.',
@@ -181,30 +238,42 @@ export const FARM: GSection[] = [
   },
   {
     key: 'SPECIMEN',
-    title: 'SPECIMEN FILES (1)',
-    group: 'GROW',
+    title: 'SPECIES FILES (3.5)',
+    group: '3 XENOLAB',
     module: 'SPECIMEN',
-    what: 'One file per species: how to grow it, with a turning wireframe model.',
+    what: 'One file per species: how to grow it, with a turning wireframe model. The screen is called SPECIMEN FILES.',
     blocks: [
       {
         h: 'HOW TO USE IT',
         steps: [
           'Tap a species in the list (on a phone use the strip at the top).',
+          'Watch the model grow from the cut to picking, one stage at a time. PAUSE stops it and PLAY starts it again. The stage keys under it jump to a stage, and the growth bar scrubs through it.',
+          'Tap a label on the model to light up that part and read about it under the model. LABELS hides them.',
           'Read the tabs: OVERVIEW, CULTIVATION, TIMELINE, CLIMATE, YIELD, HAZARDS, NOTES, SOURCES.',
           'Tap WHY? beside a number to see where it came from.',
           'On OVERVIEW the file shows the strains you hold and the contaminants to watch, each tappable.',
         ],
       },
-      { h: 'GOOD TO KNOW', text: ['The model turns slowly on purpose. Numbers marked as context come from other conditions than your farm. Where sources differ the standard figure is given first.'] },
+      { h: 'GOOD TO KNOW', text: ['The model turns slowly on purpose. Drag it sideways to turn it. The ▲ and ▼ keys under it tilt the view, from just under the caps to straight overhead (with a mouse you can also drag up and down). On a phone, swiping up or down over the model scrolls the page as usual. Double-tap the model to go back to the usual angle. TUNE > WIREFRAMES makes the models brighter or dimmer. A dashed label line means that part is on the far side. With reduced motion on, it stays still on the picking picture until you press PLAY. Numbers marked as context come from other conditions than your farm. Where sources differ the standard figure is given first.'] },
     ],
   },
   {
     key: 'XENO',
-    title: 'XENOGENETICS (5)',
-    group: 'GROW',
+    title: 'XENOGENETICS (3.1 TO 3.4)',
+    group: '3 XENOLAB',
     module: 'XENO',
     what: 'Strains, cultures, the culture bank, lineage, the planner and labels.',
     blocks: [
+      {
+        h: 'ITS STATIONS',
+        text: ['Four stations on XENOLAB open this screen. Each one shows only its own tabs.'],
+        items: [
+          ['3.1 STRAIN REGISTRY', 'The STRAINS and LINEAGE tabs.'],
+          ['3.2 CULTURE BANK', 'The BANK tab.'],
+          ['3.3 CULTURE STOCK', 'The STOCK and LABELS tabs.'],
+          ['3.4 SPAWN PLANNER', 'The PLANNER tab.'],
+        ],
+      },
       {
         h: 'WORDS TO KNOW',
         items: [
@@ -238,8 +307,8 @@ export const FARM: GSection[] = [
   },
   {
     key: 'HAZARD',
-    title: 'HAZARD INDEX (6)',
-    group: 'GROW',
+    title: 'HAZARD INDEX (3.6)',
+    group: '3 XENOLAB',
     module: 'HAZARD',
     what: 'Contaminants, pests and faults: how to spot, cause, treat and prevent.',
     blocks: [
@@ -269,10 +338,10 @@ export const FARM: GSection[] = [
   },
   {
     key: 'PROPULSION',
-    title: 'PROPULSION: COOK LOG (7)',
-    group: 'GROW',
+    title: 'STEAM COOKS (2.4)',
+    group: '2 GROW DECK',
     module: 'PROPULSION',
-    what: 'The steam and sterilization log with temperature curves and a verdict.',
+    what: 'The steam and sterilization log with temperature curves and a verdict. The screen is called PROPULSION.',
     blocks: [
       {
         h: 'LOG A RUN',
@@ -293,15 +362,15 @@ export const FARM: GSection[] = [
           ['TARGETS', 'The targets and where they came from.'],
         ],
       },
-      { h: 'GOOD TO KNOW', text: ['Targets marked GUESS - REVIEW are the app\'s guesses. Check them against your own procedure.'] },
+      { h: 'GOOD TO KNOW', text: ['Targets marked GUESS - REVIEW are the app\'s guesses. Check them against your own procedure.', 'CURVE, READINGS and SHEET show one run. With no run picked they say so and offer the latest run.'] },
     ],
   },
   {
     key: 'VITALS',
-    title: 'VITALS (2)',
-    group: 'ROOMS AND POWER',
+    title: 'POWER GRID (7.1)',
+    group: '7 ENGINEERING',
     module: 'VITALS',
-    what: 'The power board: breakers against what the supply can carry.',
+    what: 'The power board: breakers against what the supply can carry. The screen is called VITALS.',
     blocks: [
       {
         h: 'HOW TO USE IT',
@@ -317,7 +386,7 @@ export const FARM: GSection[] = [
         h: 'THE SECTIONS',
         items: [
           ['BUDGET', 'Amps and watts on, against the 200 A service or the generator.'],
-          ['POWER CUTS', 'Buttons for a cut in progress. Same as FACILITY LOGS.'],
+          ['POWER CUTS', 'Buttons for a cut in progress. Same as POWER CUTS (7.2).'],
           ['RULES', 'Things the board checks, like linked breakers.'],
           ['PRESETS', 'One-tap sets of breakers.'],
           ['BREAKER BOX', 'Every breaker by its slot number in the box behind incubation.'],
@@ -329,8 +398,8 @@ export const FARM: GSection[] = [
   },
   {
     key: 'DECK',
-    title: 'DECK PLAN (3)',
-    group: 'ROOMS AND POWER',
+    title: 'DECK PLAN (7.3)',
+    group: '7 ENGINEERING',
     module: 'DECK',
     what: 'The floor plan with the rooms, their equipment and set points.',
     blocks: [
@@ -338,15 +407,15 @@ export const FARM: GSection[] = [
         h: 'HOW TO USE IT',
         steps: ['Tap a room on the plan, or in the list.', 'Under the plan you see that room\'s SET POINTS, EQUIPMENT, CIRCUITS and INVENTORY.', 'OPEN VITALS or OPEN CARGO jump to the power board or the stock list.'],
       },
-      { h: 'GOOD TO KNOW', text: ['Each room also shows its live climate and any alarm (from ATMOSPHERICS). The plan is drawn from the real floor plan. Room names and some equipment placements are guesses until confirmed.'] },
+      { h: 'GOOD TO KNOW', text: ['Each room also shows its live climate and any alarm (from LIFE SUPPORT, 7.4). The plan is drawn from the real floor plan. Room names and some equipment placements are guesses until confirmed.'] },
     ],
   },
   {
     key: 'ATMOS',
-    title: 'ATMOSPHERICS (18)',
-    group: 'ROOMS AND POWER',
+    title: 'LIFE SUPPORT (7.4)',
+    group: '7 ENGINEERING',
     module: 'ATMOS',
-    what: 'Room temperature, humidity and CO2: readings, graphs and alarms.',
+    what: 'Room temperature, humidity and CO2: readings, graphs and alarms. The screen is called ATMOSPHERICS.',
     blocks: [
       {
         h: 'THE TABS',
@@ -369,7 +438,11 @@ export const FARM: GSection[] = [
       },
       {
         h: 'GOOD TO KNOW',
-        text: ['Full automatic sensor hookup waits until the farm is built and a bridge computer is set up. For now readings come from you, a CSV file or the mock test.', 'The alarm limits and delays are GUESSES until you confirm them.'],
+        text: [
+          'Full automatic sensor hookup waits until the farm is built and a bridge computer is set up. For now readings come from you, a CSV file or the mock test.',
+          'A graph line breaks only where readings stop for much longer than usual. A reading with none near it shows as a dot, so hand readings always show.',
+          'The alarm limits and delays are GUESSES until you confirm them.',
+        ],
       },
     ],
   },

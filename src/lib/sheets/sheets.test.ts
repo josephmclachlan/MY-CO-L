@@ -453,9 +453,11 @@ describe('mock trial: a week of farm records in the sheet', () => {
 
   it('history and readings tabs are windows, read only', async () => {
     const f = await farm({ readings: true, readingDays: 1, historyMax: 3 })
+    // Reading times are set from the test clock (fixed dates went stale a day after they were written).
+    const ago = (h: number) => new Date(f.clock().getTime() - h * 3600000).toISOString()
     await f.st.put('sensor_readings', [
-      { id: 'r-old', room_id: 'fruiting', place: 'fruiting', taken_at: new Date(f.clock().getTime() - 3 * 86400000).toISOString(), temp_c: 16 },
-      { id: 'r-new', room_id: 'fruiting', place: 'fruiting', taken_at: new Date(f.clock().getTime() - 3600000).toISOString(), temp_c: 16.4 },
+      { id: 'r-old', room_id: 'fruiting', place: 'fruiting', taken_at: ago(6 * 24), temp_c: 16 },
+      { id: 'r-new', room_id: 'fruiting', place: 'fruiting', taken_at: ago(1), temp_c: 16.4 },
     ])
     await f.sync.run()
     expect(f.ss.tab('Sensor readings').dataRows()).toBe(1)

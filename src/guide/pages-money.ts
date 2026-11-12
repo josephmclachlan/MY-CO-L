@@ -1,43 +1,59 @@
 import type { GSection } from './content'
 
-// Money screens (owner only) and the tools and reference screens.
+// Money screens (owner only), the bridge tools and the mainframe screens. Each page names the stations that open its screen.
 export const MONEY: GSection[] = [
   {
     key: 'LEDGER',
-    title: 'LEDGER (8)',
-    group: 'MONEY',
+    title: 'LEDGER (6.5 TO 6.8)',
+    group: '6 BURSAR',
     module: 'LEDGER',
     what: 'What a block costs, with electricity bills, hours and every price in one place.',
     blocks: [
       {
-        h: 'THE PAGES',
+        h: 'ITS STATIONS',
+        text: ['Four stations on BURSAR open this screen. Each one opens its own page of it.'],
         items: [
-          ['OVERVIEW + PLAN WEEK', 'Cost of goods: what one block and one kilogram cost, split into parts, and the cost of the planned week.'],
-          ['ICE BILLS', 'Type in each electricity bill. The app checks the bill against the ICE tariff.'],
-          ['LABOUR HOURS', 'Log hours worked. They count toward cost when labour is switched on.'],
-          ['PRICES + COSTS', 'Every price and cost the app uses: sale price per kg, electricity tariff, labour rate, wear. Blank means the built-in number.'],
+          ['6.5 COST OF GOODS', 'The OVERVIEW + PLAN WEEK page: what one block and one kilogram cost, split into parts, and the cost of the planned week.'],
+          ['6.6 POWER BILLS', 'The ICE BILLS page. Type in each electricity bill. The app checks the bill against the ICE tariff.'],
+          ['6.7 LABOUR', 'The LABOUR HOURS page. Log hours worked. They count toward cost when labour is switched on.'],
+          ['6.8 PRICE BOOK', 'Every price and cost the app uses: sale price per kg, electricity tariff, labour rate, wear, the shelf life of fresh mushrooms and the exchange rate. Blank means the built-in number.'],
+        ],
+      },
+      {
+        h: 'THE EXCHANGE RATE',
+        text: [
+          'There is one exchange rate for the whole app, set in the PRICE BOOK. When online the app fetches the day\'s market rate. A rate you type for a day wins over the fetched one: use it for the rate your bank gave.',
+          'Every money record keeps the rate of its own day, so old figures never change when the rate does.',
         ],
       },
       {
         h: 'TYPE AN ELECTRICITY BILL',
-        steps: ['Open ICE BILLS.', 'Type the month, kWh used, billed kW (demand) and the total in colones.', 'Press SAVE BILL. Room energy in the cost uses real bills for the months you typed.'],
+        steps: ['Open POWER BILLS (6.6).', 'Type the month, kWh used, billed kW (demand) and the total in colones.', 'Press SAVE BILL. Room energy in the cost uses real bills for the months you typed.'],
       },
-      { h: 'GOOD TO KNOW', text: ['Money is stored in colones only. US dollars are worked out at the rate saved for each record\'s own day, so old figures never change when the rate does.', 'Owner only.'] },
+      { h: 'GOOD TO KNOW', text: ['Money is stored in colones only. US dollars are worked out at the rate saved for each record\'s own day.', 'Owner only.'] },
     ],
   },
   {
     key: 'TRADE',
-    title: 'TRADE (9)',
-    group: 'MONEY',
+    title: 'TRADE (5.1 TO 5.3)',
+    group: '5 TRADE DOCK',
     module: 'TRADE',
     what: 'Record sales and see totals and margin.',
     blocks: [
       {
+        h: 'ITS STATIONS',
+        items: [
+          ['5.1 NEW SALE', 'The NEW SALE tab.'],
+          ['5.2 SALES LOG', 'The SALES LOG, TOTALS + MARGIN and GUESSES tabs.'],
+          ['5.3 BUYERS', 'The BUYERS tab.'],
+        ],
+      },
+      {
         h: 'RECORD A SALE',
         steps: [
-          'Open NEW SALE.',
-          'Pick or type the BUYER, the channel (MARKET, RESTAURANT, SHOP, DIRECT, DELIVERY, OTHER), the species and FRESH or DRIED.',
-          'Type the weight in KG and the grade. The price per kg box may be empty and show BUILT-IN with a price: leave it for that price, or type your own if this sale differs. Set the built-in prices in PRICES + COSTS.',
+          'Open NEW SALE (5.1).',
+          'Pick or type the BUYER, the channel (MARKET, RESTAURANT, SHOP, DIRECT, DELIVERY, OTHER), the species and FRESH or DRIED. Turkey tail is sold dried, so picking it switches to DRIED.',
+          'Type the weight in KG and the grade. The price per kg box may be empty and show BUILT-IN with a price: leave it for that price, or type your own if this sale differs. Set the built-in prices in PRICE BOOK.',
           'Optionally type the lot codes (B1020 L1022). They are what lets TRACE find who got a lot.',
           'Choose PAID ON DELIVERY or NOT PAID YET.',
           'Press SAVE SALE. UNDO reverses it.',
@@ -53,16 +69,23 @@ export const MONEY: GSection[] = [
           ['GUESSES', 'Things the app guessed.'],
         ],
       },
-      { h: 'GOOD TO KNOW', text: ['Every buyer pays cash on delivery. A sale marked NOT PAID YET goes onto MONEY and puts that buyer on hold: the app warns you on the next sale and on the pick list, it does not block.'] },
+      { h: 'GOOD TO KNOW', text: ['Every buyer pays cash on delivery. A sale marked NOT PAID YET goes onto MONEY OWED (5.6) and puts that buyer on hold: the app warns you on the next sale and on the pick list, it does not block.'] },
     ],
   },
   {
     key: 'ORDERS',
-    title: 'STANDING ORDERS (15)',
-    group: 'MONEY',
+    title: 'STANDING ORDERS (5.4, 5.5)',
+    group: '5 TRADE DOCK',
     module: 'ORDERS',
     what: 'Regular weekly orders, the harvest forecast, the pick list and the WhatsApp price list.',
     blocks: [
+      {
+        h: 'ITS STATIONS',
+        items: [
+          ['5.4 STANDING ORDERS', 'The STANDING ORDERS, HARVEST FORECAST, PICK + PACK LIST and GUESSES tabs.'],
+          ['5.5 PRICE LIST', 'The PRICE LIST (WHATSAPP) tab.'],
+        ],
+      },
       {
         h: 'THE TABS',
         items: [
@@ -77,24 +100,38 @@ export const MONEY: GSection[] = [
         h: 'ADD A STANDING ORDER',
         steps: ['Open STANDING ORDERS.', 'Type the buyer, the species, KG per week and the price in colones per kg.', 'Choose the delivery days and the date it starts (a Monday).', 'Tick the confirmed box once the buyer has agreed.', 'Press SAVE STANDING ORDER.'],
       },
-      { h: 'GOOD TO KNOW', text: ['Changing kilograms, price or day starts a new version on a Monday and keeps the old one for the history. Delivering a line on the pick list makes a paid sale in TRADE.'] },
+      { h: 'GOOD TO KNOW', text: ['Changing kilograms, price or day starts a new version on a Monday and keeps the old one for the history. Delivering a line on the pick list makes a paid sale in the SALES LOG.'] },
     ],
   },
   {
     key: 'MONEY',
-    title: 'MONEY (16)',
-    group: 'MONEY',
+    title: 'MONEY (4.3, 5.6 TO 5.8, 6.1 TO 6.4)',
+    group: '6 BURSAR',
     module: 'MONEY',
     what: 'Who owes you, receipts, spending, profit and loss, cash flow and what-ifs.',
     blocks: [
+      {
+        h: 'ITS STATIONS',
+        text: ['This screen is split over three decks. Each station shows only its own tabs. Typing MONEY opens the BURSAR deck.'],
+        items: [
+          ['4.3 SURPLUS + WASTE', 'The WASTE LOG tab, on CARGO HOLD.'],
+          ['5.6 MONEY OWED', 'The MONEY OWED and RECEIPTS tabs, on TRADE DOCK.'],
+          ['5.7 SALES TRENDS', 'The SALES TRENDS tab.'],
+          ['5.8 TRACE + RECALL', 'The TRACE + RECALL tab.'],
+          ['6.1 PROFIT + LOSS', 'The PROFIT AND LOSS and GUESSES tabs, on BURSAR.'],
+          ['6.2 CASH FLOW', 'The 12-MONTH CASH FLOW and SPENDING + CASH IN tabs.'],
+          ['6.3 BUDGET', 'The BUDGET tab.'],
+          ['6.4 WHAT-IF', 'The WHAT-IF PLANNER tab.'],
+        ],
+      },
       {
         h: 'THE TABS',
         items: [
           ['MONEY OWED', 'Every unpaid sale by buyer and age. Mark one paid or written off.'],
           ['RECEIPTS', 'A numbered receipt for a sale, to copy and send.'],
           ['SPENDING + CASH IN', 'Money out, and money in that is not a sale (loans, workshops).'],
-          ['PROFIT AND LOSS', 'Income minus costs by month, in colones and US dollars.'],
-          ['12-MONTH CASH FLOW', 'Planned and real cash in and out for twelve months, month by month.'],
+          ['PROFIT AND LOSS', 'Income minus costs by month, in colones and US dollars, with a chart of profit for the last 12 months. Tap a month in the chart to open it.'],
+          ['12-MONTH CASH FLOW', 'Planned and real cash in and out for twelve months. The chart shows money in (solid) and out (hatched) each month, cash at the month end as a line, and your cash floor as a shaded band.'],
           ['BUDGET', 'The monthly lines you plan. PUT THESE IN ALL 12 MONTHS copies one month across.'],
           ['SALES TRENDS', 'Which species and buyers are rising or falling.'],
           ['WASTE LOG', 'Mushrooms dried, donated, composted or thrown out.'],
@@ -105,9 +142,9 @@ export const MONEY: GSection[] = [
       },
       {
         h: 'MARK A SALE PAID',
-        steps: ['Open MONEY OWED.', 'Tap the buyer\'s unpaid sale.', 'Type the day the cash came in and press the save button. The buyer comes off hold when nothing else is owed.'],
+        steps: ['Open MONEY OWED (5.6).', 'Tap the buyer\'s unpaid sale.', 'Type the day the cash came in and press the save button. The buyer comes off hold when nothing else is owed.'],
       },
-      { h: 'GOOD TO KNOW', text: ['Electricity in the books comes from ICE BILLS in LEDGER. Stock deliveries and logged hours count as spending unless you switch them off, so they are not counted twice. Owner only.'] },
+      { h: 'GOOD TO KNOW', text: ['Electricity in the books comes from POWER BILLS (6.6). Supply deliveries and labour hours count as spending unless you switch them off, so they are not counted twice. Owner only.'] },
     ],
   },
 ]
@@ -115,8 +152,8 @@ export const MONEY: GSection[] = [
 export const TOOLS: GSection[] = [
   {
     key: 'SEARCH',
-    title: 'SEARCH (19)',
-    group: 'TOOLS',
+    title: 'SEARCH (1.3)',
+    group: '1 BRIDGE',
     module: 'SEARCH',
     what: 'Find any record or screen, and change many records at once.',
     blocks: [
@@ -139,8 +176,8 @@ export const TOOLS: GSection[] = [
   },
   {
     key: 'ASK',
-    title: 'ASK THE LATTICE (22)',
-    group: 'TOOLS',
+    title: 'ASK MY/CO/L (1.2)',
+    group: '1 BRIDGE',
     module: 'ASK',
     what: 'The farm assistant: ask in plain words, or tell it something to save.',
     blocks: [
@@ -161,10 +198,10 @@ export const TOOLS: GSection[] = [
   },
   {
     key: 'HISTORY',
-    title: 'HISTORY (13)',
-    group: 'TOOLS',
+    title: 'EDIT HISTORY (8.3)',
+    group: '8 MAINFRAME',
     module: 'HISTORY',
-    what: 'Every change, who made it, UNDO, and the saving status.',
+    what: 'Every change, who made it, UNDO, and the saving status. The screen is called HISTORY.',
     blocks: [
       {
         h: 'THE PAGES',
@@ -185,10 +222,10 @@ export const TOOLS: GSection[] = [
   },
   {
     key: 'DATA',
-    title: 'DATA (20)',
-    group: 'TOOLS',
+    title: 'DATA VAULT (8.4)',
+    group: '8 MAINFRAME',
     module: 'DATA',
-    what: 'Backups, spreadsheets and restoring.',
+    what: 'Backups, spreadsheets, restoring and the Google Sheet. The screen is called DATA.',
     blocks: [
       {
         h: 'MAKE A BACKUP',
@@ -220,16 +257,16 @@ export const TOOLS: GSection[] = [
   },
   {
     key: 'STAFF',
-    title: 'STAFF (21)',
-    group: 'TOOLS',
+    title: 'CREW ACCESS (8.5)',
+    group: '8 MAINFRAME',
     module: 'STAFF',
-    what: 'Who is using this device and what they may open.',
+    what: 'Who is using this device and what they may open. The screen is called STAFF.',
     blocks: [
       {
         h: 'THE ROLES',
         items: [
           ['OWNER', 'Sees everything.'],
-          ['STAFF', 'Logs the work and sees no money, history, data or textbook.'],
+          ['STAFF', 'Logs the work and sees no money, history, data or textbook. TRADE DOCK, BURSAR and the COLD STORE are hidden.'],
         ],
       },
       {
@@ -241,28 +278,28 @@ export const TOOLS: GSection[] = [
   },
   {
     key: 'MANUAL',
-    title: 'MANUAL: THE TEXTBOOK (11)',
-    group: 'TOOLS',
+    title: 'TEXTBOOK (8.2)',
+    group: '8 MAINFRAME',
     module: 'MANUAL',
     what: 'The growing textbook. Private copy only.',
     blocks: [
       {
         h: 'WHAT IT IS',
-        text: ['The textbook is the farm\'s own reference on growing. It is only in the owner\'s private copy of the app. On the public site this screen says MANUAL LOCKED. The WHY? buttons on other screens open the exact section a number came from.'],
+        text: ['The textbook is the farm\'s own reference on growing. The WHY? buttons on other screens open the exact section a number came from.'],
       },
       { h: 'HOW TO USE IT', steps: ['Pick a chapter or section in the contents.', 'Tap a link to jump. BACK returns you to where you were.'] },
     ],
   },
   {
     key: 'GUIDE',
-    title: 'USER GUIDE (23)',
-    group: 'TOOLS',
+    title: 'USER GUIDE (8.1)',
+    group: '8 MAINFRAME',
     module: 'GUIDE',
     what: 'This guide.',
     blocks: [
       {
         h: 'HOW TO USE IT',
-        steps: ['Pick a page from the list at the left (on a phone, from the picker at the top).', 'Or type a word in SEARCH THE GUIDE.', 'Type GUIDE on any screen to land on its page.', 'Tap OPEN THIS SCREEN to go to the screen the page is about.'],
+        steps: ['Pick a page from the list at the left (on a phone, from the picker at the top). The pages are grouped by deck.', 'Or type a word in SEARCH THE GUIDE.', 'Type GUIDE on any screen to land on its page. GUIDE 5.6 opens the page for station 5.6.', 'Tap OPEN THIS SCREEN (or OPEN THIS DECK) to go to the screen the page is about.'],
       },
       { h: 'GOOD TO KNOW', text: ['There is a copy of this guide as a plain file, docs/USER-MANUAL.md in the app\'s repository, for printing. It is made from the same text.'] },
     ],
@@ -309,7 +346,7 @@ export const MORE: GSection[] = [
       },
       {
         h: 'THE DATA LOOKS EMPTY ON A DIFFERENT DEVICE',
-        text: ['In local mode each device keeps its own records. Make a backup on the device that has them (DATA) and restore it on the other one.'],
+        text: ['In local mode each device keeps its own records. Make a backup on the device that has them (DATA VAULT, 8.4) and restore it on the other one.'],
       },
       {
         h: 'A BUTTON DOES NOTHING WHEN I TAP IT',
@@ -321,7 +358,7 @@ export const MORE: GSection[] = [
       },
       {
         h: 'THE SCREEN IS HARD TO READ',
-        text: ['Press F6 for CLEAN mode in sunlight, or F5 to change the colour, or open TUNE and lower the glass strength.'],
+        text: ['Press F6 for CLEAN mode in sunlight, or F5 to change the colour, or open TUNING (F3) and raise BRIGHTNESS or lower the glass strength. WIREFRAMES on the same screen brightens just the species models.'],
       },
       {
         h: 'THERE IS NO SOUND',

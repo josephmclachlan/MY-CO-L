@@ -83,7 +83,7 @@ function useCook() {
   const raw = useTable<CookRun>('cook_runs')
   const readings = useTable<CookReading>('cook_readings')
   const now = useNow()
-  const rt = useRates() // a rate change on PRICES + COSTS re-prices every run
+  const rt = useRates() // a rate change on PRICE BOOK re-prices every run
   const runs = useMemo(() => [...raw].sort((a, b) => (b.started_at ?? b.created_at ?? '').localeCompare(a.started_at ?? a.created_at ?? '')), [raw])
   const info = useMemo(() => {
     const m = new Map<string, RunInfo>()
@@ -96,7 +96,7 @@ function useCook() {
   return { store, runs, readings, info, now }
 }
 
-const rateNote = () => `ICE ENERGY ₡${rates().ice.energyCrcPerKwh}/KWH (SET ON LEDGER > PRICES + COSTS). BEFORE ${Math.round((rates().ice.tax - 1) * 100)}% TAXES AND THE DEMAND CHARGE.`
+const rateNote = () => `ICE ENERGY ₡${rates().ice.energyCrcPerKwh}/KWH (SET ON BURSAR > PRICE BOOK). BEFORE ${Math.round((rates().ice.tax - 1) * 100)}% TAXES AND THE DEMAND CHARGE.`
 const VERDICT_TEXT = { pending: 'OPEN', pass: 'PASS', fail: 'FAIL' } as const
 const STATUS_TEXT: Record<Status, string> = { pass: 'PASS', fail: 'FAIL', warn: 'WARN', short: 'SHORT', info: 'INFO', none: '--' }
 const crc = (n: number | null | undefined) => (n === null || n === undefined ? '--' : `₡${Math.round(n).toLocaleString('en-US')}`)
@@ -229,6 +229,19 @@ export function Propulsion({
           ))}
         </Select>
       </label>
+      {!run && (x.tab === 'CURVE' || x.tab === 'READINGS' || x.tab === 'SHEET') && (
+        // CURVE, READINGS and SHEET belong to one run: say so instead of quietly showing the overview.
+        <div className="ck-box ck-norun" role="status">
+          <div className="warn">
+            {x.tab} SHOWS ONE RUN. {d.runs.length ? 'PICK A RUN IN THE LIST ABOVE, OR OPEN THE LATEST.' : 'THERE ARE NO RUNS YET: START ONE BELOW.'}
+          </div>
+          {d.runs[0] && (
+            <button type="button" className="btn" data-tip="Open the newest run on this tab." onClick={() => (sound.chirp(), set({ sel: d.runs[0].id }))}>
+              OPEN THE LATEST: {dayShort(d.runs[0].started_at)} {KIND_LABEL[d.runs[0].kind]}
+            </button>
+          )}
+        </div>
+      )}
       {!run && x.tab !== 'TARGETS' && <Overview d={d} set={set} say={say} onOpenVitals={onOpenVitals} onPrint={() => setPrinting('blank')} />}
       {!run && x.tab === 'TARGETS' && <Targets />}
       {run && info && (

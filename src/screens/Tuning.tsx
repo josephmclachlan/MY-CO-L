@@ -17,6 +17,8 @@ type Test =
   | { kind: 'glitch' }
 
 const pct = (v: number) => `${Math.round(v * 100)}`
+/** Unmuting fades the volume up over about a tenth of a second, so a test waits this long (ms) and plays at full volume. */
+const WAKE_MS = 160
 
 /** Holds the drone on for as long as the WORKING bar is on screen. */
 function DroneTest() {
@@ -47,7 +49,7 @@ function WarbleTest() {
  * TUNE: every look and sound setting, each sound layer with a TEST button.
  * Each test puts something on screen at the same moment the sound plays.
  */
-export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onReplayBoot: () => void }) {
+export function Tuning({ onAlarm, onReplayBoot, onSay }: { onAlarm: () => void; onReplayBoot: () => void; onSay: (text: string) => void }) {
   const { settings, update, reset, sound } = useApp()
   const { look, sound: snd } = settings
   const { t: tt } = useT()
@@ -59,8 +61,40 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
 
   const setLook = <K extends keyof LookSettings>(k: K, v: LookSettings[K]) =>
     update((s) => ({ ...s, look: { ...s.look, [k]: v } }))
+  /** A glass slider: moving it while CLEAN MODE is on brings the glass back, so the change shows. */
+  const setGlass = (k: 'strength' | 'glow' | 'scanlines' | 'curve' | 'flicker' | 'noise', v: number) => {
+    if (look.clean) onSay(tt('CLEAN MODE OFF'))
+    update((s) => ({ ...s, look: { ...s.look, [k]: v, clean: false } }))
+  }
   const setSound = <K extends keyof SoundSettings>(k: K, v: SoundSettings[K]) =>
     update((s) => ({ ...s, sound: { ...s.sound, [k]: v } }))
+  /**
+   * Turn sound back on, in the sound engine too, so a TEST plays from this same tap.
+   * Returns how long the test should wait (ms) so it plays at full volume.
+   */
+  const wake = (extra: Partial<SoundSettings> = {}): number => {
+    if (snd.enabled && Object.entries(extra).every(([k, v]) => snd[k as keyof SoundSettings] === v)) return 0
+    sound.apply({ ...snd, ...extra, enabled: true })
+    update((s) => ({ ...s, sound: { ...s.sound, ...extra, enabled: true } }))
+    if (snd.enabled) return 0
+    onSay(tt('SOUND ON'))
+    return WAKE_MS
+  }
+  /** Run fn now, or after the wait wake() asked for. */
+  const after = (ms: number, fn: () => void) => (ms > 0 ? void window.setTimeout(fn, ms) : fn())
+  /** A level slider: moving it while muted (or with its layer off) turns the sound back on, and says so. */
+  const setLevel = (k: 'master' | 'typing' | 'chatter' | 'drone' | 'hum' | 'signals' | 'warble' | 'glitch' | 'ambience', v: number) => {
+    const said: string[] = []
+    if (!snd.enabled) said.push(tt('SOUND ON'))
+    if (k === 'glitch' && !snd.glitchOn) said.push('GLITCHES ON')
+    if (k === 'ambience' && !snd.ambienceOn) said.push('AMBIENCE ON')
+    if (said.length) onSay(said.join(' // '))
+    update((s) => ({
+      ...s,
+      sound: { ...s.sound, [k]: v, enabled: true, ...(k === 'glitch' ? { glitchOn: true } : k === 'ambience' ? { ambienceOn: true } : {}) },
+    }))
+  }
+  const runTest = (t: Test) => after(wake(), () => run(t))
 
   // Drone and test visuals stop after a few seconds.
   useEffect(() => {
@@ -70,12 +104,14 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
     return () => window.clearTimeout(timer)
   }, [test])
 
-  const signal = (text: string, fn: () => void) => {
-    fn()
-    run({ kind: 'signal', text })
-  }
+  const signal = (text: string, fn: () => void) =>
+    after(wake(), () => {
+      fn()
+      run({ kind: 'signal', text })
+    })
 
-  const disabled = !snd.enabled
+  const muted = !snd.enabled
+  const pctOf = (v: number) => `${Math.round(v * 100)}%`
 
   return (
     <div className="tune">
@@ -118,18 +154,22 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
             </button>
           ))}
         </div>
+        <Meter label="BRIGHTNESS" value={look.brightness} min={0.6} max={1.5} step={0.05} onChange={(v) => setLook('brightness', v)} format={pctOf} />
+        <Meter label="WIREFRAMES" value={look.models} min={0.5} max={2} step={0.05} onChange={(v) => setLook('models', v)} format={pctOf} />
+        <div className="dim tiny">BRIGHTNESS LIGHTS OR DIMS THE WHOLE SCREEN. WIREFRAMES BRIGHTENS ONLY THE SPECIES MODELS AND LEAVES THE REST OF THE SCREEN AS IT IS.</div>
         <div className="tune-row">
           <span className="lbl">CLEAN MODE</span>
           <button type="button" className={`btn ${look.clean ? 'on' : ''}`} onClick={() => setLook('clean', !look.clean)}>
             {look.clean ? 'ON // SUNLIGHT' : 'OFF'}
           </button>
         </div>
-        <Meter label="STRENGTH" value={look.strength} onChange={(v) => setLook('strength', v)} format={pct} disabled={look.clean} />
-        <Meter label="GLOW" value={look.glow} onChange={(v) => setLook('glow', v)} format={pct} disabled={look.clean} />
-        <Meter label="SCANLINES" value={look.scanlines} onChange={(v) => setLook('scanlines', v)} format={pct} disabled={look.clean} />
-        <Meter label="CURVE" value={look.curve} onChange={(v) => setLook('curve', v)} format={pct} disabled={look.clean} />
-        <Meter label="FLICKER" value={look.flicker} onChange={(v) => setLook('flicker', v)} format={pct} disabled={look.clean} />
-        <Meter label="GRAIN" value={look.noise} onChange={(v) => setLook('noise', v)} format={pct} disabled={look.clean} />
+        {look.clean && <div className="dim tiny tune-why">CLEAN MODE IS ON, SO THE GLASS EFFECTS BELOW ARE OFF. MOVING ANY OF THEM TURNS THE GLASS BACK ON.</div>}
+        <Meter label="STRENGTH" value={look.strength} onChange={(v) => setGlass('strength', v)} format={pct} />
+        <Meter label="GLOW" value={look.glow} onChange={(v) => setGlass('glow', v)} format={pct} />
+        <Meter label="SCANLINES" value={look.scanlines} onChange={(v) => setGlass('scanlines', v)} format={pct} />
+        <Meter label="CURVE" value={look.curve} onChange={(v) => setGlass('curve', v)} format={pct} />
+        <Meter label="FLICKER" value={look.flicker} onChange={(v) => setGlass('flicker', v)} format={pct} />
+        <Meter label="GRAIN" value={look.noise} onChange={(v) => setGlass('noise', v)} format={pct} />
         <Meter
           label="TEXT SIZE"
           value={look.textSize}
@@ -158,6 +198,7 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
             {snd.enabled ? 'ON' : 'MUTED'}
           </button>
         </div>
+        {muted && <div className="dim tiny tune-why">SOUND IS MUTED. MOVING A SLIDER OR PRESSING A TEST BUTTON TURNS IT BACK ON.</div>}
         <div className="tune-row">
           <span className="lbl">MODE</span>
           {(['CHATTER', 'TICK'] as const).map((m) => (
@@ -166,15 +207,15 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
             </button>
           ))}
         </div>
-        <Meter label="MASTER" value={snd.master} onChange={(v) => setSound('master', v)} format={pct} disabled={disabled} />
+        <Meter label="MASTER" value={snd.master} onChange={(v) => setLevel('master', v)} format={pct} />
 
-        <Meter label="TYPING" value={snd.typing} onChange={(v) => setSound('typing', v)} format={pct} disabled={disabled} />
+        <Meter label="TYPING" value={snd.typing} onChange={(v) => setLevel('typing', v)} format={pct} />
         <div className="tune-row">
           <span className="lbl" />
-          <button type="button" className="btn" disabled={disabled} onClick={() => run({ kind: 'typing' })}>
+          <button type="button" className="btn" onClick={() => runTest({ kind: 'typing' })}>
             TEST TYPING
           </button>
-          <button type="button" className="btn" disabled={disabled} onClick={() => run({ kind: 'readout' })}>
+          <button type="button" className="btn" onClick={() => runTest({ kind: 'readout' })}>
             TEST READOUT
           </button>
         </div>
@@ -188,54 +229,58 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
           ))}
         </div>
 
-        <Meter label="DATA CHATTER" value={snd.chatter} onChange={(v) => setSound('chatter', v)} format={pct} disabled={disabled} />
+        <Meter label="DATA CHATTER" value={snd.chatter} onChange={(v) => setLevel('chatter', v)} format={pct} />
         <div className="tune-row">
           <span className="lbl" />
-          <button type="button" className="btn" disabled={disabled} onClick={() => run({ kind: 'chatter' })}>
+          <button type="button" className="btn" onClick={() => runTest({ kind: 'chatter' })}>
             TEST CHATTER
           </button>
         </div>
         {out('chatter')}
 
-        <Meter label="DRONE" value={snd.drone} onChange={(v) => setSound('drone', v)} format={pct} disabled={disabled} />
+        <Meter label="DRONE" value={snd.drone} onChange={(v) => setLevel('drone', v)} format={pct} />
         <div className="tune-row">
           <span className="lbl" />
-          <button type="button" className="btn" disabled={disabled} onClick={() => run({ kind: 'drone' })}>
+          <button type="button" className="btn" onClick={() => runTest({ kind: 'drone' })}>
             TEST DRONE
           </button>
         </div>
         {out('drone')}
 
-        <Meter label="ROOM HUM" value={snd.hum} onChange={(v) => setSound('hum', v)} format={pct} disabled={disabled} />
+        <Meter label="ROOM HUM" value={snd.hum} onChange={(v) => setLevel('hum', v)} format={pct} />
 
-        <Meter label="SIGNALS" value={snd.signals} onChange={(v) => setSound('signals', v)} format={pct} disabled={disabled} />
+        <Meter label="SIGNALS" value={snd.signals} onChange={(v) => setLevel('signals', v)} format={pct} />
         <div className="tune-row">
           <span className="lbl" />
-          <button type="button" className="btn" disabled={disabled} onClick={() => signal('CONFIRMED', () => sound.confirm())}>
+          <button type="button" className="btn" onClick={() => signal('CONFIRMED', () => sound.confirm())}>
             CONFIRM
           </button>
-          <button type="button" className="btn" disabled={disabled} onClick={() => signal('ACCESS GRANTED', () => sound.granted())}>
+          <button type="button" className="btn" onClick={() => signal('ACCESS GRANTED', () => sound.granted())}>
             GRANTED
           </button>
-          <button type="button" className="btn" disabled={disabled} onClick={() => signal('SCREEN CHANGE', () => sound.chirp())}>
+          <button type="button" className="btn" onClick={() => signal('SCREEN CHANGE', () => sound.chirp())}>
             CHIRP
           </button>
-          <button type="button" className="btn" disabled={disabled} onClick={() => signal('POWER ON', () => sound.swoop())}>
+          <button type="button" className="btn" onClick={() => signal('POWER ON', () => sound.swoop())}>
             SWOOP
           </button>
-          <button type="button" className="btn" disabled={disabled} onClick={() => signal('ENTERING CORE', () => sound.whoosh())}>
+          <button type="button" className="btn" onClick={() => signal('ENTERING CORE', () => sound.whoosh())}>
             WHOOSH
           </button>
-          <button type="button" className="btn hazard" disabled={disabled} onClick={onAlarm}>
+          <button
+            type="button"
+            className="btn hazard"
+            onClick={() => after(wake(), onAlarm)}
+          >
             ALARM
           </button>
         </div>
         {test?.t.kind === 'signal' && test.t.text !== 'DEFAULTS RESTORED' && <TestOut test={test} />}
 
-        <Meter label="WARBLE" value={snd.warble} onChange={(v) => setSound('warble', v)} format={pct} disabled={disabled} />
+        <Meter label="WARBLE" value={snd.warble} onChange={(v) => setLevel('warble', v)} format={pct} />
         <div className="tune-row">
           <span className="lbl" />
-          <button type="button" className="btn" disabled={disabled} onClick={() => run({ kind: 'warble' })}>
+          <button type="button" className="btn" onClick={() => runTest({ kind: 'warble' })}>
             TEST WARBLE
           </button>
         </div>
@@ -243,32 +288,34 @@ export function Tuning({ onAlarm, onReplayBoot }: { onAlarm: () => void; onRepla
 
         <div className="tune-row">
           <span className="lbl">GLITCHES</span>
-          <button type="button" className={`btn ${snd.glitchOn ? 'on' : ''}`} disabled={disabled} onClick={() => setSound('glitchOn', !snd.glitchOn)}>
+          <button type="button" className={`btn ${snd.glitchOn ? 'on' : ''}`} onClick={() => (snd.glitchOn ? setSound('glitchOn', false) : void wake({ glitchOn: true }))}>
             {snd.glitchOn ? 'ON' : 'OFF'}
           </button>
           <button
             type="button"
             className="btn"
-            disabled={disabled || !snd.glitchOn}
-            onClick={() => {
-              sound.glitch()
-              run({ kind: 'glitch' })
-            }}
+            onClick={() =>
+              // one crackle at the GLITCH level; glitches stay as they are (on or off)
+              after(wake(), () => {
+                sound.testGlitch()
+                run({ kind: 'glitch' })
+              })
+            }
           >
             TEST GLITCH
           </button>
         </div>
         {out('glitch')}
-        <Meter label="GLITCH" value={snd.glitch} onChange={(v) => setSound('glitch', v)} format={pct} disabled={disabled || !snd.glitchOn} />
+        <Meter label="GLITCH" value={snd.glitch} onChange={(v) => setLevel('glitch', v)} format={pct} />
 
         <div className="tune-row">
           <span className="lbl">AMBIENCE</span>
-          <button type="button" className={`btn ${snd.ambienceOn ? 'on' : ''}`} disabled={disabled} onClick={() => setSound('ambienceOn', !snd.ambienceOn)}>
+          <button type="button" className={`btn ${snd.ambienceOn ? 'on' : ''}`} onClick={() => (snd.ambienceOn ? setSound('ambienceOn', false) : void wake({ ambienceOn: true }))}>
             {snd.ambienceOn ? 'ON' : 'OFF'}
           </button>
           <span className="dim">ROOM RUMBLE AND AIR HISS. BEST ON HEADPHONES OR SPEAKERS.</span>
         </div>
-        <Meter label="AMBIENCE" value={snd.ambience} onChange={(v) => setSound('ambience', v)} format={pct} disabled={disabled || !snd.ambienceOn} />
+        <Meter label="AMBIENCE" value={snd.ambience} onChange={(v) => setLevel('ambience', v)} format={pct} />
 
       </section>
 
