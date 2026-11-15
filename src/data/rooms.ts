@@ -63,7 +63,7 @@ export const ROOMS: Room[] = [
     rect: { x: 60, y: 320, w: 112, h: 280 },
     label: { x: 116, y: 500 },
     setPoints: [
-      { label: 'PLENUM AIR', value: '12-14 C' },
+      { label: 'PLENUM AIR', value: '16 C (THE LOWEST THE LENNOX UNITS GO)' },
       { label: 'RH', value: 'DO NOT HUMIDIFY' },
       { label: 'CO2', value: 'AT OR BELOW ~450 PPM' },
       { label: 'INTAKE', value: 'CLOUDLINE S10 ON THE CO2 METER' },
