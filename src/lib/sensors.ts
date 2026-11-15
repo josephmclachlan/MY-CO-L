@@ -1023,7 +1023,7 @@ export const SENSOR_GUESSES = [
   'Readings older than 12 hours are shown with their age but do not raise an alarm. An automatic sensor that sends nothing for 30 minutes is SILENT. If every automatic sensor goes silent at once, the alarm says power or internet may be down.',
   'The Govee cloud reports temperature in Fahrenheit (its own sample reads 79.52 next to 61.2% RH). The app turns it into Celsius. If the first real readings look wrong, switch the unit on FEEDS.',
   'Govee CSV dates: 03/04/2026 is read month first (as the Govee app writes), unless the file shows a day over 12 first. Times are taken as the farm clock.',
-  'Air conditioner checks are by hand until a Lennox feed is found (see FEEDS). Which Lennox app the mini-splits use is not known yet: Joseph to read the model number on the indoor units.',
+  'Air conditioner checks are by hand (see FEEDS). The mini-splits are Lennox LI-series units (36k LI036CI-180P332, 12k LI012CI-180P332-1, from the boxes 15 Nov 2026). Their phone app is Lennox Global, Wi-Fi only with the optional plug-in module, and it has no API. The lowest set point on these units is 16 C.',
   'Places: LAB, CULTURE FRIDGE, PACKING (the fruiting supply plenum), COLD ROOMS, INCUBATION, FRUITING, COOK ROOM, OUTSIDE. One place can have several sensors.',
   'Readings are not in the JSON backup file (they grow without limit). Use EXPORT READINGS CSV on GRAPHS for a copy.',
 ]

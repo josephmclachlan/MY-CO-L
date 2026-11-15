@@ -200,14 +200,14 @@ export const BOX: Circuit[] = [
   {
     id: 'c34', tag: '25-27', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
     name: 'LENNOX 36K BTU MINI-SPLIT #1 (PACKING)', short: 'LENNOX 36K #1',
-    note: 'Inverter. 3,600 W = 15 A typical cooling on the Lennox 36k submittal; it can peak near 24 A. 40 A breaker (Joseph, 8 Nov 2026), so #8 wire and a 40 A voltage protector.',
-    items: [it('lennox36a', 'Lennox 36k BTU mini-split #1', 1, 3600, 'packing')],
+    note: 'Lennox LI036CI-180P332 indoor (cat. 37B01) + LI036CO-180P332 outdoor (cat. 37B02), read off the boxes 15 Nov 2026. Inverter, cooling only, 208-230 V, set point 16-30 C (supplier submittal). The indoor unit is powered from the outdoor unit. 3,600 W = 15 A typical cooling (earlier Lennox 36k submittal). The same-size R-410A model LI036CO-180P432 lists MCA 24 A, max fuse 40 A, compressor 17.5 A, EER 2.4 (about 4,100 W at full load): the outdoor nameplate decides. 40 A breaker (Joseph, 8 Nov 2026), so #8 wire and a 40 A voltage protector.',
+    items: [it('lennox36a', 'Lennox 36k BTU mini-split #1 (LI036CI/CO-180P332)', 1, 3600, 'packing')],
   },
   {
     id: 'c56', tag: '26-28', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,
     name: 'LENNOX 36K BTU MINI-SPLIT #2 (PACKING)', short: 'LENNOX 36K #2',
     note: 'Same as #1. Stagger compressor starts.',
-    items: [it('lennox36b', 'Lennox 36k BTU mini-split #2', 1, 3600, 'packing')],
+    items: [it('lennox36b', 'Lennox 36k BTU mini-split #2 (LI036CI/CO-180P332)', 1, 3600, 'packing')],
   },
 ]
 
