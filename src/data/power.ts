@@ -188,14 +188,14 @@ export const BOX: Circuit[] = [
   {
     id: 'c78', tag: '21-23', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
     name: 'LENNOX 12K BTU MINI-SPLIT #1 (INCUBATION)', short: 'LENNOX 12K #1',
-    note: 'Indoor 37A88, outdoor 379A1. Lennox 12k submittals list 3.7 A typical (about 850 W), 6.3 A max and a 15 A max breaker. 1,000 W kept as the running figure.',
-    items: [it('lennox12a', 'Lennox 12k BTU mini-split #1 (37A88 / 379A1)', 1, 1000, 'incubation')],
+    note: 'Lennox LI012CI-180P332-1 indoor (LP series, cat. 39G42) + LI012CO-180P332-1 outdoor, read off the box 15 Nov 2026 (both incubation units, Joseph). Inverter, cooling only, set point 16-30 C. 1,000 W kept as the running figure until the outdoor nameplate is read; the same-size sister model LI012CO-180P432 lists 1,150 W normal, 1,350 W max, MCA 9 A.',
+    items: [it('lennox12a', 'Lennox 12k BTU mini-split #1 (LI012CI/CO-180P332-1)', 1, 1000, 'incubation')],
   },
   {
     id: 'c910', tag: '22-24', leg: 'B', v: 240, breaker: '15 A 2-POLE', wire: '#12 CU', cls: 'base', em: false,
     name: 'LENNOX 12K BTU MINI-SPLIT #2 (INCUBATION)', short: 'LENNOX 12K #2',
     note: 'Same as #1.',
-    items: [it('lennox12b', 'Lennox 12k BTU mini-split #2 (37A88 / 379A1)', 1, 1000, 'incubation')],
+    items: [it('lennox12b', 'Lennox 12k BTU mini-split #2 (LI012CI/CO-180P332-1)', 1, 1000, 'incubation')],
   },
   {
     id: 'c34', tag: '25-27', leg: 'B', v: 240, breaker: '40 A 2-POLE', wire: '#8 CU', cls: 'base', em: false,

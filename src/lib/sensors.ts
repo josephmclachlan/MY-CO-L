@@ -65,7 +65,7 @@ export type PlaceBands = Partial<Record<Measure, Band>>
 export const DEFAULT_BANDS: Record<PlaceId, PlaceBands> = {
   lab: { temp: { lo: 16, hi: 21 } },
   fridge: { temp: { lo: 1, hi: 4 } },
-  packing: { temp: { lo: 10, hi: 16 }, co2: { lo: null, hi: 600 } },
+  packing: { temp: { lo: 14, hi: 18 }, co2: { lo: null, hi: 600 } },
   coldroom: { temp: { lo: 1, hi: 4 } },
   incubation: { temp: { lo: 15, hi: 21 }, co2: { lo: null, hi: 4000 } },
   fruiting: { temp: { lo: 13, hi: 19 }, rh: { lo: 80, hi: 96 }, co2: { lo: null, hi: 1200 } },
@@ -77,7 +77,7 @@ export const DEFAULT_BANDS: Record<PlaceId, PlaceBands> = {
 export const TARGETS: Record<PlaceId, string> = {
   lab: 'AIR 18-19 C, POSITIVE PRESSURE',
   fridge: '1-4 C',
-  packing: 'PLENUM AIR 12-14 C, DO NOT HUMIDIFY, CO2 AT OR BELOW ~450 PPM',
+  packing: 'PLENUM AIR 16 C, DO NOT HUMIDIFY, CO2 AT OR BELOW ~450 PPM',
   coldroom: '1-4 C',
   incubation: 'AIR ~18 C, BLOCK CORES AT OR BELOW 21-22 C, CO2 EXHAUST ON AT 3,000 PPM',
   fruiting: 'AIR 16 C (14-17, MAX 18), RH 80-90%, CO2 EXHAUST ON 900 / OFF 600 PPM',
@@ -1018,7 +1018,7 @@ export function climateLine(list: Alarm[], placesWithData: number): { label: str
 }
 
 export const SENSOR_GUESSES = [
-  'Alarm bands. Taken from the farm\'s HVAC plan as written: culture fridge and cold rooms 1-4 C, incubation alarm at 21 C air, fruiting alarm at 19 C air, fruiting RH floor 80%. Working numbers (not in Joseph\'s files): lab 16-21 C, packing plenum 10-16 C, incubation floor 15 C, fruiting floor 13 C, fruiting RH ceiling 96%, CO2 ceilings packing 600, incubation 4,000, fruiting 1,200 ppm (the exhaust fans should hold 450, 3,000 and 900). Change them on SET POINTS.',
+  'Alarm bands. Taken from the farm\'s HVAC plan as written: culture fridge and cold rooms 1-4 C, incubation alarm at 21 C air, fruiting alarm at 19 C air, fruiting RH floor 80%. Working numbers (not in Joseph\'s files): lab 16-21 C, packing plenum 14-18 C (set point 16 C, the lowest the Lennox units accept), incubation floor 15 C, fruiting floor 13 C, fruiting RH ceiling 96%, CO2 ceilings packing 600, incubation 4,000, fruiting 1,200 ppm (the exhaust fans should hold 450, 3,000 and 900). Change them on SET POINTS.',
   'Alarm delay: a place must stay outside its band for 15 minutes (fridge and cold rooms 30, incubation 20) before it alarms, so a door opening does not ring. A reading typed by hand alarms at once: it is a spot check.',
   'Readings older than 12 hours are shown with their age but do not raise an alarm. An automatic sensor that sends nothing for 30 minutes is SILENT. If every automatic sensor goes silent at once, the alarm says power or internet may be down.',
   'The Govee cloud reports temperature in Fahrenheit (its own sample reads 79.52 next to 61.2% RH). The app turns it into Celsius. If the first real readings look wrong, switch the unit on FEEDS.',
